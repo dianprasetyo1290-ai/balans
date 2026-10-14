@@ -29,6 +29,6 @@ go run ./tools/lintconfig > .golangci.yml
 
 if [ -f "$root/web-erp/package.json" ]; then
   echo "→ tipe TypeScript web-erp"
-  (cd "$root/web-erp" && pnpm --silent generate:api)
+  (cd "$root/web-erp" && { [ -d node_modules ] || pnpm install --frozen-lockfile --silent; } && pnpm --silent generate:api)
 fi
 echo "Selesai."

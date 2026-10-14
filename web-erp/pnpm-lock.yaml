@@ -62,9 +62,6 @@ importers:
       react-hook-form:
         specifier: ^7.90.0
         version: 7.90.0(@types/react@19.3.0)(react@19.3.0)
-      shadcn:
-        specifier: ^4.21.4
-        version: 4.21.4
       sonner:
         specifier: ^2.0.8
         version: 2.0.8(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -147,6 +144,9 @@ importers:
       prettier-plugin-tailwindcss:
         specifier: ^0.8.1
         version: 0.8.1(prettier@3.9.10)
+      shadcn:
+        specifier: 4.21.4
+        version: 4.21.4
       typescript:
         specifier: ~6.0.2
         version: 6.0.3
