@@ -13,7 +13,7 @@ Monorepo Unified Business Platform Balans Nutrition: ERP back-office, Finance & 
 
 ## Prasyarat
 
-Go 1.27.0, Node 24.19.0, pnpm 10.34.6, Docker. `golangci-lint` v2.14.0 untuk lint lokal. `sqlc` tidak wajib dipasang: di Windows dijalankan lewat image Docker oleh `scripts/generate.sh`.
+Go 1.27.2, Node 24.19.0, pnpm 10.34.6, Docker. `golangci-lint` v2.14.0 untuk lint lokal. `sqlc` tidak wajib dipasang: di Windows dijalankan lewat image Docker oleh `scripts/generate.sh`.
 
 ## Menjalankan lokal
 

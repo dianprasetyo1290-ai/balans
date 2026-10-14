@@ -1,6 +1,6 @@
 # Image backend berisi seluruh binary (api, worker, migrate, cutover, storefront); proses dipilih lewat
 # command di Compose. Versi Go dikunci sama dengan go.mod (Technical Guideline 3.1, 14.3).
-FROM golang:1.27.0-alpine AS build
+FROM golang:1.27.2-alpine AS build
 WORKDIR /src
 ENV CGO_ENABLED=0 GOOS=linux GOFLAGS=-trimpath
 
