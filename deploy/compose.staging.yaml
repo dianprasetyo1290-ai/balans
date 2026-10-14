@@ -1,0 +1,44 @@
+# Override staging: sumber daya kecil (total ± 1 GB) agar tidak berebut dengan production, plus Mailpit
+# untuk email mock (Technical Guideline 5.10, 14.1). Staging dapat dihentikan saat production butuh sumber daya.
+
+services:
+  postgres:
+    command:
+      - postgres
+      - -c
+      - shared_buffers=128MB
+      - -c
+      - max_connections=40
+    mem_limit: 512m
+
+  api:
+    environment:
+      GOMEMLIMIT: 200MiB
+    mem_limit: 256m
+    networks:
+      edge:
+        aliases: [staging-api]
+
+  worker:
+    environment:
+      GOMEMLIMIT: 160MiB
+    mem_limit: 192m
+
+  web:
+    mem_limit: 64m
+    networks:
+      edge:
+        aliases: [staging-web]
+
+  mailpit:
+    image: axllent/mailpit:v1.27
+    environment:
+      MP_WEBROOT: /_mock/mail/
+      MP_MAX_MESSAGES: "2000"
+    restart: unless-stopped
+    mem_limit: 64m
+    networks:
+      internal:
+        aliases: [mailpit]
+      edge:
+        aliases: [staging-mailpit]

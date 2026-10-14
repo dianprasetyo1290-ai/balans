@@ -1,0 +1,65 @@
+openapi: 3.0.3
+info:
+  title: Balans Platform API
+  version: 0.0.0
+  description: |
+    Kontrak API back-office Balans. File ini adalah sumber kebenaran (Technical Guideline 8.1).
+    Server Go dan client TypeScript digenerate dari spec ini. Path dipecah per modul di folder paths/.
+servers:
+  - url: /
+security:
+  - bearerAuth: []
+tags:
+  - name: system
+    description: Kesehatan proses dan informasi sistem
+  - name: sales
+    description: Penjualan, termasuk webhook payment gateway
+  - name: logistics
+    description: Pengiriman, termasuk webhook kurir
+  - name: identity
+    description: Sesi, pengguna, dan permission (R1.1)
+  - name: catalog
+    description: Master produk, packaging, material, bundling (R1.1)
+  - name: warehouse
+    description: Gudang dan lokasi stok (R1.1)
+paths:
+  /healthz:
+    $ref: "./paths/system.yaml#/healthz"
+  /readyz:
+    $ref: "./paths/system.yaml#/readyz"
+  /api/v1/system/info:
+    $ref: "./paths/system.yaml#/systemInfo"
+  /api/v1/webhooks/midtrans:
+    $ref: "./paths/sales.yaml#/midtransWebhook"
+  /api/v1/webhooks/biteship:
+    $ref: "./paths/logistics.yaml#/biteshipWebhook"
+  /api/v1/auth/login:
+    $ref: "./paths/identity.yaml#/login"
+  /api/v1/auth/refresh:
+    $ref: "./paths/identity.yaml#/refresh"
+  /api/v1/auth/logout:
+    $ref: "./paths/identity.yaml#/logout"
+  /api/v1/me:
+    $ref: "./paths/identity.yaml#/me"
+  /api/v1/users:
+    $ref: "./paths/identity.yaml#/users"
+  /api/v1/products:
+    $ref: "./paths/catalog.yaml#/products"
+  /api/v1/products/{id}:
+    $ref: "./paths/catalog.yaml#/product"
+  /api/v1/warehouses:
+    $ref: "./paths/warehouse.yaml#/warehouses"
+  /api/v1/locations:
+    $ref: "./paths/warehouse.yaml#/locations"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Access token EdDSA 15 menit (Technical Guideline 9.1).
+  schemas:
+    Problem:
+      $ref: "./components/problem.yaml#/Problem"
+    ErrorCode:
+      $ref: "./components/problem.yaml#/ErrorCode"

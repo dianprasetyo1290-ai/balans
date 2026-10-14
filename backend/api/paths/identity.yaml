@@ -1,0 +1,198 @@
+login:
+  post:
+    operationId: login
+    security: []
+    tags: [identity]
+    summary: Masuk dengan email dan password
+    description: |
+      Mengembalikan access token (15 menit, disimpan di memori FE) dan memasang refresh token di cookie
+      HttpOnly `Path=/api/v1/auth` (Technical Guideline 9.1). Gagal login selalu `AUTH_INVALID_CREDENTIALS`;
+      5 kali gagal dalam 15 menit → `AUTH_ACCOUNT_LOCKED`. Role ber-MFA → `AUTH_MFA_REQUIRED` lalu kirim ulang dengan `totpCode`.
+      Tidak memakai Idempotency-Key.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/LoginRequest"
+    responses:
+      "200":
+        description: Berhasil masuk
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccessToken"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+refresh:
+  post:
+    operationId: refreshSession
+    security: []
+    tags: [identity]
+    summary: Memperbarui access token dengan refresh token (rotasi)
+    description: Refresh token lama langsung tidak berlaku. Pemakaian ulang token lama mencabut seluruh keluarga sesi.
+    responses:
+      "200":
+        description: Access token baru
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccessToken"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+logout:
+  post:
+    operationId: logout
+    tags: [identity]
+    summary: Keluar dan mencabut sesi aktif
+    responses:
+      "204":
+        description: Sesi dicabut
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+me:
+  get:
+    operationId: getCurrentUser
+    tags: [identity]
+    summary: User yang sedang login beserta permission
+    description: Permission dimuat server-side dan tidak disimpan di token (Technical Guideline 9.1).
+    responses:
+      "200":
+        description: Data user
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CurrentUser"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+users:
+  get:
+    operationId: listUsers
+    tags: [identity]
+    summary: Daftar pengguna
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - $ref: "../components/common.yaml#/parameters/Sort"
+      - $ref: "../components/common.yaml#/parameters/Search"
+    responses:
+      "200":
+        description: Daftar pengguna
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createUser
+    tags: [identity]
+    summary: Membuat pengguna dan mengirim undangan atur password
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UserInput"
+    responses:
+      "201":
+        description: Pengguna dibuat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 1
+        totpCode:
+          type: string
+          pattern: "^[0-9]{6}$"
+    AccessToken:
+      type: object
+      required: [accessToken, expiresAt]
+      properties:
+        accessToken:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+    CurrentUser:
+      type: object
+      required: [id, email, fullName, roles, permissions]
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+        fullName:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+        permissions:
+          type: array
+          items:
+            type: string
+          example: [catalog.product.read, catalog.product.write]
+    UserInput:
+      type: object
+      required: [email, fullName, roleCodes]
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        fullName:
+          type: string
+          minLength: 1
+          maxLength: 120
+        roleCodes:
+          type: array
+          minItems: 1
+          items:
+            type: string
+        divisionId:
+          type: string
+          format: uuid
+    User:
+      allOf:
+        - $ref: "#/components/schemas/UserInput"
+        - $ref: "../components/common.yaml#/AuditFields"
+        - type: object
+          required: [id, isActive, isMfaEnabled]
+          properties:
+            id:
+              type: string
+              format: uuid
+            isActive:
+              type: boolean
+            isMfaEnabled:
+              type: boolean
+            lastLoginAt:
+              type: string
+              format: date-time
+    UserList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/User"

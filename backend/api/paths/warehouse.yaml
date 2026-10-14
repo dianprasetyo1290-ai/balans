@@ -1,0 +1,177 @@
+warehouses:
+  get:
+    operationId: listWarehouses
+    tags: [warehouse]
+    summary: Daftar gudang fisik
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - $ref: "../components/common.yaml#/parameters/Search"
+    responses:
+      "200":
+        description: Daftar gudang
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WarehouseList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createWarehouse
+    tags: [warehouse]
+    summary: Membuat gudang fisik beserta lokasi standarnya (WMS-01)
+    description: Lokasi Inbound, FG Non-Ecommerce, E-commerce Stock, Gudang Material, dan Gudang Retur dibuat otomatis (U-08).
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/WarehouseInput"
+    responses:
+      "201":
+        description: Gudang dibuat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Warehouse"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+locations:
+  get:
+    operationId: listLocations
+    tags: [warehouse]
+    summary: Daftar lokasi stok (internal dan eksternal)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - $ref: "../components/common.yaml#/parameters/Search"
+      - name: warehouseId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: locationType
+        in: query
+        schema:
+          $ref: "#/components/schemas/LocationType"
+    responses:
+      "200":
+        description: Daftar lokasi
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LocationList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createLocation
+    tags: [warehouse]
+    summary: Membuat lokasi (termasuk lokasi eksternal maklon, konsinyasi, buffer vending, mesin)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/LocationInput"
+    responses:
+      "201":
+        description: Lokasi dibuat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Location"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+components:
+  schemas:
+    LocationType:
+      type: string
+      enum: [inbound, finished_goods, ecommerce, material, returns, toll_manufacturer, consignment, vending_buffer, vending_machine]
+    WarehouseInput:
+      type: object
+      required: [code, name, address]
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 20
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        address:
+          type: string
+          maxLength: 500
+    Warehouse:
+      allOf:
+        - $ref: "#/components/schemas/WarehouseInput"
+        - $ref: "../components/common.yaml#/AuditFields"
+        - type: object
+          required: [id]
+          properties:
+            id:
+              type: string
+              format: uuid
+    WarehouseList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/Warehouse"
+    LocationInput:
+      type: object
+      required: [code, name, locationType]
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 30
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        locationType:
+          $ref: "#/components/schemas/LocationType"
+        warehouseId:
+          type: string
+          format: uuid
+          description: Wajib untuk lokasi internal; kosong untuk lokasi eksternal.
+        externalPartyType:
+          type: string
+          enum: [supplier, partner, vending_machine]
+        externalPartyId:
+          type: string
+          format: uuid
+    Location:
+      allOf:
+        - $ref: "#/components/schemas/LocationInput"
+        - $ref: "../components/common.yaml#/AuditFields"
+        - type: object
+          required: [id, isSellable, isActive]
+          properties:
+            id:
+              type: string
+              format: uuid
+            isSellable:
+              type: boolean
+              description: Stok di lokasi ini bisa dialokasikan ke penjualan.
+            isActive:
+              type: boolean
+    LocationList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/Location"

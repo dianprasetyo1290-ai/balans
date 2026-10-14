@@ -1,0 +1,79 @@
+Pagination:
+  type: object
+  description: Metadata pagination standar (Technical Guideline 8.2).
+  required: [page, pageSize, totalItems, totalPages]
+  properties:
+    page:
+      type: integer
+      minimum: 1
+    pageSize:
+      type: integer
+      minimum: 1
+      maximum: 200
+    totalItems:
+      type: integer
+      format: int64
+    totalPages:
+      type: integer
+AuditFields:
+  type: object
+  required: [createdAt, updatedAt, version]
+  properties:
+    createdAt:
+      type: string
+      format: date-time
+    updatedAt:
+      type: string
+      format: date-time
+    version:
+      type: integer
+      description: Dipakai optimistic locking; kirim kembali saat update (Technical Guideline 7.2).
+parameters:
+  Page:
+    name: page
+    in: query
+    schema:
+      type: integer
+      minimum: 1
+      default: 1
+  PageSize:
+    name: pageSize
+    in: query
+    schema:
+      type: integer
+      minimum: 1
+      maximum: 200
+      default: 50
+  Sort:
+    name: sort
+    in: query
+    description: Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`.
+    schema:
+      type: string
+  Search:
+    name: q
+    in: query
+    schema:
+      type: string
+  IdempotencyKey:
+    name: Idempotency-Key
+    in: header
+    required: true
+    description: UUID per percobaan submit (Technical Guideline 7.1).
+    schema:
+      type: string
+      format: uuid
+  Id:
+    name: id
+    in: path
+    required: true
+    schema:
+      type: string
+      format: uuid
+responses:
+  Problem:
+    description: Error standar (problem+json)
+    content:
+      application/problem+json:
+        schema:
+          $ref: "./problem.yaml#/Problem"

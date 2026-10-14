@@ -1,0 +1,37 @@
+# Image Postgres + WAL-G dibangun terpisah karena mengganti tagnya me-restart database. Tag baru
+# dipasang manual di POSTGRES_IMAGE_TAG pada /opt/balans/<lingkungan>.deploy saat jendela pemeliharaan.
+name: build-postgres
+
+on:
+  push:
+    branches: [main]
+    paths: ["deploy/postgres/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - id: meta
+        run: |
+          echo "registry=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
+          echo "tag=18.0-walg3.0.8-r${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v7
+        with:
+          context: deploy/postgres
+          push: true
+          tags: ${{ steps.meta.outputs.registry }}/balans-postgres:${{ steps.meta.outputs.tag }}
+      - name: Ringkasan
+        run: |
+          echo "Image siap: ${{ steps.meta.outputs.registry }}/balans-postgres:${{ steps.meta.outputs.tag }}" >> "$GITHUB_STEP_SUMMARY"

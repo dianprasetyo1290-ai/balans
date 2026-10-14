@@ -1,0 +1,7 @@
+package: http
+generate:
+  chi-server: true
+  models: true
+output: internal/logistics/http/api.gen.go
+output-options:
+  include-tags: [logistics]

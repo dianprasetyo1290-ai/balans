@@ -1,0 +1,62 @@
+# Caddy edge untuk erp.findyourbalans.com dan erp-staging.findyourbalans.com (D-28).
+# API dilayani dari host yang sama lewat /api sehingga CORS tidak dibuka (Technical Guideline 9.4).
+{
+	email {$ACME_EMAIL}
+}
+
+(security_headers) {
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(self), geolocation=(self), microphone=()"
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://*.ingest.sentry.io https://*.ingest.us.sentry.io; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+		-Server
+	}
+}
+
+(request_id) {
+	# Request ID dibuat di edge lalu diteruskan ke api (Technical Guideline 13).
+	request_header X-Request-ID {http.request.uuid}
+}
+
+{$PRODUCTION_HOST:erp.findyourbalans.com} {
+	import security_headers
+	encode zstd gzip
+
+	@backend path /api/* /healthz /readyz
+	handle @backend {
+		import request_id
+		reverse_proxy production-api:8080
+	}
+	handle {
+		reverse_proxy production-web:8080
+	}
+}
+
+{$STAGING_HOST:erp-staging.findyourbalans.com} {
+	import security_headers
+	encode zstd gzip
+	header X-Robots-Tag "noindex, nofollow"
+
+	# route menjaga urutan: health check dan webhook tidak melewati basic auth, sisanya wajib basic auth
+	# karena staging tidak dibuka untuk umum sebelum login tersedia di R1.1 (PRD Fase 0 bagian 4.2).
+	route {
+		request_header X-Request-ID {http.request.uuid}
+
+		@public path /healthz /readyz /api/v1/webhooks/*
+		reverse_proxy @public staging-api:8080
+
+		basic_auth {
+			{$STAGING_BASIC_AUTH_USER} {$STAGING_BASIC_AUTH_HASH}
+		}
+
+		@mail path /_mock/mail /_mock/mail/*
+		reverse_proxy @mail staging-mailpit:8025
+
+		@backend path /api/* /_mock /_mock/*
+		reverse_proxy @backend staging-api:8080
+
+		reverse_proxy staging-web:8080
+	}
+}

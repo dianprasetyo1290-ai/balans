@@ -1,0 +1,121 @@
+healthz:
+  get:
+    operationId: getHealth
+    security: []
+    tags: [system]
+    summary: Proses hidup
+    responses:
+      "200":
+        description: Proses berjalan
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HealthStatus"
+readyz:
+  get:
+    operationId: getReadiness
+    security: []
+    tags: [system]
+    summary: Siap menerima trafik (DB terhubung dan migrasi terbaru)
+    responses:
+      "200":
+        description: Siap
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReadinessStatus"
+      "503":
+        description: Belum siap
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReadinessStatus"
+systemInfo:
+  get:
+    operationId: getSystemInfo
+    security: []
+    tags: [system]
+    summary: Informasi versi, lingkungan, dan modul aktif
+    description: Dipakai halaman Tentang Sistem dan untuk menentukan menu modul yang tampil (Technical Guideline 14.5).
+    responses:
+      "200":
+        description: Informasi sistem
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SystemInfo"
+      "500":
+        description: Kesalahan sistem
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/problem.yaml#/Problem"
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [ok]
+    ReadinessStatus:
+      type: object
+      required: [status, checks]
+      properties:
+        status:
+          type: string
+          enum: [ready, not_ready]
+        checks:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReadinessCheck"
+    ReadinessCheck:
+      type: object
+      required: [name, status]
+      properties:
+        name:
+          type: string
+          example: database
+        status:
+          type: string
+          enum: [ok, failed]
+        detail:
+          type: string
+    SystemInfo:
+      type: object
+      required: [version, commit, environment, enabledModules, mockActive, serverTime, database]
+      properties:
+        version:
+          type: string
+          example: v1.0.0
+        commit:
+          type: string
+        environment:
+          type: string
+          enum: [local, staging, production]
+        enabledModules:
+          type: array
+          items:
+            type: string
+        mockActive:
+          type: boolean
+          description: True jika minimal satu adapter pihak ketiga memakai mock.
+        serverTime:
+          type: string
+          format: date-time
+        database:
+          $ref: "#/components/schemas/DatabaseInfo"
+    DatabaseInfo:
+      type: object
+      required: [status, schemaVersion, latestSchemaVersion]
+      properties:
+        status:
+          type: string
+          enum: [ok, failed]
+        schemaVersion:
+          type: integer
+          format: int64
+        latestSchemaVersion:
+          type: integer
+          format: int64

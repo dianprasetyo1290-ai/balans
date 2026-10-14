@@ -1,0 +1,68 @@
+# Tag v*.*.* → approval manual (GitHub Environment "production") → retag image yang sama dengan
+# staging tanpa build ulang → deploy.sh (backup, migrate, up, smoke, rollback otomatis)
+# (Technical Guideline 14.3, 14.5, 14.6). Rollback manual: jalankan workflow ini dengan tag versi sebelumnya.
+name: deploy-production
+
+on:
+  push:
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Tag versi yang sudah pernah dirilis, untuk rollback (mis. v1.0.0)
+        required: true
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io/${{ github.repository_owner }}
+
+# Deploy hanya berjalan setelah VPS siap: set variabel repo DEPLOY_ENABLED=true (Settings → Variables).
+jobs:
+  deploy:
+    if: vars.DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    environment:
+      name: production
+      url: https://erp.findyourbalans.com
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.version || github.ref }}
+      - id: meta
+        run: |
+          version="${{ inputs.version || github.ref_name }}"
+          [[ "$version" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::Versi harus semver vX.Y.Z"; exit 1; }
+          {
+            echo "version=$version"
+            echo "sha=$(git rev-parse HEAD | cut -c1-12)"
+            echo "registry=${REGISTRY,,}"
+          } >> "$GITHUB_OUTPUT"
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Retag image staging menjadi versi rilis
+        if: ${{ !inputs.version }}
+        run: |
+          for image in balans-api balans-web-erp; do
+            docker buildx imagetools create \
+              -t "${{ steps.meta.outputs.registry }}/$image:${{ steps.meta.outputs.version }}" \
+              "${{ steps.meta.outputs.registry }}/$image:${{ steps.meta.outputs.sha }}"
+          done
+      - name: Siapkan SSH
+        run: |
+          install -m 700 -d ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
+          echo "${{ secrets.VPS_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+      - name: Kirim konfigurasi deploy
+        run: rsync -az --delete deploy/ "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/balans/deploy/"
+      - name: Deploy
+        run: ssh "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" "bash /opt/balans/deploy/scripts/deploy.sh production ${{ steps.meta.outputs.version }}"

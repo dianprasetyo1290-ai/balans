@@ -1,0 +1,16 @@
+{{define "index.html"}}{{template "head" .}}
+<p>Halaman ini meniru pihak ketiga yang belum tersambung. Setiap simulasi dikirim ke endpoint asli sistem,
+sehingga jalur verifikasi signature, pencatatan webhook, dan job pemrosesan ikut teruji.</p>
+<ul>
+  {{if .HasPayment}}<li><a href="/_mock/payments">Pembayaran (Midtrans)</a> — buat transaksi uji lalu pilih Berhasil, Gagal, atau Kedaluwarsa.</li>{{end}}
+  {{if .HasShip}}<li><a href="/_mock/shipments">Pengiriman (Biteship)</a> — buat order uji lalu ubah status pengiriman.</li>{{end}}
+  {{if .HasEmail}}<li><a href="/_mock/mail/">Kotak Email (Mailpit)</a> — semua email sistem tertangkap di sini dan tidak dikirim keluar.</li>{{end}}
+</ul>
+{{if .HasEmail}}
+<h2>Kirim email uji</h2>
+<form method="post" action="/_mock/emails">
+  <input type="email" name="to" required placeholder="nama@findyourbalans.com" aria-label="Alamat email tujuan">
+  <button class="primary" type="submit">Kirim</button>
+</form>
+{{end}}
+{{template "foot" .}}{{end}}

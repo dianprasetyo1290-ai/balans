@@ -1,0 +1,64 @@
+# Override production: batas memori sesuai Technical Guideline 14.1, tuning Postgres, WAL archiving,
+# dan backup harian ke object storage di luar VPS (14.7).
+
+services:
+  postgres:
+    command:
+      - postgres
+      - -c
+      - shared_buffers=2GB
+      - -c
+      - effective_cache_size=4GB
+      - -c
+      - work_mem=16MB
+      - -c
+      - max_connections=100
+      - -c
+      - wal_level=replica
+      - -c
+      - archive_mode=on
+      - -c
+      - archive_command=wal-g wal-push %p
+      - -c
+      - archive_timeout=60
+    shm_size: 2gb
+    mem_limit: 3g
+
+  api:
+    environment:
+      GOMEMLIMIT: 400MiB
+    mem_limit: 512m
+    networks:
+      edge:
+        aliases: [production-api]
+
+  worker:
+    environment:
+      GOMEMLIMIT: 400MiB
+    mem_limit: 512m
+
+  web:
+    mem_limit: 128m
+    networks:
+      edge:
+        aliases: [production-web]
+
+  backup:
+    image: ${REGISTRY}/balans-postgres:${POSTGRES_IMAGE_TAG}
+    env_file: ${ENV_FILE}
+    command: ["backup-loop"]
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      # Backup membaca data directory yang sama dengan Postgres (WAL-G backup-push).
+      - postgres-data:/var/lib/postgresql
+    mem_limit: 256m
+    networks:
+      - internal

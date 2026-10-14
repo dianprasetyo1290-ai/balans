@@ -1,0 +1,58 @@
+Problem:
+  type: object
+  description: Format error RFC 7807 (Technical Guideline 8.3). Field code adalah kontrak stabil untuk FE.
+  required: [type, title, status, code, detail]
+  properties:
+    type:
+      type: string
+    title:
+      type: string
+    status:
+      type: integer
+    code:
+      $ref: "#/ErrorCode"
+    detail:
+      type: string
+      description: Pesan Bahasa Indonesia yang aman ditampilkan ke user.
+    fields:
+      type: object
+      additionalProperties:
+        type: string
+    requestId:
+      type: string
+ErrorCode:
+  type: string
+  description: Katalog kode error (Technical Guideline Lampiran A).
+  enum:
+    - VALIDATION_FAILED
+    - AUTH_INVALID_CREDENTIALS
+    - AUTH_ACCOUNT_LOCKED
+    - AUTH_MFA_REQUIRED
+    - AUTH_MFA_INVALID
+    - AUTH_TOKEN_EXPIRED
+    - AUTH_SESSION_EXPIRED
+    - AUTH_REAUTH_REQUIRED
+    - FORBIDDEN
+    - NOT_FOUND
+    - VERSION_CONFLICT
+    - INVALID_STATE_TRANSITION
+    - IDEMPOTENCY_KEY_REQUIRED
+    - IDEMPOTENCY_IN_PROGRESS
+    - IDEMPOTENCY_KEY_REUSED
+    - DUPLICATE_CODE
+    - PERIOD_LOCKED
+    - STOCK_INSUFFICIENT
+    - BATCH_SHELF_LIFE_TOO_SHORT
+    - APPROVAL_REQUIRED
+    - DISCOUNT_LIMIT_EXCEEDED
+    - CREDIT_LIMIT_EXCEEDED
+    - THREE_WAY_MATCH_FAILED
+    - DEPOSIT_INSUFFICIENT
+    - OUTSIDE_ATTENDANCE_RADIUS
+    - FILE_TOO_LARGE
+    - FILE_TYPE_NOT_ALLOWED
+    - IMPORT_ALREADY_PROCESSED
+    - RATE_LIMITED
+    - PROVIDER_UNAVAILABLE
+    - BAD_REQUEST
+    - INTERNAL_ERROR

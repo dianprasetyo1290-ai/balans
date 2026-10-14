@@ -1,0 +1,197 @@
+products:
+  get:
+    operationId: listProducts
+    tags: [catalog]
+    summary: Daftar produk (Produk Jadi, Packaging, Material)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - $ref: "../components/common.yaml#/parameters/Sort"
+      - $ref: "../components/common.yaml#/parameters/Search"
+      - name: productType
+        in: query
+        schema:
+          $ref: "#/components/schemas/ProductType"
+      - name: isBundle
+        in: query
+        schema:
+          type: boolean
+    responses:
+      "200":
+        description: Daftar produk; field sort yang diizinkan `sku`, `name`, `createdAt`
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createProduct
+    tags: [catalog]
+    summary: Membuat produk (MD-01, MD-02, MD-03)
+    description: SKU unik permanen dan tidak bisa dipakai ulang walau produk dihapus (`DUPLICATE_CODE`).
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProductInput"
+    responses:
+      "201":
+        description: Produk dibuat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+product:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  get:
+    operationId: getProduct
+    tags: [catalog]
+    summary: Detail produk
+    responses:
+      "200":
+        description: Detail produk
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  put:
+    operationId: updateProduct
+    tags: [catalog]
+    summary: Mengubah produk (optimistic locking dengan `version`)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/ProductInput"
+              - type: object
+                required: [version]
+                properties:
+                  version:
+                    type: integer
+    responses:
+      "200":
+        description: Produk diubah
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  delete:
+    operationId: deleteProduct
+    tags: [catalog]
+    summary: Menghapus produk (soft delete; tetap tampil di dokumen lama)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    responses:
+      "204":
+        description: Produk dihapus
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+components:
+  schemas:
+    ProductType:
+      type: string
+      enum: [finished_good, packaging, reprocess_material]
+    PackagingType:
+      type: string
+      enum: [tube, pouch, roll_sachet]
+    BundleComponent:
+      type: object
+      required: [componentProductId, qty]
+      properties:
+        componentProductId:
+          type: string
+          format: uuid
+        componentSku:
+          type: string
+          readOnly: true
+        qty:
+          type: string
+          description: Kuantitas desimal sebagai string.
+          example: "2.000"
+    ProductInput:
+      type: object
+      required: [sku, name, productType, uom, hasBatch, isBundle]
+      properties:
+        sku:
+          type: string
+          minLength: 1
+          maxLength: 40
+          pattern: "^[A-Z0-9][A-Z0-9-]*$"
+        name:
+          type: string
+          minLength: 1
+          maxLength: 160
+        variant:
+          type: string
+          maxLength: 80
+        productType:
+          $ref: "#/components/schemas/ProductType"
+        packagingType:
+          $ref: "#/components/schemas/PackagingType"
+        uom:
+          type: string
+          example: pcs
+        shelfLifeDays:
+          type: integer
+          minimum: 1
+        hasBatch:
+          type: boolean
+        isBundle:
+          type: boolean
+          description: Bundle virtual tidak punya stok sendiri; stok komponen terpotong saat terjual (MD-03).
+        categoryId:
+          type: string
+          format: uuid
+        barcodes:
+          type: array
+          items:
+            type: string
+        minStockQty:
+          type: string
+          example: "100.000"
+        bundleComponents:
+          type: array
+          items:
+            $ref: "#/components/schemas/BundleComponent"
+    Product:
+      allOf:
+        - $ref: "#/components/schemas/ProductInput"
+        - $ref: "../components/common.yaml#/AuditFields"
+        - type: object
+          required: [id, isActive, allowedActions]
+          properties:
+            id:
+              type: string
+              format: uuid
+            isActive:
+              type: boolean
+            allowedActions:
+              type: array
+              items:
+                type: string
+                enum: [update, delete]
+    ProductList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/Product"

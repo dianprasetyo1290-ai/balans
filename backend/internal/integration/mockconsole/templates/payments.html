@@ -1,0 +1,20 @@
+{{define "payments.html"}}{{template "head" .}}
+<h2>Buat transaksi uji</h2>
+<form method="post" action="/_mock/payments">
+  <input name="grossAmount" inputmode="decimal" required value="150000" aria-label="Nominal">
+  <button class="primary" type="submit">Buat &amp; buka halaman bayar</button>
+</form>
+<h2>Transaksi terbaru</h2>
+<div class="scroll">
+<table>
+  <thead><tr><th>Order</th><th>Nominal</th><th>Status</th><th>Dibuat (WIB)</th></tr></thead>
+  <tbody>
+  {{range .Payments}}
+    <tr><td><a href="/_mock/payments/{{.OrderID}}">{{.OrderID}}</a></td><td>{{.GrossAmount}}</td><td>{{.Status}}</td><td class="muted">{{wib .CreatedAt}}</td></tr>
+  {{else}}
+    <tr><td colspan="4" class="muted">Belum ada transaksi.</td></tr>
+  {{end}}
+  </tbody>
+</table>
+</div>
+{{template "foot" .}}{{end}}

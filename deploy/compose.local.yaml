@@ -1,0 +1,32 @@
+# Dependensi untuk development lokal (Technical Guideline 14.2): Postgres dan Mailpit.
+# Jalankan: docker compose -f deploy/compose.local.yaml up -d
+name: balans-local
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: balans
+      POSTGRES_USER: balans
+      POSTGRES_PASSWORD: balans
+      TZ: UTC
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U balans -d balans"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  mailpit:
+    image: axllent/mailpit:v1.27
+    environment:
+      MP_WEBROOT: /_mock/mail/
+    ports:
+      - "${SMTP_PORT:-1025}:1025"
+      - "${MAILPIT_PORT:-8025}:8025"
+
+volumes:
+  postgres-data:

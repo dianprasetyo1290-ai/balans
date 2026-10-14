@@ -1,0 +1,28 @@
+{{define "shipments.html"}}{{template "head" .}}
+<form method="post" action="/_mock/shipments">
+  <button class="primary" type="submit">Buat order pengiriman uji (JNE REG, 1 kg)</button>
+</form>
+<h2>Order terbaru</h2>
+<p class="muted">Ubah status untuk mengirim webhook bersignature ke <code>/api/v1/webhooks/biteship</code>.</p>
+<div class="scroll">
+<table>
+  <thead><tr><th>Referensi</th><th>Resi</th><th>Ongkir</th><th>Status</th><th>Ubah status</th></tr></thead>
+  <tbody>
+  {{$statuses := .Statuses}}
+  {{range .Shipments}}
+    <tr>
+      <td>{{.ReferenceID}}<br><span class="muted">{{wib .CreatedAt}}</span></td>
+      <td>{{.TrackingNumber}}</td><td>{{.ShippingCost}}</td><td>{{.Status}}</td>
+      <td>
+        <form method="post" action="/_mock/shipments/{{.ReferenceID}}/simulate">
+          {{range $statuses}}<button type="submit" name="status" value="{{.}}">{{.}}</button> {{end}}
+        </form>
+      </td>
+    </tr>
+  {{else}}
+    <tr><td colspan="5" class="muted">Belum ada order.</td></tr>
+  {{end}}
+  </tbody>
+</table>
+</div>
+{{template "foot" .}}{{end}}

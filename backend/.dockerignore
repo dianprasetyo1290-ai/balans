@@ -1,0 +1,5 @@
+**/*_test.go
+.golangci.yml
+Dockerfile
+.dockerignore
+coverage*

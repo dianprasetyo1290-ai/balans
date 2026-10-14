@@ -1,0 +1,64 @@
+midtransWebhook:
+  post:
+    operationId: receiveMidtransWebhook
+    security: []
+    tags: [sales]
+    summary: Notifikasi pembayaran Midtrans
+    description: |
+      Signature diverifikasi sebelum payload disimpan. Event disimpan di webhook_events (dedup per event)
+      dan diproses job payment_webhook.process yang mengonfirmasi ulang status ke Midtrans
+      (Technical Guideline 7.4, 9.3). Endpoint ini tidak memakai Idempotency-Key.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MidtransNotification"
+    responses:
+      "200":
+        description: Event diterima atau sudah pernah diterima
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebhookAck"
+      "400":
+        description: Payload tidak bisa dibaca
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/problem.yaml#/Problem"
+      "403":
+        description: Signature tidak valid
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/problem.yaml#/Problem"
+components:
+  schemas:
+    MidtransNotification:
+      type: object
+      description: Payload HTTP notification Midtrans (nama field milik Midtrans).
+      required: [order_id, status_code, gross_amount, signature_key, transaction_status, transaction_id]
+      properties:
+        order_id:
+          type: string
+        status_code:
+          type: string
+        gross_amount:
+          type: string
+        signature_key:
+          type: string
+        transaction_status:
+          type: string
+        transaction_id:
+          type: string
+        fraud_status:
+          type: string
+    WebhookAck:
+      type: object
+      required: [received, duplicate]
+      properties:
+        received:
+          type: boolean
+        duplicate:
+          type: boolean

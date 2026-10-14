@@ -1,0 +1,84 @@
+# Stack aplikasi per lingkungan (Technical Guideline 14.1, 14.2). Dipakai bersama override:
+#   docker compose -p balans-production -f compose.yaml -f compose.production.yaml ...
+#   docker compose -p balans-staging    -f compose.yaml -f compose.staging.yaml ...
+# Jalankan lewat deploy/scripts/deploy.sh agar tag image dan file env selalu benar.
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+x-backend: &backend
+  image: ${REGISTRY:?REGISTRY wajib diisi}/balans-api:${IMAGE_TAG:?IMAGE_TAG wajib diisi}
+  env_file: ${ENV_FILE:?ENV_FILE wajib diisi}
+  restart: unless-stopped
+  logging: *logging
+  depends_on:
+    postgres:
+      condition: service_healthy
+  networks:
+    - internal
+
+services:
+  postgres:
+    image: ${REGISTRY}/balans-postgres:${POSTGRES_IMAGE_TAG:?POSTGRES_IMAGE_TAG wajib diisi}
+    env_file: ${ENV_FILE}
+    environment:
+      TZ: UTC
+      PGTZ: UTC
+    restart: unless-stopped
+    logging: *logging
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - internal
+
+  migrate:
+    <<: *backend
+    command: ["migrate", "up"]
+    restart: "no"
+    profiles: ["tools"]
+
+  api:
+    <<: *backend
+    command: ["api"]
+    healthcheck:
+      test: ["CMD", "healthcheck"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - internal
+      - edge
+
+  worker:
+    <<: *backend
+    command: ["worker"]
+
+  web:
+    image: ${REGISTRY}/balans-web-erp:${IMAGE_TAG}
+    restart: unless-stopped
+    logging: *logging
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8080/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks:
+      - edge
+
+networks:
+  internal: {}
+  edge:
+    external: true
+    name: balans-edge
+
+volumes:
+  postgres-data: {}

@@ -1,0 +1,19 @@
+{{define "payment.html"}}{{template "head" .}}
+{{with .Payment}}{{if .OrderID}}
+<dl>
+  <dt class="muted">Order</dt><dd>{{.OrderID}}</dd>
+  <dt class="muted">ID transaksi</dt><dd>{{.TransactionID}}</dd>
+  <dt class="muted">Nominal</dt><dd>{{.GrossAmount}}</dd>
+  <dt class="muted">Status</dt><dd>{{.Status}}</dd>
+</dl>
+{{if eq .Status "pending"}}
+<p>Pilih hasil pembayaran. Webhook bersignature dikirim ke <code>/api/v1/webhooks/midtrans</code>.</p>
+<form class="inline" method="post" action="/_mock/payments/{{.OrderID}}/simulate"><input type="hidden" name="outcome" value="settlement"><button class="primary" type="submit">Berhasil</button></form>
+<form class="inline" method="post" action="/_mock/payments/{{.OrderID}}/simulate"><input type="hidden" name="outcome" value="deny"><button class="danger" type="submit">Gagal</button></form>
+<form class="inline" method="post" action="/_mock/payments/{{.OrderID}}/simulate"><input type="hidden" name="outcome" value="expire"><button type="submit">Kedaluwarsa</button></form>
+{{else}}
+<p class="muted">Transaksi sudah selesai disimulasikan.</p>
+{{end}}
+{{end}}{{end}}
+<p><a href="/_mock/payments">Kembali ke daftar</a></p>
+{{template "foot" .}}{{end}}

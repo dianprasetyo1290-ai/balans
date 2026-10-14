@@ -1,0 +1,56 @@
+biteshipWebhook:
+  post:
+    operationId: receiveBiteshipWebhook
+    security: []
+    tags: [logistics]
+    summary: Notifikasi status pengiriman Biteship
+    description: |
+      Signature di header X-Biteship-Signature diverifikasi sebelum payload disimpan. Event diproses job
+      shipment_webhook.process yang mengonfirmasi ulang status ke Biteship. Endpoint ini tidak memakai Idempotency-Key.
+    parameters:
+      - name: X-Biteship-Signature
+        in: header
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BiteshipNotification"
+    responses:
+      "200":
+        description: Event diterima atau sudah pernah diterima
+        content:
+          application/json:
+            schema:
+              $ref: "./sales.yaml#/components/schemas/WebhookAck"
+      "400":
+        description: Payload tidak bisa dibaca
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/problem.yaml#/Problem"
+      "403":
+        description: Signature tidak valid
+        content:
+          application/problem+json:
+            schema:
+              $ref: "../components/problem.yaml#/Problem"
+components:
+  schemas:
+    BiteshipNotification:
+      type: object
+      description: Payload webhook status order Biteship (nama field milik Biteship).
+      required: [event, order_id, status]
+      properties:
+        event:
+          type: string
+          example: order.status
+        order_id:
+          type: string
+        courier_waybill_id:
+          type: string
+        status:
+          type: string

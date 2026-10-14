@@ -1,0 +1,53 @@
+version: "2"
+sql:
+  - &pkg
+    engine: postgresql
+    schema: migrations
+    queries: internal/platform/idempotency/queries
+    gen:
+      go: &go
+        package: sqlcgen
+        out: internal/platform/idempotency/sqlcgen
+        sql_package: pgx/v5
+        emit_interface: false
+        emit_json_tags: false
+        overrides:
+          - db_type: uuid
+            go_type: github.com/google/uuid.UUID
+          - db_type: uuid
+            nullable: true
+            go_type: github.com/google/uuid.NullUUID
+          - db_type: timestamptz
+            go_type: time.Time
+          - db_type: timestamptz
+            nullable: true
+            go_type:
+              import: time
+              type: Time
+              pointer: true
+          - db_type: pg_catalog.numeric
+            go_type: github.com/shopspring/decimal.Decimal
+  - <<: *pkg
+    queries: internal/platform/webhook/queries
+    gen:
+      go:
+        <<: *go
+        out: internal/platform/webhook/sqlcgen
+  - <<: *pkg
+    queries: internal/integration/mockpayment/queries
+    gen:
+      go:
+        <<: *go
+        out: internal/integration/mockpayment/sqlcgen
+  - <<: *pkg
+    queries: internal/integration/mockshipment/queries
+    gen:
+      go:
+        <<: *go
+        out: internal/integration/mockshipment/sqlcgen
+  - <<: *pkg
+    queries: internal/notification/postgres/queries
+    gen:
+      go:
+        <<: *go
+        out: internal/notification/postgres/sqlcgen

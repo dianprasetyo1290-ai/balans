@@ -1,0 +1,6 @@
+**/node_modules
+**/dist
+.git
+web-erp/playwright-report
+web-erp/test-results
+docs

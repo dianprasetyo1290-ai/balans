@@ -1,0 +1,31 @@
+# Dependensi & hasil build
+node_modules/
+dist/
+*.exe
+/backend/bin/
+coverage*.out
+
+# Hasil test
+web-erp/playwright-report/
+web-erp/test-results/
+
+# Env & secret lokal (Technical Guideline 9.4)
+.env
+.env.*
+!.env.example
+*.env
+!deploy/env.example
+!deploy/edge.env.example
+*.pem
+*.key
+
+# Editor & OS
+.idea/
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+~$*
+
+# Dokumen klien (BRD, PRD, desain, data Balans) tidak dipublikasikan di repo publik.
+/docs/

@@ -1,0 +1,19 @@
+# Melayani file static web-erp di dalam jaringan Compose. TLS, header keamanan, dan proxy /api
+# ditangani Caddy edge (deploy/Caddyfile).
+{
+	admin off
+	auto_https off
+}
+
+:8080 {
+	root * /srv
+	encode zstd gzip
+
+	@assets path /assets/*
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+	header /index.html Cache-Control "no-cache"
+
+	# SPA: route TanStack Router dilayani index.html.
+	try_files {path} /index.html
+	file_server
+}
