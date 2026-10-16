@@ -12,6 +12,21 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+type AuditLog struct {
+	ID          uuid.UUID
+	ActorID     uuid.UUID
+	ActorName   string
+	Action      string
+	EntityType  string
+	EntityID    uuid.UUID
+	EntityLabel string
+	Changes     []byte
+	Note        string
+	RequestID   string
+	Ip          string
+	CreatedAt   time.Time
+}
+
 type IdempotencyKey struct {
 	UserID        uuid.UUID
 	Key           uuid.UUID
@@ -23,6 +38,15 @@ type IdempotencyKey struct {
 	ResponseBody  []byte
 	CreatedAt     time.Time
 	ExpiresAt     time.Time
+}
+
+type LoginAttempt struct {
+	ID        uuid.UUID
+	EmailHash []byte
+	UserID    uuid.NullUUID
+	Ip        string
+	Succeeded bool
+	CreatedAt time.Time
 }
 
 type MockPayment struct {
@@ -54,6 +78,96 @@ type NotificationEmail struct {
 	LastError pgtype.Text
 	CreatedAt time.Time
 	SentAt    *time.Time
+}
+
+type PasswordToken struct {
+	ID        uuid.UUID
+	UserID    uuid.UUID
+	Purpose   string
+	TokenHash []byte
+	ExpiresAt time.Time
+	UsedAt    *time.Time
+	CreatedAt time.Time
+	CreatedBy uuid.UUID
+}
+
+type Permission struct {
+	ID             uuid.UUID
+	Code           string
+	Module         string
+	Description    string
+	RequiresReauth bool
+	CreatedAt      time.Time
+}
+
+type Role struct {
+	ID               uuid.UUID
+	Code             string
+	Name             string
+	Description      string
+	RequiresMfa      bool
+	HasDivisionScope bool
+	CreatedAt        time.Time
+	CreatedBy        uuid.UUID
+	UpdatedAt        time.Time
+	UpdatedBy        uuid.UUID
+	Version          int32
+	DeletedAt        *time.Time
+	DeletedBy        uuid.NullUUID
+}
+
+type RolePermission struct {
+	RoleID       uuid.UUID
+	PermissionID uuid.UUID
+	CreatedAt    time.Time
+	CreatedBy    uuid.UUID
+}
+
+type Session struct {
+	ID               uuid.UUID
+	UserID           uuid.UUID
+	Audience         string
+	FamilyID         uuid.UUID
+	RefreshTokenHash []byte
+	ExpiresAt        time.Time
+	IdleExpiresAt    time.Time
+	RevokedAt        *time.Time
+	RevokeReason     pgtype.Text
+	ReplacedBy       uuid.NullUUID
+	UserAgent        string
+	Ip               string
+	CreatedAt        time.Time
+}
+
+type User struct {
+	ID                uuid.UUID
+	Email             string
+	FullName          string
+	PasswordHash      pgtype.Text
+	IsActive          bool
+	TokenVersion      int32
+	MfaSecretEnc      pgtype.Text
+	IsMfaEnabled      bool
+	EmployeeID        uuid.NullUUID
+	DivisionID        uuid.NullUUID
+	LastLoginAt       *time.Time
+	PasswordChangedAt *time.Time
+	CreatedAt         time.Time
+	CreatedBy         uuid.UUID
+	UpdatedAt         time.Time
+	UpdatedBy         uuid.UUID
+	Version           int32
+	DeletedAt         *time.Time
+	DeletedBy         uuid.NullUUID
+}
+
+type UserRole struct {
+	UserID          uuid.UUID
+	RoleID          uuid.UUID
+	ScopeDivisionID uuid.NullUUID
+	ScopePartnerID  uuid.NullUUID
+	CreatedAt       time.Time
+	CreatedBy       uuid.UUID
 }
 
 type WebhookEvent struct {

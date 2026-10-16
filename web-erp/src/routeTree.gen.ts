@@ -11,7 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as ForbiddenRouteImport } from './routes/forbidden'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as MfaSetupRouteImport } from './routes/mfa-setup'
+import { Route as SetPasswordRouteImport } from './routes/set-password'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AppSettingsAuditLogsRouteImport } from './routes/_app/settings/audit-logs'
+import { Route as AppSettingsRolesRouteImport } from './routes/_app/settings/roles'
+import { Route as AppSettingsUsersRouteImport } from './routes/_app/settings/users'
 import { Route as AppSystemAboutRouteImport } from './routes/_app/system/about'
 
 const AppRoute = AppRouteImport.update({
@@ -23,9 +30,44 @@ const ForbiddenRoute = ForbiddenRouteImport.update({
   path: '/forbidden',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MfaSetupRoute = MfaSetupRouteImport.update({
+  id: '/mfa-setup',
+  path: '/mfa-setup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SetPasswordRoute = SetPasswordRouteImport.update({
+  id: '/set-password',
+  path: '/set-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsAuditLogsRoute = AppSettingsAuditLogsRouteImport.update({
+  id: '/settings/audit-logs',
+  path: '/settings/audit-logs',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRolesRoute = AppSettingsRolesRouteImport.update({
+  id: '/settings/roles',
+  path: '/settings/roles',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsUsersRoute = AppSettingsUsersRouteImport.update({
+  id: '/settings/users',
+  path: '/settings/users',
   getParentRoute: () => AppRoute,
 } as any)
 const AppSystemAboutRoute = AppSystemAboutRouteImport.update({
@@ -37,31 +79,88 @@ const AppSystemAboutRoute = AppSystemAboutRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/forbidden': typeof ForbiddenRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/mfa-setup': typeof MfaSetupRoute
+  '/set-password': typeof SetPasswordRoute
+  '/settings/audit-logs': typeof AppSettingsAuditLogsRoute
+  '/settings/roles': typeof AppSettingsRolesRoute
+  '/settings/users': typeof AppSettingsUsersRoute
   '/system/about': typeof AppSystemAboutRoute
 }
 export interface FileRoutesByTo {
   '/forbidden': typeof ForbiddenRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/mfa-setup': typeof MfaSetupRoute
+  '/set-password': typeof SetPasswordRoute
   '/': typeof AppIndexRoute
+  '/settings/audit-logs': typeof AppSettingsAuditLogsRoute
+  '/settings/roles': typeof AppSettingsRolesRoute
+  '/settings/users': typeof AppSettingsUsersRoute
   '/system/about': typeof AppSystemAboutRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
   '/forbidden': typeof ForbiddenRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/mfa-setup': typeof MfaSetupRoute
+  '/set-password': typeof SetPasswordRoute
   '/_app/': typeof AppIndexRoute
+  '/_app/settings/audit-logs': typeof AppSettingsAuditLogsRoute
+  '/_app/settings/roles': typeof AppSettingsRolesRoute
+  '/_app/settings/users': typeof AppSettingsUsersRoute
   '/_app/system/about': typeof AppSystemAboutRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/forbidden' | '/system/about'
+  fullPaths:
+    | '/'
+    | '/forbidden'
+    | '/forgot-password'
+    | '/login'
+    | '/mfa-setup'
+    | '/set-password'
+    | '/settings/audit-logs'
+    | '/settings/roles'
+    | '/settings/users'
+    | '/system/about'
   fileRoutesByTo: FileRoutesByTo
-  to: '/forbidden' | '/' | '/system/about'
-  id: '__root__' | '/_app' | '/forbidden' | '/_app/' | '/_app/system/about'
+  to:
+    | '/forbidden'
+    | '/forgot-password'
+    | '/login'
+    | '/mfa-setup'
+    | '/set-password'
+    | '/'
+    | '/settings/audit-logs'
+    | '/settings/roles'
+    | '/settings/users'
+    | '/system/about'
+  id:
+    | '__root__'
+    | '/_app'
+    | '/forbidden'
+    | '/forgot-password'
+    | '/login'
+    | '/mfa-setup'
+    | '/set-password'
+    | '/_app/'
+    | '/_app/settings/audit-logs'
+    | '/_app/settings/roles'
+    | '/_app/settings/users'
+    | '/_app/system/about'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   ForbiddenRoute: typeof ForbiddenRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  LoginRoute: typeof LoginRoute
+  MfaSetupRoute: typeof MfaSetupRoute
+  SetPasswordRoute: typeof SetPasswordRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -80,11 +179,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForbiddenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mfa-setup': {
+      id: '/mfa-setup'
+      path: '/mfa-setup'
+      fullPath: '/mfa-setup'
+      preLoaderRoute: typeof MfaSetupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/set-password': {
+      id: '/set-password'
+      path: '/set-password'
+      fullPath: '/set-password'
+      preLoaderRoute: typeof SetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_app/': {
       id: '/_app/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/settings/audit-logs': {
+      id: '/_app/settings/audit-logs'
+      path: '/settings/audit-logs'
+      fullPath: '/settings/audit-logs'
+      preLoaderRoute: typeof AppSettingsAuditLogsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/settings/roles': {
+      id: '/_app/settings/roles'
+      path: '/settings/roles'
+      fullPath: '/settings/roles'
+      preLoaderRoute: typeof AppSettingsRolesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/settings/users': {
+      id: '/_app/settings/users'
+      path: '/settings/users'
+      fullPath: '/settings/users'
+      preLoaderRoute: typeof AppSettingsUsersRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/system/about': {
@@ -99,11 +247,17 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
+  AppSettingsAuditLogsRoute: typeof AppSettingsAuditLogsRoute
+  AppSettingsRolesRoute: typeof AppSettingsRolesRoute
+  AppSettingsUsersRoute: typeof AppSettingsUsersRoute
   AppSystemAboutRoute: typeof AppSystemAboutRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
+  AppSettingsAuditLogsRoute: AppSettingsAuditLogsRoute,
+  AppSettingsRolesRoute: AppSettingsRolesRoute,
+  AppSettingsUsersRoute: AppSettingsUsersRoute,
   AppSystemAboutRoute: AppSystemAboutRoute,
 }
 
@@ -112,6 +266,10 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   ForbiddenRoute: ForbiddenRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  LoginRoute: LoginRoute,
+  MfaSetupRoute: MfaSetupRoute,
+  SetPasswordRoute: SetPasswordRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

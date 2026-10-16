@@ -3,7 +3,13 @@ import { CheckCircle2Icon, XCircleIcon } from "lucide-react"
 
 import { LoadingArea } from "@/components/common/loading-area"
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { formatDateTime } from "@/lib/format/date"
 
 import { readinessQuery, systemInfoQuery } from "../api/system-queries"
@@ -19,7 +25,13 @@ const CHECK_LABELS: Record<string, string> = {
   migration: "Migrasi skema",
 }
 
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
+function Row({
+  label,
+  children,
+}: {
+  label: string
+  children: React.ReactNode
+}) {
   return (
     <div className="grid grid-cols-1 gap-1 py-2 sm:grid-cols-3">
       <dt className="text-sm text-muted-foreground">{label}</dt>
@@ -39,14 +51,20 @@ export function AboutSystemPage() {
   return (
     <div className="flex max-w-3xl flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Tentang Sistem</h1>
-        <p className="text-sm text-muted-foreground">Versi aplikasi dan status layanan.</p>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          Tentang Sistem
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          Versi aplikasi dan status layanan.
+        </p>
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle>Aplikasi</CardTitle>
-          <CardDescription>Informasi build yang sedang berjalan.</CardDescription>
+          <CardDescription>
+            Informasi build yang sedang berjalan.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <LoadingArea loading={info.isPending} label="Memuat informasi sistem">
@@ -59,7 +77,8 @@ export function AboutSystemPage() {
                   <span className="font-mono text-xs">{info.data.commit}</span>
                 </Row>
                 <Row label="Lingkungan">
-                  {ENVIRONMENT_LABELS[info.data.environment] ?? info.data.environment}
+                  {ENVIRONMENT_LABELS[info.data.environment] ??
+                    info.data.environment}
                   {info.data.mockActive ? (
                     <Badge variant="outline" className="ml-2">
                       Mode simulasi pihak ketiga
@@ -76,13 +95,19 @@ export function AboutSystemPage() {
                       ))}
                     </span>
                   ) : (
-                    <span className="text-muted-foreground">Belum ada modul bisnis yang dirilis</span>
+                    <span className="text-muted-foreground">
+                      Belum ada modul bisnis yang dirilis
+                    </span>
                   )}
                 </Row>
                 <Row label="Versi skema database">
-                  <span className="font-mono">{info.data.database.schemaVersion}</span>
+                  <span className="font-mono">
+                    {info.data.database.schemaVersion}
+                  </span>
                 </Row>
-                <Row label="Waktu server">{formatDateTime(info.data.serverTime)} WIB</Row>
+                <Row label="Waktu server">
+                  {formatDateTime(info.data.serverTime)} WIB
+                </Row>
               </dl>
             ) : null}
           </LoadingArea>
@@ -94,31 +119,55 @@ export function AboutSystemPage() {
           <CardTitle className="flex items-center gap-2">
             Status layanan
             {readiness.data ? (
-              <Badge variant={readiness.data.status === "ready" ? "secondary" : "destructive"} data-testid="readiness">
+              <Badge
+                variant={
+                  readiness.data.status === "ready"
+                    ? "secondary"
+                    : "destructive"
+                }
+                data-testid="readiness"
+              >
                 {readiness.data.status === "ready" ? "Siap" : "Belum siap"}
               </Badge>
             ) : null}
           </CardTitle>
-          <CardDescription>Hasil pemeriksaan /readyz, diperbarui setiap 30 detik.</CardDescription>
+          <CardDescription>
+            Hasil pemeriksaan /readyz, diperbarui setiap 30 detik.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <LoadingArea loading={readiness.isPending} label="Memeriksa layanan">
             {readiness.data ? (
               <ul className="flex flex-col gap-2">
                 {readiness.data.checks.map((check) => (
-                  <li key={check.name} className="flex items-center gap-2 text-sm">
+                  <li
+                    key={check.name}
+                    className="flex items-center gap-2 text-sm"
+                  >
                     {check.status === "ok" ? (
-                      <CheckCircle2Icon className="size-4 text-emerald-600" aria-hidden="true" />
+                      <CheckCircle2Icon
+                        className="size-4 text-emerald-600"
+                        aria-hidden="true"
+                      />
                     ) : (
-                      <XCircleIcon className="size-4 text-destructive" aria-hidden="true" />
+                      <XCircleIcon
+                        className="size-4 text-destructive"
+                        aria-hidden="true"
+                      />
                     )}
                     <span>{CHECK_LABELS[check.name] ?? check.name}</span>
-                    <span className="text-muted-foreground">{check.status === "ok" ? "Normal" : (check.detail ?? "Gagal")}</span>
+                    <span className="text-muted-foreground">
+                      {check.status === "ok"
+                        ? "Normal"
+                        : (check.detail ?? "Gagal")}
+                    </span>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-destructive">Layanan tidak dapat dihubungi.</p>
+              <p className="text-sm text-destructive">
+                Layanan tidak dapat dihubungi.
+              </p>
             )}
           </LoadingArea>
         </CardContent>

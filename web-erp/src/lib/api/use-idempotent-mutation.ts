@@ -1,9 +1,15 @@
 import { useMutation, type UseMutationOptions } from "@tanstack/react-query"
 import { useCallback, useRef } from "react"
 
-type IdempotentMutationFn<TData, TVariables> = (variables: TVariables, idempotencyKey: string) => Promise<TData>
+type IdempotentMutationFn<TData, TVariables> = (
+  variables: TVariables,
+  idempotencyKey: string
+) => Promise<TData>
 
-type Options<TData, TError, TVariables> = Omit<UseMutationOptions<TData, TError, TVariables>, "mutationFn"> & {
+type Options<TData, TError, TVariables> = Omit<
+  UseMutationOptions<TData, TError, TVariables>,
+  "mutationFn"
+> & {
   mutationFn: IdempotentMutationFn<TData, TVariables>
 }
 
@@ -13,7 +19,7 @@ type Options<TData, TError, TVariables> = Omit<UseMutationOptions<TData, TError,
  * atau saat `resetKey` dipanggil (misalnya ketika form di-reset).
  */
 export function useIdempotentMutation<TData, TError = Error, TVariables = void>(
-  options: Options<TData, TError, TVariables>,
+  options: Options<TData, TError, TVariables>
 ) {
   const keyRef = useRef<string | null>(null)
   const { mutationFn, onSuccess, ...rest } = options

@@ -1,25 +1,51 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router"
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router"
 
 import { AppSidebar } from "@/components/layout/app-sidebar"
 import { Separator } from "@/components/ui/separator"
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar"
+import { meQuery } from "@/features/auth/api/auth-api"
 import { systemInfoQuery } from "@/features/system/api/system-queries"
+import { ensureSession } from "@/lib/api/auth-fetch"
 
 /**
- * Layout utama ERP. Login dan pengecekan sesi ditambahkan di beforeLoad saat modul identity
- * dibangun (R1.1); selama Fase 0 akses dibatasi di Caddy.
+ * Layout utama ERP. Semua halaman di dalamnya butuh sesi: access token diambil ulang dari cookie
+ * refresh token saat halaman dimuat ulang; user wajib MFA diarahkan ke aktivasi MFA (S-101, S-104).
  */
 export const Route = createFileRoute("/_app")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(systemInfoQuery),
+  beforeLoad: async ({ context, location }) => {
+    if (!(await ensureSession())) {
+      throw redirect({ to: "/login", search: { redirect: location.href } })
+    }
+    const me = await context.queryClient.fetchQuery(meQuery)
+    if (me.mfaEnrollmentRequired) {
+      throw redirect({ to: "/mfa-setup" })
+    }
+  },
+  loader: async ({ context }) => {
+    const [info, me] = await Promise.all([
+      context.queryClient.ensureQueryData(systemInfoQuery),
+      context.queryClient.ensureQueryData(meQuery),
+    ])
+    return { info, me }
+  },
   component: AppLayout,
 })
 
 function AppLayout() {
-  const info = Route.useLoaderData()
+  const { info, me } = Route.useLoaderData()
 
   return (
     <SidebarProvider>
-      <AppSidebar enabledModules={info.enabledModules} version={info.version} />
+      <AppSidebar
+        enabledModules={info.enabledModules}
+        version={info.version}
+        permissions={me.permissions}
+        user={me}
+      />
       <SidebarInset>
         <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger className="-ml-1" aria-label="Buka atau tutup menu" />

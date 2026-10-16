@@ -4,1078 +4,1993 @@
  */
 
 export interface paths {
-    "/healthz": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Proses hidup */
-        get: operations["getHealth"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/readyz": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Siap menerima trafik (DB terhubung dan migrasi terbaru) */
-        get: operations["getReadiness"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/system/info": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Informasi versi, lingkungan, dan modul aktif
-         * @description Dipakai halaman Tentang Sistem dan untuk menentukan menu modul yang tampil (Technical Guideline 14.5).
-         */
-        get: operations["getSystemInfo"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/webhooks/midtrans": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Notifikasi pembayaran Midtrans
-         * @description Signature diverifikasi sebelum payload disimpan. Event disimpan di webhook_events (dedup per event)
-         *     dan diproses job payment_webhook.process yang mengonfirmasi ulang status ke Midtrans
-         *     (Technical Guideline 7.4, 9.3). Endpoint ini tidak memakai Idempotency-Key.
-         */
-        post: operations["receiveMidtransWebhook"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/webhooks/biteship": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Notifikasi status pengiriman Biteship
-         * @description Signature di header X-Biteship-Signature diverifikasi sebelum payload disimpan. Event diproses job
-         *     shipment_webhook.process yang mengonfirmasi ulang status ke Biteship. Endpoint ini tidak memakai Idempotency-Key.
-         */
-        post: operations["receiveBiteshipWebhook"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/login": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Masuk dengan email dan password
-         * @description Mengembalikan access token (15 menit, disimpan di memori FE) dan memasang refresh token di cookie
-         *     HttpOnly `Path=/api/v1/auth` (Technical Guideline 9.1). Gagal login selalu `AUTH_INVALID_CREDENTIALS`;
-         *     5 kali gagal dalam 15 menit → `AUTH_ACCOUNT_LOCKED`. Role ber-MFA → `AUTH_MFA_REQUIRED` lalu kirim ulang dengan `totpCode`.
-         *     Tidak memakai Idempotency-Key.
-         */
-        post: operations["login"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/refresh": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Memperbarui access token dengan refresh token (rotasi)
-         * @description Refresh token lama langsung tidak berlaku. Pemakaian ulang token lama mencabut seluruh keluarga sesi.
-         */
-        post: operations["refreshSession"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/logout": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Keluar dan mencabut sesi aktif */
-        post: operations["logout"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * User yang sedang login beserta permission
-         * @description Permission dimuat server-side dan tidak disimpan di token (Technical Guideline 9.1).
-         */
-        get: operations["getCurrentUser"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Daftar pengguna */
-        get: operations["listUsers"];
-        put?: never;
-        /** Membuat pengguna dan mengirim undangan atur password */
-        post: operations["createUser"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/products": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Daftar produk (Produk Jadi, Packaging, Material) */
-        get: operations["listProducts"];
-        put?: never;
-        /**
-         * Membuat produk (MD-01, MD-02, MD-03)
-         * @description SKU unik permanen dan tidak bisa dipakai ulang walau produk dihapus (`DUPLICATE_CODE`).
-         */
-        post: operations["createProduct"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/products/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: components["parameters"]["Id"];
-            };
-            cookie?: never;
-        };
-        /** Detail produk */
-        get: operations["getProduct"];
-        /** Mengubah produk (optimistic locking dengan `version`) */
-        put: operations["updateProduct"];
-        post?: never;
-        /** Menghapus produk (soft delete; tetap tampil di dokumen lama) */
-        delete: operations["deleteProduct"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/warehouses": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Daftar gudang fisik */
-        get: operations["listWarehouses"];
-        put?: never;
-        /**
-         * Membuat gudang fisik beserta lokasi standarnya (WMS-01)
-         * @description Lokasi Inbound, FG Non-Ecommerce, E-commerce Stock, Gudang Material, dan Gudang Retur dibuat otomatis (U-08).
-         */
-        post: operations["createWarehouse"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/locations": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Daftar lokasi stok (internal dan eksternal) */
-        get: operations["listLocations"];
-        put?: never;
-        /** Membuat lokasi (termasuk lokasi eksternal maklon, konsinyasi, buffer vending, mesin) */
-        post: operations["createLocation"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-}
-export type webhooks = Record<string, never>;
-export interface components {
-    schemas: {
-        /** @description Format error RFC 7807 (Technical Guideline 8.3). Field code adalah kontrak stabil untuk FE. */
-        Problem: {
-            type: string;
-            title: string;
-            status: number;
-            code: components["schemas"]["ErrorCode"];
-            /** @description Pesan Bahasa Indonesia yang aman ditampilkan ke user. */
-            detail: string;
-            fields?: {
-                [key: string]: string;
-            };
-            requestId?: string;
-        };
-        /**
-         * @description Katalog kode error (Technical Guideline Lampiran A).
-         * @enum {string}
-         */
-        ErrorCode: "VALIDATION_FAILED" | "AUTH_INVALID_CREDENTIALS" | "AUTH_ACCOUNT_LOCKED" | "AUTH_MFA_REQUIRED" | "AUTH_MFA_INVALID" | "AUTH_TOKEN_EXPIRED" | "AUTH_SESSION_EXPIRED" | "AUTH_REAUTH_REQUIRED" | "FORBIDDEN" | "NOT_FOUND" | "VERSION_CONFLICT" | "INVALID_STATE_TRANSITION" | "IDEMPOTENCY_KEY_REQUIRED" | "IDEMPOTENCY_IN_PROGRESS" | "IDEMPOTENCY_KEY_REUSED" | "DUPLICATE_CODE" | "PERIOD_LOCKED" | "STOCK_INSUFFICIENT" | "BATCH_SHELF_LIFE_TOO_SHORT" | "APPROVAL_REQUIRED" | "DISCOUNT_LIMIT_EXCEEDED" | "CREDIT_LIMIT_EXCEEDED" | "THREE_WAY_MATCH_FAILED" | "DEPOSIT_INSUFFICIENT" | "OUTSIDE_ATTENDANCE_RADIUS" | "FILE_TOO_LARGE" | "FILE_TYPE_NOT_ALLOWED" | "IMPORT_ALREADY_PROCESSED" | "RATE_LIMITED" | "PROVIDER_UNAVAILABLE" | "BAD_REQUEST" | "INTERNAL_ERROR";
-        HealthStatus: {
-            /** @enum {string} */
-            status: "ok";
-        };
-        ReadinessCheck: {
-            /** @example database */
-            name: string;
-            /** @enum {string} */
-            status: "ok" | "failed";
-            detail?: string;
-        };
-        ReadinessStatus: {
-            /** @enum {string} */
-            status: "ready" | "not_ready";
-            checks: components["schemas"]["ReadinessCheck"][];
-        };
-        DatabaseInfo: {
-            /** @enum {string} */
-            status: "ok" | "failed";
-            /** Format: int64 */
-            schemaVersion: number;
-            /** Format: int64 */
-            latestSchemaVersion: number;
-        };
-        SystemInfo: {
-            /** @example v1.0.0 */
-            version: string;
-            commit: string;
-            /** @enum {string} */
-            environment: "local" | "staging" | "production";
-            enabledModules: string[];
-            /** @description True jika minimal satu adapter pihak ketiga memakai mock. */
-            mockActive: boolean;
-            /** Format: date-time */
-            serverTime: string;
-            database: components["schemas"]["DatabaseInfo"];
-        };
-        /** @description Payload HTTP notification Midtrans (nama field milik Midtrans). */
-        MidtransNotification: {
-            order_id: string;
-            status_code: string;
-            gross_amount: string;
-            signature_key: string;
-            transaction_status: string;
-            transaction_id: string;
-            fraud_status?: string;
-        };
-        WebhookAck: {
-            received: boolean;
-            duplicate: boolean;
-        };
-        /** @description Payload webhook status order Biteship (nama field milik Biteship). */
-        BiteshipNotification: {
-            /** @example order.status */
-            event: string;
-            order_id: string;
-            courier_waybill_id?: string;
-            status: string;
-        };
-        LoginRequest: {
-            /** Format: email */
-            email: string;
-            password: string;
-            totpCode?: string;
-        };
-        AccessToken: {
-            accessToken: string;
-            /** Format: date-time */
-            expiresAt: string;
-        };
-        CurrentUser: {
-            /** Format: uuid */
-            id: string;
-            email: string;
-            fullName: string;
-            roles: string[];
-            /**
-             * @example [
-             *       "catalog.product.read",
-             *       "catalog.product.write"
-             *     ]
-             */
-            permissions: string[];
-        };
-        /** @description Metadata pagination standar (Technical Guideline 8.2). */
-        Pagination: {
-            page: number;
-            pageSize: number;
-            /** Format: int64 */
-            totalItems: number;
-            totalPages: number;
-        };
-        UserInput: {
-            /** Format: email */
-            email: string;
-            fullName: string;
-            roleCodes: string[];
-            /** Format: uuid */
-            divisionId?: string;
-        };
-        AuditFields: {
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
-            /** @description Dipakai optimistic locking; kirim kembali saat update (Technical Guideline 7.2). */
-            version: number;
-        };
-        User: components["schemas"]["UserInput"] & components["schemas"]["AuditFields"] & {
-            /** Format: uuid */
-            id: string;
-            isActive: boolean;
-            isMfaEnabled: boolean;
-            /** Format: date-time */
-            lastLoginAt?: string;
-        };
-        UserList: components["schemas"]["Pagination"] & {
-            items: components["schemas"]["User"][];
-        };
-        /** @enum {string} */
-        ProductType: "finished_good" | "packaging" | "reprocess_material";
-        /** @enum {string} */
-        PackagingType: "tube" | "pouch" | "roll_sachet";
-        BundleComponent: {
-            /** Format: uuid */
-            componentProductId: string;
-            readonly componentSku?: string;
-            /**
-             * @description Kuantitas desimal sebagai string.
-             * @example 2.000
-             */
-            qty: string;
-        };
-        ProductInput: {
-            sku: string;
-            name: string;
-            variant?: string;
-            productType: components["schemas"]["ProductType"];
-            packagingType?: components["schemas"]["PackagingType"];
-            /** @example pcs */
-            uom: string;
-            shelfLifeDays?: number;
-            hasBatch: boolean;
-            /** @description Bundle virtual tidak punya stok sendiri; stok komponen terpotong saat terjual (MD-03). */
-            isBundle: boolean;
-            /** Format: uuid */
-            categoryId?: string;
-            barcodes?: string[];
-            /** @example 100.000 */
-            minStockQty?: string;
-            bundleComponents?: components["schemas"]["BundleComponent"][];
-        };
-        Product: components["schemas"]["ProductInput"] & components["schemas"]["AuditFields"] & {
-            /** Format: uuid */
-            id: string;
-            isActive: boolean;
-            allowedActions: ("update" | "delete")[];
-        };
-        ProductList: components["schemas"]["Pagination"] & {
-            items: components["schemas"]["Product"][];
-        };
-        WarehouseInput: {
-            code: string;
-            name: string;
-            address: string;
-        };
-        Warehouse: components["schemas"]["WarehouseInput"] & components["schemas"]["AuditFields"] & {
-            /** Format: uuid */
-            id: string;
-        };
-        WarehouseList: components["schemas"]["Pagination"] & {
-            items: components["schemas"]["Warehouse"][];
-        };
-        /** @enum {string} */
-        LocationType: "inbound" | "finished_goods" | "ecommerce" | "material" | "returns" | "toll_manufacturer" | "consignment" | "vending_buffer" | "vending_machine";
-        LocationInput: {
-            code: string;
-            name: string;
-            locationType: components["schemas"]["LocationType"];
-            /**
-             * Format: uuid
-             * @description Wajib untuk lokasi internal; kosong untuk lokasi eksternal.
-             */
-            warehouseId?: string;
-            /** @enum {string} */
-            externalPartyType?: "supplier" | "partner" | "vending_machine";
-            /** Format: uuid */
-            externalPartyId?: string;
-        };
-        Location: components["schemas"]["LocationInput"] & components["schemas"]["AuditFields"] & {
-            /** Format: uuid */
-            id: string;
-            /** @description Stok di lokasi ini bisa dialokasikan ke penjualan. */
-            isSellable: boolean;
-            isActive: boolean;
-        };
-        LocationList: components["schemas"]["Pagination"] & {
-            items: components["schemas"]["Location"][];
-        };
-    };
-    responses: {
-        /** @description Error standar (problem+json) */
-        Problem: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/problem+json": components["schemas"]["Problem"];
-            };
-        };
-    };
+  "/healthz": {
     parameters: {
-        Page: number;
-        PageSize: number;
-        /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
-        Sort: string;
-        Search: string;
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        IdempotencyKey: string;
-        Id: string;
-    };
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Proses hidup */
+    get: operations["getHealth"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/readyz": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Siap menerima trafik (DB terhubung dan migrasi terbaru) */
+    get: operations["getReadiness"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/system/info": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Informasi versi, lingkungan, dan modul aktif
+     * @description Dipakai halaman Tentang Sistem dan untuk menentukan menu modul yang tampil (Technical Guideline 14.5).
+     */
+    get: operations["getSystemInfo"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/webhooks/midtrans": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Notifikasi pembayaran Midtrans
+     * @description Signature diverifikasi sebelum payload disimpan. Event disimpan di webhook_events (dedup per event)
+     *     dan diproses job payment_webhook.process yang mengonfirmasi ulang status ke Midtrans
+     *     (Technical Guideline 7.4, 9.3). Endpoint ini tidak memakai Idempotency-Key.
+     */
+    post: operations["receiveMidtransWebhook"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/webhooks/biteship": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Notifikasi status pengiriman Biteship
+     * @description Signature di header X-Biteship-Signature diverifikasi sebelum payload disimpan. Event diproses job
+     *     shipment_webhook.process yang mengonfirmasi ulang status ke Biteship. Endpoint ini tidak memakai Idempotency-Key.
+     */
+    post: operations["receiveBiteshipWebhook"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/auth/login": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Masuk dengan email dan password
+     * @description Mengembalikan access token (15 menit, disimpan di memori FE) dan memasang refresh token di cookie
+     *     HttpOnly `Path=/api/v1/auth` (Technical Guideline 9.1). Gagal login selalu `AUTH_INVALID_CREDENTIALS`;
+     *     5 kali gagal dalam 15 menit → `AUTH_ACCOUNT_LOCKED`. User ber-MFA → `AUTH_MFA_REQUIRED` lalu kirim ulang dengan `totpCode`.
+     *     Tidak memakai Idempotency-Key.
+     */
+    post: operations["login"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/auth/refresh": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Memperbarui access token dengan refresh token (rotasi)
+     * @description Refresh token lama langsung tidak berlaku. Pemakaian ulang token lama mencabut seluruh keluarga sesi.
+     */
+    post: operations["refreshSession"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/auth/logout": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Keluar dan mencabut sesi aktif
+     * @description Sesi dicari dari cookie refresh token, sehingga tetap bisa keluar walaupun access token sudah kedaluwarsa.
+     */
+    post: operations["logout"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/auth/reauth": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Konfirmasi identitas untuk aksi sensitif
+     * @description Mengembalikan access token baru dengan claim `reauth_at` yang berlaku 5 menit (Technical Guideline 9.1).
+     */
+    post: operations["reauthenticate"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/auth/password/forgot": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Meminta tautan atur ulang password
+     * @description Selalu 204 walaupun email tidak terdaftar, agar tidak bisa dipakai menebak email.
+     */
+    post: operations["requestPasswordReset"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/auth/password/token": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Memeriksa tautan undangan atau atur ulang password */
+    get: operations["getPasswordToken"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/auth/password/setup": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Mengatur password dari tautan undangan atau atur ulang */
+    post: operations["setupPassword"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/auth/password/change": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Mengganti password sendiri */
+    post: operations["changePassword"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/auth/mfa/setup": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Membuat secret TOTP baru untuk didaftarkan di aplikasi autentikator */
+    post: operations["setupMfa"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/auth/mfa/activate": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Mengaktifkan MFA dengan kode pertama dari aplikasi autentikator */
+    post: operations["activateMfa"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/me": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * User yang sedang login beserta permission
+     * @description Permission dimuat server-side dan tidak disimpan di token (Technical Guideline 9.1).
+     */
+    get: operations["getCurrentUser"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/users": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Daftar pengguna */
+    get: operations["listUsers"]
+    put?: never
+    /**
+     * Membuat pengguna dan mengirim undangan atur password
+     * @description Pemberian role butuh re-autentikasi (`identity.user_role.write`).
+     */
+    post: operations["createUser"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/users/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail pengguna */
+    get: operations["getUser"]
+    /**
+     * Mengubah nama, divisi, dan role pengguna
+     * @description Perubahan role butuh re-autentikasi dan memutus semua sesi pengguna (< 30 detik).
+     */
+    put: operations["updateUser"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/users/{id}/activate": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Mengaktifkan kembali pengguna */
+    post: operations["activateUser"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/users/{id}/deactivate": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Menonaktifkan pengguna dan memutus semua sesinya */
+    post: operations["deactivateUser"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/users/{id}/resend-invitation": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Mengirim ulang undangan atur password */
+    post: operations["resendUserInvitation"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/users/{id}/reset-mfa": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Mereset MFA pengguna (HP hilang); pengguna mendaftar ulang saat masuk berikutnya */
+    post: operations["resetUserMfa"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/roles": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Daftar role beserta permission */
+    get: operations["listRoles"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/roles/{id}/permissions": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Mengganti permission role (berlaku langsung, butuh re-autentikasi) */
+    put: operations["setRolePermissions"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/permissions": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Katalog permission */
+    get: operations["listPermissions"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/audit-logs": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Riwayat perubahan
+     * @description Tanpa `entityId` butuh `audit.log.read`. Dengan `entityType` + `entityId` (tab Riwayat dokumen) cukup permission
+     *     baca entitas tersebut. Field sensitif sudah dimask (Technical Guideline 6.6).
+     */
+    get: operations["listAuditLogs"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/products": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Daftar produk (Produk Jadi, Packaging, Material) */
+    get: operations["listProducts"]
+    put?: never
+    /**
+     * Membuat produk (MD-01, MD-02, MD-03)
+     * @description SKU unik permanen dan tidak bisa dipakai ulang walau produk dihapus (`DUPLICATE_CODE`).
+     */
+    post: operations["createProduct"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/products/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    /** Detail produk */
+    get: operations["getProduct"]
+    /** Mengubah produk (optimistic locking dengan `version`) */
+    put: operations["updateProduct"]
+    post?: never
+    /** Menghapus produk (soft delete; tetap tampil di dokumen lama) */
+    delete: operations["deleteProduct"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/warehouses": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Daftar gudang fisik */
+    get: operations["listWarehouses"]
+    put?: never
+    /**
+     * Membuat gudang fisik beserta lokasi standarnya (WMS-01)
+     * @description Lokasi Inbound, FG Non-Ecommerce, E-commerce Stock, Gudang Material, dan Gudang Retur dibuat otomatis (U-08).
+     */
+    post: operations["createWarehouse"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/locations": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Daftar lokasi stok (internal dan eksternal) */
+    get: operations["listLocations"]
+    put?: never
+    /** Membuat lokasi (termasuk lokasi eksternal maklon, konsinyasi, buffer vending, mesin) */
+    post: operations["createLocation"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
-export type $defs = Record<string, never>;
+export type webhooks = Record<string, never>
+export interface components {
+  schemas: {
+    /** @description Format error RFC 7807 (Technical Guideline 8.3). Field code adalah kontrak stabil untuk FE. */
+    Problem: {
+      type: string
+      title: string
+      status: number
+      code: components["schemas"]["ErrorCode"]
+      /** @description Pesan Bahasa Indonesia yang aman ditampilkan ke user. */
+      detail: string
+      fields?: {
+        [key: string]: string
+      }
+      requestId?: string
+    }
+    /**
+     * @description Katalog kode error (Technical Guideline Lampiran A).
+     * @enum {string}
+     */
+    ErrorCode:
+      | "VALIDATION_FAILED"
+      | "AUTH_INVALID_CREDENTIALS"
+      | "AUTH_ACCOUNT_LOCKED"
+      | "AUTH_MFA_REQUIRED"
+      | "AUTH_MFA_INVALID"
+      | "AUTH_TOKEN_EXPIRED"
+      | "AUTH_SESSION_EXPIRED"
+      | "AUTH_REAUTH_REQUIRED"
+      | "AUTH_MFA_ENROLLMENT_REQUIRED"
+      | "AUTH_PASSWORD_TOKEN_INVALID"
+      | "FORBIDDEN"
+      | "NOT_FOUND"
+      | "VERSION_CONFLICT"
+      | "INVALID_STATE_TRANSITION"
+      | "IDEMPOTENCY_KEY_REQUIRED"
+      | "IDEMPOTENCY_IN_PROGRESS"
+      | "IDEMPOTENCY_KEY_REUSED"
+      | "DUPLICATE_CODE"
+      | "PERIOD_LOCKED"
+      | "STOCK_INSUFFICIENT"
+      | "BATCH_SHELF_LIFE_TOO_SHORT"
+      | "APPROVAL_REQUIRED"
+      | "DISCOUNT_LIMIT_EXCEEDED"
+      | "CREDIT_LIMIT_EXCEEDED"
+      | "THREE_WAY_MATCH_FAILED"
+      | "DEPOSIT_INSUFFICIENT"
+      | "OUTSIDE_ATTENDANCE_RADIUS"
+      | "FILE_TOO_LARGE"
+      | "FILE_TYPE_NOT_ALLOWED"
+      | "IMPORT_ALREADY_PROCESSED"
+      | "RATE_LIMITED"
+      | "PROVIDER_UNAVAILABLE"
+      | "BAD_REQUEST"
+      | "INTERNAL_ERROR"
+    HealthStatus: {
+      /** @enum {string} */
+      status: "ok"
+    }
+    ReadinessCheck: {
+      /** @example database */
+      name: string
+      /** @enum {string} */
+      status: "ok" | "failed"
+      detail?: string
+    }
+    ReadinessStatus: {
+      /** @enum {string} */
+      status: "ready" | "not_ready"
+      checks: components["schemas"]["ReadinessCheck"][]
+    }
+    DatabaseInfo: {
+      /** @enum {string} */
+      status: "ok" | "failed"
+      /** Format: int64 */
+      schemaVersion: number
+      /** Format: int64 */
+      latestSchemaVersion: number
+    }
+    SystemInfo: {
+      /** @example v1.0.0 */
+      version: string
+      commit: string
+      /** @enum {string} */
+      environment: "local" | "staging" | "production"
+      enabledModules: string[]
+      /** @description True jika minimal satu adapter pihak ketiga memakai mock. */
+      mockActive: boolean
+      /** Format: date-time */
+      serverTime: string
+      database: components["schemas"]["DatabaseInfo"]
+    }
+    /** @description Payload HTTP notification Midtrans (nama field milik Midtrans). */
+    MidtransNotification: {
+      order_id: string
+      status_code: string
+      gross_amount: string
+      signature_key: string
+      transaction_status: string
+      transaction_id: string
+      fraud_status?: string
+    }
+    WebhookAck: {
+      received: boolean
+      duplicate: boolean
+    }
+    /** @description Payload webhook status order Biteship (nama field milik Biteship). */
+    BiteshipNotification: {
+      /** @example order.status */
+      event: string
+      order_id: string
+      courier_waybill_id?: string
+      status: string
+    }
+    LoginRequest: {
+      /** Format: email */
+      email: string
+      password: string
+      totpCode?: string
+    }
+    AccessToken: {
+      accessToken: string
+      /** Format: date-time */
+      expiresAt: string
+    }
+    ReauthRequest: {
+      password?: string
+      totpCode?: string
+    }
+    PasswordForgotRequest: {
+      /** Format: email */
+      email: string
+    }
+    PasswordTokenInfo: {
+      email: string
+      fullName: string
+      /** @enum {string} */
+      purpose: "invite" | "reset"
+    }
+    PasswordSetupRequest: {
+      token: string
+      password: string
+    }
+    PasswordChangeRequest: {
+      currentPassword: string
+      newPassword: string
+    }
+    MfaSetup: {
+      secret: string
+      otpauthUrl: string
+      /** @description Gambar PNG QR code dalam format data URL. */
+      qrCodeDataUrl: string
+    }
+    MfaActivateRequest: {
+      code: string
+    }
+    CurrentUser: {
+      /** Format: uuid */
+      id: string
+      email: string
+      fullName: string
+      roles: string[]
+      /**
+       * @example [
+       *       "catalog.product.read",
+       *       "catalog.product.write"
+       *     ]
+       */
+      permissions: string[]
+      isMfaEnabled: boolean
+      /** @description Role user mewajibkan MFA tetapi MFA belum aktif; semua menu lain terkunci sampai MFA aktif. */
+      mfaEnrollmentRequired: boolean
+    }
+    /** @description Metadata pagination standar (Technical Guideline 8.2). */
+    Pagination: {
+      page: number
+      pageSize: number
+      /** Format: int64 */
+      totalItems: number
+      totalPages: number
+    }
+    UserRoleAssignment: {
+      code: string
+      readonly name?: string
+      /** Format: uuid */
+      scopeDivisionId?: string | null
+    }
+    User: {
+      /** Format: uuid */
+      id: string
+      email: string
+      fullName: string
+      roles: components["schemas"]["UserRoleAssignment"][]
+      /** Format: uuid */
+      divisionId?: string | null
+      /** Format: uuid */
+      employeeId?: string | null
+      isActive: boolean
+      isMfaEnabled: boolean
+      /** @description false berarti undangan belum diterima. */
+      hasPassword: boolean
+      /** Format: date-time */
+      lastLoginAt?: string | null
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    UserList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["User"][]
+    }
+    UserInput: {
+      /** Format: email */
+      email: string
+      fullName: string
+      roles: components["schemas"]["UserRoleAssignment"][]
+      /** Format: uuid */
+      divisionId?: string | null
+      /** Format: uuid */
+      employeeId?: string | null
+    }
+    UserUpdate: {
+      fullName: string
+      roles: components["schemas"]["UserRoleAssignment"][]
+      /** Format: uuid */
+      divisionId?: string | null
+      /** Format: uuid */
+      employeeId?: string | null
+      version: number
+    }
+    VersionInput: {
+      /** @description Versi terakhir yang dilihat user (optimistic locking). */
+      version: number
+    }
+    Role: {
+      /** Format: uuid */
+      id: string
+      code: string
+      name: string
+      description: string
+      requiresMfa: boolean
+      hasDivisionScope: boolean
+      permissions: string[]
+      version: number
+    }
+    RolePermissionsInput: {
+      permissions: string[]
+      version: number
+    }
+    Permission: {
+      code: string
+      module: string
+      description: string
+      requiresReauth: boolean
+    }
+    /** @enum {string} */
+    AuditAction:
+      | "create"
+      | "update"
+      | "delete"
+      | "restore"
+      | "status_change"
+      | "approve"
+      | "reject"
+      | "submit"
+      | "post"
+      | "cancel"
+      | "login"
+      | "login_failed"
+      | "logout"
+      | "import"
+      | "export"
+    AuditChange: {
+      from?: unknown
+      to?: unknown
+    }
+    AuditLog: {
+      /** Format: uuid */
+      id: string
+      /** Format: uuid */
+      actorId: string
+      actorName: string
+      action: components["schemas"]["AuditAction"]
+      entityType: string
+      /** Format: uuid */
+      entityId: string
+      entityLabel: string
+      changes: {
+        [key: string]: components["schemas"]["AuditChange"]
+      }
+      note: string
+      ip?: string
+      /** Format: date-time */
+      createdAt: string
+    }
+    AuditLogList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["AuditLog"][]
+    }
+    /** @enum {string} */
+    ProductType: "finished_good" | "packaging" | "reprocess_material"
+    /** @enum {string} */
+    PackagingType: "tube" | "pouch" | "roll_sachet"
+    BundleComponent: {
+      /** Format: uuid */
+      componentProductId: string
+      readonly componentSku?: string
+      /**
+       * @description Kuantitas desimal sebagai string.
+       * @example 2.000
+       */
+      qty: string
+    }
+    ProductInput: {
+      sku: string
+      name: string
+      variant?: string
+      productType: components["schemas"]["ProductType"]
+      packagingType?: components["schemas"]["PackagingType"]
+      /** @example pcs */
+      uom: string
+      shelfLifeDays?: number
+      hasBatch: boolean
+      /** @description Bundle virtual tidak punya stok sendiri; stok komponen terpotong saat terjual (MD-03). */
+      isBundle: boolean
+      /** Format: uuid */
+      categoryId?: string
+      barcodes?: string[]
+      /** @example 100.000 */
+      minStockQty?: string
+      bundleComponents?: components["schemas"]["BundleComponent"][]
+    }
+    AuditFields: {
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      /** @description Dipakai optimistic locking; kirim kembali saat update (Technical Guideline 7.2). */
+      version: number
+    }
+    Product: components["schemas"]["ProductInput"] &
+      components["schemas"]["AuditFields"] & {
+        /** Format: uuid */
+        id: string
+        isActive: boolean
+        allowedActions: ("update" | "delete")[]
+      }
+    ProductList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["Product"][]
+    }
+    WarehouseInput: {
+      code: string
+      name: string
+      address: string
+    }
+    Warehouse: components["schemas"]["WarehouseInput"] &
+      components["schemas"]["AuditFields"] & {
+        /** Format: uuid */
+        id: string
+      }
+    WarehouseList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["Warehouse"][]
+    }
+    /** @enum {string} */
+    LocationType:
+      | "inbound"
+      | "finished_goods"
+      | "ecommerce"
+      | "raw_material"
+      | "goods_material"
+      | "returns"
+      | "event"
+      | "toll_manufacturer"
+      | "consignment"
+      | "vending_buffer"
+      | "vending_machine"
+    LocationInput: {
+      code: string
+      name: string
+      locationType: components["schemas"]["LocationType"]
+      /**
+       * Format: uuid
+       * @description Wajib untuk lokasi internal; kosong untuk lokasi eksternal.
+       */
+      warehouseId?: string
+      /** @enum {string} */
+      externalPartyType?: "supplier" | "partner" | "vending_machine"
+      /** Format: uuid */
+      externalPartyId?: string
+    }
+    Location: components["schemas"]["LocationInput"] &
+      components["schemas"]["AuditFields"] & {
+        /** Format: uuid */
+        id: string
+        /** @description Stok di lokasi ini bisa dialokasikan ke penjualan. */
+        isSellable: boolean
+        isActive: boolean
+      }
+    LocationList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["Location"][]
+    }
+  }
+  responses: {
+    /** @description Error standar (problem+json) */
+    Problem: {
+      headers: {
+        [name: string]: unknown
+      }
+      content: {
+        "application/problem+json": components["schemas"]["Problem"]
+      }
+    }
+  }
+  parameters: {
+    RefreshCookie: string
+    /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+    IdempotencyKey: string
+    Page: number
+    PageSize: number
+    /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
+    Sort: string
+    Search: string
+    Id: string
+  }
+  requestBodies: never
+  headers: never
+  pathItems: never
+}
+export type $defs = Record<string, never>
 export interface operations {
-    getHealth: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Proses berjalan */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HealthStatus"];
-                };
-            };
-        };
-    };
-    getReadiness: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Siap */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ReadinessStatus"];
-                };
-            };
-            /** @description Belum siap */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ReadinessStatus"];
-                };
-            };
-        };
-    };
-    getSystemInfo: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Informasi sistem */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SystemInfo"];
-                };
-            };
-            /** @description Kesalahan sistem */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["Problem"];
-                };
-            };
-        };
-    };
-    receiveMidtransWebhook: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["MidtransNotification"];
-            };
-        };
-        responses: {
-            /** @description Event diterima atau sudah pernah diterima */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["WebhookAck"];
-                };
-            };
-            /** @description Payload tidak bisa dibaca */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["Problem"];
-                };
-            };
-            /** @description Signature tidak valid */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["Problem"];
-                };
-            };
-        };
-    };
-    receiveBiteshipWebhook: {
-        parameters: {
-            query?: never;
-            header: {
-                "X-Biteship-Signature": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["BiteshipNotification"];
-            };
-        };
-        responses: {
-            /** @description Event diterima atau sudah pernah diterima */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["WebhookAck"];
-                };
-            };
-            /** @description Payload tidak bisa dibaca */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["Problem"];
-                };
-            };
-            /** @description Signature tidak valid */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["Problem"];
-                };
-            };
-        };
-    };
-    login: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["LoginRequest"];
-            };
-        };
-        responses: {
-            /** @description Berhasil masuk */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AccessToken"];
-                };
-            };
-            default: components["responses"]["Problem"];
-        };
-    };
-    refreshSession: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Access token baru */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AccessToken"];
-                };
-            };
-            default: components["responses"]["Problem"];
-        };
-    };
-    logout: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Sesi dicabut */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            default: components["responses"]["Problem"];
-        };
-    };
-    getCurrentUser: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Data user */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CurrentUser"];
-                };
-            };
-            default: components["responses"]["Problem"];
-        };
-    };
-    listUsers: {
-        parameters: {
-            query?: {
-                page?: components["parameters"]["Page"];
-                pageSize?: components["parameters"]["PageSize"];
-                /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
-                sort?: components["parameters"]["Sort"];
-                q?: components["parameters"]["Search"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Daftar pengguna */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserList"];
-                };
-            };
-            default: components["responses"]["Problem"];
-        };
-    };
-    createUser: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UserInput"];
-            };
-        };
-        responses: {
-            /** @description Pengguna dibuat */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["User"];
-                };
-            };
-            default: components["responses"]["Problem"];
-        };
-    };
-    listProducts: {
-        parameters: {
-            query?: {
-                page?: components["parameters"]["Page"];
-                pageSize?: components["parameters"]["PageSize"];
-                /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
-                sort?: components["parameters"]["Sort"];
-                q?: components["parameters"]["Search"];
-                productType?: components["schemas"]["ProductType"];
-                isBundle?: boolean;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Daftar produk; field sort yang diizinkan `sku`, `name`, `createdAt` */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ProductList"];
-                };
-            };
-            default: components["responses"]["Problem"];
-        };
-    };
-    createProduct: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ProductInput"];
-            };
-        };
-        responses: {
-            /** @description Produk dibuat */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Product"];
-                };
-            };
-            default: components["responses"]["Problem"];
-        };
-    };
-    getProduct: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: components["parameters"]["Id"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Detail produk */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Product"];
-                };
-            };
-            default: components["responses"]["Problem"];
-        };
-    };
-    updateProduct: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
-            };
-            path: {
-                id: components["parameters"]["Id"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ProductInput"] & {
-                    version: number;
-                };
-            };
-        };
-        responses: {
-            /** @description Produk diubah */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Product"];
-                };
-            };
-            default: components["responses"]["Problem"];
-        };
-    };
-    deleteProduct: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
-            };
-            path: {
-                id: components["parameters"]["Id"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Produk dihapus */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            default: components["responses"]["Problem"];
-        };
-    };
-    listWarehouses: {
-        parameters: {
-            query?: {
-                page?: components["parameters"]["Page"];
-                pageSize?: components["parameters"]["PageSize"];
-                q?: components["parameters"]["Search"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Daftar gudang */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["WarehouseList"];
-                };
-            };
-            default: components["responses"]["Problem"];
-        };
-    };
-    createWarehouse: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["WarehouseInput"];
-            };
-        };
-        responses: {
-            /** @description Gudang dibuat */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Warehouse"];
-                };
-            };
-            default: components["responses"]["Problem"];
-        };
-    };
-    listLocations: {
-        parameters: {
-            query?: {
-                page?: components["parameters"]["Page"];
-                pageSize?: components["parameters"]["PageSize"];
-                q?: components["parameters"]["Search"];
-                warehouseId?: string;
-                locationType?: components["schemas"]["LocationType"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Daftar lokasi */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LocationList"];
-                };
-            };
-            default: components["responses"]["Problem"];
-        };
-    };
-    createLocation: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["LocationInput"];
-            };
-        };
-        responses: {
-            /** @description Lokasi dibuat */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Location"];
-                };
-            };
-            default: components["responses"]["Problem"];
-        };
-    };
+  getHealth: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Proses berjalan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["HealthStatus"]
+        }
+      }
+    }
+  }
+  getReadiness: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Siap */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ReadinessStatus"]
+        }
+      }
+      /** @description Belum siap */
+      503: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ReadinessStatus"]
+        }
+      }
+    }
+  }
+  getSystemInfo: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Informasi sistem */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SystemInfo"]
+        }
+      }
+      /** @description Kesalahan sistem */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["Problem"]
+        }
+      }
+    }
+  }
+  receiveMidtransWebhook: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["MidtransNotification"]
+      }
+    }
+    responses: {
+      /** @description Event diterima atau sudah pernah diterima */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["WebhookAck"]
+        }
+      }
+      /** @description Payload tidak bisa dibaca */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["Problem"]
+        }
+      }
+      /** @description Signature tidak valid */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["Problem"]
+        }
+      }
+    }
+  }
+  receiveBiteshipWebhook: {
+    parameters: {
+      query?: never
+      header: {
+        "X-Biteship-Signature": string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["BiteshipNotification"]
+      }
+    }
+    responses: {
+      /** @description Event diterima atau sudah pernah diterima */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["WebhookAck"]
+        }
+      }
+      /** @description Payload tidak bisa dibaca */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["Problem"]
+        }
+      }
+      /** @description Signature tidak valid */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/problem+json": components["schemas"]["Problem"]
+        }
+      }
+    }
+  }
+  login: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["LoginRequest"]
+      }
+    }
+    responses: {
+      /** @description Berhasil masuk */
+      200: {
+        headers: {
+          "Set-Cookie"?: string
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["AccessToken"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  refreshSession: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: {
+        balans_refresh?: components["parameters"]["RefreshCookie"]
+      }
+    }
+    requestBody?: never
+    responses: {
+      /** @description Access token baru */
+      200: {
+        headers: {
+          "Set-Cookie"?: string
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["AccessToken"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  logout: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: {
+        balans_refresh?: components["parameters"]["RefreshCookie"]
+      }
+    }
+    requestBody?: never
+    responses: {
+      /** @description Sesi dicabut */
+      204: {
+        headers: {
+          "Set-Cookie"?: string
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  reauthenticate: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ReauthRequest"]
+      }
+    }
+    responses: {
+      /** @description Access token baru */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["AccessToken"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  requestPasswordReset: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PasswordForgotRequest"]
+      }
+    }
+    responses: {
+      /** @description Diterima */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getPasswordToken: {
+    parameters: {
+      query: {
+        token: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Tautan berlaku */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PasswordTokenInfo"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  setupPassword: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PasswordSetupRequest"]
+      }
+    }
+    responses: {
+      /** @description Password tersimpan; semua sesi lama dicabut */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  changePassword: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PasswordChangeRequest"]
+      }
+    }
+    responses: {
+      /** @description Password diganti; sesi lain dicabut */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  setupMfa: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Secret dan QR code */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["MfaSetup"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  activateMfa: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["MfaActivateRequest"]
+      }
+    }
+    responses: {
+      /** @description MFA aktif */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getCurrentUser: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Data user */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CurrentUser"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listUsers: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
+        sort?: components["parameters"]["Sort"]
+        q?: components["parameters"]["Search"]
+        isActive?: boolean
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar pengguna */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["UserList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createUser: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UserInput"]
+      }
+    }
+    responses: {
+      /** @description Pengguna dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["User"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getUser: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Pengguna */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["User"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateUser: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UserUpdate"]
+      }
+    }
+    responses: {
+      /** @description Pengguna diubah */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["User"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  activateUser: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Pengguna aktif */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["User"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  deactivateUser: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Pengguna nonaktif */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["User"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  resendUserInvitation: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Undangan dikirim */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  resetUserMfa: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description MFA direset */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listRoles: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar role */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Role"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  setRolePermissions: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RolePermissionsInput"]
+      }
+    }
+    responses: {
+      /** @description Role diubah */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Role"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listPermissions: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Katalog permission */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Permission"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listAuditLogs: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        entityType?: string
+        entityId?: string
+        actorId?: string
+        action?: components["schemas"]["AuditAction"]
+        createdFrom?: string
+        createdTo?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Riwayat perubahan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["AuditLogList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listProducts: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
+        sort?: components["parameters"]["Sort"]
+        q?: components["parameters"]["Search"]
+        productType?: components["schemas"]["ProductType"]
+        isBundle?: boolean
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar produk; field sort yang diizinkan `sku`, `name`, `createdAt` */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ProductList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createProduct: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ProductInput"]
+      }
+    }
+    responses: {
+      /** @description Produk dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Product"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getProduct: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Detail produk */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Product"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateProduct: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ProductInput"] & {
+          version: number
+        }
+      }
+    }
+    responses: {
+      /** @description Produk diubah */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Product"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  deleteProduct: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Produk dihapus */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listWarehouses: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar gudang */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["WarehouseList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createWarehouse: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["WarehouseInput"]
+      }
+    }
+    responses: {
+      /** @description Gudang dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Warehouse"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listLocations: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        warehouseId?: string
+        locationType?: components["schemas"]["LocationType"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar lokasi */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["LocationList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createLocation: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["LocationInput"]
+      }
+    }
+    responses: {
+      /** @description Lokasi dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Location"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
 }

@@ -16,6 +16,9 @@ func main() {
 			return err
 		}
 		defer a.Close()
+		if err := a.Start(ctx); err != nil {
+			return err
+		}
 		return app.Serve(ctx, log, cfg.HTTPAddr, a.Router(), cfg.ShutdownTimeout)
 	})
 }

@@ -18,6 +18,8 @@ tags:
     description: Pengiriman, termasuk webhook kurir
   - name: identity
     description: Sesi, pengguna, dan permission (R1.1)
+  - name: audit
+    description: Riwayat perubahan (audit trail)
   - name: catalog
     description: Master produk, packaging, material, bundling (R1.1)
   - name: warehouse
@@ -39,10 +41,42 @@ paths:
     $ref: "./paths/identity.yaml#/refresh"
   /api/v1/auth/logout:
     $ref: "./paths/identity.yaml#/logout"
+  /api/v1/auth/reauth:
+    $ref: "./paths/identity.yaml#/reauth"
+  /api/v1/auth/password/forgot:
+    $ref: "./paths/identity.yaml#/passwordForgot"
+  /api/v1/auth/password/token:
+    $ref: "./paths/identity.yaml#/passwordToken"
+  /api/v1/auth/password/setup:
+    $ref: "./paths/identity.yaml#/passwordSetup"
+  /api/v1/auth/password/change:
+    $ref: "./paths/identity.yaml#/passwordChange"
+  /api/v1/auth/mfa/setup:
+    $ref: "./paths/identity.yaml#/mfaSetup"
+  /api/v1/auth/mfa/activate:
+    $ref: "./paths/identity.yaml#/mfaActivate"
   /api/v1/me:
     $ref: "./paths/identity.yaml#/me"
   /api/v1/users:
     $ref: "./paths/identity.yaml#/users"
+  /api/v1/users/{id}:
+    $ref: "./paths/identity.yaml#/user"
+  /api/v1/users/{id}/activate:
+    $ref: "./paths/identity.yaml#/userActivate"
+  /api/v1/users/{id}/deactivate:
+    $ref: "./paths/identity.yaml#/userDeactivate"
+  /api/v1/users/{id}/resend-invitation:
+    $ref: "./paths/identity.yaml#/userResendInvitation"
+  /api/v1/users/{id}/reset-mfa:
+    $ref: "./paths/identity.yaml#/userResetMfa"
+  /api/v1/roles:
+    $ref: "./paths/identity.yaml#/roles"
+  /api/v1/roles/{id}/permissions:
+    $ref: "./paths/identity.yaml#/rolePermissions"
+  /api/v1/permissions:
+    $ref: "./paths/identity.yaml#/permissions"
+  /api/v1/audit-logs:
+    $ref: "./paths/audit.yaml#/auditLogs"
   /api/v1/products:
     $ref: "./paths/catalog.yaml#/products"
   /api/v1/products/{id}:

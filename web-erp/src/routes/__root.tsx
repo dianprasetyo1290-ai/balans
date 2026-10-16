@@ -4,6 +4,7 @@ import { createRootRouteWithContext, Outlet } from "@tanstack/react-router"
 import { ErrorDialog } from "@/components/common/error-dialog"
 import { NotFoundPage, StatusPage } from "@/components/layout/status-page"
 import { Toaster } from "@/components/ui/sonner"
+import { ReauthDialog } from "@/features/auth/components/reauth-dialog"
 
 export type RouterContext = {
   queryClient: QueryClient
@@ -26,6 +27,7 @@ function RootLayout() {
     <>
       <Outlet />
       <ErrorDialog />
+      <ReauthDialog />
       <Toaster richColors position="top-right" />
     </>
   )

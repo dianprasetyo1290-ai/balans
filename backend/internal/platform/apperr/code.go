@@ -16,6 +16,8 @@ const (
 	CodeAuthTokenExpired        Code = "AUTH_TOKEN_EXPIRED"
 	CodeAuthSessionExpired      Code = "AUTH_SESSION_EXPIRED"
 	CodeAuthReauthRequired      Code = "AUTH_REAUTH_REQUIRED"
+	CodeAuthMFAEnrollment       Code = "AUTH_MFA_ENROLLMENT_REQUIRED"
+	CodeAuthPasswordToken       Code = "AUTH_PASSWORD_TOKEN_INVALID"
 	CodeForbidden               Code = "FORBIDDEN"
 	CodeNotFound                Code = "NOT_FOUND"
 	CodeVersionConflict         Code = "VERSION_CONFLICT"
@@ -57,6 +59,8 @@ var codeSpecs = map[Code]codeSpec{
 	CodeAuthTokenExpired:        {http.StatusUnauthorized, "Token kedaluwarsa", "Token akses kedaluwarsa."},
 	CodeAuthSessionExpired:      {http.StatusUnauthorized, "Sesi berakhir", "Sesi Anda berakhir. Silakan masuk kembali."},
 	CodeAuthReauthRequired:      {http.StatusUnauthorized, "Konfirmasi identitas", "Konfirmasi identitas Anda untuk melanjutkan."},
+	CodeAuthMFAEnrollment:       {http.StatusForbidden, "Aktifkan autentikasi dua langkah", "Role Anda mewajibkan autentikasi dua langkah. Aktifkan terlebih dahulu untuk melanjutkan."},
+	CodeAuthPasswordToken:       {http.StatusUnprocessableEntity, "Tautan tidak berlaku", "Tautan sudah dipakai atau kedaluwarsa. Minta tautan baru."},
 	CodeForbidden:               {http.StatusForbidden, "Akses ditolak", "Anda tidak memiliki akses untuk tindakan ini."},
 	CodeNotFound:                {http.StatusNotFound, "Tidak ditemukan", "Data tidak ditemukan."},
 	CodeVersionConflict:         {http.StatusConflict, "Data sudah berubah", "Data sudah diubah oleh pengguna lain. Muat ulang untuk melihat perubahan terbaru."},

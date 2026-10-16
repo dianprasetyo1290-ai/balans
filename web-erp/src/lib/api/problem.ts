@@ -24,7 +24,12 @@ export class ApiError extends Error {
 }
 
 function isProblemBody(value: unknown): value is ProblemBody {
-  return typeof value === "object" && value !== null && "code" in value && "status" in value
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "code" in value &&
+    "status" in value
+  )
 }
 
 /** Mengubah body error dan status HTTP menjadi Problem. FE hanya bergantung pada `code`. */
@@ -40,7 +45,8 @@ export function toProblem(body: unknown, status: number): Problem {
       requestId: body.requestId,
     }
   }
-  const code: ErrorCode = status >= 500 || status === 0 ? "INTERNAL_ERROR" : "BAD_REQUEST"
+  const code: ErrorCode =
+    status >= 500 || status === 0 ? "INTERNAL_ERROR" : "BAD_REQUEST"
   const fallback = errorMessageFor(code)
   return { code, title: fallback.title, detail: fallback.message, status }
 }
@@ -52,7 +58,12 @@ export function parseProblem(error: unknown): Problem {
   }
   if (error instanceof TypeError) {
     const fallback = errorMessageFor("NETWORK_ERROR")
-    return { code: "NETWORK_ERROR", title: fallback.title, detail: fallback.message, status: 0 }
+    return {
+      code: "NETWORK_ERROR",
+      title: fallback.title,
+      detail: fallback.message,
+      status: 0,
+    }
   }
   return toProblem(undefined, 500)
 }

@@ -28,6 +28,13 @@ AuditFields:
     version:
       type: integer
       description: Dipakai optimistic locking; kirim kembali saat update (Technical Guideline 7.2).
+VersionInput:
+  type: object
+  required: [version]
+  properties:
+    version:
+      type: integer
+      description: Versi terakhir yang dilihat user (optimistic locking).
 parameters:
   Page:
     name: page

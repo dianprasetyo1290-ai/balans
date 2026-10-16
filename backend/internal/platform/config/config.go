@@ -53,6 +53,19 @@ type Config struct {
 	MidtransServerKey     string
 	BiteshipWebhookSecret string
 
+	// Kunci JWT Ed25519 (Runbook 3.1): PEM base64 satu baris; JWTVerifyKeys berformat `kid:base64,kid2:base64`.
+	JWTSigningKeyID string
+	JWTSigningKey   string
+	JWTVerifyKeys   string
+	// Kunci data pribadi AES-256-GCM dan HMAC (Runbook 3.2).
+	PIIEncryptionKeyID string
+	PIIEncryptionKeys  string
+	PIIHashKey         string
+	// InitialAdminEmail mendapat undangan Admin Sistem saat database belum punya user sama sekali.
+	InitialAdminEmail string
+	// DevSkipMFA mematikan kewajiban MFA untuk pengembangan lokal. Ditolak di luar APP_ENV=local.
+	DevSkipMFA bool
+
 	ShutdownTimeout time.Duration
 }
 
@@ -95,6 +108,14 @@ func load(getenv func(string) string) (Config, error) {
 		MailFrom:              env("MAIL_FROM", "Balans ERP <no-reply@findyourbalans.com>"),
 		MidtransServerKey:     env("MIDTRANS_SERVER_KEY", ""),
 		BiteshipWebhookSecret: env("BITESHIP_WEBHOOK_SECRET", ""),
+		JWTSigningKeyID:       env("JWT_SIGNING_KEY_ID", ""),
+		JWTSigningKey:         env("JWT_SIGNING_KEY", ""),
+		JWTVerifyKeys:         env("JWT_VERIFY_KEYS", ""),
+		PIIEncryptionKeyID:    env("PII_ENCRYPTION_KEY_ID", ""),
+		PIIEncryptionKeys:     env("PII_ENCRYPTION_KEYS", ""),
+		PIIHashKey:            env("PII_HASH_KEY", ""),
+		InitialAdminEmail:     env("INITIAL_ADMIN_EMAIL", ""),
+		DevSkipMFA:            env("DEV_SKIP_MFA", "") == "true",
 		ShutdownTimeout:       shutdown,
 	}
 	if err := cfg.Validate(); err != nil {
@@ -150,6 +171,17 @@ func (c Config) Validate() error {
 			if c.IsEnabled(module) && provider == ProviderMock {
 				errs = append(errs, fmt.Errorf("modul %s aktif di production tetapi provider masih mock", module))
 			}
+		}
+	}
+	if c.DevSkipMFA && c.Env != EnvLocal {
+		errs = append(errs, errors.New("DEV_SKIP_MFA hanya boleh dipakai di APP_ENV=local"))
+	}
+	if c.Env != EnvLocal && c.IsEnabled("identity") {
+		if c.JWTSigningKeyID == "" || c.JWTSigningKey == "" || c.JWTVerifyKeys == "" {
+			errs = append(errs, errors.New("JWT_SIGNING_KEY_ID, JWT_SIGNING_KEY, dan JWT_VERIFY_KEYS wajib diisi (Runbook 3.1)"))
+		}
+		if c.PIIEncryptionKeyID == "" || c.PIIEncryptionKeys == "" || c.PIIHashKey == "" {
+			errs = append(errs, errors.New("PII_ENCRYPTION_KEY_ID, PII_ENCRYPTION_KEYS, dan PII_HASH_KEY wajib diisi (Runbook 3.2)"))
 		}
 	}
 	if c.PaymentGateway == ProviderMock && c.MidtransServerKey == "" && c.Env != EnvLocal {

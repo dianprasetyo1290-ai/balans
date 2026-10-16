@@ -90,7 +90,7 @@ components:
   schemas:
     LocationType:
       type: string
-      enum: [inbound, finished_goods, ecommerce, material, returns, toll_manufacturer, consignment, vending_buffer, vending_machine]
+      enum: [inbound, finished_goods, ecommerce, raw_material, goods_material, returns, event, toll_manufacturer, consignment, vending_buffer, vending_machine]
     WarehouseInput:
       type: object
       required: [code, name, address]

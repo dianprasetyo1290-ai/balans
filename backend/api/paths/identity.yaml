@@ -7,7 +7,7 @@ login:
     description: |
       Mengembalikan access token (15 menit, disimpan di memori FE) dan memasang refresh token di cookie
       HttpOnly `Path=/api/v1/auth` (Technical Guideline 9.1). Gagal login selalu `AUTH_INVALID_CREDENTIALS`;
-      5 kali gagal dalam 15 menit → `AUTH_ACCOUNT_LOCKED`. Role ber-MFA → `AUTH_MFA_REQUIRED` lalu kirim ulang dengan `totpCode`.
+      5 kali gagal dalam 15 menit → `AUTH_ACCOUNT_LOCKED`. User ber-MFA → `AUTH_MFA_REQUIRED` lalu kirim ulang dengan `totpCode`.
       Tidak memakai Idempotency-Key.
     requestBody:
       required: true
@@ -18,6 +18,10 @@ login:
     responses:
       "200":
         description: Berhasil masuk
+        headers:
+          Set-Cookie:
+            schema:
+              type: string
         content:
           application/json:
             schema:
@@ -31,9 +35,15 @@ refresh:
     tags: [identity]
     summary: Memperbarui access token dengan refresh token (rotasi)
     description: Refresh token lama langsung tidak berlaku. Pemakaian ulang token lama mencabut seluruh keluarga sesi.
+    parameters:
+      - $ref: "#/components/parameters/RefreshCookie"
     responses:
       "200":
         description: Access token baru
+        headers:
+          Set-Cookie:
+            schema:
+              type: string
         content:
           application/json:
             schema:
@@ -43,11 +53,148 @@ refresh:
 logout:
   post:
     operationId: logout
+    security: []
     tags: [identity]
     summary: Keluar dan mencabut sesi aktif
+    description: Sesi dicari dari cookie refresh token, sehingga tetap bisa keluar walaupun access token sudah kedaluwarsa.
+    parameters:
+      - $ref: "#/components/parameters/RefreshCookie"
     responses:
       "204":
         description: Sesi dicabut
+        headers:
+          Set-Cookie:
+            schema:
+              type: string
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+reauth:
+  post:
+    operationId: reauthenticate
+    tags: [identity]
+    summary: Konfirmasi identitas untuk aksi sensitif
+    description: Mengembalikan access token baru dengan claim `reauth_at` yang berlaku 5 menit (Technical Guideline 9.1).
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ReauthRequest"
+    responses:
+      "200":
+        description: Access token baru
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccessToken"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+passwordForgot:
+  post:
+    operationId: requestPasswordReset
+    security: []
+    tags: [identity]
+    summary: Meminta tautan atur ulang password
+    description: Selalu 204 walaupun email tidak terdaftar, agar tidak bisa dipakai menebak email.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PasswordForgotRequest"
+    responses:
+      "204":
+        description: Diterima
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+passwordToken:
+  get:
+    operationId: getPasswordToken
+    security: []
+    tags: [identity]
+    summary: Memeriksa tautan undangan atau atur ulang password
+    parameters:
+      - name: token
+        in: query
+        required: true
+        schema:
+          type: string
+    responses:
+      "200":
+        description: Tautan berlaku
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasswordTokenInfo"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+passwordSetup:
+  post:
+    operationId: setupPassword
+    security: []
+    tags: [identity]
+    summary: Mengatur password dari tautan undangan atau atur ulang
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PasswordSetupRequest"
+    responses:
+      "204":
+        description: Password tersimpan; semua sesi lama dicabut
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+passwordChange:
+  post:
+    operationId: changePassword
+    tags: [identity]
+    summary: Mengganti password sendiri
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PasswordChangeRequest"
+    responses:
+      "204":
+        description: Password diganti; sesi lain dicabut
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+mfaSetup:
+  post:
+    operationId: setupMfa
+    tags: [identity]
+    summary: Membuat secret TOTP baru untuk didaftarkan di aplikasi autentikator
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    responses:
+      "200":
+        description: Secret dan QR code
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MfaSetup"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+mfaActivate:
+  post:
+    operationId: activateMfa
+    tags: [identity]
+    summary: Mengaktifkan MFA dengan kode pertama dari aplikasi autentikator
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MfaActivateRequest"
+    responses:
+      "204":
+        description: MFA aktif
       default:
         $ref: "../components/common.yaml#/responses/Problem"
 me:
@@ -75,6 +222,10 @@ users:
       - $ref: "../components/common.yaml#/parameters/PageSize"
       - $ref: "../components/common.yaml#/parameters/Sort"
       - $ref: "../components/common.yaml#/parameters/Search"
+      - name: isActive
+        in: query
+        schema:
+          type: boolean
     responses:
       "200":
         description: Daftar pengguna
@@ -88,6 +239,7 @@ users:
     operationId: createUser
     tags: [identity]
     summary: Membuat pengguna dan mengirim undangan atur password
+    description: Pemberian role butuh re-autentikasi (`identity.user_role.write`).
     parameters:
       - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
     requestBody:
@@ -105,7 +257,180 @@ users:
               $ref: "#/components/schemas/User"
       default:
         $ref: "../components/common.yaml#/responses/Problem"
+user:
+  get:
+    operationId: getUser
+    tags: [identity]
+    summary: Detail pengguna
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+    responses:
+      "200":
+        description: Pengguna
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  put:
+    operationId: updateUser
+    tags: [identity]
+    summary: Mengubah nama, divisi, dan role pengguna
+    description: Perubahan role butuh re-autentikasi dan memutus semua sesi pengguna (< 30 detik).
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UserUpdate"
+    responses:
+      "200":
+        description: Pengguna diubah
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+userActivate:
+  post:
+    operationId: activateUser
+    tags: [identity]
+    summary: Mengaktifkan kembali pengguna
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../components/common.yaml#/VersionInput"
+    responses:
+      "200":
+        description: Pengguna aktif
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+userDeactivate:
+  post:
+    operationId: deactivateUser
+    tags: [identity]
+    summary: Menonaktifkan pengguna dan memutus semua sesinya
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../components/common.yaml#/VersionInput"
+    responses:
+      "200":
+        description: Pengguna nonaktif
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+userResendInvitation:
+  post:
+    operationId: resendUserInvitation
+    tags: [identity]
+    summary: Mengirim ulang undangan atur password
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    responses:
+      "204":
+        description: Undangan dikirim
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+userResetMfa:
+  post:
+    operationId: resetUserMfa
+    tags: [identity]
+    summary: Mereset MFA pengguna (HP hilang); pengguna mendaftar ulang saat masuk berikutnya
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    responses:
+      "204":
+        description: MFA direset
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+roles:
+  get:
+    operationId: listRoles
+    tags: [identity]
+    summary: Daftar role beserta permission
+    responses:
+      "200":
+        description: Daftar role
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/Role"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+rolePermissions:
+  put:
+    operationId: setRolePermissions
+    tags: [identity]
+    summary: Mengganti permission role (berlaku langsung, butuh re-autentikasi)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/RolePermissionsInput"
+    responses:
+      "200":
+        description: Role diubah
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Role"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+permissions:
+  get:
+    operationId: listPermissions
+    tags: [identity]
+    summary: Katalog permission
+    responses:
+      "200":
+        description: Katalog permission
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/Permission"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
 components:
+  parameters:
+    RefreshCookie:
+      name: balans_refresh
+      in: cookie
+      required: false
+      schema:
+        type: string
   schemas:
     LoginRequest:
       type: object
@@ -120,6 +445,14 @@ components:
         totpCode:
           type: string
           pattern: "^[0-9]{6}$"
+    ReauthRequest:
+      type: object
+      properties:
+        password:
+          type: string
+        totpCode:
+          type: string
+          pattern: "^[0-9]{6}$"
     AccessToken:
       type: object
       required: [accessToken, expiresAt]
@@ -129,9 +462,65 @@ components:
         expiresAt:
           type: string
           format: date-time
+    PasswordForgotRequest:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+    PasswordTokenInfo:
+      type: object
+      required: [email, fullName, purpose]
+      properties:
+        email:
+          type: string
+        fullName:
+          type: string
+        purpose:
+          type: string
+          enum: [invite, reset]
+    PasswordSetupRequest:
+      type: object
+      required: [token, password]
+      properties:
+        token:
+          type: string
+        password:
+          type: string
+          minLength: 10
+          maxLength: 128
+    PasswordChangeRequest:
+      type: object
+      required: [currentPassword, newPassword]
+      properties:
+        currentPassword:
+          type: string
+        newPassword:
+          type: string
+          minLength: 10
+          maxLength: 128
+    MfaSetup:
+      type: object
+      required: [secret, otpauthUrl, qrCodeDataUrl]
+      properties:
+        secret:
+          type: string
+        otpauthUrl:
+          type: string
+        qrCodeDataUrl:
+          type: string
+          description: Gambar PNG QR code dalam format data URL.
+    MfaActivateRequest:
+      type: object
+      required: [code]
+      properties:
+        code:
+          type: string
+          pattern: "^[0-9]{6}$"
     CurrentUser:
       type: object
-      required: [id, email, fullName, roles, permissions]
+      required: [id, email, fullName, roles, permissions, isMfaEnabled, mfaEnrollmentRequired]
       properties:
         id:
           type: string
@@ -149,9 +538,27 @@ components:
           items:
             type: string
           example: [catalog.product.read, catalog.product.write]
+        isMfaEnabled:
+          type: boolean
+        mfaEnrollmentRequired:
+          type: boolean
+          description: Role user mewajibkan MFA tetapi MFA belum aktif; semua menu lain terkunci sampai MFA aktif.
+    UserRoleAssignment:
+      type: object
+      required: [code]
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+          readOnly: true
+        scopeDivisionId:
+          type: string
+          format: uuid
+          nullable: true
     UserInput:
       type: object
-      required: [email, fullName, roleCodes]
+      required: [email, fullName, roles]
       properties:
         email:
           type: string
@@ -161,31 +568,84 @@ components:
           type: string
           minLength: 1
           maxLength: 120
-        roleCodes:
+        roles:
           type: array
           minItems: 1
           items:
-            type: string
+            $ref: "#/components/schemas/UserRoleAssignment"
         divisionId:
           type: string
           format: uuid
+          nullable: true
+        employeeId:
+          type: string
+          format: uuid
+          nullable: true
+    UserUpdate:
+      type: object
+      required: [fullName, roles, version]
+      properties:
+        fullName:
+          type: string
+          minLength: 1
+          maxLength: 120
+        roles:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/UserRoleAssignment"
+        divisionId:
+          type: string
+          format: uuid
+          nullable: true
+        employeeId:
+          type: string
+          format: uuid
+          nullable: true
+        version:
+          type: integer
     User:
-      allOf:
-        - $ref: "#/components/schemas/UserInput"
-        - $ref: "../components/common.yaml#/AuditFields"
-        - type: object
-          required: [id, isActive, isMfaEnabled]
-          properties:
-            id:
-              type: string
-              format: uuid
-            isActive:
-              type: boolean
-            isMfaEnabled:
-              type: boolean
-            lastLoginAt:
-              type: string
-              format: date-time
+      type: object
+      required: [id, email, fullName, roles, isActive, isMfaEnabled, hasPassword, createdAt, updatedAt, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+        fullName:
+          type: string
+        roles:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserRoleAssignment"
+        divisionId:
+          type: string
+          format: uuid
+          nullable: true
+        employeeId:
+          type: string
+          format: uuid
+          nullable: true
+        isActive:
+          type: boolean
+        isMfaEnabled:
+          type: boolean
+        hasPassword:
+          type: boolean
+          description: false berarti undangan belum diterima.
+        lastLoginAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
     UserList:
       allOf:
         - $ref: "../components/common.yaml#/Pagination"
@@ -196,3 +656,48 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/User"
+    Role:
+      type: object
+      required: [id, code, name, description, requiresMfa, hasDivisionScope, permissions, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        requiresMfa:
+          type: boolean
+        hasDivisionScope:
+          type: boolean
+        permissions:
+          type: array
+          items:
+            type: string
+        version:
+          type: integer
+    RolePermissionsInput:
+      type: object
+      required: [permissions, version]
+      properties:
+        permissions:
+          type: array
+          items:
+            type: string
+        version:
+          type: integer
+    Permission:
+      type: object
+      required: [code, module, description, requiresReauth]
+      properties:
+        code:
+          type: string
+        module:
+          type: string
+        description:
+          type: string
+        requiresReauth:
+          type: boolean

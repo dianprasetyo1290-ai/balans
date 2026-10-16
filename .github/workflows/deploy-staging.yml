@@ -101,6 +101,9 @@ jobs:
         env:
           E2E_BASE_URL: https://erp-staging.findyourbalans.com
           E2E_BASIC_AUTH: ${{ secrets.STAGING_BASIC_AUTH }}
+          # Akun khusus smoke test (role tanpa MFA); kosong = tes login penuh dilewati.
+          E2E_EMAIL: ${{ secrets.STAGING_E2E_EMAIL }}
+          E2E_PASSWORD: ${{ secrets.STAGING_E2E_PASSWORD }}
         run: pnpm test:e2e
       - if: failure()
         uses: actions/upload-artifact@v7

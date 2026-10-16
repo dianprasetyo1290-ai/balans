@@ -18,6 +18,8 @@ tags:
     description: Pengiriman, termasuk webhook kurir
   - name: identity
     description: Sesi, pengguna, dan permission (R1.1)
+  - name: audit
+    description: Riwayat perubahan (audit trail)
   - name: catalog
     description: Master produk, packaging, material, bundling (R1.1)
   - name: warehouse
@@ -165,7 +167,7 @@ paths:
       description: |
         Mengembalikan access token (15 menit, disimpan di memori FE) dan memasang refresh token di cookie
         HttpOnly `Path=/api/v1/auth` (Technical Guideline 9.1). Gagal login selalu `AUTH_INVALID_CREDENTIALS`;
-        5 kali gagal dalam 15 menit → `AUTH_ACCOUNT_LOCKED`. Role ber-MFA → `AUTH_MFA_REQUIRED` lalu kirim ulang dengan `totpCode`.
+        5 kali gagal dalam 15 menit → `AUTH_ACCOUNT_LOCKED`. User ber-MFA → `AUTH_MFA_REQUIRED` lalu kirim ulang dengan `totpCode`.
         Tidak memakai Idempotency-Key.
       requestBody:
         required: true
@@ -176,6 +178,10 @@ paths:
       responses:
         '200':
           description: Berhasil masuk
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
           content:
             application/json:
               schema:
@@ -190,9 +196,15 @@ paths:
         - identity
       summary: Memperbarui access token dengan refresh token (rotasi)
       description: Refresh token lama langsung tidak berlaku. Pemakaian ulang token lama mencabut seluruh keluarga sesi.
+      parameters:
+        - $ref: '#/components/parameters/RefreshCookie'
       responses:
         '200':
           description: Access token baru
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
           content:
             application/json:
               schema:
@@ -202,12 +214,156 @@ paths:
   /api/v1/auth/logout:
     post:
       operationId: logout
+      security: []
       tags:
         - identity
       summary: Keluar dan mencabut sesi aktif
+      description: Sesi dicari dari cookie refresh token, sehingga tetap bisa keluar walaupun access token sudah kedaluwarsa.
+      parameters:
+        - $ref: '#/components/parameters/RefreshCookie'
       responses:
         '204':
           description: Sesi dicabut
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/auth/reauth:
+    post:
+      operationId: reauthenticate
+      tags:
+        - identity
+      summary: Konfirmasi identitas untuk aksi sensitif
+      description: Mengembalikan access token baru dengan claim `reauth_at` yang berlaku 5 menit (Technical Guideline 9.1).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReauthRequest'
+      responses:
+        '200':
+          description: Access token baru
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessToken'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/auth/password/forgot:
+    post:
+      operationId: requestPasswordReset
+      security: []
+      tags:
+        - identity
+      summary: Meminta tautan atur ulang password
+      description: Selalu 204 walaupun email tidak terdaftar, agar tidak bisa dipakai menebak email.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordForgotRequest'
+      responses:
+        '204':
+          description: Diterima
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/auth/password/token:
+    get:
+      operationId: getPasswordToken
+      security: []
+      tags:
+        - identity
+      summary: Memeriksa tautan undangan atau atur ulang password
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Tautan berlaku
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordTokenInfo'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/auth/password/setup:
+    post:
+      operationId: setupPassword
+      security: []
+      tags:
+        - identity
+      summary: Mengatur password dari tautan undangan atau atur ulang
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordSetupRequest'
+      responses:
+        '204':
+          description: Password tersimpan; semua sesi lama dicabut
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/auth/password/change:
+    post:
+      operationId: changePassword
+      tags:
+        - identity
+      summary: Mengganti password sendiri
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordChangeRequest'
+      responses:
+        '204':
+          description: Password diganti; sesi lain dicabut
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/auth/mfa/setup:
+    post:
+      operationId: setupMfa
+      tags:
+        - identity
+      summary: Membuat secret TOTP baru untuk didaftarkan di aplikasi autentikator
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Secret dan QR code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MfaSetup'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/auth/mfa/activate:
+    post:
+      operationId: activateMfa
+      tags:
+        - identity
+      summary: Mengaktifkan MFA dengan kode pertama dari aplikasi autentikator
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaActivateRequest'
+      responses:
+        '204':
+          description: MFA aktif
         default:
           $ref: '#/components/responses/Problem'
   /api/v1/me:
@@ -237,6 +393,10 @@ paths:
         - $ref: '#/components/parameters/PageSize'
         - $ref: '#/components/parameters/Sort'
         - $ref: '#/components/parameters/Search'
+        - name: isActive
+          in: query
+          schema:
+            type: boolean
       responses:
         '200':
           description: Daftar pengguna
@@ -251,6 +411,7 @@ paths:
       tags:
         - identity
       summary: Membuat pengguna dan mengirim undangan atur password
+      description: Pemberian role butuh re-autentikasi (`identity.user_role.write`).
       parameters:
         - $ref: '#/components/parameters/IdempotencyKey'
       requestBody:
@@ -266,6 +427,230 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/users/{id}:
+    get:
+      operationId: getUser
+      tags:
+        - identity
+      summary: Detail pengguna
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Pengguna
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      operationId: updateUser
+      tags:
+        - identity
+      summary: Mengubah nama, divisi, dan role pengguna
+      description: Perubahan role butuh re-autentikasi dan memutus semua sesi pengguna (< 30 detik).
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      responses:
+        '200':
+          description: Pengguna diubah
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/users/{id}/activate:
+    post:
+      operationId: activateUser
+      tags:
+        - identity
+      summary: Mengaktifkan kembali pengguna
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Pengguna aktif
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/users/{id}/deactivate:
+    post:
+      operationId: deactivateUser
+      tags:
+        - identity
+      summary: Menonaktifkan pengguna dan memutus semua sesinya
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Pengguna nonaktif
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/users/{id}/resend-invitation:
+    post:
+      operationId: resendUserInvitation
+      tags:
+        - identity
+      summary: Mengirim ulang undangan atur password
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '204':
+          description: Undangan dikirim
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/users/{id}/reset-mfa:
+    post:
+      operationId: resetUserMfa
+      tags:
+        - identity
+      summary: Mereset MFA pengguna (HP hilang); pengguna mendaftar ulang saat masuk berikutnya
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '204':
+          description: MFA direset
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/roles:
+    get:
+      operationId: listRoles
+      tags:
+        - identity
+      summary: Daftar role beserta permission
+      responses:
+        '200':
+          description: Daftar role
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Role'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/roles/{id}/permissions:
+    put:
+      operationId: setRolePermissions
+      tags:
+        - identity
+      summary: Mengganti permission role (berlaku langsung, butuh re-autentikasi)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RolePermissionsInput'
+      responses:
+        '200':
+          description: Role diubah
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/permissions:
+    get:
+      operationId: listPermissions
+      tags:
+        - identity
+      summary: Katalog permission
+      responses:
+        '200':
+          description: Katalog permission
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Permission'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/audit-logs:
+    get:
+      operationId: listAuditLogs
+      tags:
+        - audit
+      summary: Riwayat perubahan
+      description: |
+        Tanpa `entityId` butuh `audit.log.read`. Dengan `entityType` + `entityId` (tab Riwayat dokumen) cukup permission
+        baca entitas tersebut. Field sensitif sudah dimask (Technical Guideline 6.6).
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - name: entityType
+          in: query
+          schema:
+            type: string
+        - name: entityId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: actorId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: action
+          in: query
+          schema:
+            $ref: '#/components/schemas/AuditAction'
+        - name: createdFrom
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: createdTo
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Riwayat perubahan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditLogList'
         default:
           $ref: '#/components/responses/Problem'
   /api/v1/products:
@@ -516,6 +901,8 @@ components:
         - AUTH_TOKEN_EXPIRED
         - AUTH_SESSION_EXPIRED
         - AUTH_REAUTH_REQUIRED
+        - AUTH_MFA_ENROLLMENT_REQUIRED
+        - AUTH_PASSWORD_TOKEN_INVALID
         - FORBIDDEN
         - NOT_FOUND
         - VERSION_CONFLICT
@@ -710,6 +1097,84 @@ components:
         expiresAt:
           type: string
           format: date-time
+    ReauthRequest:
+      type: object
+      properties:
+        password:
+          type: string
+        totpCode:
+          type: string
+          pattern: ^[0-9]{6}$
+    PasswordForgotRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+    PasswordTokenInfo:
+      type: object
+      required:
+        - email
+        - fullName
+        - purpose
+      properties:
+        email:
+          type: string
+        fullName:
+          type: string
+        purpose:
+          type: string
+          enum:
+            - invite
+            - reset
+    PasswordSetupRequest:
+      type: object
+      required:
+        - token
+        - password
+      properties:
+        token:
+          type: string
+        password:
+          type: string
+          minLength: 10
+          maxLength: 128
+    PasswordChangeRequest:
+      type: object
+      required:
+        - currentPassword
+        - newPassword
+      properties:
+        currentPassword:
+          type: string
+        newPassword:
+          type: string
+          minLength: 10
+          maxLength: 128
+    MfaSetup:
+      type: object
+      required:
+        - secret
+        - otpauthUrl
+        - qrCodeDataUrl
+      properties:
+        secret:
+          type: string
+        otpauthUrl:
+          type: string
+        qrCodeDataUrl:
+          type: string
+          description: Gambar PNG QR code dalam format data URL.
+    MfaActivateRequest:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          pattern: ^[0-9]{6}$
     CurrentUser:
       type: object
       required:
@@ -718,6 +1183,8 @@ components:
         - fullName
         - roles
         - permissions
+        - isMfaEnabled
+        - mfaEnrollmentRequired
       properties:
         id:
           type: string
@@ -737,6 +1204,11 @@ components:
           example:
             - catalog.product.read
             - catalog.product.write
+        isMfaEnabled:
+          type: boolean
+        mfaEnrollmentRequired:
+          type: boolean
+          description: Role user mewajibkan MFA tetapi MFA belum aktif; semua menu lain terkunci sampai MFA aktif.
     Pagination:
       type: object
       description: Metadata pagination standar (Technical Guideline 8.2).
@@ -758,36 +1230,64 @@ components:
           format: int64
         totalPages:
           type: integer
-    UserInput:
+    UserRoleAssignment:
       type: object
       required:
-        - email
-        - fullName
-        - roleCodes
+        - code
       properties:
-        email:
+        code:
           type: string
-          format: email
-          maxLength: 254
-        fullName:
+        name:
           type: string
-          minLength: 1
-          maxLength: 120
-        roleCodes:
-          type: array
-          minItems: 1
-          items:
-            type: string
-        divisionId:
+          readOnly: true
+        scopeDivisionId:
           type: string
           format: uuid
-    AuditFields:
+          nullable: true
+    User:
       type: object
       required:
+        - id
+        - email
+        - fullName
+        - roles
+        - isActive
+        - isMfaEnabled
+        - hasPassword
         - createdAt
         - updatedAt
         - version
       properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+        fullName:
+          type: string
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserRoleAssignment'
+        divisionId:
+          type: string
+          format: uuid
+          nullable: true
+        employeeId:
+          type: string
+          format: uuid
+          nullable: true
+        isActive:
+          type: boolean
+        isMfaEnabled:
+          type: boolean
+        hasPassword:
+          type: boolean
+          description: false berarti undangan belum diterima.
+        lastLoginAt:
+          type: string
+          format: date-time
+          nullable: true
         createdAt:
           type: string
           format: date-time
@@ -796,27 +1296,6 @@ components:
           format: date-time
         version:
           type: integer
-          description: Dipakai optimistic locking; kirim kembali saat update (Technical Guideline 7.2).
-    User:
-      allOf:
-        - $ref: '#/components/schemas/UserInput'
-        - $ref: '#/components/schemas/AuditFields'
-        - type: object
-          required:
-            - id
-            - isActive
-            - isMfaEnabled
-          properties:
-            id:
-              type: string
-              format: uuid
-            isActive:
-              type: boolean
-            isMfaEnabled:
-              type: boolean
-            lastLoginAt:
-              type: string
-              format: date-time
     UserList:
       allOf:
         - $ref: '#/components/schemas/Pagination'
@@ -828,6 +1307,203 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/User'
+    UserInput:
+      type: object
+      required:
+        - email
+        - fullName
+        - roles
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        fullName:
+          type: string
+          minLength: 1
+          maxLength: 120
+        roles:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/UserRoleAssignment'
+        divisionId:
+          type: string
+          format: uuid
+          nullable: true
+        employeeId:
+          type: string
+          format: uuid
+          nullable: true
+    UserUpdate:
+      type: object
+      required:
+        - fullName
+        - roles
+        - version
+      properties:
+        fullName:
+          type: string
+          minLength: 1
+          maxLength: 120
+        roles:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/UserRoleAssignment'
+        divisionId:
+          type: string
+          format: uuid
+          nullable: true
+        employeeId:
+          type: string
+          format: uuid
+          nullable: true
+        version:
+          type: integer
+    VersionInput:
+      type: object
+      required:
+        - version
+      properties:
+        version:
+          type: integer
+          description: Versi terakhir yang dilihat user (optimistic locking).
+    Role:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - description
+        - requiresMfa
+        - hasDivisionScope
+        - permissions
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        requiresMfa:
+          type: boolean
+        hasDivisionScope:
+          type: boolean
+        permissions:
+          type: array
+          items:
+            type: string
+        version:
+          type: integer
+    RolePermissionsInput:
+      type: object
+      required:
+        - permissions
+        - version
+      properties:
+        permissions:
+          type: array
+          items:
+            type: string
+        version:
+          type: integer
+    Permission:
+      type: object
+      required:
+        - code
+        - module
+        - description
+        - requiresReauth
+      properties:
+        code:
+          type: string
+        module:
+          type: string
+        description:
+          type: string
+        requiresReauth:
+          type: boolean
+    AuditAction:
+      type: string
+      enum:
+        - create
+        - update
+        - delete
+        - restore
+        - status_change
+        - approve
+        - reject
+        - submit
+        - post
+        - cancel
+        - login
+        - login_failed
+        - logout
+        - import
+        - export
+    AuditChange:
+      type: object
+      properties:
+        from: {}
+        to: {}
+    AuditLog:
+      type: object
+      required:
+        - id
+        - actorId
+        - actorName
+        - action
+        - entityType
+        - entityId
+        - entityLabel
+        - changes
+        - note
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        actorId:
+          type: string
+          format: uuid
+        actorName:
+          type: string
+        action:
+          $ref: '#/components/schemas/AuditAction'
+        entityType:
+          type: string
+        entityId:
+          type: string
+          format: uuid
+        entityLabel:
+          type: string
+        changes:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/AuditChange'
+        note:
+          type: string
+        ip:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    AuditLogList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/AuditLog'
     ProductType:
       type: string
       enum:
@@ -907,6 +1583,22 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/BundleComponent'
+    AuditFields:
+      type: object
+      required:
+        - createdAt
+        - updatedAt
+        - version
+      properties:
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          description: Dipakai optimistic locking; kirim kembali saat update (Technical Guideline 7.2).
     Product:
       allOf:
         - $ref: '#/components/schemas/ProductInput'
@@ -986,8 +1678,10 @@ components:
         - inbound
         - finished_goods
         - ecommerce
-        - material
+        - raw_material
+        - goods_material
         - returns
+        - event
         - toll_manufacturer
         - consignment
         - vending_buffer
@@ -1059,6 +1753,20 @@ components:
           schema:
             $ref: '#/components/schemas/Problem'
   parameters:
+    RefreshCookie:
+      name: balans_refresh
+      in: cookie
+      required: false
+      schema:
+        type: string
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: UUID per percobaan submit (Technical Guideline 7.1).
+      schema:
+        type: string
+        format: uuid
     Page:
       name: page
       in: query
@@ -1085,14 +1793,6 @@ components:
       in: query
       schema:
         type: string
-    IdempotencyKey:
-      name: Idempotency-Key
-      in: header
-      required: true
-      description: UUID per percobaan submit (Technical Guideline 7.1).
-      schema:
-        type: string
-        format: uuid
     Id:
       name: id
       in: path

@@ -1,0 +1,100 @@
+auditLogs:
+  get:
+    operationId: listAuditLogs
+    tags: [audit]
+    summary: Riwayat perubahan
+    description: |
+      Tanpa `entityId` butuh `audit.log.read`. Dengan `entityType` + `entityId` (tab Riwayat dokumen) cukup permission
+      baca entitas tersebut. Field sensitif sudah dimask (Technical Guideline 6.6).
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - name: entityType
+        in: query
+        schema:
+          type: string
+      - name: entityId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: actorId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: action
+        in: query
+        schema:
+          $ref: "#/components/schemas/AuditAction"
+      - name: createdFrom
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: createdTo
+        in: query
+        schema:
+          type: string
+          format: date-time
+    responses:
+      "200":
+        description: Riwayat perubahan
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuditLogList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+components:
+  schemas:
+    AuditAction:
+      type: string
+      enum: [create, update, delete, restore, status_change, approve, reject, submit, post, cancel, login, login_failed, logout, import, export]
+    AuditChange:
+      type: object
+      properties:
+        from: {}
+        to: {}
+    AuditLog:
+      type: object
+      required: [id, actorId, actorName, action, entityType, entityId, entityLabel, changes, note, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        actorId:
+          type: string
+          format: uuid
+        actorName:
+          type: string
+        action:
+          $ref: "#/components/schemas/AuditAction"
+        entityType:
+          type: string
+        entityId:
+          type: string
+          format: uuid
+        entityLabel:
+          type: string
+        changes:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/AuditChange"
+        note:
+          type: string
+        ip:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    AuditLogList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/AuditLog"

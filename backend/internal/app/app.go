@@ -3,12 +3,16 @@ package app
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"log/slog"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
+	"balans/internal/audit"
+	"balans/internal/identity"
 	"balans/internal/integration/mockconsole"
 	"balans/internal/integration/mockpayment"
 	"balans/internal/integration/mockshipment"
@@ -21,6 +25,7 @@ import (
 	"balans/internal/platform/httpx"
 	"balans/internal/platform/idempotency"
 	"balans/internal/platform/jobqueue"
+	"balans/internal/platform/pii"
 	"balans/internal/platform/webhook"
 	"balans/internal/sales"
 	"balans/internal/system"
@@ -39,6 +44,8 @@ type App struct {
 
 	idempotency *idempotency.Store
 	system      *system.Module
+	audit       *audit.Module
+	identity    *identity.Module
 	modules     []module
 	console     *mockconsole.Console
 }
@@ -105,16 +112,42 @@ func (a *App) buildModules() error {
 	inbox := webhook.NewInbox(a.Pool, a.Tx, a.Jobs, a.Clock)
 	console := mockconsole.Deps{Clock: a.Clock, Log: a.Log}
 
+	// Audit trail dipakai semua modul, sehingga selalu disusun; route-nya mengikuti ENABLED_MODULES.
+	a.audit = audit.New(audit.Deps{Pool: a.Pool, Responder: a.Responder})
+	if cfg.IsEnabled(audit.Name) {
+		a.modules = append(a.modules, a.audit)
+	}
+
+	var mailer *notification.Module
 	if cfg.IsEnabled(notification.Name) {
 		if cfg.EmailProvider != config.ProviderMock {
 			return providerNotAvailable("EMAIL_PROVIDER", cfg.EmailProvider)
 		}
-		m := notification.New(notification.Deps{
+		mailer = notification.New(notification.Deps{
 			Pool: a.Pool, Tx: a.Tx, Jobs: a.Jobs, Clock: a.Clock, Log: a.Log,
 			Sender: smtpmail.New(cfg.SMTPHost, cfg.SMTPPort, cfg.MailFrom),
 		})
-		a.modules = append(a.modules, m)
-		console.Email = m
+		a.modules = append(a.modules, mailer)
+		console.Email = mailer
+	}
+	if cfg.IsEnabled(identity.Name) {
+		if mailer == nil {
+			return errors.New("modul identity membutuhkan modul notification untuk email undangan")
+		}
+		cipher, err := newCipher(cfg)
+		if err != nil {
+			return err
+		}
+		a.identity, err = identity.New(identity.Deps{
+			Pool: a.Pool, Tx: a.Tx, Clock: a.Clock, Log: a.Log, Responder: a.Responder, Audit: a.audit,
+			Mailer: mailer, Cipher: cipher, BaseURL: cfg.PublicBaseURL, SecureCookie: cfg.Env != config.EnvLocal,
+			SkipMFA: cfg.DevSkipMFA && cfg.Env == config.EnvLocal,
+			Keys:    identity.KeyConfig{SigningKeyID: cfg.JWTSigningKeyID, SigningKey: cfg.JWTSigningKey, VerifyKeys: cfg.JWTVerifyKeys},
+		})
+		if err != nil {
+			return err
+		}
+		a.modules = append(a.modules, a.identity)
 	}
 	if cfg.IsEnabled(sales.Name) {
 		if cfg.PaymentGateway != config.ProviderMock {
@@ -146,9 +179,51 @@ func (a *App) buildModules() error {
 	return nil
 }
 
+// Start menjalankan inisialisasi proses api: sinkron katalog permission dan undangan Admin Sistem pertama.
+func (a *App) Start(ctx context.Context) error {
+	if a.identity == nil {
+		return nil
+	}
+	return a.identity.Start(ctx, a.Config.InitialAdminEmail)
+}
+
+// SeedDev mengisi data pengembangan lokal. Ditolak di luar APP_ENV=local.
+func (a *App) SeedDev(ctx context.Context, password string) ([]identity.DevUser, error) {
+	if a.Config.Env != config.EnvLocal {
+		return nil, errors.New("seed pengembangan hanya untuk APP_ENV=local")
+	}
+	if a.identity == nil {
+		return nil, errors.New("seed pengembangan membutuhkan modul identity aktif")
+	}
+	return a.identity.SeedDevUsers(ctx, password)
+}
+
+// newCipher membaca kunci PII. Di APP_ENV=local tanpa kunci dipakai kunci pengembangan deterministik;
+// config.Validate mewajibkan kunci asli di staging dan production.
+func newCipher(cfg config.Config) (*pii.Cipher, error) {
+	if cfg.PIIEncryptionKeys == "" && cfg.Env == config.EnvLocal {
+		key := sha256.Sum256([]byte("balans-local-development-pii"))
+		hash := sha256.Sum256([]byte("balans-local-development-pii-hash"))
+		return pii.New("local-dev", map[string][]byte{"local-dev": key[:]}, hash[:])
+	}
+	keys, err := pii.ParseKeyRing(cfg.PIIEncryptionKeys)
+	if err != nil {
+		return nil, fmt.Errorf("PII_ENCRYPTION_KEYS: %w", err)
+	}
+	hashKey, err := decodeBase64(cfg.PIIHashKey)
+	if err != nil {
+		return nil, fmt.Errorf("PII_HASH_KEY: %w", err)
+	}
+	return pii.New(cfg.PIIEncryptionKeyID, keys, hashKey)
+}
+
 // errProviderNotAvailable dipakai sampai adapter provider asli dibangun.
 var errProviderNotAvailable = errors.New("adapter provider asli belum tersedia")
 
 func providerNotAvailable(env, value string) error {
 	return fmt.Errorf("%s=%q: %w; gunakan %q", env, value, errProviderNotAvailable, config.ProviderMock)
+}
+
+func decodeBase64(s string) ([]byte, error) {
+	return base64.StdEncoding.DecodeString(s)
 }

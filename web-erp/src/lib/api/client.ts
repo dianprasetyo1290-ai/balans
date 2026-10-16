@@ -1,10 +1,14 @@
 import createClient from "openapi-fetch"
 
+import { authFetch } from "./auth-fetch"
 import { ApiError, toProblem } from "./problem"
 import type { paths } from "./schema.gen"
 
 /** Client API bertipe dari schema.gen.ts. Tipe response DILARANG ditulis manual (Technical Guideline 10.4). */
-export const api = createClient<paths>({ baseUrl: window.location.origin })
+export const api = createClient<paths>({
+  baseUrl: window.location.origin,
+  fetch: authFetch,
+})
 
 type FetchResult<T> = { data?: T; error?: unknown; response: Response }
 

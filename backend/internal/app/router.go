@@ -1,14 +1,13 @@
 package app
 
 import (
-	"context"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/google/uuid"
 
+	"balans/internal/platform/actor"
 	"balans/internal/platform/httpx"
 	"balans/internal/platform/idempotency"
 )
@@ -25,16 +24,18 @@ func (a *App) Router() http.Handler {
 		httpx.AccessLog(a.Log),
 		httpx.Recover(a.Responder),
 		httpx.Timeout(requestTimeout),
-		idempotency.Middleware(idempotency.Options{
-			Store:     a.idempotency,
-			Clock:     a.Clock,
-			Responder: a.Responder,
-			Log:       a.Log,
-			// User diisi middleware otentikasi di R1.1; sebelum itu semua request anonim.
-			UserID: func(context.Context) uuid.UUID { return uuid.Nil },
-			Exempt: isIdempotencyExempt,
-		}),
 	)
+	if a.identity != nil {
+		r.Use(a.identity.Middleware())
+	}
+	r.Use(idempotency.Middleware(idempotency.Options{
+		Store:     a.idempotency,
+		Clock:     a.Clock,
+		Responder: a.Responder,
+		Log:       a.Log,
+		UserID:    actor.UserID,
+		Exempt:    isIdempotencyExempt,
+	}))
 
 	a.system.RegisterRoutes(r)
 	for _, m := range a.modules {
@@ -46,12 +47,18 @@ func (a *App) Router() http.Handler {
 	return r
 }
 
-// isIdempotencyExempt: webhook memakai event ID, halaman simulasi bukan API, login dan refresh
-// token dikecualikan saat modul identity dibangun (Technical Guideline 7.1).
+// idempotencyExemptPaths: endpoint sesi dan password tidak memakai Idempotency-Key (Technical Guideline 7.1).
+var idempotencyExemptPaths = map[string]bool{
+	"/api/v1/auth/login":           true,
+	"/api/v1/auth/refresh":         true,
+	"/api/v1/auth/logout":          true,
+	"/api/v1/auth/reauth":          true,
+	"/api/v1/auth/password/forgot": true,
+	"/api/v1/auth/password/setup":  true,
+}
+
+// isIdempotencyExempt: webhook memakai event ID, halaman simulasi bukan API.
 func isIdempotencyExempt(r *http.Request) bool {
 	p := r.URL.Path
-	return strings.HasPrefix(p, "/api/v1/webhooks/") ||
-		strings.HasPrefix(p, "/_mock/") ||
-		p == "/api/v1/auth/login" ||
-		p == "/api/v1/auth/refresh"
+	return strings.HasPrefix(p, "/api/v1/webhooks/") || strings.HasPrefix(p, "/_mock/") || idempotencyExemptPaths[p]
 }

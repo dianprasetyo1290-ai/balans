@@ -33,7 +33,7 @@ export function ErrorDialog() {
     } else if (action === "reload") {
       window.location.reload()
     } else if (action === "relogin") {
-      void navigate({ to: "/" })
+      void navigate({ to: "/login" })
     }
   }
 

@@ -66,6 +66,16 @@ func TestValidate(t *testing.T) {
 			wantErr: "MIDTRANS_SERVER_KEY",
 		},
 		{
+			name:    "staging dengan identity butuh kunci JWT dan PII",
+			env:     map[string]string{"DATABASE_URL": "x", "APP_ENV": "staging", "ENABLED_MODULES": "identity", "MIDTRANS_SERVER_KEY": "k"},
+			wantErr: "JWT_SIGNING_KEY_ID",
+		},
+		{
+			name:    "lewati MFA hanya untuk local",
+			env:     map[string]string{"DATABASE_URL": "x", "APP_ENV": "staging", "DEV_SKIP_MFA": "true", "MIDTRANS_SERVER_KEY": "k"},
+			wantErr: "DEV_SKIP_MFA",
+		},
+		{
 			name:    "port SMTP harus angka",
 			env:     map[string]string{"DATABASE_URL": "x", "SMTP_PORT": "abc"},
 			wantErr: "SMTP_PORT",

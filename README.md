@@ -24,9 +24,11 @@ POSTGRES_PORT=5432 SMTP_PORT=1025 MAILPIT_PORT=8025 docker compose -f deploy/com
 # 2. Backend (terminal 1 dan 2)
 cd backend
 export DATABASE_URL="postgres://balans:balans@localhost:5432/balans?sslmode=disable"
-export APP_ENV=local ENABLED_MODULES=notification,sales,logistics
+export APP_ENV=local ENABLED_MODULES=identity,audit,notification,sales,logistics
 export MIDTRANS_SERVER_KEY=local BITESHIP_WEBHOOK_SECRET=local
+export DEV_SKIP_MFA=true  # opsional, hanya local: login tanpa kode autentikator
 go run ./cmd/migrate up
+go run ./cmd/devseed      # satu akun per role, password sama (default Balans-Lokal-2026)
 go run ./cmd/api          # http://localhost:8080
 go run ./cmd/worker
 
@@ -36,7 +38,9 @@ pnpm install
 pnpm dev                  # http://localhost:5173, /api diteruskan ke :8080
 ```
 
-Halaman yang tersedia: **Ringkasan Operasional** (`/`), **Tentang Sistem** (`/system/about`), simulasi pihak ketiga di `/_mock/` (pembayaran, pengiriman, kotak email Mailpit di `/_mock/mail/`).
+Halaman yang tersedia: **Masuk** (`/login`), **Ringkasan Operasional** (`/`), **Pengaturan › Pengguna & Role, Hak Akses, Riwayat Perubahan**, **Tentang Sistem** (`/system/about`), simulasi pihak ketiga di `/_mock/` (pembayaran, pengiriman, kotak email Mailpit di `/_mock/mail/` — tautan undangan & atur ulang password muncul di sini).
+
+Akun seed lokal: `admin@balans.local`, `purchasing@balans.local`, `staf.gudang@balans.local`, `logistik.leader@balans.local`, `fulfillment.leader@balans.local`, `merchandiser@balans.local`, `head.logistik@balans.local`, `finance@balans.local`, `head.finance@balans.local`, `sales.mt@balans.local`, `sales.ecommerce@balans.local`, `cs@balans.local`, `head.sales@balans.local`, `marketing@balans.local`, `hrga@balans.local`, `head.divisi@balans.local`, `direksi@balans.local`, `dirut@balans.local`. `cmd/devseed` menolak berjalan di luar `APP_ENV=local`. Di local tanpa `JWT_*`/`PII_*` dipakai kunci pengembangan deterministik; staging dan production wajib kunci asli (Runbook 3.1 – 3.2).
 
 Konfigurasi teknis lewat env (lihat `deploy/env.example`). Nilai bisnis DILARANG di env; tempatnya modul `setting`.
 

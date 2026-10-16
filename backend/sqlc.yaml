@@ -51,3 +51,15 @@ sql:
       go:
         <<: *go
         out: internal/notification/postgres/sqlcgen
+  - <<: *pkg
+    queries: internal/audit/postgres/queries
+    gen:
+      go:
+        <<: *go
+        out: internal/audit/postgres/sqlcgen
+  - <<: *pkg
+    queries: internal/identity/postgres/queries
+    gen:
+      go:
+        <<: *go
+        out: internal/identity/postgres/sqlcgen

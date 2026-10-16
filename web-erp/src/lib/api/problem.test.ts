@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest"
 
 import { ERROR_MESSAGES, errorMessageFor, isErrorCode } from "./error-messages"
-import { ApiError, isTransientProblem, parseProblem, toProblem } from "./problem"
+import {
+  ApiError,
+  isTransientProblem,
+  parseProblem,
+  toProblem,
+} from "./problem"
 import type { components } from "./schema.gen"
 
 type ErrorCodeFromSpec = components["schemas"]["ErrorCode"]
@@ -9,14 +14,40 @@ type ErrorCodeFromSpec = components["schemas"]["ErrorCode"]
 describe("katalog error", () => {
   it("memuat semua kode dari kontrak OpenAPI", () => {
     const specCodes: Record<ErrorCodeFromSpec, true> = {
-      VALIDATION_FAILED: true, AUTH_INVALID_CREDENTIALS: true, AUTH_ACCOUNT_LOCKED: true, AUTH_MFA_REQUIRED: true,
-      AUTH_MFA_INVALID: true, AUTH_TOKEN_EXPIRED: true, AUTH_SESSION_EXPIRED: true, AUTH_REAUTH_REQUIRED: true,
-      FORBIDDEN: true, NOT_FOUND: true, VERSION_CONFLICT: true, INVALID_STATE_TRANSITION: true,
-      IDEMPOTENCY_KEY_REQUIRED: true, IDEMPOTENCY_IN_PROGRESS: true, IDEMPOTENCY_KEY_REUSED: true, DUPLICATE_CODE: true,
-      PERIOD_LOCKED: true, STOCK_INSUFFICIENT: true, BATCH_SHELF_LIFE_TOO_SHORT: true, APPROVAL_REQUIRED: true,
-      DISCOUNT_LIMIT_EXCEEDED: true, CREDIT_LIMIT_EXCEEDED: true, THREE_WAY_MATCH_FAILED: true, DEPOSIT_INSUFFICIENT: true,
-      OUTSIDE_ATTENDANCE_RADIUS: true, FILE_TOO_LARGE: true, FILE_TYPE_NOT_ALLOWED: true, IMPORT_ALREADY_PROCESSED: true,
-      RATE_LIMITED: true, PROVIDER_UNAVAILABLE: true, BAD_REQUEST: true, INTERNAL_ERROR: true,
+      VALIDATION_FAILED: true,
+      AUTH_INVALID_CREDENTIALS: true,
+      AUTH_ACCOUNT_LOCKED: true,
+      AUTH_MFA_REQUIRED: true,
+      AUTH_MFA_INVALID: true,
+      AUTH_TOKEN_EXPIRED: true,
+      AUTH_SESSION_EXPIRED: true,
+      AUTH_REAUTH_REQUIRED: true,
+      AUTH_MFA_ENROLLMENT_REQUIRED: true,
+      AUTH_PASSWORD_TOKEN_INVALID: true,
+      FORBIDDEN: true,
+      NOT_FOUND: true,
+      VERSION_CONFLICT: true,
+      INVALID_STATE_TRANSITION: true,
+      IDEMPOTENCY_KEY_REQUIRED: true,
+      IDEMPOTENCY_IN_PROGRESS: true,
+      IDEMPOTENCY_KEY_REUSED: true,
+      DUPLICATE_CODE: true,
+      PERIOD_LOCKED: true,
+      STOCK_INSUFFICIENT: true,
+      BATCH_SHELF_LIFE_TOO_SHORT: true,
+      APPROVAL_REQUIRED: true,
+      DISCOUNT_LIMIT_EXCEEDED: true,
+      CREDIT_LIMIT_EXCEEDED: true,
+      THREE_WAY_MATCH_FAILED: true,
+      DEPOSIT_INSUFFICIENT: true,
+      OUTSIDE_ATTENDANCE_RADIUS: true,
+      FILE_TOO_LARGE: true,
+      FILE_TYPE_NOT_ALLOWED: true,
+      IMPORT_ALREADY_PROCESSED: true,
+      RATE_LIMITED: true,
+      PROVIDER_UNAVAILABLE: true,
+      BAD_REQUEST: true,
+      INTERNAL_ERROR: true,
     }
     for (const code of Object.keys(specCodes)) {
       expect(isErrorCode(code), code).toBe(true)
@@ -47,21 +78,44 @@ describe("katalog error", () => {
 describe("parseProblem", () => {
   it("membaca body problem+json", () => {
     const problem = toProblem(
-      { type: "x", title: "Data tidak valid", status: 422, code: "VALIDATION_FAILED", detail: "Periksa kembali.", fields: { supplierId: "Wajib diisi" }, requestId: "r1" },
-      422,
+      {
+        type: "x",
+        title: "Data tidak valid",
+        status: 422,
+        code: "VALIDATION_FAILED",
+        detail: "Periksa kembali.",
+        fields: { supplierId: "Wajib diisi" },
+        requestId: "r1",
+      },
+      422
     )
-    expect(problem).toMatchObject({ code: "VALIDATION_FAILED", fields: { supplierId: "Wajib diisi" }, requestId: "r1" })
+    expect(problem).toMatchObject({
+      code: "VALIDATION_FAILED",
+      fields: { supplierId: "Wajib diisi" },
+      requestId: "r1",
+    })
     expect(parseProblem(new ApiError(problem))).toBe(problem)
   })
 
   it("memakai teks default bila detail kosong", () => {
-    const problem = toProblem({ type: "x", title: "", status: 409, code: "VERSION_CONFLICT", detail: "" }, 409)
+    const problem = toProblem(
+      {
+        type: "x",
+        title: "",
+        status: 409,
+        code: "VERSION_CONFLICT",
+        detail: "",
+      },
+      409
+    )
     expect(problem.title).toBe("Data sudah berubah")
     expect(problem.detail).toContain("Muat ulang")
   })
 
   it("mengubah fetch gagal menjadi NETWORK_ERROR", () => {
-    expect(parseProblem(new TypeError("Failed to fetch")).code).toBe("NETWORK_ERROR")
+    expect(parseProblem(new TypeError("Failed to fetch")).code).toBe(
+      "NETWORK_ERROR"
+    )
   })
 
   it("body yang tidak dikenal dipetakan berdasarkan status", () => {
@@ -73,6 +127,19 @@ describe("parseProblem", () => {
   it("hanya jaringan dan 5xx yang boleh di-retry otomatis", () => {
     expect(isTransientProblem(parseProblem(new TypeError("x")))).toBe(true)
     expect(isTransientProblem(toProblem(undefined, 503))).toBe(true)
-    expect(isTransientProblem(toProblem({ code: "VERSION_CONFLICT", status: 409, title: "", detail: "", type: "" }, 409))).toBe(false)
+    expect(
+      isTransientProblem(
+        toProblem(
+          {
+            code: "VERSION_CONFLICT",
+            status: 409,
+            title: "",
+            detail: "",
+            type: "",
+          },
+          409
+        )
+      )
+    ).toBe(false)
   })
 })

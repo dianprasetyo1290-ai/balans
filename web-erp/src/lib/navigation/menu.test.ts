@@ -28,13 +28,36 @@ describe("menu", () => {
   it("tanpa modul aktif hanya menampilkan halaman yang sudah dibangun", () => {
     const groups = visibleMenu([])
     expect(groups.map((g) => g.label)).toEqual(["Ringkasan", "Pengaturan"])
-    expect(groups.flatMap((g) => g.items.map((i) => i.label))).toEqual(["Ringkasan Operasional", "Tentang Sistem"])
+    expect(groups.flatMap((g) => g.items.map((i) => i.label))).toEqual([
+      "Ringkasan Operasional",
+      "Pengguna & Role",
+      "Hak Akses",
+      "Riwayat Perubahan",
+      "Tentang Sistem",
+    ])
+  })
+
+  it("menyembunyikan halaman yang permission-nya tidak dimiliki user", () => {
+    const labels = visibleMenu([], [], ["identity.user.read"]).flatMap((g) =>
+      g.items.map((i) => i.label)
+    )
+    expect(labels).toContain("Pengguna & Role")
+    expect(labels).not.toContain("Hak Akses")
+    expect(labels).not.toContain("Riwayat Perubahan")
+    expect(labels).toContain("Tentang Sistem")
   })
 
   it("menyembunyikan item opsional sampai usulannya diambil", () => {
-    const withOption = MENU.map((g) => ({ ...g, items: g.items.map((i) => ({ ...i, to: i.to ?? "/x" })) }))
+    const withOption = MENU.map((g) => ({
+      ...g,
+      items: g.items.map((i) => ({ ...i, to: i.to ?? "/x" })),
+    }))
     const finance = withOption.find((g) => g.label === "Keuangan & Akuntansi")
-    expect(finance?.items.some((i) => i.label === "Anggaran Biaya" && i.optional === "U-13")).toBe(true)
+    expect(
+      finance?.items.some(
+        (i) => i.label === "Anggaran Biaya" && i.optional === "U-13"
+      )
+    ).toBe(true)
   })
 
   it("setiap label unik di dalam grupnya", () => {
