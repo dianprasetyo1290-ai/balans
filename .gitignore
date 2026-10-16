@@ -26,6 +26,3 @@ web-erp/test-results/
 .DS_Store
 Thumbs.db
 ~$*
-
-# Dokumen klien (BRD, PRD, desain, data Balans) tidak dipublikasikan di repo publik.
-/docs/
