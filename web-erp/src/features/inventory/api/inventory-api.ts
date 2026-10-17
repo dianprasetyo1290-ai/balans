@@ -58,13 +58,22 @@ export type StockBalanceSearch = {
   page: number
   productId?: string
   locationId?: string
+  /** Jenis lokasi (mis. konsinyasi, maklon, buffer/mesin vending) — S-219. */
+  locationType?: string
   batchId?: string
   status?: StockStatus
 }
 
-export const stockBalancesQuery = (s: StockBalanceSearch) =>
+/**
+ * Saldo stok. `locationIds` dipakai bila filter jenis lokasi dipilih tanpa lokasi tertentu (semua lokasi
+ * jenis itu, mis. seluruh lokasi konsinyasi mitra).
+ */
+export const stockBalancesQuery = (
+  s: StockBalanceSearch,
+  locationIds?: string[]
+) =>
   queryOptions({
-    queryKey: ["inventory", "balances", s],
+    queryKey: ["inventory", "balances", s, locationIds],
     queryFn: () =>
       unwrap(
         api.GET("/api/v1/stock-balances", {
@@ -72,7 +81,7 @@ export const stockBalancesQuery = (s: StockBalanceSearch) =>
             query: {
               page: s.page,
               productId: s.productId,
-              locationId: s.locationId ? [s.locationId] : undefined,
+              locationId: s.locationId ? [s.locationId] : locationIds,
               batchId: s.batchId,
               status: s.status ? [s.status] : undefined,
             },

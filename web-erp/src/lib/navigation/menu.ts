@@ -192,17 +192,36 @@ export const MENU: MenuGroup[] = [
     label: "Gudang",
     icon: WarehouseIcon,
     modules: ["warehouse"],
-    items: items(
-      "Inbound",
-      "Put-away",
-      "Transfer Stok",
-      "Stok dalam Pengiriman",
-      "Outbound",
-      "Stock Count",
-      "Gudang Retur",
-      "Disposisi Retur",
-      "Riwayat Mutasi Stok"
-    ),
+    items: [
+      {
+        label: "Inbound",
+        to: "/warehouse/inbounds",
+        permission: "warehouse.inbound.read",
+      },
+      { label: "Put-away" },
+      {
+        label: "Transfer Stok",
+        to: "/warehouse/stock-transfers",
+        permission: "warehouse.stock_transfer.read",
+      },
+      {
+        label: "Permintaan Petty Stock",
+        to: "/warehouse/petty-stock-requests",
+        permission: "warehouse.stock_transfer.read",
+      },
+      {
+        label: "Stok dalam Pengiriman",
+        to: "/warehouse/in-transit",
+        permission: "warehouse.stock_transfer.read",
+      },
+      { label: "Outbound" },
+      {
+        label: "Stock Count",
+        to: "/warehouse/stock-counts",
+        permission: "warehouse.stock_count.read",
+      },
+      ...items("Gudang Retur", "Disposisi Retur", "Riwayat Mutasi Stok"),
+    ],
   },
   {
     label: "Persediaan",

@@ -44,12 +44,21 @@ import { Route as AppSettingsDocumentSequencesRouteImport } from './routes/_app/
 import { Route as AppSettingsRolesRouteImport } from './routes/_app/settings/roles'
 import { Route as AppSettingsUsersRouteImport } from './routes/_app/settings/users'
 import { Route as AppSystemAboutRouteImport } from './routes/_app/system/about'
+import { Route as AppWarehouseInTransitRouteImport } from './routes/_app/warehouse/in-transit'
 import { Route as AppFinanceJournalsIndexRouteImport } from './routes/_app/finance/journals/index'
 import { Route as AppFinanceJournalsNewRouteImport } from './routes/_app/finance/journals/new'
 import { Route as AppMasterDataProductsIndexRouteImport } from './routes/_app/master-data/products/index'
 import { Route as AppMasterDataProductsIdRouteImport } from './routes/_app/master-data/products/$id'
 import { Route as AppMasterDataWarehousesIndexRouteImport } from './routes/_app/master-data/warehouses/index'
 import { Route as AppMasterDataWarehousesIdRouteImport } from './routes/_app/master-data/warehouses/$id'
+import { Route as AppWarehouseInboundsIndexRouteImport } from './routes/_app/warehouse/inbounds/index'
+import { Route as AppWarehouseInboundsIdRouteImport } from './routes/_app/warehouse/inbounds/$id'
+import { Route as AppWarehousePettyStockRequestsIndexRouteImport } from './routes/_app/warehouse/petty-stock-requests/index'
+import { Route as AppWarehousePettyStockRequestsIdRouteImport } from './routes/_app/warehouse/petty-stock-requests/$id'
+import { Route as AppWarehouseStockCountsIndexRouteImport } from './routes/_app/warehouse/stock-counts/index'
+import { Route as AppWarehouseStockCountsIdRouteImport } from './routes/_app/warehouse/stock-counts/$id'
+import { Route as AppWarehouseStockTransfersIndexRouteImport } from './routes/_app/warehouse/stock-transfers/index'
+import { Route as AppWarehouseStockTransfersIdRouteImport } from './routes/_app/warehouse/stock-transfers/$id'
 import { Route as AppFinanceJournalsIdIndexRouteImport } from './routes/_app/finance/journals/$id.index'
 import { Route as AppFinanceJournalsIdEditRouteImport } from './routes/_app/finance/journals/$id.edit'
 
@@ -234,6 +243,11 @@ const AppSystemAboutRoute = AppSystemAboutRouteImport.update({
   path: '/system/about',
   getParentRoute: () => AppRoute,
 } as any)
+const AppWarehouseInTransitRoute = AppWarehouseInTransitRouteImport.update({
+  id: '/warehouse/in-transit',
+  path: '/warehouse/in-transit',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppFinanceJournalsIndexRoute = AppFinanceJournalsIndexRouteImport.update({
   id: '/finance/journals/',
   path: '/finance/journals/',
@@ -265,6 +279,53 @@ const AppMasterDataWarehousesIdRoute =
   AppMasterDataWarehousesIdRouteImport.update({
     id: '/master-data/warehouses/$id',
     path: '/master-data/warehouses/$id',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppWarehouseInboundsIndexRoute =
+  AppWarehouseInboundsIndexRouteImport.update({
+    id: '/warehouse/inbounds/',
+    path: '/warehouse/inbounds/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppWarehouseInboundsIdRoute = AppWarehouseInboundsIdRouteImport.update({
+  id: '/warehouse/inbounds/$id',
+  path: '/warehouse/inbounds/$id',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppWarehousePettyStockRequestsIndexRoute =
+  AppWarehousePettyStockRequestsIndexRouteImport.update({
+    id: '/warehouse/petty-stock-requests/',
+    path: '/warehouse/petty-stock-requests/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppWarehousePettyStockRequestsIdRoute =
+  AppWarehousePettyStockRequestsIdRouteImport.update({
+    id: '/warehouse/petty-stock-requests/$id',
+    path: '/warehouse/petty-stock-requests/$id',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppWarehouseStockCountsIndexRoute =
+  AppWarehouseStockCountsIndexRouteImport.update({
+    id: '/warehouse/stock-counts/',
+    path: '/warehouse/stock-counts/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppWarehouseStockCountsIdRoute =
+  AppWarehouseStockCountsIdRouteImport.update({
+    id: '/warehouse/stock-counts/$id',
+    path: '/warehouse/stock-counts/$id',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppWarehouseStockTransfersIndexRoute =
+  AppWarehouseStockTransfersIndexRouteImport.update({
+    id: '/warehouse/stock-transfers/',
+    path: '/warehouse/stock-transfers/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppWarehouseStockTransfersIdRoute =
+  AppWarehouseStockTransfersIdRouteImport.update({
+    id: '/warehouse/stock-transfers/$id',
+    path: '/warehouse/stock-transfers/$id',
     getParentRoute: () => AppRoute,
   } as any)
 const AppFinanceJournalsIdIndexRoute =
@@ -315,12 +376,21 @@ export interface FileRoutesByFullPath {
   '/settings/roles': typeof AppSettingsRolesRoute
   '/settings/users': typeof AppSettingsUsersRoute
   '/system/about': typeof AppSystemAboutRoute
+  '/warehouse/in-transit': typeof AppWarehouseInTransitRoute
   '/finance/journals/new': typeof AppFinanceJournalsNewRoute
   '/master-data/products/$id': typeof AppMasterDataProductsIdRoute
   '/master-data/warehouses/$id': typeof AppMasterDataWarehousesIdRoute
+  '/warehouse/inbounds/$id': typeof AppWarehouseInboundsIdRoute
+  '/warehouse/petty-stock-requests/$id': typeof AppWarehousePettyStockRequestsIdRoute
+  '/warehouse/stock-counts/$id': typeof AppWarehouseStockCountsIdRoute
+  '/warehouse/stock-transfers/$id': typeof AppWarehouseStockTransfersIdRoute
   '/finance/journals/': typeof AppFinanceJournalsIndexRoute
   '/master-data/products/': typeof AppMasterDataProductsIndexRoute
   '/master-data/warehouses/': typeof AppMasterDataWarehousesIndexRoute
+  '/warehouse/inbounds/': typeof AppWarehouseInboundsIndexRoute
+  '/warehouse/petty-stock-requests/': typeof AppWarehousePettyStockRequestsIndexRoute
+  '/warehouse/stock-counts/': typeof AppWarehouseStockCountsIndexRoute
+  '/warehouse/stock-transfers/': typeof AppWarehouseStockTransfersIndexRoute
   '/finance/journals/$id/edit': typeof AppFinanceJournalsIdEditRoute
   '/finance/journals/$id/': typeof AppFinanceJournalsIdIndexRoute
 }
@@ -359,12 +429,21 @@ export interface FileRoutesByTo {
   '/settings/roles': typeof AppSettingsRolesRoute
   '/settings/users': typeof AppSettingsUsersRoute
   '/system/about': typeof AppSystemAboutRoute
+  '/warehouse/in-transit': typeof AppWarehouseInTransitRoute
   '/finance/journals/new': typeof AppFinanceJournalsNewRoute
   '/master-data/products/$id': typeof AppMasterDataProductsIdRoute
   '/master-data/warehouses/$id': typeof AppMasterDataWarehousesIdRoute
+  '/warehouse/inbounds/$id': typeof AppWarehouseInboundsIdRoute
+  '/warehouse/petty-stock-requests/$id': typeof AppWarehousePettyStockRequestsIdRoute
+  '/warehouse/stock-counts/$id': typeof AppWarehouseStockCountsIdRoute
+  '/warehouse/stock-transfers/$id': typeof AppWarehouseStockTransfersIdRoute
   '/finance/journals': typeof AppFinanceJournalsIndexRoute
   '/master-data/products': typeof AppMasterDataProductsIndexRoute
   '/master-data/warehouses': typeof AppMasterDataWarehousesIndexRoute
+  '/warehouse/inbounds': typeof AppWarehouseInboundsIndexRoute
+  '/warehouse/petty-stock-requests': typeof AppWarehousePettyStockRequestsIndexRoute
+  '/warehouse/stock-counts': typeof AppWarehouseStockCountsIndexRoute
+  '/warehouse/stock-transfers': typeof AppWarehouseStockTransfersIndexRoute
   '/finance/journals/$id/edit': typeof AppFinanceJournalsIdEditRoute
   '/finance/journals/$id': typeof AppFinanceJournalsIdIndexRoute
 }
@@ -405,12 +484,21 @@ export interface FileRoutesById {
   '/_app/settings/roles': typeof AppSettingsRolesRoute
   '/_app/settings/users': typeof AppSettingsUsersRoute
   '/_app/system/about': typeof AppSystemAboutRoute
+  '/_app/warehouse/in-transit': typeof AppWarehouseInTransitRoute
   '/_app/finance/journals/new': typeof AppFinanceJournalsNewRoute
   '/_app/master-data/products/$id': typeof AppMasterDataProductsIdRoute
   '/_app/master-data/warehouses/$id': typeof AppMasterDataWarehousesIdRoute
+  '/_app/warehouse/inbounds/$id': typeof AppWarehouseInboundsIdRoute
+  '/_app/warehouse/petty-stock-requests/$id': typeof AppWarehousePettyStockRequestsIdRoute
+  '/_app/warehouse/stock-counts/$id': typeof AppWarehouseStockCountsIdRoute
+  '/_app/warehouse/stock-transfers/$id': typeof AppWarehouseStockTransfersIdRoute
   '/_app/finance/journals/': typeof AppFinanceJournalsIndexRoute
   '/_app/master-data/products/': typeof AppMasterDataProductsIndexRoute
   '/_app/master-data/warehouses/': typeof AppMasterDataWarehousesIndexRoute
+  '/_app/warehouse/inbounds/': typeof AppWarehouseInboundsIndexRoute
+  '/_app/warehouse/petty-stock-requests/': typeof AppWarehousePettyStockRequestsIndexRoute
+  '/_app/warehouse/stock-counts/': typeof AppWarehouseStockCountsIndexRoute
+  '/_app/warehouse/stock-transfers/': typeof AppWarehouseStockTransfersIndexRoute
   '/_app/finance/journals/$id/edit': typeof AppFinanceJournalsIdEditRoute
   '/_app/finance/journals/$id/': typeof AppFinanceJournalsIdIndexRoute
 }
@@ -451,12 +539,21 @@ export interface FileRouteTypes {
     | '/settings/roles'
     | '/settings/users'
     | '/system/about'
+    | '/warehouse/in-transit'
     | '/finance/journals/new'
     | '/master-data/products/$id'
     | '/master-data/warehouses/$id'
+    | '/warehouse/inbounds/$id'
+    | '/warehouse/petty-stock-requests/$id'
+    | '/warehouse/stock-counts/$id'
+    | '/warehouse/stock-transfers/$id'
     | '/finance/journals/'
     | '/master-data/products/'
     | '/master-data/warehouses/'
+    | '/warehouse/inbounds/'
+    | '/warehouse/petty-stock-requests/'
+    | '/warehouse/stock-counts/'
+    | '/warehouse/stock-transfers/'
     | '/finance/journals/$id/edit'
     | '/finance/journals/$id/'
   fileRoutesByTo: FileRoutesByTo
@@ -495,12 +592,21 @@ export interface FileRouteTypes {
     | '/settings/roles'
     | '/settings/users'
     | '/system/about'
+    | '/warehouse/in-transit'
     | '/finance/journals/new'
     | '/master-data/products/$id'
     | '/master-data/warehouses/$id'
+    | '/warehouse/inbounds/$id'
+    | '/warehouse/petty-stock-requests/$id'
+    | '/warehouse/stock-counts/$id'
+    | '/warehouse/stock-transfers/$id'
     | '/finance/journals'
     | '/master-data/products'
     | '/master-data/warehouses'
+    | '/warehouse/inbounds'
+    | '/warehouse/petty-stock-requests'
+    | '/warehouse/stock-counts'
+    | '/warehouse/stock-transfers'
     | '/finance/journals/$id/edit'
     | '/finance/journals/$id'
   id:
@@ -540,12 +646,21 @@ export interface FileRouteTypes {
     | '/_app/settings/roles'
     | '/_app/settings/users'
     | '/_app/system/about'
+    | '/_app/warehouse/in-transit'
     | '/_app/finance/journals/new'
     | '/_app/master-data/products/$id'
     | '/_app/master-data/warehouses/$id'
+    | '/_app/warehouse/inbounds/$id'
+    | '/_app/warehouse/petty-stock-requests/$id'
+    | '/_app/warehouse/stock-counts/$id'
+    | '/_app/warehouse/stock-transfers/$id'
     | '/_app/finance/journals/'
     | '/_app/master-data/products/'
     | '/_app/master-data/warehouses/'
+    | '/_app/warehouse/inbounds/'
+    | '/_app/warehouse/petty-stock-requests/'
+    | '/_app/warehouse/stock-counts/'
+    | '/_app/warehouse/stock-transfers/'
     | '/_app/finance/journals/$id/edit'
     | '/_app/finance/journals/$id/'
   fileRoutesById: FileRoutesById
@@ -806,6 +921,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSystemAboutRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/warehouse/in-transit': {
+      id: '/_app/warehouse/in-transit'
+      path: '/warehouse/in-transit'
+      fullPath: '/warehouse/in-transit'
+      preLoaderRoute: typeof AppWarehouseInTransitRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/finance/journals/': {
       id: '/_app/finance/journals/'
       path: '/finance/journals'
@@ -846,6 +968,62 @@ declare module '@tanstack/react-router' {
       path: '/master-data/warehouses/$id'
       fullPath: '/master-data/warehouses/$id'
       preLoaderRoute: typeof AppMasterDataWarehousesIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/warehouse/inbounds/': {
+      id: '/_app/warehouse/inbounds/'
+      path: '/warehouse/inbounds'
+      fullPath: '/warehouse/inbounds/'
+      preLoaderRoute: typeof AppWarehouseInboundsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/warehouse/inbounds/$id': {
+      id: '/_app/warehouse/inbounds/$id'
+      path: '/warehouse/inbounds/$id'
+      fullPath: '/warehouse/inbounds/$id'
+      preLoaderRoute: typeof AppWarehouseInboundsIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/warehouse/petty-stock-requests/': {
+      id: '/_app/warehouse/petty-stock-requests/'
+      path: '/warehouse/petty-stock-requests'
+      fullPath: '/warehouse/petty-stock-requests/'
+      preLoaderRoute: typeof AppWarehousePettyStockRequestsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/warehouse/petty-stock-requests/$id': {
+      id: '/_app/warehouse/petty-stock-requests/$id'
+      path: '/warehouse/petty-stock-requests/$id'
+      fullPath: '/warehouse/petty-stock-requests/$id'
+      preLoaderRoute: typeof AppWarehousePettyStockRequestsIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/warehouse/stock-counts/': {
+      id: '/_app/warehouse/stock-counts/'
+      path: '/warehouse/stock-counts'
+      fullPath: '/warehouse/stock-counts/'
+      preLoaderRoute: typeof AppWarehouseStockCountsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/warehouse/stock-counts/$id': {
+      id: '/_app/warehouse/stock-counts/$id'
+      path: '/warehouse/stock-counts/$id'
+      fullPath: '/warehouse/stock-counts/$id'
+      preLoaderRoute: typeof AppWarehouseStockCountsIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/warehouse/stock-transfers/': {
+      id: '/_app/warehouse/stock-transfers/'
+      path: '/warehouse/stock-transfers'
+      fullPath: '/warehouse/stock-transfers/'
+      preLoaderRoute: typeof AppWarehouseStockTransfersIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/warehouse/stock-transfers/$id': {
+      id: '/_app/warehouse/stock-transfers/$id'
+      path: '/warehouse/stock-transfers/$id'
+      fullPath: '/warehouse/stock-transfers/$id'
+      preLoaderRoute: typeof AppWarehouseStockTransfersIdRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/finance/journals/$id/': {
@@ -895,12 +1073,21 @@ interface AppRouteChildren {
   AppSettingsRolesRoute: typeof AppSettingsRolesRoute
   AppSettingsUsersRoute: typeof AppSettingsUsersRoute
   AppSystemAboutRoute: typeof AppSystemAboutRoute
+  AppWarehouseInTransitRoute: typeof AppWarehouseInTransitRoute
   AppFinanceJournalsNewRoute: typeof AppFinanceJournalsNewRoute
   AppMasterDataProductsIdRoute: typeof AppMasterDataProductsIdRoute
   AppMasterDataWarehousesIdRoute: typeof AppMasterDataWarehousesIdRoute
+  AppWarehouseInboundsIdRoute: typeof AppWarehouseInboundsIdRoute
+  AppWarehousePettyStockRequestsIdRoute: typeof AppWarehousePettyStockRequestsIdRoute
+  AppWarehouseStockCountsIdRoute: typeof AppWarehouseStockCountsIdRoute
+  AppWarehouseStockTransfersIdRoute: typeof AppWarehouseStockTransfersIdRoute
   AppFinanceJournalsIndexRoute: typeof AppFinanceJournalsIndexRoute
   AppMasterDataProductsIndexRoute: typeof AppMasterDataProductsIndexRoute
   AppMasterDataWarehousesIndexRoute: typeof AppMasterDataWarehousesIndexRoute
+  AppWarehouseInboundsIndexRoute: typeof AppWarehouseInboundsIndexRoute
+  AppWarehousePettyStockRequestsIndexRoute: typeof AppWarehousePettyStockRequestsIndexRoute
+  AppWarehouseStockCountsIndexRoute: typeof AppWarehouseStockCountsIndexRoute
+  AppWarehouseStockTransfersIndexRoute: typeof AppWarehouseStockTransfersIndexRoute
   AppFinanceJournalsIdEditRoute: typeof AppFinanceJournalsIdEditRoute
   AppFinanceJournalsIdIndexRoute: typeof AppFinanceJournalsIdIndexRoute
 }
@@ -935,12 +1122,22 @@ const AppRouteChildren: AppRouteChildren = {
   AppSettingsRolesRoute: AppSettingsRolesRoute,
   AppSettingsUsersRoute: AppSettingsUsersRoute,
   AppSystemAboutRoute: AppSystemAboutRoute,
+  AppWarehouseInTransitRoute: AppWarehouseInTransitRoute,
   AppFinanceJournalsNewRoute: AppFinanceJournalsNewRoute,
   AppMasterDataProductsIdRoute: AppMasterDataProductsIdRoute,
   AppMasterDataWarehousesIdRoute: AppMasterDataWarehousesIdRoute,
+  AppWarehouseInboundsIdRoute: AppWarehouseInboundsIdRoute,
+  AppWarehousePettyStockRequestsIdRoute: AppWarehousePettyStockRequestsIdRoute,
+  AppWarehouseStockCountsIdRoute: AppWarehouseStockCountsIdRoute,
+  AppWarehouseStockTransfersIdRoute: AppWarehouseStockTransfersIdRoute,
   AppFinanceJournalsIndexRoute: AppFinanceJournalsIndexRoute,
   AppMasterDataProductsIndexRoute: AppMasterDataProductsIndexRoute,
   AppMasterDataWarehousesIndexRoute: AppMasterDataWarehousesIndexRoute,
+  AppWarehouseInboundsIndexRoute: AppWarehouseInboundsIndexRoute,
+  AppWarehousePettyStockRequestsIndexRoute:
+    AppWarehousePettyStockRequestsIndexRoute,
+  AppWarehouseStockCountsIndexRoute: AppWarehouseStockCountsIndexRoute,
+  AppWarehouseStockTransfersIndexRoute: AppWarehouseStockTransfersIndexRoute,
   AppFinanceJournalsIdEditRoute: AppFinanceJournalsIdEditRoute,
   AppFinanceJournalsIdIndexRoute: AppFinanceJournalsIdIndexRoute,
 }
