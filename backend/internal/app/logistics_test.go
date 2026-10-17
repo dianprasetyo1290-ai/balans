@@ -277,6 +277,7 @@ func TestDeliveryOrderOutboundQCFlow(t *testing.T) {
 		"version": do["version"], "courierId": h.courier("own"), "internalCourierUserId": h.userID("staf.gudang@balans.local"),
 	})
 	require.Equal(t, http.StatusUnprocessableEntity, status, "kurir internal harus Merchandiser")
+	assert.Contains(t, problem["fields"], "internalCourierUserId")
 	merch := h.userID("merchandiser@balans.local")
 	do = h.json(http.MethodPost, "/api/v1/delivery-orders/"+doID+"/ship", map[string]any{
 		"version": do["version"], "courierId": h.courier("own"), "internalCourierUserId": merch,

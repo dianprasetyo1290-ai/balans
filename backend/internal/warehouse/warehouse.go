@@ -13,6 +13,10 @@
 //   - TransferStock / ReceiveTransfer: memindah stok antar lokasi (DO konsinyasi A-07, buffer vending A-24, kirim
 //     ke maklon) dan mengembalikan nilai FIFO barang yang dipindah untuk jurnal modul pemanggil.
 //   - StockCountResult: hasil stock count konsinyasi/vending untuk rekonsiliasi.
+//   - CreateOutbound / RegisterOutboundHandler / CancelOutbound (R1.3, WMS-12): dokumen asal (Delivery Order)
+//     mendaftarkan barang yang stoknya sudah reserved; Staf Gudang picking per batch & packing koli, QC oleh
+//     Fulfillment Leader/Merchandiser yang bukan penyiap. QC gagal memanggil OutboundHandler.Replace (barang ke
+//     Karantina + stok pengganti FEFO) dan SetQCReturns (retur pembelian otomatis ke pemasok/maklon, D-24).
 package warehouse
 
 import (
