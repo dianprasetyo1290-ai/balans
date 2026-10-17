@@ -168,9 +168,17 @@ export function cancelImportJob(id: string, key: string) {
   )
 }
 
-export function createExportJob(kind: string, key: string) {
+/** params dipakai ekspor laporan (mis. Neraca Saldo: year, month, divisionId). */
+export function createExportJob(
+  kind: string,
+  key: string,
+  params?: Record<string, string>
+) {
   return unwrap(
-    api.POST("/api/v1/export-jobs", { params: idem(key), body: { kind } })
+    api.POST("/api/v1/export-jobs", {
+      params: idem(key),
+      body: { kind, params },
+    })
   )
 }
 

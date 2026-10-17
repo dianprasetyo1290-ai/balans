@@ -210,8 +210,8 @@ func (a *App) buildDataExchange() error {
 		dx.RegisterImporter(imp)
 		dx.RegisterExporter(tableExporter{spec: s, export: exp})
 		a.filestore.RegisterOwner(filestore.OwnerPolicy{
-			OwnerType: dataexchange.UploadOwnerType(s.Kind), WritePermission: s.Kind + ".import",
-			ReadPermission: s.Kind + ".import", ContentTypes: []string{filestore.TypeXLSX}, MaxBytes: dataexchange.MaxFileBytes,
+			OwnerType: dataexchange.UploadOwnerType(s.Kind), WritePermission: s.ImportPermission(),
+			ReadPermission: s.ImportPermission(), ContentTypes: []string{filestore.TypeXLSX}, MaxBytes: dataexchange.MaxFileBytes,
 		})
 	}
 	if a.catalog != nil {
@@ -240,6 +240,7 @@ func (a *App) buildDataExchange() error {
 		s := spec("warehouse.location", "Lokasi Stok", "Gudang & Lokasi", warehouse.LocationColumns())
 		register(s, tableImporter{spec: s, apply: a.warehouse.ImportLocationRow}, a.warehouse.ExportLocations)
 	}
+	a.registerAccountingExchange(dx)
 	return nil
 }
 

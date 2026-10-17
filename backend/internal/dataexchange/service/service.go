@@ -53,6 +53,22 @@ type Exporter interface {
 	Export(ctx context.Context, emit func(tabular.Row) error) error
 }
 
+// ParamsValidator opsional: exporter laporan memeriksa parameter ekspor saat job dibuat.
+type ParamsValidator interface {
+	ValidateParams(ctx context.Context, params map[string]string) error
+}
+
+type exportParamsCtx struct{}
+
+// ExportParams adalah parameter ekspor job yang sedang berjalan (kosong untuk master data).
+func ExportParams(ctx context.Context) map[string]string {
+	p, _ := ctx.Value(exportParamsCtx{}).(map[string]string)
+	if p == nil {
+		return map[string]string{}
+	}
+	return p
+}
+
 type rowKeyCtx struct{}
 
 // RowKey adalah kunci idempotensi baris: ID job + nomor baris. Kosong di luar job impor.
@@ -104,6 +120,7 @@ type txRunner interface {
 type store interface {
 	InsertImportJob(ctx context.Context, j domain.ImportJob, actorID uuid.UUID) (domain.ImportJob, error)
 	GetImportJob(ctx context.Context, id uuid.UUID, forUpdate bool) (domain.ImportJob, error)
+	ImportJobBySHA(ctx context.Context, kind string, sha []byte) (domain.ImportJob, bool, error)
 	ListImportJobs(ctx context.Context, kinds []string, kind *string, page paging.Page) (paging.Result[domain.ImportJob], error)
 	SaveImportJob(ctx context.Context, j domain.ImportJob, now time.Time, actorID uuid.UUID) (domain.ImportJob, error)
 	SetImportProgress(ctx context.Context, id uuid.UUID, processed, committed int, now time.Time) error
@@ -112,7 +129,7 @@ type store interface {
 	ValidRowNumbers(ctx context.Context, jobID uuid.UUID) (map[int]bool, error)
 	SetRowErrors(ctx context.Context, jobID uuid.UUID, row int, errs []domain.RowError) error
 
-	InsertExportJob(ctx context.Context, kind string, actorID uuid.UUID) (domain.ExportJob, error)
+	InsertExportJob(ctx context.Context, kind string, params map[string]string, actorID uuid.UUID) (domain.ExportJob, error)
 	GetExportJob(ctx context.Context, id uuid.UUID, forUpdate bool) (domain.ExportJob, error)
 	ListExportJobs(ctx context.Context, kinds []string, kind *string, page paging.Page) (paging.Result[domain.ExportJob], error)
 	SaveExportJob(ctx context.Context, j domain.ExportJob, now time.Time, actorID uuid.UUID) (domain.ExportJob, error)

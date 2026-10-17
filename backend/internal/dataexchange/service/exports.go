@@ -28,14 +28,22 @@ func exportLink(j domain.ExportJob) string {
 }
 
 // CreateExport menjadwalkan ekspor jenis data; file xlsx dibuat job dataexchange.export di antrean bulk.
-func (s *Service) CreateExport(ctx context.Context, kind string) (domain.ExportJob, error) {
-	_, a, err := s.requireExporter(ctx, kind)
+func (s *Service) CreateExport(ctx context.Context, kind string, params map[string]string) (domain.ExportJob, error) {
+	exp, a, err := s.requireExporter(ctx, kind)
 	if err != nil {
 		return domain.ExportJob{}, err
 	}
+	if len(params) > 20 {
+		return domain.ExportJob{}, apperr.Validation(map[string]string{"params": "Parameter ekspor terlalu banyak"})
+	}
+	if v, ok := exp.(ParamsValidator); ok {
+		if err := v.ValidateParams(ctx, params); err != nil {
+			return domain.ExportJob{}, err
+		}
+	}
 	var job domain.ExportJob
 	err = s.Tx.WithTx(ctx, func(ctx context.Context) error {
-		if job, err = s.Store.InsertExportJob(ctx, kind, a.UserID); err != nil {
+		if job, err = s.Store.InsertExportJob(ctx, kind, params, a.UserID); err != nil {
 			return err
 		}
 		return s.Jobs.Enqueue(ctx, ExportArgs{JobID: job.ID}, nil)
@@ -104,7 +112,7 @@ func (s *Service) RunExport(ctx context.Context, id uuid.UUID) error {
 	if !a.Has(spec.ExportPermission()) {
 		return s.failExport(ctx, j, "Pengguna tidak lagi memiliki akses ekspor "+spec.Label+".")
 	}
-	ctx = actor.With(ctx, a)
+	ctx = context.WithValue(actor.With(ctx, a), exportParamsCtx{}, j.Params)
 	j.Status = domain.ExportRunning
 	if j, err = s.Store.SaveExportJob(ctx, j, s.now(), j.CreatedBy); err != nil {
 		return err

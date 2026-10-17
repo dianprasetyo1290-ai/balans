@@ -106,7 +106,7 @@ WHERE l.account_id = sqlc.arg('account_id') AND e.status = 'posted' AND e.busine
 
 -- name: LedgerLines :many
 -- Mutasi per baris dengan kumulatif debit − kredit sejak date_from (saldo berjalan dihitung di Go).
-SELECT e.id AS entry_id, e.number, e.business_date, e.description, e.entry_type, e.source_type, e.source_label,
+SELECT e.id AS entry_id, e.number, e.business_date, e.description, e.entry_type, e.source_type, e.source_id, e.source_label,
        l.line_no, l.debit_amount, l.credit_amount, l.memo, l.channel_id, l.sub_channel_id, l.division_id, l.campaign_id,
        sum(l.debit_amount - l.credit_amount) OVER (
            ORDER BY e.business_date, e.number, l.line_no ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)::numeric AS cumulative_net

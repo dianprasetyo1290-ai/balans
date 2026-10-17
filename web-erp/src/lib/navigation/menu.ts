@@ -578,14 +578,43 @@ export const MENU: MenuGroup[] = [
         "Biaya Operasional"
       ),
       { label: "Anggaran Biaya", optional: "U-13" },
-      ...items("Pajak & Bukti Potong", "Aset Tetap", "Penyusutan"),
+      ...items("Pajak & Bukti Potong"),
+      {
+        label: "Aset Tetap",
+        to: "/finance/fixed-assets",
+        permission: "accounting.fixed_asset.read",
+        module: "accounting",
+      },
+      {
+        label: "Penyusutan",
+        to: "/finance/depreciation",
+        permission: "accounting.fixed_asset.read",
+        module: "accounting",
+      },
       {
         label: "Periode Akuntansi",
         to: "/finance/fiscal-periods",
         permission: "accounting.fiscal_period.read",
         module: "accounting",
       },
-      ...items("Tutup Buku", "Saldo Awal", "Laporan Keuangan"),
+      {
+        label: "Tutup Buku",
+        to: "/finance/period-close",
+        permission: "accounting.fiscal_period.read",
+        module: "accounting",
+      },
+      {
+        label: "Saldo Awal",
+        to: "/finance/opening-balances",
+        permission: "accounting.journal.read",
+        module: "accounting",
+      },
+      {
+        label: "Laporan Keuangan",
+        to: "/finance/reports",
+        permission: "accounting.report.read",
+        module: "accounting",
+      },
     ],
   },
   {
