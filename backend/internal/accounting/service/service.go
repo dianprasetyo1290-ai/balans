@@ -89,6 +89,8 @@ type store interface {
 	ListEntries(ctx context.Context, f postgres.EntryFilter, page paging.Page) (paging.Result[domain.Entry], error)
 	LedgerSummary(ctx context.Context, f postgres.LedgerFilter) (postgres.LedgerSummary, error)
 	LedgerLines(ctx context.Context, f postgres.LedgerFilter, page paging.Page) ([]postgres.LedgerLine, error)
+
+	closeStore
 }
 
 // Deps adalah dependensi Service.
@@ -104,6 +106,8 @@ type Deps struct {
 // Service adalah use case modul accounting.
 type Service struct {
 	Deps
+	// ext adalah dependensi opsional tutup buku & saldo awal yang dipasang saat wiring (close.go).
+	ext extensions
 }
 
 // New membuat Service.

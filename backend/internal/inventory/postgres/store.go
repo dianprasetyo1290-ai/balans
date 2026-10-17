@@ -724,3 +724,24 @@ func (s *Store) ExpiredReservationSources(ctx context.Context, now time.Time, li
 	}
 	return out, nil
 }
+
+// StockValue adalah qty dan nilai persediaan satu produk di satu lokasi.
+type StockValue struct {
+	ProductID  uuid.UUID
+	LocationID uuid.UUID
+	Qty        decimal.Decimal
+	Value      decimal.Decimal
+}
+
+// StockValues menjumlahkan qty & nilai ledger per produk & lokasi s.d. tanggal (semua status stok).
+func (s *Store) StockValues(ctx context.Context, asOf clock.BusinessDate) ([]StockValue, error) {
+	rows, err := s.q(ctx).StockValuesAsOf(ctx, asOf)
+	if err != nil {
+		return nil, fmt.Errorf("stock values: %w", err)
+	}
+	out := make([]StockValue, len(rows))
+	for i, r := range rows {
+		out[i] = StockValue{ProductID: r.ProductID, LocationID: r.LocationID, Qty: r.Qty, Value: r.ValueAmount}
+	}
+	return out, nil
+}

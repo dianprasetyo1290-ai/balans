@@ -221,6 +221,7 @@ type LedgerLine struct {
 	Description  string
 	EntryType    domain.EntryType
 	SourceType   string
+	SourceID     uuid.UUID
 	SourceLabel  string
 	LineNo       int
 	Debit        money.Amount
@@ -271,7 +272,7 @@ func (s *Store) LedgerLines(ctx context.Context, f LedgerFilter, page paging.Pag
 	for i, r := range rows {
 		out[i] = LedgerLine{
 			EntryID: r.EntryID, Number: textValue(r.Number), BusinessDate: r.BusinessDate, Description: r.Description,
-			EntryType: domain.EntryType(r.EntryType), SourceType: r.SourceType, SourceLabel: r.SourceLabel, LineNo: int(r.LineNo),
+			EntryType: domain.EntryType(r.EntryType), SourceType: r.SourceType, SourceID: r.SourceID, SourceLabel: r.SourceLabel, LineNo: int(r.LineNo),
 			Debit: money.FromDecimal(r.DebitAmount), Credit: money.FromDecimal(r.CreditAmount), Memo: r.Memo,
 			Dimensions: domain.Dimensions{
 				ChannelID: uuidPtr(r.ChannelID), SubChannelID: uuidPtr(r.SubChannelID), DivisionID: uuidPtr(r.DivisionID), CampaignID: uuidPtr(r.CampaignID),

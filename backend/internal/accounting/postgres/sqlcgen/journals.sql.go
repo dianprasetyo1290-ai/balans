@@ -214,7 +214,7 @@ func (q *Queries) InsertLine(ctx context.Context, arg InsertLineParams) error {
 }
 
 const ledgerLines = `-- name: LedgerLines :many
-SELECT e.id AS entry_id, e.number, e.business_date, e.description, e.entry_type, e.source_type, e.source_label,
+SELECT e.id AS entry_id, e.number, e.business_date, e.description, e.entry_type, e.source_type, e.source_id, e.source_label,
        l.line_no, l.debit_amount, l.credit_amount, l.memo, l.channel_id, l.sub_channel_id, l.division_id, l.campaign_id,
        sum(l.debit_amount - l.credit_amount) OVER (
            ORDER BY e.business_date, e.number, l.line_no ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)::numeric AS cumulative_net
@@ -249,6 +249,7 @@ type LedgerLinesRow struct {
 	Description   string
 	EntryType     string
 	SourceType    string
+	SourceID      uuid.UUID
 	SourceLabel   string
 	LineNo        int32
 	DebitAmount   decimal.Decimal
@@ -288,6 +289,7 @@ func (q *Queries) LedgerLines(ctx context.Context, arg LedgerLinesParams) ([]Led
 			&i.Description,
 			&i.EntryType,
 			&i.SourceType,
+			&i.SourceID,
 			&i.SourceLabel,
 			&i.LineNo,
 			&i.DebitAmount,

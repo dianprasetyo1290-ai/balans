@@ -1,8 +1,11 @@
 import { useQuery } from "@tanstack/react-query"
 import { getRouteApi, Link } from "@tanstack/react-router"
+import { DownloadIcon } from "lucide-react"
+import { toast } from "sonner"
 
 import { DataTable, type DataTableColumn } from "@/components/common/data-table"
 import { DateInput } from "@/components/common/date-input"
+import { LoadingButton } from "@/components/common/loading-button"
 import { Field, FieldLabel } from "@/components/ui/field"
 import {
   Select,
@@ -11,8 +14,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { usePermissions } from "@/features/auth/api/auth-api"
+import { createExportJob } from "@/features/dataexchange/api/dataexchange-api"
+import { parseProblem } from "@/lib/api/problem"
+import { useIdempotentMutation } from "@/lib/api/use-idempotent-mutation"
 import { formatDate } from "@/lib/format/date"
 import { formatRupiah } from "@/lib/format/money"
+import { showErrorDialog } from "@/stores/error-dialog-store"
 
 import {
   accountsQuery,
@@ -23,6 +31,7 @@ import {
   type GeneralLedger,
 } from "../api/accounting-api"
 import { DimensionSelect } from "./dimension-select"
+import { SourceDocumentLink } from "./source-document-link"
 
 const route = getRouteApi("/_app/finance/general-ledger")
 
@@ -36,6 +45,24 @@ export function GeneralLedgerPage() {
   const channels = useQuery(channelsQuery(true))
   const divisions = useQuery(divisionsQuery(true))
   const ledger = useQuery(generalLedgerQuery(search))
+  const { can } = usePermissions()
+  const exportJob = useIdempotentMutation({
+    mutationFn: (_: void, key) => {
+      const params: Record<string, string> = {
+        dateFrom: search.dateFrom,
+        dateTo: search.dateTo,
+      }
+      if (search.accountId) params.accountId = search.accountId
+      if (search.divisionId) params.divisionId = search.divisionId
+      if (search.channelId) params.channelId = search.channelId
+      return createExportJob("accounting.general_ledger", key, params)
+    },
+    onSuccess: () =>
+      toast.success(
+        "Ekspor Buku Besar diproses. Tautan unduhan dikirim lewat notifikasi."
+      ),
+    onError: (err) => showErrorDialog(parseProblem(err)),
+  })
   const postable = (accounts.data ?? []).filter((a) => a.isPostable)
   const setSearch = (patch: Partial<typeof search>) =>
     void navigate({ search: (s) => ({ ...s, ...patch, page: 1 }) })
@@ -69,7 +96,16 @@ export function GeneralLedgerPage() {
           <span>{l.memo || l.description}</span>
           <span className="text-xs text-muted-foreground">
             {ENTRY_TYPE_LABELS[l.entryType]}
-            {l.sourceLabel ? ` · ${l.sourceLabel}` : ""}
+            {l.sourceLabel ? (
+              <>
+                {" · "}
+                <SourceDocumentLink
+                  sourceType={l.sourceType}
+                  sourceId={l.sourceId}
+                  label={l.sourceLabel}
+                />
+              </>
+            ) : null}
             {l.division ? ` · ${l.division.name}` : ""}
             {l.channel ? ` · ${l.channel.name}` : ""}
           </span>
@@ -104,12 +140,25 @@ export function GeneralLedgerPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Buku Besar</h1>
-        <p className="text-sm text-muted-foreground">
-          Mutasi per akun dari jurnal yang sudah diposting, dengan saldo
-          berjalan sesuai saldo normal akun.
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Buku Besar</h1>
+          <p className="text-sm text-muted-foreground">
+            Mutasi per akun dari jurnal yang sudah diposting, dengan saldo
+            berjalan sesuai saldo normal akun. Ekspor tanpa akun berisi semua
+            akun pada rentang tanggal.
+          </p>
+        </div>
+        {can("dataexchange.transaction.export") ? (
+          <LoadingButton
+            variant="outline"
+            loading={exportJob.isPending}
+            loadingText="Memproses…"
+            onClick={() => exportJob.mutate()}
+          >
+            <DownloadIcon /> Ekspor Buku Besar
+          </LoadingButton>
+        ) : null}
       </div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <Field className="lg:col-span-2">

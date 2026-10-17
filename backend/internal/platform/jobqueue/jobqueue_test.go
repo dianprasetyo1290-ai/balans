@@ -80,3 +80,13 @@ func TestDailyAtUsesJakartaTime(t *testing.T) {
 	}
 	assert.Len(t, jobqueue.QueueConfig(), 3)
 }
+
+func TestMonthlyAtUsesJakartaTime(t *testing.T) {
+	sched := jobqueue.MonthlyAt{Day: 1, Hour: 1, Minute: 0}
+	// 1 Nov 2026 01.00 WIB = 31 Okt 2026 18.00 UTC.
+	first := time.Date(2026, 10, 31, 18, 0, 0, 0, time.UTC)
+	assert.Equal(t, first, sched.Next(time.Date(2026, 10, 17, 3, 0, 0, 0, time.UTC)))
+	assert.Equal(t, time.Date(2026, 11, 30, 18, 0, 0, 0, time.UTC), sched.Next(first), "tepat jadwal pindah ke bulan berikutnya")
+	// 1 Jan 2027 01.00 WIB = 31 Des 2026 18.00 UTC.
+	assert.Equal(t, time.Date(2026, 12, 31, 18, 0, 0, 0, time.UTC), sched.Next(time.Date(2026, 12, 15, 0, 0, 0, 0, time.UTC)))
+}

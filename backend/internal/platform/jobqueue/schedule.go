@@ -21,3 +21,21 @@ func (d DailyAt) Next(t time.Time) time.Time {
 	}
 	return next.UTC()
 }
+
+// MonthlyAt adalah jadwal bulanan pada tanggal dan jam WIB tertentu (mis. penyusutan tanggal 1 pukul 01.00).
+// Day 1–28 agar selalu ada di setiap bulan.
+type MonthlyAt struct {
+	Day    int
+	Hour   int
+	Minute int
+}
+
+// Next mengembalikan waktu jalan berikutnya setelah t.
+func (m MonthlyAt) Next(t time.Time) time.Time {
+	local := t.In(clock.Jakarta)
+	next := time.Date(local.Year(), local.Month(), m.Day, m.Hour, m.Minute, 0, 0, clock.Jakarta)
+	if !next.After(local) {
+		next = time.Date(local.Year(), local.Month()+1, m.Day, m.Hour, m.Minute, 0, 0, clock.Jakarta)
+	}
+	return next.UTC()
+}
