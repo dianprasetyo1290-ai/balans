@@ -25,6 +25,31 @@ describe("menu", () => {
     ])
   })
 
+  it("Gudang memuat label Naming Convention untuk dokumen gudang R1.2", () => {
+    const gudang = MENU.find((g) => g.label === "Gudang")
+    expect(gudang?.items.map((i) => i.label)).toEqual([
+      "Inbound",
+      "Put-away",
+      "Transfer Stok",
+      "Permintaan Petty Stock",
+      "Stok dalam Pengiriman",
+      "Outbound",
+      "Stock Count",
+      "Gudang Retur",
+      "Disposisi Retur",
+      "Riwayat Mutasi Stok",
+    ])
+    expect(gudang?.items.filter((i) => i.to).map((i) => i.to)).toEqual([
+      "/warehouse/inbounds",
+      "/warehouse/stock-transfers",
+      "/warehouse/petty-stock-requests",
+      "/warehouse/in-transit",
+      "/warehouse/stock-counts",
+      "/warehouse/returns",
+      "/warehouse/return-dispositions",
+    ])
+  })
+
   it("tanpa modul aktif hanya menampilkan halaman yang sudah dibangun", () => {
     const groups = visibleMenu([])
     expect(groups.map((g) => g.label)).toEqual(["Ringkasan", "Pengaturan"])
@@ -183,6 +208,31 @@ describe("menu", () => {
     )
     expect(labels(["sales", "accounting"], [])).not.toContain(
       "Data Master › Jenis Biaya"
+    )
+  })
+
+  it("menampilkan halaman harga jika modul pricing aktif", () => {
+    const labels = (modules: string[], perms: string[]) =>
+      visibleMenu(modules, [], perms).flatMap((g) =>
+        g.items.map((i) => `${g.label} › ${i.label}`)
+      )
+    expect(
+      labels(["pricing"], ["pricing.price_list.read", "pricing.promotion.read"])
+    ).toEqual(
+      expect.arrayContaining([
+        "Data Master › Daftar Harga",
+        "Data Master › Aturan Harga",
+        "Penjualan › Harga & Diskon",
+      ])
+    )
+    // Approver Head Finance & Accounting membuka daftar harga dari inbox persetujuan.
+    expect(labels(["pricing"], ["pricing.price_list.approve"])).toEqual([
+      "Ringkasan › Ringkasan Operasional",
+      "Data Master › Daftar Harga",
+      "Pengaturan › Tentang Sistem",
+    ])
+    expect(labels([], ["pricing.price_list.read"])).not.toContain(
+      "Data Master › Daftar Harga"
     )
   })
 })

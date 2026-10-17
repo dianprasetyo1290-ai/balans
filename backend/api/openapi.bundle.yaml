@@ -27,7 +27,7 @@ tags:
   - name: catalog
     description: Master produk, packaging, material, bundling (R1.1)
   - name: warehouse
-    description: Gudang dan lokasi stok (R1.1)
+    description: Gudang dan lokasi stok (R1.1); Inbound/QC, Transfer Stok, Petty Stock, Stock Count (R1.2)
   - name: inventory
     description: Ledger stok, batch, HPP FIFO, saran FEFO (R1.2)
   - name: accounting
@@ -38,8 +38,12 @@ tags:
     description: Pelanggan, mitra & PKS, kode produk mitra, pemasok & maklon (R1.1)
   - name: hris
     description: Data karyawan dasar (R1.1)
+  - name: procurement
+    description: Purchase Request, Purchase Order (barang, maklon, reprocess), uang muka pembelian (R1.2)
   - name: filestore
     description: Upload dan unduhan file bertanda tangan (R1.1)
+  - name: pricing
+    description: Daftar harga & versi, harga khusus, promo, harga bertingkat, batas diskon, resolver harga (R1.1)
   - name: dataexchange
     description: Impor/ekspor Excel master data (R1.1)
 paths:
@@ -2574,6 +2578,449 @@ paths:
                 $ref: '#/components/schemas/Location'
         default:
           $ref: '#/components/responses/Problem'
+  /api/v1/inbounds:
+    get:
+      operationId: listInbounds
+      tags:
+        - warehouse
+      summary: Antrian Inbound — barang Karantina per dokumen asal (WMS-02, WMS-09)
+      description: Terbaru lebih dulu. Permission `warehouse.inbound.read`.
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Search'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/InboundStatus'
+        - name: sourceType
+          in: query
+          schema:
+            type: string
+        - name: warehouseId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Daftar Inbound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InboundList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/inbounds/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      operationId: getInbound
+      tags:
+        - warehouse
+      summary: Detail Inbound beserta baris dan catatan QC
+      responses:
+        '200':
+          description: Detail Inbound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inbound'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/inbounds/{id}/lines/{lineId}/qc:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+      - name: lineId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      operationId: recordInboundQc
+      tags:
+        - warehouse
+      summary: QC satu baris Inbound (checklist, qty lulus/ditolak, foto, lokasi tujuan)
+      description: |
+        Qty lulus pindah Karantina → Tersedia di lokasi tujuan; qty ditolak tetap Karantina (ditahan di Inbound untuk
+        barang pemasok/maklon, atau pindah ke Gudang Retur). Qty lulus + ditolak = qty baris. Permission
+        `warehouse.inbound.post`.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InboundQcInput'
+      responses:
+        '200':
+          description: Inbound setelah QC
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inbound'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/stock-transfers:
+    get:
+      operationId: listStockTransfers
+      tags:
+        - warehouse
+      summary: Daftar Transfer Stok atau Permintaan Petty Stock
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Search'
+        - name: transferType
+          in: query
+          schema:
+            $ref: '#/components/schemas/StockTransferType'
+        - name: status
+          in: query
+          description: Bisa lebih dari satu.
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/StockTransferStatus'
+        - name: locationId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Daftar transfer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockTransferList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createStockTransfer
+      tags:
+        - warehouse
+      summary: Membuat Transfer Stok / Permintaan Petty Stock berstatus Draft
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockTransferInput'
+      responses:
+        '201':
+          description: Transfer dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockTransfer'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/stock-transfers/in-transit:
+    get:
+      operationId: listStockInTransit
+      tags:
+        - warehouse
+      summary: Stok dalam Pengiriman — baris transfer yang belum diterima penuh (WMS-10)
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - name: locationId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Baris Dalam Pengiriman
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockInTransitList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/stock-transfers/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      operationId: getStockTransfer
+      tags:
+        - warehouse
+      summary: Detail transfer
+      responses:
+        '200':
+          description: Detail transfer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockTransfer'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      operationId: updateStockTransfer
+      tags:
+        - warehouse
+      summary: Mengubah transfer Draft
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/StockTransferInput'
+                - $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Transfer diubah
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockTransfer'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/stock-transfers/{id}/actions:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      operationId: actOnStockTransfer
+      tags:
+        - warehouse
+      summary: Aksi status transfer (submit, release, prepare, post, ship, receive, complete, cancel)
+      description: |
+        Transfer langsung: `post` (dalam satu gudang, langsung Selesai) atau `ship` (antar gudang/eksternal →
+        Dalam Pengiriman), `receive` (qty diterima per baris), `complete` (sisa dicatat kekurangan). Permintaan
+        Petty Stock: `submit` (Fulfillment Leader), `release` (Logistik Leader; stok asal dialokasikan FEFO),
+        `prepare` (Staf Gudang), `receive` (Fulfillment Leader mengonfirmasi qty; sisa alokasi dilepas).
+        Aksi yang boleh dijalankan ada di `allowedActions`.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockTransferActionInput'
+      responses:
+        '200':
+          description: Transfer setelah aksi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockTransfer'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/stock-counts:
+    get:
+      operationId: listStockCounts
+      tags:
+        - warehouse
+      summary: Daftar Stock Count (Merchandiser hanya lokasi konsinyasi mitra yang ditugaskan)
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Search'
+        - name: status
+          in: query
+          description: Bisa lebih dari satu.
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/StockCountStatus'
+        - name: countType
+          in: query
+          schema:
+            $ref: '#/components/schemas/StockCountType'
+        - name: locationId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Daftar stock count
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockCountList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createStockCounts
+      tags:
+        - warehouse
+      summary: Membuat Stock Count Draft, satu dokumen per lokasi
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockCountInput'
+      responses:
+        '201':
+          description: Stock count dibuat
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StockCountSummary'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/stock-counts/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      operationId: getStockCount
+      tags:
+        - warehouse
+      summary: Detail Stock Count (hitung buta — qty sistem dan selisih kosong sampai hasil dikirim)
+      responses:
+        '200':
+          description: Detail stock count
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockCount'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/stock-counts/{id}/entries:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    put:
+      operationId: saveStockCountEntries
+      tags:
+        - warehouse
+      summary: Menyimpan isian hitung (autosave form HP), barang tambahan, dan foto
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockCountEntriesInput'
+      responses:
+        '200':
+          description: Stock count setelah disimpan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockCount'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/stock-counts/{id}/actions:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      operationId: actOnStockCount
+      tags:
+        - warehouse
+      summary: Aksi status Stock Count (start, submit, recount, cancel)
+      description: |
+        `start` memberi nomor SC dan mengambil snapshot saldo sistem; `submit` menghitung selisih — ada selisih
+        pada stock count gudang → approval `stock_count` (nominal = nilai selisih absolut); tanpa selisih atau
+        konsinyasi/vending → Selesai. Setelah disetujui, penyesuaian stok + jurnal A-14 diposting otomatis.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockCountActionInput'
+      responses:
+        '200':
+          description: Stock count setelah aksi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockCount'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/stock-count-schedules:
+    get:
+      operationId: listStockCountSchedules
+      tags:
+        - warehouse
+      summary: Jadwal Stock Count (cycle count, konsinyasi/vending bulanan, penuh akhir tahun)
+      responses:
+        '200':
+          description: Jadwal
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StockCountSchedule'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createStockCountSchedule
+      tags:
+        - warehouse
+      summary: Membuat jadwal Stock Count
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockCountScheduleInput'
+      responses:
+        '201':
+          description: Jadwal dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockCountSchedule'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/stock-count-schedules/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    put:
+      operationId: updateStockCountSchedule
+      tags:
+        - warehouse
+      summary: Mengubah jadwal Stock Count
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/StockCountScheduleInput'
+                - $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Jadwal diubah
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockCountSchedule'
+        default:
+          $ref: '#/components/responses/Problem'
   /api/v1/stock-balances:
     get:
       operationId: listStockBalances
@@ -4194,6 +4641,748 @@ paths:
                 format: binary
         default:
           $ref: '#/components/responses/Problem'
+  /api/v1/price-lists:
+    get:
+      operationId: listPriceLists
+      tags:
+        - pricing
+      summary: Data Master › Daftar Harga
+      description: |
+        Butuh `pricing.price_list.read` (atau `pricing.price_list.approve` untuk approver). Harga Dasar & HET selalu
+        paling atas. `deleted=true` hanya menampilkan daftar harga terhapus (untuk dipulihkan Admin Sistem).
+      parameters:
+        - $ref: '#/components/parameters/Search'
+        - name: priceListType
+          in: query
+          schema:
+            $ref: '#/components/schemas/PriceListType'
+        - name: includeInactive
+          in: query
+          schema:
+            type: boolean
+            default: false
+        - name: deleted
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Daftar harga beserta versi yang berlaku, versi terjadwal, dan versi yang sedang disiapkan
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PriceList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createPriceList
+      tags:
+        - pricing
+      summary: Menambah daftar harga
+      description: Harga diisi lewat versi yang diajukan untuk approval (Head Sales → Head Finance & Accounting).
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PriceListInput'
+      responses:
+        '201':
+          description: Daftar harga dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceListDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/price-lists/options:
+    get:
+      operationId: listPriceListOptions
+      tags:
+        - pricing
+      summary: Pilihan daftar harga aktif (acuan persentase, harga bertingkat)
+      responses:
+        '200':
+          description: Daftar harga aktif yang belum dihapus
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PriceListOption'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/price-lists/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      operationId: getPriceList
+      tags:
+        - pricing
+      summary: Detail daftar harga dan riwayat versi
+      responses:
+        '200':
+          description: Daftar harga
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceListDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      operationId: updatePriceList
+      tags:
+        - pricing
+      summary: Mengubah header daftar harga (kode dan jenis tetap)
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PriceListUpdate'
+      responses:
+        '200':
+          description: Daftar harga diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceListDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+    delete:
+      operationId: deletePriceList
+      tags:
+        - pricing
+      summary: Menghapus (soft delete) daftar harga
+      description: Harga Dasar & HET tidak bisa dihapus. Transaksi lama tetap menyimpan harga dan versinya.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/PricingVersion'
+      responses:
+        '204':
+          description: Daftar harga dihapus
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/price-lists/{id}/restore:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      operationId: restorePriceList
+      tags:
+        - pricing
+      summary: Memulihkan daftar harga yang dihapus (hanya Admin Sistem)
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Daftar harga dipulihkan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceListDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/price-lists/{id}/versions:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      operationId: createPriceListVersion
+      tags:
+        - pricing
+      summary: Menyiapkan versi draft baru
+      description: |
+        `copyFromVersionId` menyalin harga versi lain bila `items` kosong. Paling banyak satu versi draft/diajukan per
+        daftar harga. Tanggal mulai berlaku tidak boleh sebelum hari ini.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PriceListVersionInput'
+      responses:
+        '201':
+          description: Versi draft dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceListVersion'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/price-list-versions/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      operationId: getPriceListVersion
+      tags:
+        - pricing
+      summary: Detail versi beserta harga per produk
+      responses:
+        '200':
+          description: Versi daftar harga
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceListVersion'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      operationId: updatePriceListVersion
+      tags:
+        - pricing
+      summary: Mengubah versi draft (seluruh item diganti)
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PriceListVersionUpdate'
+      responses:
+        '200':
+          description: Versi diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceListVersion'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/price-list-versions/{id}/submit:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      operationId: submitPriceListVersion
+      tags:
+        - pricing
+      summary: Mengajukan versi untuk approval price_list_version
+      description: Versi berlaku setelah disetujui Head Sales lalu Head Finance & Accounting.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Versi diajukan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceListVersion'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/price-list-versions/{id}/withdraw:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      operationId: withdrawPriceListVersion
+      tags:
+        - pricing
+      summary: Menarik kembali pengajuan menjadi draft
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Pengajuan ditarik
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceListVersion'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/price-list-versions/{id}/cancel:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      operationId: cancelPriceListVersion
+      tags:
+        - pricing
+      summary: Membatalkan versi draft
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Versi dibatalkan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceListVersion'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/special-prices:
+    get:
+      operationId: listSpecialPrices
+      tags:
+        - pricing
+      summary: Data Master › Aturan Harga › Harga Khusus
+      parameters:
+        - name: partyType
+          in: query
+          schema:
+            $ref: '#/components/schemas/SpecialPricePartyType'
+        - name: partyId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: productId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/PricingIncludeEnded'
+      responses:
+        '200':
+          description: Harga khusus
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SpecialPrice'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createSpecialPrice
+      tags:
+        - pricing
+      summary: Menambah harga khusus pelanggan/mitra
+      description: Harga khusus lama tanpa tanggal berakhir untuk pihak & produk yang sama ditutup otomatis.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpecialPriceInput'
+      responses:
+        '201':
+          description: Harga khusus dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpecialPrice'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/special-prices/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    delete:
+      operationId: deleteSpecialPrice
+      tags:
+        - pricing
+      summary: Menghapus harga khusus yang belum pernah berlaku
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/PricingVersion'
+      responses:
+        '204':
+          description: Harga khusus dihapus
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/special-prices/{id}/end:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      operationId: endSpecialPrice
+      tags:
+        - pricing
+      summary: Mengisi tanggal berakhir harga khusus
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PricingEndInput'
+      responses:
+        '200':
+          description: Harga khusus diakhiri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpecialPrice'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/promotions:
+    get:
+      operationId: listPromotions
+      tags:
+        - pricing
+      summary: Data Master › Aturan Harga › Promo
+      parameters:
+        - $ref: '#/components/parameters/Search'
+        - name: channelId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/PricingIncludeEnded'
+        - name: deleted
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Promo tanpa item, terbaru dulu
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Promotion'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createPromotion
+      tags:
+        - pricing
+      summary: Menambah promo periode
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PromotionInput'
+      responses:
+        '201':
+          description: Promo dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Promotion'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/promotions/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      operationId: getPromotion
+      tags:
+        - pricing
+      summary: Detail promo beserta item
+      responses:
+        '200':
+          description: Promo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Promotion'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      operationId: updatePromotion
+      tags:
+        - pricing
+      summary: Mengubah promo
+      description: |
+        Promo yang sudah berjalan hanya boleh diubah nama, keterangan, status, dan tanggal selesai (paling cepat
+        kemarin); `items` harus sama dengan yang tersimpan atau dikosongkan.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PromotionUpdate'
+      responses:
+        '200':
+          description: Promo diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Promotion'
+        default:
+          $ref: '#/components/responses/Problem'
+    delete:
+      operationId: deletePromotion
+      tags:
+        - pricing
+      summary: Menghapus promo yang belum berjalan
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/PricingVersion'
+      responses:
+        '204':
+          description: Promo dihapus
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/tiered-prices:
+    get:
+      operationId: listTieredPrices
+      tags:
+        - pricing
+      summary: Data Master › Aturan Harga › Harga Bertingkat
+      parameters:
+        - name: productId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: priceListId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/PricingIncludeEnded'
+      responses:
+        '200':
+          description: Harga bertingkat
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TieredPrice'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createTieredPrice
+      tags:
+        - pricing
+      summary: Menambah harga bertingkat per qty minimum
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TieredPriceInput'
+      responses:
+        '201':
+          description: Harga bertingkat dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TieredPrice'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/tiered-prices/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    delete:
+      operationId: deleteTieredPrice
+      tags:
+        - pricing
+      summary: Menghapus harga bertingkat yang belum pernah berlaku
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/PricingVersion'
+      responses:
+        '204':
+          description: Harga bertingkat dihapus
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/tiered-prices/{id}/end:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      operationId: endTieredPrice
+      tags:
+        - pricing
+      summary: Mengisi tanggal berakhir harga bertingkat
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PricingEndInput'
+      responses:
+        '200':
+          description: Harga bertingkat diakhiri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TieredPrice'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/discount-limits:
+    get:
+      operationId: listDiscountLimits
+      tags:
+        - pricing
+      summary: Penjualan › Harga & Diskon › Batas Diskon per Role
+      parameters:
+        - $ref: '#/components/parameters/PricingIncludeEnded'
+      responses:
+        '200':
+          description: Batas diskon per role
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DiscountLimit'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createDiscountLimit
+      tags:
+        - pricing
+      summary: Menetapkan batas diskon role mulai tanggal tertentu
+      description: Batas lama tanpa tanggal berakhir ditutup otomatis sehari sebelum batas baru berlaku.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscountLimitInput'
+      responses:
+        '201':
+          description: Batas diskon dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscountLimit'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/discount-limits/roles:
+    get:
+      operationId: listDiscountLimitRoles
+      tags:
+        - pricing
+      summary: Pilihan role untuk batas diskon
+      responses:
+        '200':
+          description: Role pembuat dokumen penjualan
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DiscountLimitRole'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/discount-limits/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    delete:
+      operationId: deleteDiscountLimit
+      tags:
+        - pricing
+      summary: Menghapus batas diskon yang belum pernah berlaku
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/PricingVersion'
+      responses:
+        '204':
+          description: Batas diskon dihapus
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/discount-limits/{id}/end:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      operationId: endDiscountLimit
+      tags:
+        - pricing
+      summary: Mengisi tanggal berakhir batas diskon
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PricingEndInput'
+      responses:
+        '200':
+          description: Batas diskon diakhiri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscountLimit'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/pricing/quote:
+    post:
+      operationId: quotePrice
+      tags:
+        - pricing
+      summary: Simulasi harga (resolver 5 aturan BRD 5.18)
+      description: |
+        Menjalankan resolver yang sama dengan transaksi: harga khusus → promo → harga bertingkat → daftar harga
+        channel/mitra/karyawan → Harga Dasar & HET, berdasarkan tanggal transaksi. Tidak menyimpan data, sehingga
+        tidak memakai Idempotency-Key.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PriceQuoteRequest'
+      responses:
+        '200':
+          description: Harga dan aturan yang dipakai
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceQuote'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/pricing/discount-check:
+    post:
+      operationId: checkDiscount
+      tags:
+        - pricing
+      summary: Simulasi diskon manual terhadap batas diskon role user yang login
+      description: |
+        Subtotal dokumen = total bruto baris dikurangi diskon baris. Diskon di atas batas berarti Sales Order butuh
+        approval `sales_order_discount` (Head Sales). Tidak menyimpan data.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscountCheckRequest'
+      responses:
+        '200':
+          description: Hasil pemeriksaan diskon
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscountCheckResult'
+        default:
+          $ref: '#/components/responses/Problem'
   /api/v1/data-exchange/kinds:
     get:
       operationId: listDataExchangeKinds
@@ -4453,6 +5642,621 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataExchangeFileLink'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/procurement/division-options:
+    get:
+      operationId: listProcurementDivisionOptions
+      tags:
+        - procurement
+      summary: Divisi aktif untuk form Purchase Request dan Purchase Order
+      description: Terbuka untuk pemegang hak baca/tulis PR atau PO (tidak butuh hak master dimensi).
+      responses:
+        '200':
+          description: Divisi aktif urut kode
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PurchaseOption'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/procurement/cash-bank-accounts:
+    get:
+      operationId: listProcurementCashBankAccounts
+      tags:
+        - procurement
+      summary: Akun Kas & Bank (11xx) untuk pembayaran uang muka pembelian
+      responses:
+        '200':
+          description: Akun aktif yang bisa diposting
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PurchaseOption'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/purchase-requests:
+    get:
+      operationId: listPurchaseRequests
+      tags:
+        - procurement
+      summary: Daftar Purchase Request (S-201)
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/Search'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/PurchaseRequestStatus'
+        - name: divisionId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: mine
+          in: query
+          description: Hanya PR yang diajukan user.
+          schema:
+            type: boolean
+        - name: dateFrom
+          in: query
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+        - name: dateTo
+          in: query
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+      responses:
+        '200':
+          description: PR terbaru lebih dulu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseRequestList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createPurchaseRequest
+      tags:
+        - procurement
+      summary: Menyimpan draft Purchase Request
+      description: Pembuat menjadi peminta. Divisi peminta wajib; baris berisi produk katalog atau uraian bebas.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseRequestFields'
+      responses:
+        '201':
+          description: Draft dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseRequest'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/purchase-requests/{id}:
+    get:
+      operationId: getPurchaseRequest
+      tags:
+        - procurement
+      summary: Detail Purchase Request beserta PO yang dibuat darinya
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Purchase Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseRequest'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      operationId: updatePurchaseRequest
+      tags:
+        - procurement
+      summary: Mengubah draft Purchase Request
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseRequestUpdate'
+      responses:
+        '200':
+          description: Draft diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseRequest'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/purchase-requests/{id}/submit:
+    post:
+      operationId: submitPurchaseRequest
+      tags:
+        - procurement
+      summary: Ajukan Purchase Request
+      description: |
+        Nomor `PR/TAHUN/BULAN/NOMOR` diberikan dan approval `purchase_request` (Head divisi peminta) diminta di
+        transaksi yang sama. `APPROVAL_POLICY_MISSING` bila belum ada approver aktif selain pembuat.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: PR menunggu persetujuan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseRequest'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/purchase-requests/{id}/revise:
+    post:
+      operationId: revisePurchaseRequest
+      tags:
+        - procurement
+      summary: Revisi Purchase Request yang ditolak (kembali ke Draft, nomor tetap)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: PR kembali Draft
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseRequest'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/purchase-requests/{id}/cancel:
+    post:
+      operationId: cancelPurchaseRequest
+      tags:
+        - procurement
+      summary: Batalkan draft Purchase Request
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: PR dibatalkan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseRequest'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/purchase-requests/{id}/close:
+    post:
+      operationId: closePurchaseRequest
+      tags:
+        - procurement
+      summary: Tutup Purchase Request yang disetujui (sisa qty tidak dijadikan PO)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseReasonInput'
+      responses:
+        '200':
+          description: PR ditutup
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseRequest'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/purchase-orders:
+    get:
+      operationId: listPurchaseOrders
+      tags:
+        - procurement
+      summary: Daftar Purchase Order (barang/packaging, maklon, reprocess)
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/Search'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/PurchaseOrderStatus'
+        - name: orderType
+          in: query
+          description: Satu atau beberapa jenis PO.
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/PurchaseOrderType'
+        - name: supplierId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: divisionId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: dateFrom
+          in: query
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+        - name: dateTo
+          in: query
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+      responses:
+        '200':
+          description: PO terbaru lebih dulu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrderList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createPurchaseOrder
+      tags:
+        - procurement
+      summary: Menyimpan draft Purchase Order (S-202, S-203, S-204)
+      description: |
+        NON-PKP: tanpa PPN, total = subtotal. PO maklon/reprocess wajib ke pemasok berjenis maklon yang punya lokasi
+        eksternal maklon, baris = FG hasil + harga jasa per unit, dan daftar bahan (packaging atau material GM) yang
+        dikirim ke maklon. Baris dari Purchase Request mengisi `purchaseRequestLineId` (qty ≤ sisa PR).
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseOrderInput'
+      responses:
+        '201':
+          description: Draft dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrder'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/purchase-orders/{id}:
+    get:
+      operationId: getPurchaseOrder
+      tags:
+        - procurement
+      summary: Detail Purchase Order beserta uang muka
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Purchase Order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrder'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      operationId: updatePurchaseOrder
+      tags:
+        - procurement
+      summary: Mengubah draft Purchase Order (jenis PO tetap)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseOrderUpdate'
+      responses:
+        '200':
+          description: Draft diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrder'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/purchase-orders/{id}/submit:
+    post:
+      operationId: submitPurchaseOrder
+      tags:
+        - procurement
+      summary: Ajukan Purchase Order
+      description: |
+        Nomor `PO/TAHUN/BULAN/NOMOR` diberikan dan approval `purchase_order` dengan nominal `totalAmount` (level
+        sesuai Matriks Persetujuan) diminta di transaksi yang sama.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: PO menunggu persetujuan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrder'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/purchase-orders/{id}/revise:
+    post:
+      operationId: revisePurchaseOrder
+      tags:
+        - procurement
+      summary: Revisi Purchase Order yang ditolak (kembali ke Draft, nomor tetap)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: PO kembali Draft
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrder'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/purchase-orders/{id}/cancel:
+    post:
+      operationId: cancelPurchaseOrder
+      tags:
+        - procurement
+      summary: Batalkan Purchase Order
+      description: |
+        Draft, atau Disetujui yang belum ada penerimaan barang dan tidak punya uang muka aktif (alasan wajib).
+        Qty Purchase Request asal dikembalikan.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseCancelInput'
+      responses:
+        '200':
+          description: PO dibatalkan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrder'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/purchase-orders/{id}/close:
+    post:
+      operationId: closePurchaseOrder
+      tags:
+        - procurement
+      summary: Tutup Purchase Order yang diterima sebagian (sisa qty tidak ditunggu)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseReasonInput'
+      responses:
+        '200':
+          description: PO ditutup
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrder'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/purchase-advances:
+    get:
+      operationId: listPurchaseAdvances
+      tags:
+        - procurement
+      summary: Daftar uang muka pembelian (S-205)
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Search'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/PurchaseAdvanceStatus'
+        - name: purchaseOrderId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: supplierId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: dateFrom
+          in: query
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+        - name: dateTo
+          in: query
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+      responses:
+        '200':
+          description: Uang muka terbaru lebih dulu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseAdvanceList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createPurchaseAdvance
+      tags:
+        - procurement
+      summary: Menyimpan draft uang muka untuk PO yang disetujui
+      description: Total uang muka aktif per PO tidak boleh melebihi total PO.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseAdvanceInput'
+      responses:
+        '201':
+          description: Draft dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseAdvance'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/purchase-advances/{id}:
+    get:
+      operationId: getPurchaseAdvance
+      tags:
+        - procurement
+      summary: Detail uang muka pembelian
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Uang muka
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseAdvance'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      operationId: updatePurchaseAdvance
+      tags:
+        - procurement
+      summary: Mengubah draft uang muka
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseAdvanceUpdate'
+      responses:
+        '200':
+          description: Draft diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseAdvance'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/purchase-advances/{id}/post:
+    post:
+      operationId: postPurchaseAdvance
+      tags:
+        - procurement
+      summary: Posting uang muka (jurnal A-19)
+      description: |
+        Nomor `BYR/TAHUN/BULAN/NOMOR` dan jurnal A-19 (Dr 1401 Uang Muka Pembelian, Cr akun Kas & Bank) dengan
+        dimensi divisi PO dan pihak pemasok, di transaksi yang sama. Periode tertutup ditolak `PERIOD_LOCKED`.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Uang muka diposting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseAdvance'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/purchase-advances/{id}/cancel:
+    post:
+      operationId: cancelPurchaseAdvance
+      tags:
+        - procurement
+      summary: Batalkan uang muka
+      description: |
+        Draft (hak tulis) atau Diposting yang belum dipotong tagihan (hak posting, alasan wajib, jurnal A-19 dibalik).
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseCancelInput'
+      responses:
+        '200':
+          description: Uang muka dibatalkan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseAdvance'
         default:
           $ref: '#/components/responses/Problem'
 components:
@@ -7124,6 +8928,935 @@ components:
             isActive:
               type: boolean
         - $ref: '#/components/schemas/VersionInput'
+    InboundStatus:
+      type: string
+      description: '`in_progress` Diproses, `completed` Selesai.'
+      enum:
+        - in_progress
+        - completed
+    WhLocationRef:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - locationType
+        - locationTypeLabel
+        - isExternal
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        locationType:
+          $ref: '#/components/schemas/LocationType'
+        locationTypeLabel:
+          type: string
+        isExternal:
+          type: boolean
+        warehouseName:
+          type: string
+    InboundSummary:
+      type: object
+      required:
+        - id
+        - number
+        - sourceType
+        - sourceTypeLabel
+        - sourceLabel
+        - location
+        - businessDate
+        - status
+        - lineCount
+        - pendingCount
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        sourceType:
+          type: string
+        sourceTypeLabel:
+          type: string
+        sourceLabel:
+          type: string
+        location:
+          $ref: '#/components/schemas/WhLocationRef'
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        status:
+          $ref: '#/components/schemas/InboundStatus'
+        lineCount:
+          type: integer
+        pendingCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+    InboundList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/InboundSummary'
+    InboundRejectAction:
+      type: string
+      description: '`hold` ditahan di Inbound (reject ke pemasok/maklon), `returns` ke Gudang Retur.'
+      enum:
+        - hold
+        - returns
+    WhProductRef:
+      type: object
+      required:
+        - id
+        - sku
+        - name
+        - uom
+      properties:
+        id:
+          type: string
+          format: uuid
+        sku:
+          type: string
+        name:
+          type: string
+        uom:
+          type: string
+    WhBatchRef:
+      type: object
+      required:
+        - id
+        - number
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        expiryDate:
+          $ref: '#/components/schemas/BusinessDate'
+    WhQuantity:
+      type: string
+      description: Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+      pattern: ^-?[0-9]{1,15}(\.[0-9]{1,3})?$
+      example: '12.000'
+    InboundLineStatus:
+      type: string
+      description: '`quarantine` Karantina (belum QC), `posted` Diposting (lulus), `qc_rejected` Ditolak QC.'
+      enum:
+        - quarantine
+        - posted
+        - qc_rejected
+    InboundLine:
+      type: object
+      required:
+        - id
+        - lineNo
+        - product
+        - qty
+        - passedQty
+        - rejectedQty
+        - destination
+        - status
+        - rejectReason
+        - allowedActions
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        product:
+          $ref: '#/components/schemas/WhProductRef'
+        batch:
+          $ref: '#/components/schemas/WhBatchRef'
+        qty:
+          $ref: '#/components/schemas/WhQuantity'
+        passedQty:
+          $ref: '#/components/schemas/WhQuantity'
+        rejectedQty:
+          $ref: '#/components/schemas/WhQuantity'
+        destination:
+          $ref: '#/components/schemas/WhLocationRef'
+        rejectLocation:
+          $ref: '#/components/schemas/WhLocationRef'
+        status:
+          $ref: '#/components/schemas/InboundLineStatus'
+        rejectReason:
+          type: string
+        checkedByName:
+          type: string
+        checkedAt:
+          type: string
+          format: date-time
+        allowedActions:
+          type: array
+          items:
+            type: string
+            enum:
+              - qc
+    InboundQcChecklist:
+      type: object
+      required:
+        - batch
+        - expiry
+        - condition
+        - seal
+      properties:
+        batch:
+          type: boolean
+        expiry:
+          type: boolean
+        condition:
+          type: boolean
+        seal:
+          type: boolean
+    InboundQualityCheck:
+      type: object
+      required:
+        - id
+        - lineId
+        - result
+        - qty
+        - checks
+        - note
+        - photoFileIds
+        - checkedByName
+        - checkedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineId:
+          type: string
+          format: uuid
+        result:
+          type: string
+          enum:
+            - passed
+            - rejected
+        qty:
+          $ref: '#/components/schemas/WhQuantity'
+        checks:
+          $ref: '#/components/schemas/InboundQcChecklist'
+        note:
+          type: string
+        photoFileIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        checkedByName:
+          type: string
+        checkedAt:
+          type: string
+          format: date-time
+    Inbound:
+      allOf:
+        - $ref: '#/components/schemas/InboundSummary'
+        - type: object
+          required:
+            - sourceId
+            - rejectAction
+            - note
+            - lines
+            - checks
+            - version
+          properties:
+            sourceId:
+              type: string
+              format: uuid
+            rejectAction:
+              $ref: '#/components/schemas/InboundRejectAction'
+            note:
+              type: string
+            completedAt:
+              type: string
+              format: date-time
+            version:
+              type: integer
+            lines:
+              type: array
+              items:
+                $ref: '#/components/schemas/InboundLine'
+            checks:
+              type: array
+              items:
+                $ref: '#/components/schemas/InboundQualityCheck'
+    InboundQcInput:
+      type: object
+      required:
+        - passedQty
+        - rejectedQty
+        - checks
+      properties:
+        passedQty:
+          $ref: '#/components/schemas/WhQuantity'
+        rejectedQty:
+          $ref: '#/components/schemas/WhQuantity'
+        checks:
+          $ref: '#/components/schemas/InboundQcChecklist'
+        rejectReason:
+          type: string
+          maxLength: 500
+        destinationLocationId:
+          type: string
+          format: uuid
+        note:
+          type: string
+          maxLength: 500
+        photoFileIds:
+          type: array
+          maxItems: 5
+          items:
+            type: string
+            format: uuid
+    StockTransferType:
+      type: string
+      description: '`direct` Transfer Stok, `request` Permintaan Petty Stock.'
+      enum:
+        - direct
+        - request
+    StockTransferStatus:
+      type: string
+      enum:
+        - draft
+        - submitted
+        - in_progress
+        - in_transit
+        - partially_received
+        - received
+        - completed
+        - cancelled
+    StockTransferSummary:
+      type: object
+      required:
+        - id
+        - transferType
+        - from
+        - to
+        - requiresShipping
+        - businessDate
+        - status
+        - requestedByName
+        - lineCount
+        - totalQty
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        transferType:
+          $ref: '#/components/schemas/StockTransferType'
+        from:
+          $ref: '#/components/schemas/WhLocationRef'
+        to:
+          $ref: '#/components/schemas/WhLocationRef'
+        requiresShipping:
+          type: boolean
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        status:
+          $ref: '#/components/schemas/StockTransferStatus'
+        requestedByName:
+          type: string
+        lineCount:
+          type: integer
+        totalQty:
+          $ref: '#/components/schemas/WhQuantity'
+        createdAt:
+          type: string
+          format: date-time
+    StockTransferList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/StockTransferSummary'
+    StockTransferLineInput:
+      type: object
+      required:
+        - productId
+        - qty
+      properties:
+        productId:
+          type: string
+          format: uuid
+        batchId:
+          type: string
+          format: uuid
+        qty:
+          $ref: '#/components/schemas/WhQuantity'
+        batchReason:
+          type: string
+          maxLength: 500
+        note:
+          type: string
+          maxLength: 500
+    StockTransferInput:
+      type: object
+      required:
+        - transferType
+        - fromLocationId
+        - toLocationId
+        - businessDate
+        - lines
+      properties:
+        transferType:
+          $ref: '#/components/schemas/StockTransferType'
+        fromLocationId:
+          type: string
+          format: uuid
+        toLocationId:
+          type: string
+          format: uuid
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        note:
+          type: string
+          maxLength: 500
+        lines:
+          type: array
+          minItems: 1
+          maxItems: 200
+          items:
+            $ref: '#/components/schemas/StockTransferLineInput'
+    StockTransferLine:
+      type: object
+      required:
+        - id
+        - lineNo
+        - product
+        - qty
+        - receivedQty
+        - shortageQty
+        - costAmount
+        - batchReason
+        - note
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        product:
+          $ref: '#/components/schemas/WhProductRef'
+        batch:
+          $ref: '#/components/schemas/WhBatchRef'
+        qty:
+          $ref: '#/components/schemas/WhQuantity'
+        receivedQty:
+          $ref: '#/components/schemas/WhQuantity'
+        shortageQty:
+          $ref: '#/components/schemas/WhQuantity'
+        costAmount:
+          $ref: '#/components/schemas/Money'
+        batchReason:
+          type: string
+        note:
+          type: string
+    StockTransferAction:
+      type: string
+      enum:
+        - edit
+        - submit
+        - release
+        - prepare
+        - post
+        - ship
+        - receive
+        - complete
+        - cancel
+    StockTransfer:
+      allOf:
+        - $ref: '#/components/schemas/StockTransferSummary'
+        - type: object
+          required:
+            - note
+            - lines
+            - version
+            - allowedActions
+            - cancelReason
+          properties:
+            note:
+              type: string
+            sourceType:
+              type: string
+            sourceId:
+              type: string
+              format: uuid
+            submittedAt:
+              type: string
+              format: date-time
+            releasedByName:
+              type: string
+            releasedAt:
+              type: string
+              format: date-time
+            preparedByName:
+              type: string
+            preparedAt:
+              type: string
+              format: date-time
+            shippedByName:
+              type: string
+            shippedAt:
+              type: string
+              format: date-time
+            receivedByName:
+              type: string
+            receivedAt:
+              type: string
+              format: date-time
+            completedAt:
+              type: string
+              format: date-time
+            cancelledAt:
+              type: string
+              format: date-time
+            cancelReason:
+              type: string
+            version:
+              type: integer
+            lines:
+              type: array
+              items:
+                $ref: '#/components/schemas/StockTransferLine'
+            allowedActions:
+              type: array
+              items:
+                $ref: '#/components/schemas/StockTransferAction'
+    StockInTransitLine:
+      type: object
+      required:
+        - transferId
+        - lineId
+        - from
+        - to
+        - businessDate
+        - status
+        - product
+        - qty
+        - receivedQty
+        - outstandingQty
+        - costAmount
+      properties:
+        transferId:
+          type: string
+          format: uuid
+        number:
+          type: string
+        lineId:
+          type: string
+          format: uuid
+        from:
+          $ref: '#/components/schemas/WhLocationRef'
+        to:
+          $ref: '#/components/schemas/WhLocationRef'
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        shippedAt:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/StockTransferStatus'
+        product:
+          $ref: '#/components/schemas/WhProductRef'
+        batch:
+          $ref: '#/components/schemas/WhBatchRef'
+        qty:
+          $ref: '#/components/schemas/WhQuantity'
+        receivedQty:
+          $ref: '#/components/schemas/WhQuantity'
+        outstandingQty:
+          $ref: '#/components/schemas/WhQuantity'
+        costAmount:
+          $ref: '#/components/schemas/Money'
+    StockInTransitList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/StockInTransitLine'
+    StockTransferReceiveLine:
+      type: object
+      required:
+        - lineId
+        - qty
+      properties:
+        lineId:
+          type: string
+          format: uuid
+        qty:
+          $ref: '#/components/schemas/WhQuantity'
+    StockTransferActionInput:
+      type: object
+      required:
+        - action
+        - version
+      properties:
+        action:
+          $ref: '#/components/schemas/StockTransferAction'
+        version:
+          type: integer
+        reason:
+          type: string
+          maxLength: 500
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockTransferReceiveLine'
+    StockCountStatus:
+      type: string
+      enum:
+        - draft
+        - in_progress
+        - pending_approval
+        - rejected
+        - posted
+        - completed
+        - cancelled
+    StockCountType:
+      type: string
+      description: '`full` Penuh, `cycle` Cycle count, `consignment` Konsinyasi, `vending` Vending.'
+      enum:
+        - full
+        - cycle
+        - consignment
+        - vending
+    StockCountSummary:
+      type: object
+      required:
+        - id
+        - countType
+        - location
+        - businessDate
+        - status
+        - lineCount
+        - countedCount
+        - assignedToName
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        countType:
+          $ref: '#/components/schemas/StockCountType'
+        location:
+          $ref: '#/components/schemas/WhLocationRef'
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        status:
+          $ref: '#/components/schemas/StockCountStatus'
+        scheduleId:
+          type: string
+          format: uuid
+        assignedToName:
+          type: string
+        lineCount:
+          type: integer
+        countedCount:
+          type: integer
+        varianceAmount:
+          description: Kosong sampai hasil dikirim.
+          allOf:
+            - $ref: '#/components/schemas/Money'
+        createdAt:
+          type: string
+          format: date-time
+    StockCountList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/StockCountSummary'
+    StockCountInput:
+      type: object
+      required:
+        - countType
+        - locationIds
+      properties:
+        countType:
+          $ref: '#/components/schemas/StockCountType'
+        locationIds:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items:
+            type: string
+            format: uuid
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        note:
+          type: string
+          maxLength: 500
+    StockCountLine:
+      type: object
+      required:
+        - id
+        - lineNo
+        - product
+        - isExtra
+        - note
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        product:
+          $ref: '#/components/schemas/WhProductRef'
+        batch:
+          $ref: '#/components/schemas/WhBatchRef'
+        systemQty:
+          description: Kosong saat hitung buta (Draft, Diproses, Ditolak).
+          allOf:
+            - $ref: '#/components/schemas/WhQuantity'
+        countedQty:
+          $ref: '#/components/schemas/WhQuantity'
+        varianceQty:
+          $ref: '#/components/schemas/WhQuantity'
+        unitCost:
+          type: string
+        varianceAmount:
+          $ref: '#/components/schemas/Money'
+        isExtra:
+          type: boolean
+        photoFileId:
+          type: string
+          format: uuid
+        note:
+          type: string
+        countedAt:
+          type: string
+          format: date-time
+    StockCountAction:
+      type: string
+      enum:
+        - start
+        - count
+        - submit
+        - recount
+        - cancel
+    StockCount:
+      allOf:
+        - $ref: '#/components/schemas/StockCountSummary'
+        - type: object
+          required:
+            - note
+            - photoFileIds
+            - lines
+            - version
+            - allowedActions
+            - revealed
+            - decisionNote
+          properties:
+            note:
+              type: string
+            photoFileIds:
+              type: array
+              items:
+                type: string
+                format: uuid
+            revealed:
+              type: boolean
+              description: true = qty sistem dan selisih ditampilkan (setelah hasil dikirim).
+            snapshotAt:
+              type: string
+              format: date-time
+            startedByName:
+              type: string
+            submittedByName:
+              type: string
+            submittedAt:
+              type: string
+              format: date-time
+            netVariance:
+              $ref: '#/components/schemas/Money'
+            decidedAt:
+              type: string
+              format: date-time
+            decisionNote:
+              type: string
+            postedAt:
+              type: string
+              format: date-time
+            journalEntryId:
+              type: string
+              format: uuid
+            version:
+              type: integer
+            lines:
+              type: array
+              items:
+                $ref: '#/components/schemas/StockCountLine'
+            allowedActions:
+              type: array
+              items:
+                $ref: '#/components/schemas/StockCountAction'
+    StockCountEntry:
+      type: object
+      required:
+        - lineId
+      properties:
+        lineId:
+          type: string
+          format: uuid
+        countedQty:
+          $ref: '#/components/schemas/WhQuantity'
+        note:
+          type: string
+          maxLength: 500
+        photoFileId:
+          type: string
+          format: uuid
+    StockCountExtraEntry:
+      type: object
+      required:
+        - productId
+        - countedQty
+      properties:
+        productId:
+          type: string
+          format: uuid
+        batchId:
+          type: string
+          format: uuid
+        countedQty:
+          $ref: '#/components/schemas/WhQuantity'
+        note:
+          type: string
+          maxLength: 500
+    StockCountEntriesInput:
+      type: object
+      properties:
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockCountEntry'
+        extraLines:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockCountExtraEntry'
+        photoFileIds:
+          description: Diisi = mengganti foto lokasi/rak; tidak dikirim = foto tidak berubah.
+          type: array
+          maxItems: 10
+          items:
+            type: string
+            format: uuid
+    StockCountActionInput:
+      type: object
+      required:
+        - action
+        - version
+      properties:
+        action:
+          $ref: '#/components/schemas/StockCountAction'
+        version:
+          type: integer
+        reason:
+          type: string
+          maxLength: 500
+    StockCountFrequency:
+      type: string
+      enum:
+        - weekly
+        - monthly
+        - yearly
+    StockCountScheduleInput:
+      type: object
+      required:
+        - name
+        - countType
+        - frequency
+        - isActive
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        countType:
+          $ref: '#/components/schemas/StockCountType'
+        frequency:
+          $ref: '#/components/schemas/StockCountFrequency'
+        dayOfWeek:
+          type: integer
+          minimum: 1
+          maximum: 7
+        dayOfMonth:
+          type: integer
+          minimum: 1
+          maximum: 31
+        monthOfYear:
+          type: integer
+          minimum: 1
+          maximum: 12
+        warehouseId:
+          type: string
+          format: uuid
+        locationIds:
+          type: array
+          maxItems: 100
+          items:
+            type: string
+            format: uuid
+        assigneeUserId:
+          type: string
+          format: uuid
+        isActive:
+          type: boolean
+    StockCountSchedule:
+      allOf:
+        - $ref: '#/components/schemas/StockCountScheduleInput'
+        - type: object
+          required:
+            - id
+            - nextRunDate
+            - version
+            - locationIds
+            - assigneeName
+          properties:
+            id:
+              type: string
+              format: uuid
+            assigneeName:
+              type: string
+            nextRunDate:
+              $ref: '#/components/schemas/BusinessDate'
+            lastRunDate:
+              $ref: '#/components/schemas/BusinessDate'
+            version:
+              type: integer
     StockStatus:
       type: string
       description: '`available` Tersedia, `quarantine` Karantina, `in_transit` Dalam Pengiriman, `reserved` Dialokasikan.'
@@ -9604,6 +12337,944 @@ components:
         expiresAt:
           type: string
           format: date-time
+    PriceListType:
+      type: string
+      description: |
+        Cakupan daftar harga (BRD 5.18): `base` Harga Dasar & HET, `channel` per channel/sub-channel, `partner` per
+        mitra, `reseller` per level reseller (Fase 2), `employee` harga karyawan, `vending` per channel vending/mesin.
+      enum:
+        - base
+        - channel
+        - partner
+        - reseller
+        - employee
+        - vending
+    PriceListBasis:
+      type: string
+      description: '`fixed` harga per produk; `percent` persentase dari daftar harga acuan.'
+      enum:
+        - fixed
+        - percent
+    PriceListVersionStatus:
+      type: string
+      enum:
+        - draft
+        - pending_approval
+        - active
+        - rejected
+        - cancelled
+    PricingPercent:
+      type: string
+      description: Persen desimal maks. 4 angka di belakang koma, mis. `12.5`.
+      pattern: ^[0-9]{1,4}(\.[0-9]{1,4})?$
+      example: '10'
+    PriceListVersionSummary:
+      type: object
+      required:
+        - id
+        - versionNo
+        - status
+        - validFrom
+        - itemCount
+        - notes
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        versionNo:
+          type: integer
+        status:
+          $ref: '#/components/schemas/PriceListVersionStatus'
+        validFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        validTo:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
+        percent:
+          allOf:
+            - $ref: '#/components/schemas/PricingPercent'
+          nullable: true
+        itemCount:
+          type: integer
+        notes:
+          type: string
+        submittedAt:
+          type: string
+          format: date-time
+          nullable: true
+        decidedAt:
+          type: string
+          format: date-time
+          nullable: true
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    PriceList:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - priceListType
+        - resellerLevel
+        - basis
+        - description
+        - isActive
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: MT-BELI-PUTUS
+        name:
+          type: string
+        priceListType:
+          $ref: '#/components/schemas/PriceListType'
+        channelId:
+          type: string
+          format: uuid
+          nullable: true
+        subChannelId:
+          type: string
+          format: uuid
+          nullable: true
+        partnerId:
+          type: string
+          format: uuid
+          nullable: true
+        partnerName:
+          type: string
+          nullable: true
+        resellerLevel:
+          type: string
+        basis:
+          $ref: '#/components/schemas/PriceListBasis'
+        referencePriceListId:
+          type: string
+          format: uuid
+          nullable: true
+        referencePriceListName:
+          type: string
+          nullable: true
+        description:
+          type: string
+        isActive:
+          type: boolean
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+        currentVersion:
+          allOf:
+            - $ref: '#/components/schemas/PriceListVersionSummary'
+          nullable: true
+          description: Versi yang berlaku hari ini.
+        nextVersion:
+          allOf:
+            - $ref: '#/components/schemas/PriceListVersionSummary'
+          nullable: true
+          description: Versi aktif terdekat yang mulai berlaku setelah hari ini.
+        openVersion:
+          allOf:
+            - $ref: '#/components/schemas/PriceListVersionSummary'
+          nullable: true
+          description: Versi draft atau yang sedang diajukan.
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    PriceListFields:
+      type: object
+      required:
+        - name
+        - isActive
+      properties:
+        name:
+          type: string
+          maxLength: 120
+        channelId:
+          type: string
+          format: uuid
+          nullable: true
+        subChannelId:
+          type: string
+          format: uuid
+          nullable: true
+        partnerId:
+          type: string
+          format: uuid
+          nullable: true
+        resellerLevel:
+          type: string
+          maxLength: 30
+        basis:
+          $ref: '#/components/schemas/PriceListBasis'
+        referencePriceListId:
+          type: string
+          format: uuid
+          nullable: true
+        description:
+          type: string
+          maxLength: 500
+        isActive:
+          type: boolean
+    PriceListInput:
+      allOf:
+        - $ref: '#/components/schemas/PriceListFields'
+        - type: object
+          required:
+            - code
+            - priceListType
+          properties:
+            code:
+              type: string
+              maxLength: 30
+            priceListType:
+              $ref: '#/components/schemas/PriceListType'
+    PriceListDetail:
+      allOf:
+        - $ref: '#/components/schemas/PriceList'
+        - type: object
+          required:
+            - versions
+            - allowedActions
+          properties:
+            versions:
+              type: array
+              description: Riwayat versi, terbaru dulu.
+              items:
+                $ref: '#/components/schemas/PriceListVersionSummary'
+            allowedActions:
+              type: array
+              description: update, create_version, delete, restore
+              items:
+                type: string
+    PriceListOption:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - priceListType
+        - basis
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        priceListType:
+          $ref: '#/components/schemas/PriceListType'
+        basis:
+          $ref: '#/components/schemas/PriceListBasis'
+    PriceListUpdate:
+      allOf:
+        - $ref: '#/components/schemas/PriceListFields'
+        - $ref: '#/components/schemas/VersionInput'
+    PriceListItemInput:
+      type: object
+      required:
+        - productId
+        - priceAmount
+      properties:
+        productId:
+          type: string
+          format: uuid
+        priceAmount:
+          $ref: '#/components/schemas/Money'
+        maxRetailPriceAmount:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          nullable: true
+    PriceListVersionFields:
+      type: object
+      required:
+        - validFrom
+        - items
+      properties:
+        validFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        validTo:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
+        percent:
+          allOf:
+            - $ref: '#/components/schemas/PricingPercent'
+          nullable: true
+          description: Wajib untuk daftar harga basis percent.
+        notes:
+          type: string
+          maxLength: 1000
+        items:
+          type: array
+          maxItems: 2000
+          items:
+            $ref: '#/components/schemas/PriceListItemInput'
+    PriceListVersionInput:
+      allOf:
+        - $ref: '#/components/schemas/PriceListVersionFields'
+        - type: object
+          properties:
+            copyFromVersionId:
+              type: string
+              format: uuid
+              nullable: true
+    PriceListItem:
+      type: object
+      required:
+        - productId
+        - productSku
+        - productName
+        - priceAmount
+      properties:
+        productId:
+          type: string
+          format: uuid
+        productSku:
+          type: string
+        productName:
+          type: string
+        priceAmount:
+          $ref: '#/components/schemas/Money'
+        maxRetailPriceAmount:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          nullable: true
+          description: HET, hanya di Harga Dasar & HET.
+    PriceListVersion:
+      allOf:
+        - $ref: '#/components/schemas/PriceListVersionSummary'
+        - type: object
+          required:
+            - priceListId
+            - priceListCode
+            - priceListName
+            - priceListType
+            - basis
+            - items
+            - allowedActions
+          properties:
+            priceListId:
+              type: string
+              format: uuid
+            priceListCode:
+              type: string
+            priceListName:
+              type: string
+            priceListType:
+              $ref: '#/components/schemas/PriceListType'
+            basis:
+              $ref: '#/components/schemas/PriceListBasis'
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/PriceListItem'
+            allowedActions:
+              type: array
+              description: update, cancel, submit, withdraw
+              items:
+                type: string
+    PriceListVersionUpdate:
+      allOf:
+        - $ref: '#/components/schemas/PriceListVersionFields'
+        - $ref: '#/components/schemas/VersionInput'
+    SpecialPricePartyType:
+      type: string
+      enum:
+        - customer
+        - partner
+    PricingPeriodStatus:
+      type: string
+      description: Posisi periode berlaku terhadap hari ini.
+      enum:
+        - scheduled
+        - active
+        - expired
+    SpecialPrice:
+      type: object
+      required:
+        - id
+        - partyType
+        - partyId
+        - partyCode
+        - partyName
+        - productId
+        - productSku
+        - productName
+        - priceAmount
+        - validFrom
+        - status
+        - notes
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        partyType:
+          $ref: '#/components/schemas/SpecialPricePartyType'
+        partyId:
+          type: string
+          format: uuid
+        partyCode:
+          type: string
+        partyName:
+          type: string
+        productId:
+          type: string
+          format: uuid
+        productSku:
+          type: string
+        productName:
+          type: string
+        priceAmount:
+          $ref: '#/components/schemas/Money'
+        validFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        validTo:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
+        status:
+          $ref: '#/components/schemas/PricingPeriodStatus'
+        notes:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    SpecialPriceInput:
+      type: object
+      required:
+        - partyType
+        - partyId
+        - productId
+        - priceAmount
+        - validFrom
+      properties:
+        partyType:
+          $ref: '#/components/schemas/SpecialPricePartyType'
+        partyId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        priceAmount:
+          $ref: '#/components/schemas/Money'
+        validFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        validTo:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
+        notes:
+          type: string
+          maxLength: 500
+    PricingEndInput:
+      type: object
+      required:
+        - validTo
+        - version
+      properties:
+        validTo:
+          $ref: '#/components/schemas/BusinessDate'
+        version:
+          type: integer
+    PromotionItem:
+      type: object
+      required:
+        - productId
+        - productSku
+        - productName
+      properties:
+        productId:
+          type: string
+          format: uuid
+        productSku:
+          type: string
+        productName:
+          type: string
+        priceAmount:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          nullable: true
+        discountPercent:
+          allOf:
+            - $ref: '#/components/schemas/PricingPercent'
+          nullable: true
+    Promotion:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - validFrom
+        - validTo
+        - isActive
+        - description
+        - status
+        - itemCount
+        - allowedActions
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: PROMO-1111
+        name:
+          type: string
+        channelId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Kosong = semua channel.
+        subChannelId:
+          type: string
+          format: uuid
+          nullable: true
+        validFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        validTo:
+          $ref: '#/components/schemas/BusinessDate'
+        isActive:
+          type: boolean
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/PricingPeriodStatus'
+        itemCount:
+          type: integer
+        items:
+          type: array
+          description: Hanya di detail.
+          items:
+            $ref: '#/components/schemas/PromotionItem'
+        allowedActions:
+          type: array
+          description: update, delete
+          items:
+            type: string
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    PromotionItemInput:
+      type: object
+      required:
+        - productId
+      description: Isi salah satu dari harga promo atau potongan persen dari harga normal.
+      properties:
+        productId:
+          type: string
+          format: uuid
+        priceAmount:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          nullable: true
+        discountPercent:
+          allOf:
+            - $ref: '#/components/schemas/PricingPercent'
+          nullable: true
+    PromotionFields:
+      type: object
+      required:
+        - name
+        - validFrom
+        - validTo
+        - isActive
+        - items
+      properties:
+        name:
+          type: string
+          maxLength: 120
+        channelId:
+          type: string
+          format: uuid
+          nullable: true
+        subChannelId:
+          type: string
+          format: uuid
+          nullable: true
+        validFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        validTo:
+          $ref: '#/components/schemas/BusinessDate'
+        isActive:
+          type: boolean
+        description:
+          type: string
+          maxLength: 500
+        items:
+          type: array
+          maxItems: 2000
+          items:
+            $ref: '#/components/schemas/PromotionItemInput'
+    PromotionInput:
+      allOf:
+        - $ref: '#/components/schemas/PromotionFields'
+        - type: object
+          required:
+            - code
+          properties:
+            code:
+              type: string
+              maxLength: 30
+    PromotionUpdate:
+      allOf:
+        - $ref: '#/components/schemas/PromotionFields'
+        - $ref: '#/components/schemas/VersionInput'
+    PricingQuantity:
+      type: string
+      description: Kuantitas desimal maks. 3 angka di belakang koma.
+      pattern: ^[0-9]{1,15}(\.[0-9]{1,3})?$
+      example: '12'
+    TieredPrice:
+      type: object
+      required:
+        - id
+        - productId
+        - productSku
+        - productName
+        - minQty
+        - priceAmount
+        - validFrom
+        - status
+        - notes
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        priceListId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Kosong = berlaku untuk semua daftar harga.
+        priceListCode:
+          type: string
+          nullable: true
+        priceListName:
+          type: string
+          nullable: true
+        productId:
+          type: string
+          format: uuid
+        productSku:
+          type: string
+        productName:
+          type: string
+        minQty:
+          $ref: '#/components/schemas/PricingQuantity'
+        priceAmount:
+          $ref: '#/components/schemas/Money'
+        validFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        validTo:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
+        status:
+          $ref: '#/components/schemas/PricingPeriodStatus'
+        notes:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    TieredPriceInput:
+      type: object
+      required:
+        - productId
+        - minQty
+        - priceAmount
+        - validFrom
+      properties:
+        priceListId:
+          type: string
+          format: uuid
+          nullable: true
+        productId:
+          type: string
+          format: uuid
+        minQty:
+          $ref: '#/components/schemas/PricingQuantity'
+        priceAmount:
+          $ref: '#/components/schemas/Money'
+        validFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        validTo:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
+        notes:
+          type: string
+          maxLength: 500
+    DiscountLimit:
+      type: object
+      required:
+        - id
+        - roleCode
+        - roleName
+        - maxLineDiscountPercent
+        - maxDocumentDiscountPercent
+        - validFrom
+        - status
+        - notes
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        roleCode:
+          type: string
+        roleName:
+          type: string
+        maxLineDiscountPercent:
+          $ref: '#/components/schemas/PricingPercent'
+        maxDocumentDiscountPercent:
+          $ref: '#/components/schemas/PricingPercent'
+        validFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        validTo:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
+        status:
+          $ref: '#/components/schemas/PricingPeriodStatus'
+        notes:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    DiscountLimitInput:
+      type: object
+      required:
+        - roleCode
+        - maxLineDiscountPercent
+        - maxDocumentDiscountPercent
+        - validFrom
+      properties:
+        roleCode:
+          type: string
+        maxLineDiscountPercent:
+          $ref: '#/components/schemas/PricingPercent'
+        maxDocumentDiscountPercent:
+          $ref: '#/components/schemas/PricingPercent'
+        validFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        validTo:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
+        notes:
+          type: string
+          maxLength: 500
+    DiscountLimitRole:
+      type: object
+      required:
+        - code
+        - name
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+    PriceQuoteRequest:
+      type: object
+      required:
+        - productId
+        - qty
+        - date
+      properties:
+        productId:
+          type: string
+          format: uuid
+        qty:
+          $ref: '#/components/schemas/PricingQuantity'
+        channelId:
+          type: string
+          format: uuid
+          nullable: true
+        subChannelId:
+          type: string
+          format: uuid
+          nullable: true
+        customerId:
+          type: string
+          format: uuid
+          nullable: true
+        partnerId:
+          type: string
+          format: uuid
+          nullable: true
+        date:
+          $ref: '#/components/schemas/BusinessDate'
+    PriceRule:
+      type: string
+      description: |
+        Aturan harga yang menghasilkan harga baris transaksi (BRD 5.18, disimpan sebagai `price_rule`): harga khusus,
+        promo, harga bertingkat, daftar harga channel/mitra/karyawan, atau Harga Dasar & HET.
+      enum:
+        - special_price
+        - promotion
+        - tiered_price
+        - price_list
+        - base_price
+    PriceQuote:
+      type: object
+      required:
+        - unitPrice
+        - rule
+        - sourceId
+        - description
+      properties:
+        unitPrice:
+          $ref: '#/components/schemas/Money'
+        rule:
+          $ref: '#/components/schemas/PriceRule'
+        sourceId:
+          type: string
+          format: uuid
+          description: Disimpan di baris transaksi sebagai `price_source_id`.
+        priceListId:
+          type: string
+          format: uuid
+          nullable: true
+        priceListVersionId:
+          type: string
+          format: uuid
+          nullable: true
+        promotionId:
+          type: string
+          format: uuid
+          nullable: true
+        specialPriceId:
+          type: string
+          format: uuid
+          nullable: true
+        tieredPriceId:
+          type: string
+          format: uuid
+          nullable: true
+        regularPrice:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          nullable: true
+          description: Harga tanpa promo (dasar potongan persen promo).
+        maxRetailPrice:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          nullable: true
+          description: HET bila harga berasal dari Harga Dasar & HET.
+        description:
+          type: string
+    DiscountKind:
+      type: string
+      description: Bentuk diskon manual (MD-05) — persen dari dasar atau nominal rupiah.
+      enum:
+        - percent
+        - amount
+    DiscountValue:
+      type: object
+      required:
+        - kind
+        - value
+      properties:
+        kind:
+          $ref: '#/components/schemas/DiscountKind'
+        value:
+          type: string
+          description: Persen (maks. 4 desimal) atau nominal rupiah (maks. 2 desimal) sebagai string desimal.
+          pattern: ^[0-9]{1,16}(\.[0-9]{1,4})?$
+    DiscountCheckLine:
+      type: object
+      required:
+        - grossAmount
+      properties:
+        grossAmount:
+          $ref: '#/components/schemas/Money'
+        discount:
+          allOf:
+            - $ref: '#/components/schemas/DiscountValue'
+          nullable: true
+    DiscountCheckRequest:
+      type: object
+      required:
+        - lines
+      properties:
+        lines:
+          type: array
+          maxItems: 500
+          items:
+            $ref: '#/components/schemas/DiscountCheckLine'
+        documentDiscount:
+          allOf:
+            - $ref: '#/components/schemas/DiscountValue'
+          nullable: true
+    DiscountCheckOutcome:
+      type: object
+      required:
+        - discountAmount
+        - discountPercent
+        - exceedsLimit
+      properties:
+        discountAmount:
+          $ref: '#/components/schemas/Money'
+        discountPercent:
+          $ref: '#/components/schemas/PricingPercent'
+        exceedsLimit:
+          type: boolean
+    DiscountCheckResult:
+      type: object
+      required:
+        - maxLineDiscountPercent
+        - maxDocumentDiscountPercent
+        - lines
+        - document
+        - subtotalAmount
+        - totalDiscountAmount
+        - requiresApproval
+      properties:
+        maxLineDiscountPercent:
+          $ref: '#/components/schemas/PricingPercent'
+        maxDocumentDiscountPercent:
+          $ref: '#/components/schemas/PricingPercent'
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiscountCheckOutcome'
+        document:
+          $ref: '#/components/schemas/DiscountCheckOutcome'
+        subtotalAmount:
+          $ref: '#/components/schemas/Money'
+        totalDiscountAmount:
+          $ref: '#/components/schemas/Money'
+        requiresApproval:
+          type: boolean
+          description: Diskon di atas batas → Sales Order butuh approval `sales_order_discount` (Head Sales).
     DataExchangeColumn:
       type: object
       required:
@@ -9898,6 +13569,793 @@ components:
       properties:
         kind:
           type: string
+    PurchaseOption:
+      type: object
+      required:
+        - id
+        - code
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+    PurchaseRequestStatus:
+      type: string
+      enum:
+        - draft
+        - pending_approval
+        - approved
+        - rejected
+        - completed
+        - closed
+        - cancelled
+    PurchaseRequestSummary:
+      type: object
+      required:
+        - id
+        - divisionId
+        - divisionName
+        - requestedById
+        - requestedByName
+        - businessDate
+        - note
+        - estimatedTotal
+        - status
+        - closeReason
+        - createdAt
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+          nullable: true
+          description: Nomor PR, diisi saat diajukan.
+        divisionId:
+          type: string
+          format: uuid
+        divisionName:
+          type: string
+        requestedById:
+          type: string
+          format: uuid
+        requestedByName:
+          type: string
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        neededDate:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
+        note:
+          type: string
+        estimatedTotal:
+          $ref: '#/components/schemas/Money'
+        status:
+          $ref: '#/components/schemas/PurchaseRequestStatus'
+        closeReason:
+          type: string
+        submittedAt:
+          type: string
+          format: date-time
+          nullable: true
+        decidedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    PurchaseRequestList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/PurchaseRequestSummary'
+    PurchaseQuantity:
+      type: string
+      description: Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+      pattern: ^[0-9]{1,15}(\.[0-9]{1,3})?$
+      example: '10000.000'
+    PurchaseRequestLineInput:
+      type: object
+      required:
+        - qty
+        - estimatedPrice
+      properties:
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+        description:
+          type: string
+          maxLength: 500
+        qty:
+          $ref: '#/components/schemas/PurchaseQuantity'
+        estimatedPrice:
+          $ref: '#/components/schemas/Money'
+        note:
+          type: string
+          maxLength: 500
+    PurchaseRequestFields:
+      type: object
+      required:
+        - divisionId
+        - businessDate
+        - lines
+      properties:
+        divisionId:
+          type: string
+          format: uuid
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        neededDate:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
+        note:
+          type: string
+          maxLength: 1000
+        lines:
+          type: array
+          maxItems: 200
+          items:
+            $ref: '#/components/schemas/PurchaseRequestLineInput'
+    PurchaseProductRef:
+      type: object
+      required:
+        - id
+        - sku
+        - name
+        - uom
+      properties:
+        id:
+          type: string
+          format: uuid
+        sku:
+          type: string
+        name:
+          type: string
+        uom:
+          type: string
+    PurchaseRequestLine:
+      type: object
+      required:
+        - id
+        - lineNo
+        - description
+        - qty
+        - estimatedPrice
+        - estimatedAmount
+        - fulfilledQty
+        - remainingQty
+        - note
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        product:
+          allOf:
+            - $ref: '#/components/schemas/PurchaseProductRef'
+          nullable: true
+        description:
+          type: string
+        qty:
+          $ref: '#/components/schemas/PurchaseQuantity'
+        estimatedPrice:
+          $ref: '#/components/schemas/Money'
+        estimatedAmount:
+          $ref: '#/components/schemas/Money'
+        fulfilledQty:
+          $ref: '#/components/schemas/PurchaseQuantity'
+        remainingQty:
+          $ref: '#/components/schemas/PurchaseQuantity'
+        note:
+          type: string
+    PurchaseOrderStatus:
+      type: string
+      enum:
+        - draft
+        - pending_approval
+        - approved
+        - rejected
+        - partially_received
+        - received
+        - completed
+        - closed
+        - cancelled
+    PurchaseRequestOrderRef:
+      type: object
+      required:
+        - purchaseOrderId
+        - status
+        - purchaseRequestLineId
+        - orderedQty
+        - receivedQty
+      properties:
+        purchaseOrderId:
+          type: string
+          format: uuid
+        purchaseOrderNumber:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/PurchaseOrderStatus'
+        purchaseRequestLineId:
+          type: string
+          format: uuid
+        orderedQty:
+          $ref: '#/components/schemas/PurchaseQuantity'
+        receivedQty:
+          $ref: '#/components/schemas/PurchaseQuantity'
+    PurchaseRequest:
+      allOf:
+        - $ref: '#/components/schemas/PurchaseRequestSummary'
+        - type: object
+          required:
+            - lines
+            - orders
+            - allowedActions
+          properties:
+            lines:
+              type: array
+              items:
+                $ref: '#/components/schemas/PurchaseRequestLine'
+            orders:
+              type: array
+              items:
+                $ref: '#/components/schemas/PurchaseRequestOrderRef'
+            allowedActions:
+              type: array
+              items:
+                type: string
+                enum:
+                  - edit
+                  - submit
+                  - cancel
+                  - revise
+                  - close
+                  - create_order
+    PurchaseRequestUpdate:
+      allOf:
+        - $ref: '#/components/schemas/PurchaseRequestFields'
+        - $ref: '#/components/schemas/VersionInput'
+    PurchaseReasonInput:
+      type: object
+      required:
+        - version
+        - reason
+      properties:
+        version:
+          type: integer
+        reason:
+          type: string
+          maxLength: 400
+    PurchaseOrderType:
+      type: string
+      description: |
+        Jenis PO: `goods` barang, `packaging` packaging (RM), `toll_manufacturing` jasa maklon per batch,
+        `reprocess` reprocess bahan GM di maklon, `other` lainnya (baris boleh berupa uraian).
+      enum:
+        - goods
+        - packaging
+        - toll_manufacturing
+        - reprocess
+        - other
+    PurchaseOrderSummary:
+      type: object
+      required:
+        - id
+        - orderType
+        - orderTypeLabel
+        - supplierId
+        - supplierCode
+        - supplierName
+        - divisionId
+        - divisionName
+        - businessDate
+        - expectedDate
+        - paymentTermDays
+        - totalAmount
+        - status
+        - createdAt
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+          nullable: true
+          description: Nomor PO, diisi saat diajukan.
+        orderType:
+          $ref: '#/components/schemas/PurchaseOrderType'
+        orderTypeLabel:
+          type: string
+        supplierId:
+          type: string
+          format: uuid
+        supplierCode:
+          type: string
+        supplierName:
+          type: string
+        divisionId:
+          type: string
+          format: uuid
+        divisionName:
+          type: string
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        expectedDate:
+          $ref: '#/components/schemas/BusinessDate'
+        paymentTermDays:
+          type: integer
+        totalAmount:
+          $ref: '#/components/schemas/Money'
+        status:
+          $ref: '#/components/schemas/PurchaseOrderStatus'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    PurchaseOrderList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/PurchaseOrderSummary'
+    PurchaseOrderLineInput:
+      type: object
+      required:
+        - qty
+        - unitPrice
+      properties:
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+        description:
+          type: string
+          maxLength: 500
+        qty:
+          $ref: '#/components/schemas/PurchaseQuantity'
+        unitPrice:
+          $ref: '#/components/schemas/Money'
+        purchaseRequestLineId:
+          type: string
+          format: uuid
+          nullable: true
+        note:
+          type: string
+          maxLength: 500
+    PurchaseOrderMaterialInput:
+      type: object
+      required:
+        - productId
+        - plannedQty
+      properties:
+        productId:
+          type: string
+          format: uuid
+        plannedQty:
+          $ref: '#/components/schemas/PurchaseQuantity'
+        note:
+          type: string
+          maxLength: 500
+    PurchaseOrderFields:
+      type: object
+      required:
+        - supplierId
+        - divisionId
+        - businessDate
+        - expectedDate
+        - lines
+      properties:
+        supplierId:
+          type: string
+          format: uuid
+        divisionId:
+          type: string
+          format: uuid
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        expectedDate:
+          $ref: '#/components/schemas/BusinessDate'
+        paymentTermDays:
+          type: integer
+          nullable: true
+          minimum: 0
+          maximum: 365
+          description: Kosong = termin default pemasok.
+        note:
+          type: string
+          maxLength: 1000
+        materialSourceLocationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Lokasi asal bahan — wajib Gudang GM – GM untuk reprocess, opsional Gudang GM – RM untuk maklon.
+        lines:
+          type: array
+          maxItems: 200
+          items:
+            $ref: '#/components/schemas/PurchaseOrderLineInput'
+        materials:
+          type: array
+          maxItems: 200
+          items:
+            $ref: '#/components/schemas/PurchaseOrderMaterialInput'
+    PurchaseOrderInput:
+      allOf:
+        - $ref: '#/components/schemas/PurchaseOrderFields'
+        - type: object
+          required:
+            - orderType
+          properties:
+            orderType:
+              $ref: '#/components/schemas/PurchaseOrderType'
+    PurchaseOrderSupplier:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - address
+        - phone
+        - email
+        - picName
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        address:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        picName:
+          type: string
+    PurchaseLocationRef:
+      type: object
+      required:
+        - id
+        - code
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+    PurchaseOrderLine:
+      type: object
+      required:
+        - id
+        - lineNo
+        - description
+        - orderedQty
+        - unitPrice
+        - amount
+        - receivedQty
+        - billedQty
+        - outstandingQty
+        - note
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        product:
+          allOf:
+            - $ref: '#/components/schemas/PurchaseProductRef'
+          nullable: true
+        description:
+          type: string
+        orderedQty:
+          $ref: '#/components/schemas/PurchaseQuantity'
+        unitPrice:
+          $ref: '#/components/schemas/Money'
+        amount:
+          $ref: '#/components/schemas/Money'
+        receivedQty:
+          $ref: '#/components/schemas/PurchaseQuantity'
+        billedQty:
+          $ref: '#/components/schemas/PurchaseQuantity'
+        outstandingQty:
+          $ref: '#/components/schemas/PurchaseQuantity'
+        purchaseRequestLineId:
+          type: string
+          format: uuid
+          nullable: true
+        purchaseRequestId:
+          type: string
+          format: uuid
+          nullable: true
+        purchaseRequestNumber:
+          type: string
+          nullable: true
+        note:
+          type: string
+    PurchaseOrderMaterial:
+      type: object
+      required:
+        - id
+        - lineNo
+        - product
+        - plannedQty
+        - note
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        product:
+          $ref: '#/components/schemas/PurchaseProductRef'
+        plannedQty:
+          $ref: '#/components/schemas/PurchaseQuantity'
+        note:
+          type: string
+    PurchaseAdvanceStatus:
+      type: string
+      enum:
+        - draft
+        - posted
+        - cancelled
+    PurchaseAdvance:
+      type: object
+      required:
+        - id
+        - purchaseOrderId
+        - purchaseOrderNumber
+        - supplierId
+        - supplierName
+        - divisionId
+        - amount
+        - paymentDate
+        - bankAccountCode
+        - note
+        - appliedAmount
+        - outstandingAmount
+        - status
+        - cancelReason
+        - createdAt
+        - updatedAt
+        - version
+        - allowedActions
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+          nullable: true
+          description: Nomor BYR, diisi saat diposting.
+        purchaseOrderId:
+          type: string
+          format: uuid
+        purchaseOrderNumber:
+          type: string
+        supplierId:
+          type: string
+          format: uuid
+        supplierName:
+          type: string
+        divisionId:
+          type: string
+          format: uuid
+        amount:
+          $ref: '#/components/schemas/Money'
+        paymentDate:
+          $ref: '#/components/schemas/BusinessDate'
+        bankAccountCode:
+          type: string
+        note:
+          type: string
+        appliedAmount:
+          $ref: '#/components/schemas/Money'
+        outstandingAmount:
+          $ref: '#/components/schemas/Money'
+        status:
+          $ref: '#/components/schemas/PurchaseAdvanceStatus'
+        journalEntryId:
+          type: string
+          format: uuid
+          nullable: true
+        reversalJournalEntryId:
+          type: string
+          format: uuid
+          nullable: true
+        cancelReason:
+          type: string
+        postedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+        allowedActions:
+          type: array
+          items:
+            type: string
+            enum:
+              - edit
+              - post
+              - cancel
+    PurchaseOrder:
+      allOf:
+        - $ref: '#/components/schemas/PurchaseOrderSummary'
+        - type: object
+          required:
+            - note
+            - subtotalAmount
+            - closeReason
+            - cancelReason
+            - createdByName
+            - lines
+            - materials
+            - advances
+            - advancePaidAmount
+            - advanceOutstandingAmount
+            - allowedActions
+          properties:
+            note:
+              type: string
+            subtotalAmount:
+              $ref: '#/components/schemas/Money'
+            closeReason:
+              type: string
+            cancelReason:
+              type: string
+            submittedAt:
+              type: string
+              format: date-time
+              nullable: true
+            approvedAt:
+              type: string
+              format: date-time
+              nullable: true
+            createdByName:
+              type: string
+            supplier:
+              allOf:
+                - $ref: '#/components/schemas/PurchaseOrderSupplier'
+              nullable: true
+            tollLocation:
+              allOf:
+                - $ref: '#/components/schemas/PurchaseLocationRef'
+              nullable: true
+            materialSourceLocation:
+              allOf:
+                - $ref: '#/components/schemas/PurchaseLocationRef'
+              nullable: true
+            lines:
+              type: array
+              items:
+                $ref: '#/components/schemas/PurchaseOrderLine'
+            materials:
+              type: array
+              items:
+                $ref: '#/components/schemas/PurchaseOrderMaterial'
+            advances:
+              type: array
+              items:
+                $ref: '#/components/schemas/PurchaseAdvance'
+            advancePaidAmount:
+              $ref: '#/components/schemas/Money'
+            advanceOutstandingAmount:
+              $ref: '#/components/schemas/Money'
+            allowedActions:
+              type: array
+              items:
+                type: string
+                enum:
+                  - edit
+                  - submit
+                  - cancel
+                  - revise
+                  - close
+                  - print
+                  - create_advance
+    PurchaseOrderUpdate:
+      allOf:
+        - $ref: '#/components/schemas/PurchaseOrderFields'
+        - $ref: '#/components/schemas/VersionInput'
+    PurchaseCancelInput:
+      type: object
+      required:
+        - version
+      properties:
+        version:
+          type: integer
+        reason:
+          type: string
+          maxLength: 400
+          description: Wajib untuk PO Disetujui dan uang muka Diposting.
+    PurchaseAdvanceList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/PurchaseAdvance'
+    PurchaseAdvanceFields:
+      type: object
+      required:
+        - amount
+        - paymentDate
+        - bankAccountCode
+      properties:
+        amount:
+          $ref: '#/components/schemas/Money'
+        paymentDate:
+          $ref: '#/components/schemas/BusinessDate'
+        bankAccountCode:
+          type: string
+          example: '1111'
+        note:
+          type: string
+          maxLength: 1000
+    PurchaseAdvanceInput:
+      allOf:
+        - $ref: '#/components/schemas/PurchaseAdvanceFields'
+        - type: object
+          required:
+            - purchaseOrderId
+          properties:
+            purchaseOrderId:
+              type: string
+              format: uuid
+    PurchaseAdvanceUpdate:
+      allOf:
+        - $ref: '#/components/schemas/PurchaseAdvanceFields'
+        - $ref: '#/components/schemas/VersionInput'
   parameters:
     Search:
       name: q
@@ -9980,6 +14438,20 @@ components:
       required: true
       schema:
         type: string
+    PricingVersion:
+      name: version
+      in: query
+      required: true
+      description: Versi terakhir yang dilihat user (optimistic locking).
+      schema:
+        type: integer
+    PricingIncludeEnded:
+      name: includeEnded
+      in: query
+      description: Tampilkan juga data yang periodenya sudah berakhir (riwayat).
+      schema:
+        type: boolean
+        default: false
     DataExchangeKindPath:
       name: kind
       in: path

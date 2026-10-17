@@ -36,6 +36,7 @@ import (
 	"balans/internal/platform/jobqueue"
 	"balans/internal/platform/pii"
 	"balans/internal/platform/webhook"
+	"balans/internal/pricing"
 	"balans/internal/sales"
 	"balans/internal/system"
 	"balans/internal/warehouse"
@@ -65,6 +66,7 @@ type App struct {
 	filestore    *filestore.Module
 	party        *party.Module
 	hris         *hris.Module
+	pricing      *pricing.Module
 	notification *notification.Module
 	dataexchange *dataexchange.Module
 	cipher       *pii.Cipher
@@ -207,7 +209,7 @@ func (a *App) buildModules() error {
 		registerAuditEntities(a.audit, catalog.AuditEntities())
 	}
 	if cfg.IsEnabled(warehouse.Name) {
-		a.warehouse = warehouse.New(warehouse.Deps{Pool: a.Pool, Tx: a.Tx, Clock: a.Clock, Responder: a.Responder, Audit: a.audit})
+		a.warehouse = warehouse.New(warehouse.Deps{Pool: a.Pool, Tx: a.Tx, Clock: a.Clock, Responder: a.Responder, Audit: a.audit, Log: a.Log})
 		a.modules = append(a.modules, a.warehouse)
 		registerAuditEntities(a.audit, warehouse.AuditEntities())
 	}
@@ -222,7 +224,14 @@ func (a *App) buildModules() error {
 		a.buildInventory(mailer, reasons)
 	}
 	a.connectMasterData()
+	a.connectWarehouseDocuments()
+	if err := a.buildPricing(); err != nil {
+		return err
+	}
 	if err := a.buildDataExchange(); err != nil {
+		return err
+	}
+	if err := a.buildProcurement(mailer); err != nil {
 		return err
 	}
 	if cfg.IsEnabled(sales.Name) {

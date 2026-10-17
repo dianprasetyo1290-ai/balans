@@ -191,7 +191,8 @@ func TestPublicAPI(t *testing.T) {
 	require.NoError(t, err)
 	assert.False(t, ok)
 
-	assert.Equal(t, map[string]string{"warehouse": "warehouse.warehouse.read", "location": "warehouse.location.read"}, warehouse.AuditEntities())
+	assert.Equal(t, "warehouse.warehouse.read", warehouse.AuditEntities()["warehouse"])
+	assert.Equal(t, "warehouse.stock_count.read", warehouse.AuditEntities()["stock_count"])
 	assert.Equal(t, "warehouse", s.mod.Name())
-	assert.Nil(t, s.mod.PeriodicJobs())
+	assert.Len(t, s.mod.PeriodicJobs(), 1)
 }

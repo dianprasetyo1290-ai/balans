@@ -129,8 +129,20 @@ sql:
         <<: *go
         out: internal/sales/postgres/sqlcgen
   - <<: *pkg
+    queries: internal/pricing/postgres/queries
+    gen:
+      go:
+        <<: *go
+        out: internal/pricing/postgres/sqlcgen
+  - <<: *pkg
     queries: internal/inventory/postgres/queries
     gen:
       go:
         <<: *go
         out: internal/inventory/postgres/sqlcgen
+  - <<: *pkg
+    queries: internal/procurement/postgres/queries
+    gen:
+      go:
+        <<: *go
+        out: internal/procurement/postgres/sqlcgen

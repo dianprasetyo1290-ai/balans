@@ -252,3 +252,56 @@ export function StatusFilter({
     </Field>
   )
 }
+
+const LOCATION_TYPE_OPTIONS: { type: string; label: string }[] = [
+  { type: "finished_goods", label: "FG Non-Ecommerce" },
+  { type: "ecommerce", label: "E-commerce Stock" },
+  { type: "petty_stock", label: "Petty Stock" },
+  { type: "inbound", label: "Inbound" },
+  { type: "raw_material", label: "RM" },
+  { type: "goods_material", label: "GM" },
+  { type: "returns", label: "Retur" },
+  { type: "event", label: "Event" },
+  { type: "toll_manufacturer", label: "Maklon" },
+  { type: "consignment", label: "Konsinyasi" },
+  { type: "vending_buffer", label: "Buffer Vending" },
+  { type: "vending_machine", label: "Mesin Vending" },
+]
+
+/** Filter jenis lokasi, termasuk lokasi eksternal maklon/konsinyasi/buffer/mesin (S-219, WMS-08). */
+export function LocationTypeFilter({
+  id,
+  value,
+  onChange,
+}: {
+  id: string
+  value?: string
+  onChange: (t: string | undefined) => void
+}) {
+  return (
+    <Field>
+      <FieldLabel htmlFor={id}>Jenis lokasi</FieldLabel>
+      <Select
+        value={value ?? ALL}
+        onValueChange={(v) => onChange(!v || v === ALL ? undefined : String(v))}
+      >
+        <SelectTrigger id={id} className="w-full">
+          <SelectValue>
+            {(v: string) =>
+              LOCATION_TYPE_OPTIONS.find((o) => o.type === v)?.label ??
+              "Semua jenis"
+            }
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value={ALL}>Semua jenis</SelectItem>
+          {LOCATION_TYPE_OPTIONS.map((o) => (
+            <SelectItem key={o.type} value={o.type}>
+              {o.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </Field>
+  )
+}

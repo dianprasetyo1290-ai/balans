@@ -27,7 +27,7 @@ tags:
   - name: catalog
     description: Master produk, packaging, material, bundling (R1.1)
   - name: warehouse
-    description: Gudang dan lokasi stok (R1.1)
+    description: Gudang dan lokasi stok (R1.1); Inbound/QC, Transfer Stok, Petty Stock, Stock Count (R1.2)
   - name: inventory
     description: Ledger stok, batch, HPP FIFO, saran FEFO (R1.2)
   - name: accounting
@@ -38,8 +38,12 @@ tags:
     description: Pelanggan, mitra & PKS, kode produk mitra, pemasok & maklon (R1.1)
   - name: hris
     description: Data karyawan dasar (R1.1)
+  - name: procurement
+    description: Purchase Request, Purchase Order (barang, maklon, reprocess), uang muka pembelian (R1.2)
   - name: filestore
     description: Upload dan unduhan file bertanda tangan (R1.1)
+  - name: pricing
+    description: Daftar harga & versi, harga khusus, promo, harga bertingkat, batas diskon, resolver harga (R1.1)
   - name: dataexchange
     description: Impor/ekspor Excel master data (R1.1)
 paths:
@@ -201,6 +205,32 @@ paths:
     $ref: "./paths/warehouse.yaml#/location"
   /api/v1/locations/{id}/restore:
     $ref: "./paths/warehouse.yaml#/locationRestore"
+  /api/v1/inbounds:
+    $ref: "./paths/warehouse_documents.yaml#/inbounds"
+  /api/v1/inbounds/{id}:
+    $ref: "./paths/warehouse_documents.yaml#/inbound"
+  /api/v1/inbounds/{id}/lines/{lineId}/qc:
+    $ref: "./paths/warehouse_documents.yaml#/inboundLineQc"
+  /api/v1/stock-transfers:
+    $ref: "./paths/warehouse_documents.yaml#/stockTransfers"
+  /api/v1/stock-transfers/in-transit:
+    $ref: "./paths/warehouse_documents.yaml#/stockTransfersInTransit"
+  /api/v1/stock-transfers/{id}:
+    $ref: "./paths/warehouse_documents.yaml#/stockTransfer"
+  /api/v1/stock-transfers/{id}/actions:
+    $ref: "./paths/warehouse_documents.yaml#/stockTransferActions"
+  /api/v1/stock-counts:
+    $ref: "./paths/warehouse_documents.yaml#/stockCounts"
+  /api/v1/stock-counts/{id}:
+    $ref: "./paths/warehouse_documents.yaml#/stockCount"
+  /api/v1/stock-counts/{id}/entries:
+    $ref: "./paths/warehouse_documents.yaml#/stockCountEntries"
+  /api/v1/stock-counts/{id}/actions:
+    $ref: "./paths/warehouse_documents.yaml#/stockCountActions"
+  /api/v1/stock-count-schedules:
+    $ref: "./paths/warehouse_documents.yaml#/stockCountSchedules"
+  /api/v1/stock-count-schedules/{id}:
+    $ref: "./paths/warehouse_documents.yaml#/stockCountSchedule"
   /api/v1/stock-balances:
     $ref: "./paths/inventory.yaml#/stockBalances"
   /api/v1/stock-card:
@@ -285,6 +315,52 @@ paths:
     $ref: "./paths/filestore.yaml#/fileDownloadUrl"
   /api/v1/file-content/{id}:
     $ref: "./paths/filestore.yaml#/fileContent"
+  /api/v1/price-lists:
+    $ref: "./paths/pricing.yaml#/priceLists"
+  /api/v1/price-lists/options:
+    $ref: "./paths/pricing.yaml#/priceListOptions"
+  /api/v1/price-lists/{id}:
+    $ref: "./paths/pricing.yaml#/priceList"
+  /api/v1/price-lists/{id}/restore:
+    $ref: "./paths/pricing.yaml#/priceListRestore"
+  /api/v1/price-lists/{id}/versions:
+    $ref: "./paths/pricing.yaml#/priceListVersions"
+  /api/v1/price-list-versions/{id}:
+    $ref: "./paths/pricing.yaml#/priceListVersion"
+  /api/v1/price-list-versions/{id}/submit:
+    $ref: "./paths/pricing.yaml#/priceListVersionSubmit"
+  /api/v1/price-list-versions/{id}/withdraw:
+    $ref: "./paths/pricing.yaml#/priceListVersionWithdraw"
+  /api/v1/price-list-versions/{id}/cancel:
+    $ref: "./paths/pricing.yaml#/priceListVersionCancel"
+  /api/v1/special-prices:
+    $ref: "./paths/pricing.yaml#/specialPrices"
+  /api/v1/special-prices/{id}:
+    $ref: "./paths/pricing.yaml#/specialPrice"
+  /api/v1/special-prices/{id}/end:
+    $ref: "./paths/pricing.yaml#/specialPriceEnd"
+  /api/v1/promotions:
+    $ref: "./paths/pricing.yaml#/promotions"
+  /api/v1/promotions/{id}:
+    $ref: "./paths/pricing.yaml#/promotion"
+  /api/v1/tiered-prices:
+    $ref: "./paths/pricing.yaml#/tieredPrices"
+  /api/v1/tiered-prices/{id}:
+    $ref: "./paths/pricing.yaml#/tieredPrice"
+  /api/v1/tiered-prices/{id}/end:
+    $ref: "./paths/pricing.yaml#/tieredPriceEnd"
+  /api/v1/discount-limits:
+    $ref: "./paths/pricing.yaml#/discountLimits"
+  /api/v1/discount-limits/roles:
+    $ref: "./paths/pricing.yaml#/discountLimitRoles"
+  /api/v1/discount-limits/{id}:
+    $ref: "./paths/pricing.yaml#/discountLimit"
+  /api/v1/discount-limits/{id}/end:
+    $ref: "./paths/pricing.yaml#/discountLimitEnd"
+  /api/v1/pricing/quote:
+    $ref: "./paths/pricing.yaml#/priceQuote"
+  /api/v1/pricing/discount-check:
+    $ref: "./paths/pricing.yaml#/discountCheck"
   /api/v1/data-exchange/kinds:
     $ref: "./paths/dataexchange.yaml#/dataExchangeKinds"
   /api/v1/data-exchange/kinds/{kind}/template:
@@ -307,6 +383,42 @@ paths:
     $ref: "./paths/dataexchange.yaml#/exportJob"
   /api/v1/export-jobs/{id}/download-url:
     $ref: "./paths/dataexchange.yaml#/exportJobDownload"
+  /api/v1/procurement/division-options:
+    $ref: "./paths/procurement.yaml#/procurementDivisionOptions"
+  /api/v1/procurement/cash-bank-accounts:
+    $ref: "./paths/procurement.yaml#/procurementCashBankAccounts"
+  /api/v1/purchase-requests:
+    $ref: "./paths/procurement.yaml#/purchaseRequests"
+  /api/v1/purchase-requests/{id}:
+    $ref: "./paths/procurement.yaml#/purchaseRequest"
+  /api/v1/purchase-requests/{id}/submit:
+    $ref: "./paths/procurement.yaml#/purchaseRequestSubmit"
+  /api/v1/purchase-requests/{id}/revise:
+    $ref: "./paths/procurement.yaml#/purchaseRequestRevise"
+  /api/v1/purchase-requests/{id}/cancel:
+    $ref: "./paths/procurement.yaml#/purchaseRequestCancel"
+  /api/v1/purchase-requests/{id}/close:
+    $ref: "./paths/procurement.yaml#/purchaseRequestClose"
+  /api/v1/purchase-orders:
+    $ref: "./paths/procurement.yaml#/purchaseOrders"
+  /api/v1/purchase-orders/{id}:
+    $ref: "./paths/procurement.yaml#/purchaseOrder"
+  /api/v1/purchase-orders/{id}/submit:
+    $ref: "./paths/procurement.yaml#/purchaseOrderSubmit"
+  /api/v1/purchase-orders/{id}/revise:
+    $ref: "./paths/procurement.yaml#/purchaseOrderRevise"
+  /api/v1/purchase-orders/{id}/cancel:
+    $ref: "./paths/procurement.yaml#/purchaseOrderCancel"
+  /api/v1/purchase-orders/{id}/close:
+    $ref: "./paths/procurement.yaml#/purchaseOrderClose"
+  /api/v1/purchase-advances:
+    $ref: "./paths/procurement.yaml#/purchaseAdvances"
+  /api/v1/purchase-advances/{id}:
+    $ref: "./paths/procurement.yaml#/purchaseAdvance"
+  /api/v1/purchase-advances/{id}/post:
+    $ref: "./paths/procurement.yaml#/purchaseAdvancePost"
+  /api/v1/purchase-advances/{id}/cancel:
+    $ref: "./paths/procurement.yaml#/purchaseAdvanceCancel"
 components:
   securitySchemes:
     bearerAuth:

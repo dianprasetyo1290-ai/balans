@@ -36,14 +36,20 @@ import { Route as AppMasterCustomersRouteImport } from './routes/_app/master/cus
 import { Route as AppMasterExpenseTypesRouteImport } from './routes/_app/master/expense-types'
 import { Route as AppMasterPartnerProductCodesRouteImport } from './routes/_app/master/partner-product-codes'
 import { Route as AppMasterPartnersRouteImport } from './routes/_app/master/partners'
+import { Route as AppMasterPriceRulesRouteImport } from './routes/_app/master/price-rules'
 import { Route as AppMasterReturnReasonsRouteImport } from './routes/_app/master/return-reasons'
 import { Route as AppMasterSuppliersRouteImport } from './routes/_app/master/suppliers'
+import { Route as AppProcurementApprovalsRouteImport } from './routes/_app/procurement/approvals'
+import { Route as AppProcurementReprocessOrdersRouteImport } from './routes/_app/procurement/reprocess-orders'
+import { Route as AppProcurementTollOrdersRouteImport } from './routes/_app/procurement/toll-orders'
+import { Route as AppSalesPricingRouteImport } from './routes/_app/sales/pricing'
 import { Route as AppSettingsApprovalPoliciesRouteImport } from './routes/_app/settings/approval-policies'
 import { Route as AppSettingsAuditLogsRouteImport } from './routes/_app/settings/audit-logs'
 import { Route as AppSettingsDocumentSequencesRouteImport } from './routes/_app/settings/document-sequences'
 import { Route as AppSettingsRolesRouteImport } from './routes/_app/settings/roles'
 import { Route as AppSettingsUsersRouteImport } from './routes/_app/settings/users'
 import { Route as AppSystemAboutRouteImport } from './routes/_app/system/about'
+import { Route as AppWarehouseInTransitRouteImport } from './routes/_app/warehouse/in-transit'
 import { Route as AppWarehouseReturnsRouteImport } from './routes/_app/warehouse/returns'
 import { Route as AppFinanceJournalsIndexRouteImport } from './routes/_app/finance/journals/index'
 import { Route as AppFinanceJournalsNewRouteImport } from './routes/_app/finance/journals/new'
@@ -57,8 +63,24 @@ import { Route as AppMasterDataProductsIndexRouteImport } from './routes/_app/ma
 import { Route as AppMasterDataProductsIdRouteImport } from './routes/_app/master-data/products/$id'
 import { Route as AppMasterDataWarehousesIndexRouteImport } from './routes/_app/master-data/warehouses/index'
 import { Route as AppMasterDataWarehousesIdRouteImport } from './routes/_app/master-data/warehouses/$id'
+import { Route as AppMasterPriceListsIndexRouteImport } from './routes/_app/master/price-lists/index'
+import { Route as AppMasterPriceListsIdRouteImport } from './routes/_app/master/price-lists/$id'
+import { Route as AppProcurementPurchaseAdvancesIndexRouteImport } from './routes/_app/procurement/purchase-advances/index'
+import { Route as AppProcurementPurchaseAdvancesIdRouteImport } from './routes/_app/procurement/purchase-advances/$id'
+import { Route as AppProcurementPurchaseOrdersIndexRouteImport } from './routes/_app/procurement/purchase-orders/index'
+import { Route as AppProcurementPurchaseOrdersNewRouteImport } from './routes/_app/procurement/purchase-orders/new'
+import { Route as AppProcurementPurchaseRequestsIndexRouteImport } from './routes/_app/procurement/purchase-requests/index'
+import { Route as AppProcurementPurchaseRequestsNewRouteImport } from './routes/_app/procurement/purchase-requests/new'
+import { Route as AppWarehouseInboundsIndexRouteImport } from './routes/_app/warehouse/inbounds/index'
+import { Route as AppWarehouseInboundsIdRouteImport } from './routes/_app/warehouse/inbounds/$id'
+import { Route as AppWarehousePettyStockRequestsIndexRouteImport } from './routes/_app/warehouse/petty-stock-requests/index'
+import { Route as AppWarehousePettyStockRequestsIdRouteImport } from './routes/_app/warehouse/petty-stock-requests/$id'
 import { Route as AppWarehouseReturnDispositionsIndexRouteImport } from './routes/_app/warehouse/return-dispositions/index'
 import { Route as AppWarehouseReturnDispositionsNewRouteImport } from './routes/_app/warehouse/return-dispositions/new'
+import { Route as AppWarehouseStockCountsIndexRouteImport } from './routes/_app/warehouse/stock-counts/index'
+import { Route as AppWarehouseStockCountsIdRouteImport } from './routes/_app/warehouse/stock-counts/$id'
+import { Route as AppWarehouseStockTransfersIndexRouteImport } from './routes/_app/warehouse/stock-transfers/index'
+import { Route as AppWarehouseStockTransfersIdRouteImport } from './routes/_app/warehouse/stock-transfers/$id'
 import { Route as AppFinanceJournalsIdIndexRouteImport } from './routes/_app/finance/journals/$id.index'
 import { Route as AppFinanceJournalsIdEditRouteImport } from './routes/_app/finance/journals/$id.edit'
 import { Route as AppInventoryDisposalsIdIndexRouteImport } from './routes/_app/inventory/disposals/$id.index'
@@ -68,6 +90,11 @@ import { Route as AppInventoryInternalUsagesIdIndexRouteImport } from './routes/
 import { Route as AppInventoryInternalUsagesIdEditRouteImport } from './routes/_app/inventory/internal-usages/$id.edit'
 import { Route as AppInventoryRepackingsIdIndexRouteImport } from './routes/_app/inventory/repackings/$id.index'
 import { Route as AppInventoryRepackingsIdEditRouteImport } from './routes/_app/inventory/repackings/$id.edit'
+import { Route as AppProcurementPurchaseOrdersIdIndexRouteImport } from './routes/_app/procurement/purchase-orders/$id.index'
+import { Route as AppProcurementPurchaseOrdersIdEditRouteImport } from './routes/_app/procurement/purchase-orders/$id.edit'
+import { Route as AppProcurementPurchaseOrdersIdPrintRouteImport } from './routes/_app/procurement/purchase-orders/$id.print'
+import { Route as AppProcurementPurchaseRequestsIdIndexRouteImport } from './routes/_app/procurement/purchase-requests/$id.index'
+import { Route as AppProcurementPurchaseRequestsIdEditRouteImport } from './routes/_app/procurement/purchase-requests/$id.edit'
 import { Route as AppWarehouseReturnDispositionsIdIndexRouteImport } from './routes/_app/warehouse/return-dispositions/$id.index'
 import { Route as AppWarehouseReturnDispositionsIdEditRouteImport } from './routes/_app/warehouse/return-dispositions/$id.edit'
 
@@ -210,6 +237,11 @@ const AppMasterPartnersRoute = AppMasterPartnersRouteImport.update({
   path: '/master/partners',
   getParentRoute: () => AppRoute,
 } as any)
+const AppMasterPriceRulesRoute = AppMasterPriceRulesRouteImport.update({
+  id: '/master/price-rules',
+  path: '/master/price-rules',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppMasterReturnReasonsRoute = AppMasterReturnReasonsRouteImport.update({
   id: '/master/return-reasons',
   path: '/master/return-reasons',
@@ -218,6 +250,28 @@ const AppMasterReturnReasonsRoute = AppMasterReturnReasonsRouteImport.update({
 const AppMasterSuppliersRoute = AppMasterSuppliersRouteImport.update({
   id: '/master/suppliers',
   path: '/master/suppliers',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProcurementApprovalsRoute = AppProcurementApprovalsRouteImport.update({
+  id: '/procurement/approvals',
+  path: '/procurement/approvals',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProcurementReprocessOrdersRoute =
+  AppProcurementReprocessOrdersRouteImport.update({
+    id: '/procurement/reprocess-orders',
+    path: '/procurement/reprocess-orders',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppProcurementTollOrdersRoute =
+  AppProcurementTollOrdersRouteImport.update({
+    id: '/procurement/toll-orders',
+    path: '/procurement/toll-orders',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppSalesPricingRoute = AppSalesPricingRouteImport.update({
+  id: '/sales/pricing',
+  path: '/sales/pricing',
   getParentRoute: () => AppRoute,
 } as any)
 const AppSettingsApprovalPoliciesRoute =
@@ -250,6 +304,11 @@ const AppSettingsUsersRoute = AppSettingsUsersRouteImport.update({
 const AppSystemAboutRoute = AppSystemAboutRouteImport.update({
   id: '/system/about',
   path: '/system/about',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppWarehouseInTransitRoute = AppWarehouseInTransitRouteImport.update({
+  id: '/warehouse/in-transit',
+  path: '/warehouse/in-transit',
   getParentRoute: () => AppRoute,
 } as any)
 const AppWarehouseReturnsRoute = AppWarehouseReturnsRouteImport.update({
@@ -326,6 +385,76 @@ const AppMasterDataWarehousesIdRoute =
     path: '/master-data/warehouses/$id',
     getParentRoute: () => AppRoute,
   } as any)
+const AppMasterPriceListsIndexRoute =
+  AppMasterPriceListsIndexRouteImport.update({
+    id: '/master/price-lists/',
+    path: '/master/price-lists/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppMasterPriceListsIdRoute = AppMasterPriceListsIdRouteImport.update({
+  id: '/master/price-lists/$id',
+  path: '/master/price-lists/$id',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProcurementPurchaseAdvancesIndexRoute =
+  AppProcurementPurchaseAdvancesIndexRouteImport.update({
+    id: '/procurement/purchase-advances/',
+    path: '/procurement/purchase-advances/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppProcurementPurchaseAdvancesIdRoute =
+  AppProcurementPurchaseAdvancesIdRouteImport.update({
+    id: '/procurement/purchase-advances/$id',
+    path: '/procurement/purchase-advances/$id',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppProcurementPurchaseOrdersIndexRoute =
+  AppProcurementPurchaseOrdersIndexRouteImport.update({
+    id: '/procurement/purchase-orders/',
+    path: '/procurement/purchase-orders/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppProcurementPurchaseOrdersNewRoute =
+  AppProcurementPurchaseOrdersNewRouteImport.update({
+    id: '/procurement/purchase-orders/new',
+    path: '/procurement/purchase-orders/new',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppProcurementPurchaseRequestsIndexRoute =
+  AppProcurementPurchaseRequestsIndexRouteImport.update({
+    id: '/procurement/purchase-requests/',
+    path: '/procurement/purchase-requests/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppProcurementPurchaseRequestsNewRoute =
+  AppProcurementPurchaseRequestsNewRouteImport.update({
+    id: '/procurement/purchase-requests/new',
+    path: '/procurement/purchase-requests/new',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppWarehouseInboundsIndexRoute =
+  AppWarehouseInboundsIndexRouteImport.update({
+    id: '/warehouse/inbounds/',
+    path: '/warehouse/inbounds/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppWarehouseInboundsIdRoute = AppWarehouseInboundsIdRouteImport.update({
+  id: '/warehouse/inbounds/$id',
+  path: '/warehouse/inbounds/$id',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppWarehousePettyStockRequestsIndexRoute =
+  AppWarehousePettyStockRequestsIndexRouteImport.update({
+    id: '/warehouse/petty-stock-requests/',
+    path: '/warehouse/petty-stock-requests/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppWarehousePettyStockRequestsIdRoute =
+  AppWarehousePettyStockRequestsIdRouteImport.update({
+    id: '/warehouse/petty-stock-requests/$id',
+    path: '/warehouse/petty-stock-requests/$id',
+    getParentRoute: () => AppRoute,
+  } as any)
 const AppWarehouseReturnDispositionsIndexRoute =
   AppWarehouseReturnDispositionsIndexRouteImport.update({
     id: '/warehouse/return-dispositions/',
@@ -336,6 +465,30 @@ const AppWarehouseReturnDispositionsNewRoute =
   AppWarehouseReturnDispositionsNewRouteImport.update({
     id: '/warehouse/return-dispositions/new',
     path: '/warehouse/return-dispositions/new',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppWarehouseStockCountsIndexRoute =
+  AppWarehouseStockCountsIndexRouteImport.update({
+    id: '/warehouse/stock-counts/',
+    path: '/warehouse/stock-counts/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppWarehouseStockCountsIdRoute =
+  AppWarehouseStockCountsIdRouteImport.update({
+    id: '/warehouse/stock-counts/$id',
+    path: '/warehouse/stock-counts/$id',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppWarehouseStockTransfersIndexRoute =
+  AppWarehouseStockTransfersIndexRouteImport.update({
+    id: '/warehouse/stock-transfers/',
+    path: '/warehouse/stock-transfers/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppWarehouseStockTransfersIdRoute =
+  AppWarehouseStockTransfersIdRouteImport.update({
+    id: '/warehouse/stock-transfers/$id',
+    path: '/warehouse/stock-transfers/$id',
     getParentRoute: () => AppRoute,
   } as any)
 const AppFinanceJournalsIdIndexRoute =
@@ -392,6 +545,36 @@ const AppInventoryRepackingsIdEditRoute =
     path: '/inventory/repackings/$id/edit',
     getParentRoute: () => AppRoute,
   } as any)
+const AppProcurementPurchaseOrdersIdIndexRoute =
+  AppProcurementPurchaseOrdersIdIndexRouteImport.update({
+    id: '/procurement/purchase-orders/$id/',
+    path: '/procurement/purchase-orders/$id/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppProcurementPurchaseOrdersIdEditRoute =
+  AppProcurementPurchaseOrdersIdEditRouteImport.update({
+    id: '/procurement/purchase-orders/$id/edit',
+    path: '/procurement/purchase-orders/$id/edit',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppProcurementPurchaseOrdersIdPrintRoute =
+  AppProcurementPurchaseOrdersIdPrintRouteImport.update({
+    id: '/procurement/purchase-orders/$id/print',
+    path: '/procurement/purchase-orders/$id/print',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppProcurementPurchaseRequestsIdIndexRoute =
+  AppProcurementPurchaseRequestsIdIndexRouteImport.update({
+    id: '/procurement/purchase-requests/$id/',
+    path: '/procurement/purchase-requests/$id/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppProcurementPurchaseRequestsIdEditRoute =
+  AppProcurementPurchaseRequestsIdEditRouteImport.update({
+    id: '/procurement/purchase-requests/$id/edit',
+    path: '/procurement/purchase-requests/$id/edit',
+    getParentRoute: () => AppRoute,
+  } as any)
 const AppWarehouseReturnDispositionsIdIndexRoute =
   AppWarehouseReturnDispositionsIdIndexRouteImport.update({
     id: '/warehouse/return-dispositions/$id/',
@@ -432,14 +615,20 @@ export interface FileRoutesByFullPath {
   '/master/expense-types': typeof AppMasterExpenseTypesRoute
   '/master/partner-product-codes': typeof AppMasterPartnerProductCodesRoute
   '/master/partners': typeof AppMasterPartnersRoute
+  '/master/price-rules': typeof AppMasterPriceRulesRoute
   '/master/return-reasons': typeof AppMasterReturnReasonsRoute
   '/master/suppliers': typeof AppMasterSuppliersRoute
+  '/procurement/approvals': typeof AppProcurementApprovalsRoute
+  '/procurement/reprocess-orders': typeof AppProcurementReprocessOrdersRoute
+  '/procurement/toll-orders': typeof AppProcurementTollOrdersRoute
+  '/sales/pricing': typeof AppSalesPricingRoute
   '/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/settings/audit-logs': typeof AppSettingsAuditLogsRoute
   '/settings/document-sequences': typeof AppSettingsDocumentSequencesRoute
   '/settings/roles': typeof AppSettingsRolesRoute
   '/settings/users': typeof AppSettingsUsersRoute
   '/system/about': typeof AppSystemAboutRoute
+  '/warehouse/in-transit': typeof AppWarehouseInTransitRoute
   '/warehouse/returns': typeof AppWarehouseReturnsRoute
   '/finance/journals/new': typeof AppFinanceJournalsNewRoute
   '/inventory/disposals/new': typeof AppInventoryDisposalsNewRoute
@@ -447,24 +636,45 @@ export interface FileRoutesByFullPath {
   '/inventory/repackings/new': typeof AppInventoryRepackingsNewRoute
   '/master-data/products/$id': typeof AppMasterDataProductsIdRoute
   '/master-data/warehouses/$id': typeof AppMasterDataWarehousesIdRoute
+  '/master/price-lists/$id': typeof AppMasterPriceListsIdRoute
+  '/procurement/purchase-advances/$id': typeof AppProcurementPurchaseAdvancesIdRoute
+  '/procurement/purchase-orders/new': typeof AppProcurementPurchaseOrdersNewRoute
+  '/procurement/purchase-requests/new': typeof AppProcurementPurchaseRequestsNewRoute
+  '/warehouse/inbounds/$id': typeof AppWarehouseInboundsIdRoute
+  '/warehouse/petty-stock-requests/$id': typeof AppWarehousePettyStockRequestsIdRoute
   '/warehouse/return-dispositions/new': typeof AppWarehouseReturnDispositionsNewRoute
+  '/warehouse/stock-counts/$id': typeof AppWarehouseStockCountsIdRoute
+  '/warehouse/stock-transfers/$id': typeof AppWarehouseStockTransfersIdRoute
   '/finance/journals/': typeof AppFinanceJournalsIndexRoute
   '/inventory/disposals/': typeof AppInventoryDisposalsIndexRoute
   '/inventory/internal-usages/': typeof AppInventoryInternalUsagesIndexRoute
   '/inventory/repackings/': typeof AppInventoryRepackingsIndexRoute
   '/master-data/products/': typeof AppMasterDataProductsIndexRoute
   '/master-data/warehouses/': typeof AppMasterDataWarehousesIndexRoute
+  '/master/price-lists/': typeof AppMasterPriceListsIndexRoute
+  '/procurement/purchase-advances/': typeof AppProcurementPurchaseAdvancesIndexRoute
+  '/procurement/purchase-orders/': typeof AppProcurementPurchaseOrdersIndexRoute
+  '/procurement/purchase-requests/': typeof AppProcurementPurchaseRequestsIndexRoute
+  '/warehouse/inbounds/': typeof AppWarehouseInboundsIndexRoute
+  '/warehouse/petty-stock-requests/': typeof AppWarehousePettyStockRequestsIndexRoute
   '/warehouse/return-dispositions/': typeof AppWarehouseReturnDispositionsIndexRoute
+  '/warehouse/stock-counts/': typeof AppWarehouseStockCountsIndexRoute
+  '/warehouse/stock-transfers/': typeof AppWarehouseStockTransfersIndexRoute
   '/finance/journals/$id/edit': typeof AppFinanceJournalsIdEditRoute
   '/inventory/disposals/$id/edit': typeof AppInventoryDisposalsIdEditRoute
   '/inventory/disposals/$id/print': typeof AppInventoryDisposalsIdPrintRoute
   '/inventory/internal-usages/$id/edit': typeof AppInventoryInternalUsagesIdEditRoute
   '/inventory/repackings/$id/edit': typeof AppInventoryRepackingsIdEditRoute
+  '/procurement/purchase-orders/$id/edit': typeof AppProcurementPurchaseOrdersIdEditRoute
+  '/procurement/purchase-orders/$id/print': typeof AppProcurementPurchaseOrdersIdPrintRoute
+  '/procurement/purchase-requests/$id/edit': typeof AppProcurementPurchaseRequestsIdEditRoute
   '/warehouse/return-dispositions/$id/edit': typeof AppWarehouseReturnDispositionsIdEditRoute
   '/finance/journals/$id/': typeof AppFinanceJournalsIdIndexRoute
   '/inventory/disposals/$id/': typeof AppInventoryDisposalsIdIndexRoute
   '/inventory/internal-usages/$id/': typeof AppInventoryInternalUsagesIdIndexRoute
   '/inventory/repackings/$id/': typeof AppInventoryRepackingsIdIndexRoute
+  '/procurement/purchase-orders/$id/': typeof AppProcurementPurchaseOrdersIdIndexRoute
+  '/procurement/purchase-requests/$id/': typeof AppProcurementPurchaseRequestsIdIndexRoute
   '/warehouse/return-dispositions/$id/': typeof AppWarehouseReturnDispositionsIdIndexRoute
 }
 export interface FileRoutesByTo {
@@ -494,14 +704,20 @@ export interface FileRoutesByTo {
   '/master/expense-types': typeof AppMasterExpenseTypesRoute
   '/master/partner-product-codes': typeof AppMasterPartnerProductCodesRoute
   '/master/partners': typeof AppMasterPartnersRoute
+  '/master/price-rules': typeof AppMasterPriceRulesRoute
   '/master/return-reasons': typeof AppMasterReturnReasonsRoute
   '/master/suppliers': typeof AppMasterSuppliersRoute
+  '/procurement/approvals': typeof AppProcurementApprovalsRoute
+  '/procurement/reprocess-orders': typeof AppProcurementReprocessOrdersRoute
+  '/procurement/toll-orders': typeof AppProcurementTollOrdersRoute
+  '/sales/pricing': typeof AppSalesPricingRoute
   '/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/settings/audit-logs': typeof AppSettingsAuditLogsRoute
   '/settings/document-sequences': typeof AppSettingsDocumentSequencesRoute
   '/settings/roles': typeof AppSettingsRolesRoute
   '/settings/users': typeof AppSettingsUsersRoute
   '/system/about': typeof AppSystemAboutRoute
+  '/warehouse/in-transit': typeof AppWarehouseInTransitRoute
   '/warehouse/returns': typeof AppWarehouseReturnsRoute
   '/finance/journals/new': typeof AppFinanceJournalsNewRoute
   '/inventory/disposals/new': typeof AppInventoryDisposalsNewRoute
@@ -509,24 +725,45 @@ export interface FileRoutesByTo {
   '/inventory/repackings/new': typeof AppInventoryRepackingsNewRoute
   '/master-data/products/$id': typeof AppMasterDataProductsIdRoute
   '/master-data/warehouses/$id': typeof AppMasterDataWarehousesIdRoute
+  '/master/price-lists/$id': typeof AppMasterPriceListsIdRoute
+  '/procurement/purchase-advances/$id': typeof AppProcurementPurchaseAdvancesIdRoute
+  '/procurement/purchase-orders/new': typeof AppProcurementPurchaseOrdersNewRoute
+  '/procurement/purchase-requests/new': typeof AppProcurementPurchaseRequestsNewRoute
+  '/warehouse/inbounds/$id': typeof AppWarehouseInboundsIdRoute
+  '/warehouse/petty-stock-requests/$id': typeof AppWarehousePettyStockRequestsIdRoute
   '/warehouse/return-dispositions/new': typeof AppWarehouseReturnDispositionsNewRoute
+  '/warehouse/stock-counts/$id': typeof AppWarehouseStockCountsIdRoute
+  '/warehouse/stock-transfers/$id': typeof AppWarehouseStockTransfersIdRoute
   '/finance/journals': typeof AppFinanceJournalsIndexRoute
   '/inventory/disposals': typeof AppInventoryDisposalsIndexRoute
   '/inventory/internal-usages': typeof AppInventoryInternalUsagesIndexRoute
   '/inventory/repackings': typeof AppInventoryRepackingsIndexRoute
   '/master-data/products': typeof AppMasterDataProductsIndexRoute
   '/master-data/warehouses': typeof AppMasterDataWarehousesIndexRoute
+  '/master/price-lists': typeof AppMasterPriceListsIndexRoute
+  '/procurement/purchase-advances': typeof AppProcurementPurchaseAdvancesIndexRoute
+  '/procurement/purchase-orders': typeof AppProcurementPurchaseOrdersIndexRoute
+  '/procurement/purchase-requests': typeof AppProcurementPurchaseRequestsIndexRoute
+  '/warehouse/inbounds': typeof AppWarehouseInboundsIndexRoute
+  '/warehouse/petty-stock-requests': typeof AppWarehousePettyStockRequestsIndexRoute
   '/warehouse/return-dispositions': typeof AppWarehouseReturnDispositionsIndexRoute
+  '/warehouse/stock-counts': typeof AppWarehouseStockCountsIndexRoute
+  '/warehouse/stock-transfers': typeof AppWarehouseStockTransfersIndexRoute
   '/finance/journals/$id/edit': typeof AppFinanceJournalsIdEditRoute
   '/inventory/disposals/$id/edit': typeof AppInventoryDisposalsIdEditRoute
   '/inventory/disposals/$id/print': typeof AppInventoryDisposalsIdPrintRoute
   '/inventory/internal-usages/$id/edit': typeof AppInventoryInternalUsagesIdEditRoute
   '/inventory/repackings/$id/edit': typeof AppInventoryRepackingsIdEditRoute
+  '/procurement/purchase-orders/$id/edit': typeof AppProcurementPurchaseOrdersIdEditRoute
+  '/procurement/purchase-orders/$id/print': typeof AppProcurementPurchaseOrdersIdPrintRoute
+  '/procurement/purchase-requests/$id/edit': typeof AppProcurementPurchaseRequestsIdEditRoute
   '/warehouse/return-dispositions/$id/edit': typeof AppWarehouseReturnDispositionsIdEditRoute
   '/finance/journals/$id': typeof AppFinanceJournalsIdIndexRoute
   '/inventory/disposals/$id': typeof AppInventoryDisposalsIdIndexRoute
   '/inventory/internal-usages/$id': typeof AppInventoryInternalUsagesIdIndexRoute
   '/inventory/repackings/$id': typeof AppInventoryRepackingsIdIndexRoute
+  '/procurement/purchase-orders/$id': typeof AppProcurementPurchaseOrdersIdIndexRoute
+  '/procurement/purchase-requests/$id': typeof AppProcurementPurchaseRequestsIdIndexRoute
   '/warehouse/return-dispositions/$id': typeof AppWarehouseReturnDispositionsIdIndexRoute
 }
 export interface FileRoutesById {
@@ -558,14 +795,20 @@ export interface FileRoutesById {
   '/_app/master/expense-types': typeof AppMasterExpenseTypesRoute
   '/_app/master/partner-product-codes': typeof AppMasterPartnerProductCodesRoute
   '/_app/master/partners': typeof AppMasterPartnersRoute
+  '/_app/master/price-rules': typeof AppMasterPriceRulesRoute
   '/_app/master/return-reasons': typeof AppMasterReturnReasonsRoute
   '/_app/master/suppliers': typeof AppMasterSuppliersRoute
+  '/_app/procurement/approvals': typeof AppProcurementApprovalsRoute
+  '/_app/procurement/reprocess-orders': typeof AppProcurementReprocessOrdersRoute
+  '/_app/procurement/toll-orders': typeof AppProcurementTollOrdersRoute
+  '/_app/sales/pricing': typeof AppSalesPricingRoute
   '/_app/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/_app/settings/audit-logs': typeof AppSettingsAuditLogsRoute
   '/_app/settings/document-sequences': typeof AppSettingsDocumentSequencesRoute
   '/_app/settings/roles': typeof AppSettingsRolesRoute
   '/_app/settings/users': typeof AppSettingsUsersRoute
   '/_app/system/about': typeof AppSystemAboutRoute
+  '/_app/warehouse/in-transit': typeof AppWarehouseInTransitRoute
   '/_app/warehouse/returns': typeof AppWarehouseReturnsRoute
   '/_app/finance/journals/new': typeof AppFinanceJournalsNewRoute
   '/_app/inventory/disposals/new': typeof AppInventoryDisposalsNewRoute
@@ -573,24 +816,45 @@ export interface FileRoutesById {
   '/_app/inventory/repackings/new': typeof AppInventoryRepackingsNewRoute
   '/_app/master-data/products/$id': typeof AppMasterDataProductsIdRoute
   '/_app/master-data/warehouses/$id': typeof AppMasterDataWarehousesIdRoute
+  '/_app/master/price-lists/$id': typeof AppMasterPriceListsIdRoute
+  '/_app/procurement/purchase-advances/$id': typeof AppProcurementPurchaseAdvancesIdRoute
+  '/_app/procurement/purchase-orders/new': typeof AppProcurementPurchaseOrdersNewRoute
+  '/_app/procurement/purchase-requests/new': typeof AppProcurementPurchaseRequestsNewRoute
+  '/_app/warehouse/inbounds/$id': typeof AppWarehouseInboundsIdRoute
+  '/_app/warehouse/petty-stock-requests/$id': typeof AppWarehousePettyStockRequestsIdRoute
   '/_app/warehouse/return-dispositions/new': typeof AppWarehouseReturnDispositionsNewRoute
+  '/_app/warehouse/stock-counts/$id': typeof AppWarehouseStockCountsIdRoute
+  '/_app/warehouse/stock-transfers/$id': typeof AppWarehouseStockTransfersIdRoute
   '/_app/finance/journals/': typeof AppFinanceJournalsIndexRoute
   '/_app/inventory/disposals/': typeof AppInventoryDisposalsIndexRoute
   '/_app/inventory/internal-usages/': typeof AppInventoryInternalUsagesIndexRoute
   '/_app/inventory/repackings/': typeof AppInventoryRepackingsIndexRoute
   '/_app/master-data/products/': typeof AppMasterDataProductsIndexRoute
   '/_app/master-data/warehouses/': typeof AppMasterDataWarehousesIndexRoute
+  '/_app/master/price-lists/': typeof AppMasterPriceListsIndexRoute
+  '/_app/procurement/purchase-advances/': typeof AppProcurementPurchaseAdvancesIndexRoute
+  '/_app/procurement/purchase-orders/': typeof AppProcurementPurchaseOrdersIndexRoute
+  '/_app/procurement/purchase-requests/': typeof AppProcurementPurchaseRequestsIndexRoute
+  '/_app/warehouse/inbounds/': typeof AppWarehouseInboundsIndexRoute
+  '/_app/warehouse/petty-stock-requests/': typeof AppWarehousePettyStockRequestsIndexRoute
   '/_app/warehouse/return-dispositions/': typeof AppWarehouseReturnDispositionsIndexRoute
+  '/_app/warehouse/stock-counts/': typeof AppWarehouseStockCountsIndexRoute
+  '/_app/warehouse/stock-transfers/': typeof AppWarehouseStockTransfersIndexRoute
   '/_app/finance/journals/$id/edit': typeof AppFinanceJournalsIdEditRoute
   '/_app/inventory/disposals/$id/edit': typeof AppInventoryDisposalsIdEditRoute
   '/_app/inventory/disposals/$id/print': typeof AppInventoryDisposalsIdPrintRoute
   '/_app/inventory/internal-usages/$id/edit': typeof AppInventoryInternalUsagesIdEditRoute
   '/_app/inventory/repackings/$id/edit': typeof AppInventoryRepackingsIdEditRoute
+  '/_app/procurement/purchase-orders/$id/edit': typeof AppProcurementPurchaseOrdersIdEditRoute
+  '/_app/procurement/purchase-orders/$id/print': typeof AppProcurementPurchaseOrdersIdPrintRoute
+  '/_app/procurement/purchase-requests/$id/edit': typeof AppProcurementPurchaseRequestsIdEditRoute
   '/_app/warehouse/return-dispositions/$id/edit': typeof AppWarehouseReturnDispositionsIdEditRoute
   '/_app/finance/journals/$id/': typeof AppFinanceJournalsIdIndexRoute
   '/_app/inventory/disposals/$id/': typeof AppInventoryDisposalsIdIndexRoute
   '/_app/inventory/internal-usages/$id/': typeof AppInventoryInternalUsagesIdIndexRoute
   '/_app/inventory/repackings/$id/': typeof AppInventoryRepackingsIdIndexRoute
+  '/_app/procurement/purchase-orders/$id/': typeof AppProcurementPurchaseOrdersIdIndexRoute
+  '/_app/procurement/purchase-requests/$id/': typeof AppProcurementPurchaseRequestsIdIndexRoute
   '/_app/warehouse/return-dispositions/$id/': typeof AppWarehouseReturnDispositionsIdIndexRoute
 }
 export interface FileRouteTypes {
@@ -622,14 +886,20 @@ export interface FileRouteTypes {
     | '/master/expense-types'
     | '/master/partner-product-codes'
     | '/master/partners'
+    | '/master/price-rules'
     | '/master/return-reasons'
     | '/master/suppliers'
+    | '/procurement/approvals'
+    | '/procurement/reprocess-orders'
+    | '/procurement/toll-orders'
+    | '/sales/pricing'
     | '/settings/approval-policies'
     | '/settings/audit-logs'
     | '/settings/document-sequences'
     | '/settings/roles'
     | '/settings/users'
     | '/system/about'
+    | '/warehouse/in-transit'
     | '/warehouse/returns'
     | '/finance/journals/new'
     | '/inventory/disposals/new'
@@ -637,24 +907,45 @@ export interface FileRouteTypes {
     | '/inventory/repackings/new'
     | '/master-data/products/$id'
     | '/master-data/warehouses/$id'
+    | '/master/price-lists/$id'
+    | '/procurement/purchase-advances/$id'
+    | '/procurement/purchase-orders/new'
+    | '/procurement/purchase-requests/new'
+    | '/warehouse/inbounds/$id'
+    | '/warehouse/petty-stock-requests/$id'
     | '/warehouse/return-dispositions/new'
+    | '/warehouse/stock-counts/$id'
+    | '/warehouse/stock-transfers/$id'
     | '/finance/journals/'
     | '/inventory/disposals/'
     | '/inventory/internal-usages/'
     | '/inventory/repackings/'
     | '/master-data/products/'
     | '/master-data/warehouses/'
+    | '/master/price-lists/'
+    | '/procurement/purchase-advances/'
+    | '/procurement/purchase-orders/'
+    | '/procurement/purchase-requests/'
+    | '/warehouse/inbounds/'
+    | '/warehouse/petty-stock-requests/'
     | '/warehouse/return-dispositions/'
+    | '/warehouse/stock-counts/'
+    | '/warehouse/stock-transfers/'
     | '/finance/journals/$id/edit'
     | '/inventory/disposals/$id/edit'
     | '/inventory/disposals/$id/print'
     | '/inventory/internal-usages/$id/edit'
     | '/inventory/repackings/$id/edit'
+    | '/procurement/purchase-orders/$id/edit'
+    | '/procurement/purchase-orders/$id/print'
+    | '/procurement/purchase-requests/$id/edit'
     | '/warehouse/return-dispositions/$id/edit'
     | '/finance/journals/$id/'
     | '/inventory/disposals/$id/'
     | '/inventory/internal-usages/$id/'
     | '/inventory/repackings/$id/'
+    | '/procurement/purchase-orders/$id/'
+    | '/procurement/purchase-requests/$id/'
     | '/warehouse/return-dispositions/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -684,14 +975,20 @@ export interface FileRouteTypes {
     | '/master/expense-types'
     | '/master/partner-product-codes'
     | '/master/partners'
+    | '/master/price-rules'
     | '/master/return-reasons'
     | '/master/suppliers'
+    | '/procurement/approvals'
+    | '/procurement/reprocess-orders'
+    | '/procurement/toll-orders'
+    | '/sales/pricing'
     | '/settings/approval-policies'
     | '/settings/audit-logs'
     | '/settings/document-sequences'
     | '/settings/roles'
     | '/settings/users'
     | '/system/about'
+    | '/warehouse/in-transit'
     | '/warehouse/returns'
     | '/finance/journals/new'
     | '/inventory/disposals/new'
@@ -699,24 +996,45 @@ export interface FileRouteTypes {
     | '/inventory/repackings/new'
     | '/master-data/products/$id'
     | '/master-data/warehouses/$id'
+    | '/master/price-lists/$id'
+    | '/procurement/purchase-advances/$id'
+    | '/procurement/purchase-orders/new'
+    | '/procurement/purchase-requests/new'
+    | '/warehouse/inbounds/$id'
+    | '/warehouse/petty-stock-requests/$id'
     | '/warehouse/return-dispositions/new'
+    | '/warehouse/stock-counts/$id'
+    | '/warehouse/stock-transfers/$id'
     | '/finance/journals'
     | '/inventory/disposals'
     | '/inventory/internal-usages'
     | '/inventory/repackings'
     | '/master-data/products'
     | '/master-data/warehouses'
+    | '/master/price-lists'
+    | '/procurement/purchase-advances'
+    | '/procurement/purchase-orders'
+    | '/procurement/purchase-requests'
+    | '/warehouse/inbounds'
+    | '/warehouse/petty-stock-requests'
     | '/warehouse/return-dispositions'
+    | '/warehouse/stock-counts'
+    | '/warehouse/stock-transfers'
     | '/finance/journals/$id/edit'
     | '/inventory/disposals/$id/edit'
     | '/inventory/disposals/$id/print'
     | '/inventory/internal-usages/$id/edit'
     | '/inventory/repackings/$id/edit'
+    | '/procurement/purchase-orders/$id/edit'
+    | '/procurement/purchase-orders/$id/print'
+    | '/procurement/purchase-requests/$id/edit'
     | '/warehouse/return-dispositions/$id/edit'
     | '/finance/journals/$id'
     | '/inventory/disposals/$id'
     | '/inventory/internal-usages/$id'
     | '/inventory/repackings/$id'
+    | '/procurement/purchase-orders/$id'
+    | '/procurement/purchase-requests/$id'
     | '/warehouse/return-dispositions/$id'
   id:
     | '__root__'
@@ -747,14 +1065,20 @@ export interface FileRouteTypes {
     | '/_app/master/expense-types'
     | '/_app/master/partner-product-codes'
     | '/_app/master/partners'
+    | '/_app/master/price-rules'
     | '/_app/master/return-reasons'
     | '/_app/master/suppliers'
+    | '/_app/procurement/approvals'
+    | '/_app/procurement/reprocess-orders'
+    | '/_app/procurement/toll-orders'
+    | '/_app/sales/pricing'
     | '/_app/settings/approval-policies'
     | '/_app/settings/audit-logs'
     | '/_app/settings/document-sequences'
     | '/_app/settings/roles'
     | '/_app/settings/users'
     | '/_app/system/about'
+    | '/_app/warehouse/in-transit'
     | '/_app/warehouse/returns'
     | '/_app/finance/journals/new'
     | '/_app/inventory/disposals/new'
@@ -762,24 +1086,45 @@ export interface FileRouteTypes {
     | '/_app/inventory/repackings/new'
     | '/_app/master-data/products/$id'
     | '/_app/master-data/warehouses/$id'
+    | '/_app/master/price-lists/$id'
+    | '/_app/procurement/purchase-advances/$id'
+    | '/_app/procurement/purchase-orders/new'
+    | '/_app/procurement/purchase-requests/new'
+    | '/_app/warehouse/inbounds/$id'
+    | '/_app/warehouse/petty-stock-requests/$id'
     | '/_app/warehouse/return-dispositions/new'
+    | '/_app/warehouse/stock-counts/$id'
+    | '/_app/warehouse/stock-transfers/$id'
     | '/_app/finance/journals/'
     | '/_app/inventory/disposals/'
     | '/_app/inventory/internal-usages/'
     | '/_app/inventory/repackings/'
     | '/_app/master-data/products/'
     | '/_app/master-data/warehouses/'
+    | '/_app/master/price-lists/'
+    | '/_app/procurement/purchase-advances/'
+    | '/_app/procurement/purchase-orders/'
+    | '/_app/procurement/purchase-requests/'
+    | '/_app/warehouse/inbounds/'
+    | '/_app/warehouse/petty-stock-requests/'
     | '/_app/warehouse/return-dispositions/'
+    | '/_app/warehouse/stock-counts/'
+    | '/_app/warehouse/stock-transfers/'
     | '/_app/finance/journals/$id/edit'
     | '/_app/inventory/disposals/$id/edit'
     | '/_app/inventory/disposals/$id/print'
     | '/_app/inventory/internal-usages/$id/edit'
     | '/_app/inventory/repackings/$id/edit'
+    | '/_app/procurement/purchase-orders/$id/edit'
+    | '/_app/procurement/purchase-orders/$id/print'
+    | '/_app/procurement/purchase-requests/$id/edit'
     | '/_app/warehouse/return-dispositions/$id/edit'
     | '/_app/finance/journals/$id/'
     | '/_app/inventory/disposals/$id/'
     | '/_app/inventory/internal-usages/$id/'
     | '/_app/inventory/repackings/$id/'
+    | '/_app/procurement/purchase-orders/$id/'
+    | '/_app/procurement/purchase-requests/$id/'
     | '/_app/warehouse/return-dispositions/$id/'
   fileRoutesById: FileRoutesById
 }
@@ -983,6 +1328,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMasterPartnersRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/master/price-rules': {
+      id: '/_app/master/price-rules'
+      path: '/master/price-rules'
+      fullPath: '/master/price-rules'
+      preLoaderRoute: typeof AppMasterPriceRulesRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/master/return-reasons': {
       id: '/_app/master/return-reasons'
       path: '/master/return-reasons'
@@ -995,6 +1347,34 @@ declare module '@tanstack/react-router' {
       path: '/master/suppliers'
       fullPath: '/master/suppliers'
       preLoaderRoute: typeof AppMasterSuppliersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/procurement/approvals': {
+      id: '/_app/procurement/approvals'
+      path: '/procurement/approvals'
+      fullPath: '/procurement/approvals'
+      preLoaderRoute: typeof AppProcurementApprovalsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/procurement/reprocess-orders': {
+      id: '/_app/procurement/reprocess-orders'
+      path: '/procurement/reprocess-orders'
+      fullPath: '/procurement/reprocess-orders'
+      preLoaderRoute: typeof AppProcurementReprocessOrdersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/procurement/toll-orders': {
+      id: '/_app/procurement/toll-orders'
+      path: '/procurement/toll-orders'
+      fullPath: '/procurement/toll-orders'
+      preLoaderRoute: typeof AppProcurementTollOrdersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/sales/pricing': {
+      id: '/_app/sales/pricing'
+      path: '/sales/pricing'
+      fullPath: '/sales/pricing'
+      preLoaderRoute: typeof AppSalesPricingRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/settings/approval-policies': {
@@ -1037,6 +1417,13 @@ declare module '@tanstack/react-router' {
       path: '/system/about'
       fullPath: '/system/about'
       preLoaderRoute: typeof AppSystemAboutRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/warehouse/in-transit': {
+      id: '/_app/warehouse/in-transit'
+      path: '/warehouse/in-transit'
+      fullPath: '/warehouse/in-transit'
+      preLoaderRoute: typeof AppWarehouseInTransitRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/warehouse/returns': {
@@ -1130,6 +1517,90 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMasterDataWarehousesIdRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/master/price-lists/': {
+      id: '/_app/master/price-lists/'
+      path: '/master/price-lists'
+      fullPath: '/master/price-lists/'
+      preLoaderRoute: typeof AppMasterPriceListsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/master/price-lists/$id': {
+      id: '/_app/master/price-lists/$id'
+      path: '/master/price-lists/$id'
+      fullPath: '/master/price-lists/$id'
+      preLoaderRoute: typeof AppMasterPriceListsIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/procurement/purchase-advances/': {
+      id: '/_app/procurement/purchase-advances/'
+      path: '/procurement/purchase-advances'
+      fullPath: '/procurement/purchase-advances/'
+      preLoaderRoute: typeof AppProcurementPurchaseAdvancesIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/procurement/purchase-advances/$id': {
+      id: '/_app/procurement/purchase-advances/$id'
+      path: '/procurement/purchase-advances/$id'
+      fullPath: '/procurement/purchase-advances/$id'
+      preLoaderRoute: typeof AppProcurementPurchaseAdvancesIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/procurement/purchase-orders/': {
+      id: '/_app/procurement/purchase-orders/'
+      path: '/procurement/purchase-orders'
+      fullPath: '/procurement/purchase-orders/'
+      preLoaderRoute: typeof AppProcurementPurchaseOrdersIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/procurement/purchase-orders/new': {
+      id: '/_app/procurement/purchase-orders/new'
+      path: '/procurement/purchase-orders/new'
+      fullPath: '/procurement/purchase-orders/new'
+      preLoaderRoute: typeof AppProcurementPurchaseOrdersNewRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/procurement/purchase-requests/': {
+      id: '/_app/procurement/purchase-requests/'
+      path: '/procurement/purchase-requests'
+      fullPath: '/procurement/purchase-requests/'
+      preLoaderRoute: typeof AppProcurementPurchaseRequestsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/procurement/purchase-requests/new': {
+      id: '/_app/procurement/purchase-requests/new'
+      path: '/procurement/purchase-requests/new'
+      fullPath: '/procurement/purchase-requests/new'
+      preLoaderRoute: typeof AppProcurementPurchaseRequestsNewRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/warehouse/inbounds/': {
+      id: '/_app/warehouse/inbounds/'
+      path: '/warehouse/inbounds'
+      fullPath: '/warehouse/inbounds/'
+      preLoaderRoute: typeof AppWarehouseInboundsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/warehouse/inbounds/$id': {
+      id: '/_app/warehouse/inbounds/$id'
+      path: '/warehouse/inbounds/$id'
+      fullPath: '/warehouse/inbounds/$id'
+      preLoaderRoute: typeof AppWarehouseInboundsIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/warehouse/petty-stock-requests/': {
+      id: '/_app/warehouse/petty-stock-requests/'
+      path: '/warehouse/petty-stock-requests'
+      fullPath: '/warehouse/petty-stock-requests/'
+      preLoaderRoute: typeof AppWarehousePettyStockRequestsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/warehouse/petty-stock-requests/$id': {
+      id: '/_app/warehouse/petty-stock-requests/$id'
+      path: '/warehouse/petty-stock-requests/$id'
+      fullPath: '/warehouse/petty-stock-requests/$id'
+      preLoaderRoute: typeof AppWarehousePettyStockRequestsIdRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/warehouse/return-dispositions/': {
       id: '/_app/warehouse/return-dispositions/'
       path: '/warehouse/return-dispositions'
@@ -1142,6 +1613,34 @@ declare module '@tanstack/react-router' {
       path: '/warehouse/return-dispositions/new'
       fullPath: '/warehouse/return-dispositions/new'
       preLoaderRoute: typeof AppWarehouseReturnDispositionsNewRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/warehouse/stock-counts/': {
+      id: '/_app/warehouse/stock-counts/'
+      path: '/warehouse/stock-counts'
+      fullPath: '/warehouse/stock-counts/'
+      preLoaderRoute: typeof AppWarehouseStockCountsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/warehouse/stock-counts/$id': {
+      id: '/_app/warehouse/stock-counts/$id'
+      path: '/warehouse/stock-counts/$id'
+      fullPath: '/warehouse/stock-counts/$id'
+      preLoaderRoute: typeof AppWarehouseStockCountsIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/warehouse/stock-transfers/': {
+      id: '/_app/warehouse/stock-transfers/'
+      path: '/warehouse/stock-transfers'
+      fullPath: '/warehouse/stock-transfers/'
+      preLoaderRoute: typeof AppWarehouseStockTransfersIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/warehouse/stock-transfers/$id': {
+      id: '/_app/warehouse/stock-transfers/$id'
+      path: '/warehouse/stock-transfers/$id'
+      fullPath: '/warehouse/stock-transfers/$id'
+      preLoaderRoute: typeof AppWarehouseStockTransfersIdRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/finance/journals/$id/': {
@@ -1207,6 +1706,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInventoryRepackingsIdEditRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/procurement/purchase-orders/$id/': {
+      id: '/_app/procurement/purchase-orders/$id/'
+      path: '/procurement/purchase-orders/$id'
+      fullPath: '/procurement/purchase-orders/$id/'
+      preLoaderRoute: typeof AppProcurementPurchaseOrdersIdIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/procurement/purchase-orders/$id/edit': {
+      id: '/_app/procurement/purchase-orders/$id/edit'
+      path: '/procurement/purchase-orders/$id/edit'
+      fullPath: '/procurement/purchase-orders/$id/edit'
+      preLoaderRoute: typeof AppProcurementPurchaseOrdersIdEditRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/procurement/purchase-orders/$id/print': {
+      id: '/_app/procurement/purchase-orders/$id/print'
+      path: '/procurement/purchase-orders/$id/print'
+      fullPath: '/procurement/purchase-orders/$id/print'
+      preLoaderRoute: typeof AppProcurementPurchaseOrdersIdPrintRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/procurement/purchase-requests/$id/': {
+      id: '/_app/procurement/purchase-requests/$id/'
+      path: '/procurement/purchase-requests/$id'
+      fullPath: '/procurement/purchase-requests/$id/'
+      preLoaderRoute: typeof AppProcurementPurchaseRequestsIdIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/procurement/purchase-requests/$id/edit': {
+      id: '/_app/procurement/purchase-requests/$id/edit'
+      path: '/procurement/purchase-requests/$id/edit'
+      fullPath: '/procurement/purchase-requests/$id/edit'
+      preLoaderRoute: typeof AppProcurementPurchaseRequestsIdEditRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/warehouse/return-dispositions/$id/': {
       id: '/_app/warehouse/return-dispositions/$id/'
       path: '/warehouse/return-dispositions/$id'
@@ -1246,14 +1780,20 @@ interface AppRouteChildren {
   AppMasterExpenseTypesRoute: typeof AppMasterExpenseTypesRoute
   AppMasterPartnerProductCodesRoute: typeof AppMasterPartnerProductCodesRoute
   AppMasterPartnersRoute: typeof AppMasterPartnersRoute
+  AppMasterPriceRulesRoute: typeof AppMasterPriceRulesRoute
   AppMasterReturnReasonsRoute: typeof AppMasterReturnReasonsRoute
   AppMasterSuppliersRoute: typeof AppMasterSuppliersRoute
+  AppProcurementApprovalsRoute: typeof AppProcurementApprovalsRoute
+  AppProcurementReprocessOrdersRoute: typeof AppProcurementReprocessOrdersRoute
+  AppProcurementTollOrdersRoute: typeof AppProcurementTollOrdersRoute
+  AppSalesPricingRoute: typeof AppSalesPricingRoute
   AppSettingsApprovalPoliciesRoute: typeof AppSettingsApprovalPoliciesRoute
   AppSettingsAuditLogsRoute: typeof AppSettingsAuditLogsRoute
   AppSettingsDocumentSequencesRoute: typeof AppSettingsDocumentSequencesRoute
   AppSettingsRolesRoute: typeof AppSettingsRolesRoute
   AppSettingsUsersRoute: typeof AppSettingsUsersRoute
   AppSystemAboutRoute: typeof AppSystemAboutRoute
+  AppWarehouseInTransitRoute: typeof AppWarehouseInTransitRoute
   AppWarehouseReturnsRoute: typeof AppWarehouseReturnsRoute
   AppFinanceJournalsNewRoute: typeof AppFinanceJournalsNewRoute
   AppInventoryDisposalsNewRoute: typeof AppInventoryDisposalsNewRoute
@@ -1261,24 +1801,45 @@ interface AppRouteChildren {
   AppInventoryRepackingsNewRoute: typeof AppInventoryRepackingsNewRoute
   AppMasterDataProductsIdRoute: typeof AppMasterDataProductsIdRoute
   AppMasterDataWarehousesIdRoute: typeof AppMasterDataWarehousesIdRoute
+  AppMasterPriceListsIdRoute: typeof AppMasterPriceListsIdRoute
+  AppProcurementPurchaseAdvancesIdRoute: typeof AppProcurementPurchaseAdvancesIdRoute
+  AppProcurementPurchaseOrdersNewRoute: typeof AppProcurementPurchaseOrdersNewRoute
+  AppProcurementPurchaseRequestsNewRoute: typeof AppProcurementPurchaseRequestsNewRoute
+  AppWarehouseInboundsIdRoute: typeof AppWarehouseInboundsIdRoute
+  AppWarehousePettyStockRequestsIdRoute: typeof AppWarehousePettyStockRequestsIdRoute
   AppWarehouseReturnDispositionsNewRoute: typeof AppWarehouseReturnDispositionsNewRoute
+  AppWarehouseStockCountsIdRoute: typeof AppWarehouseStockCountsIdRoute
+  AppWarehouseStockTransfersIdRoute: typeof AppWarehouseStockTransfersIdRoute
   AppFinanceJournalsIndexRoute: typeof AppFinanceJournalsIndexRoute
   AppInventoryDisposalsIndexRoute: typeof AppInventoryDisposalsIndexRoute
   AppInventoryInternalUsagesIndexRoute: typeof AppInventoryInternalUsagesIndexRoute
   AppInventoryRepackingsIndexRoute: typeof AppInventoryRepackingsIndexRoute
   AppMasterDataProductsIndexRoute: typeof AppMasterDataProductsIndexRoute
   AppMasterDataWarehousesIndexRoute: typeof AppMasterDataWarehousesIndexRoute
+  AppMasterPriceListsIndexRoute: typeof AppMasterPriceListsIndexRoute
+  AppProcurementPurchaseAdvancesIndexRoute: typeof AppProcurementPurchaseAdvancesIndexRoute
+  AppProcurementPurchaseOrdersIndexRoute: typeof AppProcurementPurchaseOrdersIndexRoute
+  AppProcurementPurchaseRequestsIndexRoute: typeof AppProcurementPurchaseRequestsIndexRoute
+  AppWarehouseInboundsIndexRoute: typeof AppWarehouseInboundsIndexRoute
+  AppWarehousePettyStockRequestsIndexRoute: typeof AppWarehousePettyStockRequestsIndexRoute
   AppWarehouseReturnDispositionsIndexRoute: typeof AppWarehouseReturnDispositionsIndexRoute
+  AppWarehouseStockCountsIndexRoute: typeof AppWarehouseStockCountsIndexRoute
+  AppWarehouseStockTransfersIndexRoute: typeof AppWarehouseStockTransfersIndexRoute
   AppFinanceJournalsIdEditRoute: typeof AppFinanceJournalsIdEditRoute
   AppInventoryDisposalsIdEditRoute: typeof AppInventoryDisposalsIdEditRoute
   AppInventoryDisposalsIdPrintRoute: typeof AppInventoryDisposalsIdPrintRoute
   AppInventoryInternalUsagesIdEditRoute: typeof AppInventoryInternalUsagesIdEditRoute
   AppInventoryRepackingsIdEditRoute: typeof AppInventoryRepackingsIdEditRoute
+  AppProcurementPurchaseOrdersIdEditRoute: typeof AppProcurementPurchaseOrdersIdEditRoute
+  AppProcurementPurchaseOrdersIdPrintRoute: typeof AppProcurementPurchaseOrdersIdPrintRoute
+  AppProcurementPurchaseRequestsIdEditRoute: typeof AppProcurementPurchaseRequestsIdEditRoute
   AppWarehouseReturnDispositionsIdEditRoute: typeof AppWarehouseReturnDispositionsIdEditRoute
   AppFinanceJournalsIdIndexRoute: typeof AppFinanceJournalsIdIndexRoute
   AppInventoryDisposalsIdIndexRoute: typeof AppInventoryDisposalsIdIndexRoute
   AppInventoryInternalUsagesIdIndexRoute: typeof AppInventoryInternalUsagesIdIndexRoute
   AppInventoryRepackingsIdIndexRoute: typeof AppInventoryRepackingsIdIndexRoute
+  AppProcurementPurchaseOrdersIdIndexRoute: typeof AppProcurementPurchaseOrdersIdIndexRoute
+  AppProcurementPurchaseRequestsIdIndexRoute: typeof AppProcurementPurchaseRequestsIdIndexRoute
   AppWarehouseReturnDispositionsIdIndexRoute: typeof AppWarehouseReturnDispositionsIdIndexRoute
 }
 
@@ -1304,14 +1865,20 @@ const AppRouteChildren: AppRouteChildren = {
   AppMasterExpenseTypesRoute: AppMasterExpenseTypesRoute,
   AppMasterPartnerProductCodesRoute: AppMasterPartnerProductCodesRoute,
   AppMasterPartnersRoute: AppMasterPartnersRoute,
+  AppMasterPriceRulesRoute: AppMasterPriceRulesRoute,
   AppMasterReturnReasonsRoute: AppMasterReturnReasonsRoute,
   AppMasterSuppliersRoute: AppMasterSuppliersRoute,
+  AppProcurementApprovalsRoute: AppProcurementApprovalsRoute,
+  AppProcurementReprocessOrdersRoute: AppProcurementReprocessOrdersRoute,
+  AppProcurementTollOrdersRoute: AppProcurementTollOrdersRoute,
+  AppSalesPricingRoute: AppSalesPricingRoute,
   AppSettingsApprovalPoliciesRoute: AppSettingsApprovalPoliciesRoute,
   AppSettingsAuditLogsRoute: AppSettingsAuditLogsRoute,
   AppSettingsDocumentSequencesRoute: AppSettingsDocumentSequencesRoute,
   AppSettingsRolesRoute: AppSettingsRolesRoute,
   AppSettingsUsersRoute: AppSettingsUsersRoute,
   AppSystemAboutRoute: AppSystemAboutRoute,
+  AppWarehouseInTransitRoute: AppWarehouseInTransitRoute,
   AppWarehouseReturnsRoute: AppWarehouseReturnsRoute,
   AppFinanceJournalsNewRoute: AppFinanceJournalsNewRoute,
   AppInventoryDisposalsNewRoute: AppInventoryDisposalsNewRoute,
@@ -1319,21 +1886,48 @@ const AppRouteChildren: AppRouteChildren = {
   AppInventoryRepackingsNewRoute: AppInventoryRepackingsNewRoute,
   AppMasterDataProductsIdRoute: AppMasterDataProductsIdRoute,
   AppMasterDataWarehousesIdRoute: AppMasterDataWarehousesIdRoute,
+  AppMasterPriceListsIdRoute: AppMasterPriceListsIdRoute,
+  AppProcurementPurchaseAdvancesIdRoute: AppProcurementPurchaseAdvancesIdRoute,
+  AppProcurementPurchaseOrdersNewRoute: AppProcurementPurchaseOrdersNewRoute,
+  AppProcurementPurchaseRequestsNewRoute:
+    AppProcurementPurchaseRequestsNewRoute,
+  AppWarehouseInboundsIdRoute: AppWarehouseInboundsIdRoute,
+  AppWarehousePettyStockRequestsIdRoute: AppWarehousePettyStockRequestsIdRoute,
   AppWarehouseReturnDispositionsNewRoute:
     AppWarehouseReturnDispositionsNewRoute,
+  AppWarehouseStockCountsIdRoute: AppWarehouseStockCountsIdRoute,
+  AppWarehouseStockTransfersIdRoute: AppWarehouseStockTransfersIdRoute,
   AppFinanceJournalsIndexRoute: AppFinanceJournalsIndexRoute,
   AppInventoryDisposalsIndexRoute: AppInventoryDisposalsIndexRoute,
   AppInventoryInternalUsagesIndexRoute: AppInventoryInternalUsagesIndexRoute,
   AppInventoryRepackingsIndexRoute: AppInventoryRepackingsIndexRoute,
   AppMasterDataProductsIndexRoute: AppMasterDataProductsIndexRoute,
   AppMasterDataWarehousesIndexRoute: AppMasterDataWarehousesIndexRoute,
+  AppMasterPriceListsIndexRoute: AppMasterPriceListsIndexRoute,
+  AppProcurementPurchaseAdvancesIndexRoute:
+    AppProcurementPurchaseAdvancesIndexRoute,
+  AppProcurementPurchaseOrdersIndexRoute:
+    AppProcurementPurchaseOrdersIndexRoute,
+  AppProcurementPurchaseRequestsIndexRoute:
+    AppProcurementPurchaseRequestsIndexRoute,
+  AppWarehouseInboundsIndexRoute: AppWarehouseInboundsIndexRoute,
+  AppWarehousePettyStockRequestsIndexRoute:
+    AppWarehousePettyStockRequestsIndexRoute,
   AppWarehouseReturnDispositionsIndexRoute:
     AppWarehouseReturnDispositionsIndexRoute,
+  AppWarehouseStockCountsIndexRoute: AppWarehouseStockCountsIndexRoute,
+  AppWarehouseStockTransfersIndexRoute: AppWarehouseStockTransfersIndexRoute,
   AppFinanceJournalsIdEditRoute: AppFinanceJournalsIdEditRoute,
   AppInventoryDisposalsIdEditRoute: AppInventoryDisposalsIdEditRoute,
   AppInventoryDisposalsIdPrintRoute: AppInventoryDisposalsIdPrintRoute,
   AppInventoryInternalUsagesIdEditRoute: AppInventoryInternalUsagesIdEditRoute,
   AppInventoryRepackingsIdEditRoute: AppInventoryRepackingsIdEditRoute,
+  AppProcurementPurchaseOrdersIdEditRoute:
+    AppProcurementPurchaseOrdersIdEditRoute,
+  AppProcurementPurchaseOrdersIdPrintRoute:
+    AppProcurementPurchaseOrdersIdPrintRoute,
+  AppProcurementPurchaseRequestsIdEditRoute:
+    AppProcurementPurchaseRequestsIdEditRoute,
   AppWarehouseReturnDispositionsIdEditRoute:
     AppWarehouseReturnDispositionsIdEditRoute,
   AppFinanceJournalsIdIndexRoute: AppFinanceJournalsIdIndexRoute,
@@ -1341,6 +1935,10 @@ const AppRouteChildren: AppRouteChildren = {
   AppInventoryInternalUsagesIdIndexRoute:
     AppInventoryInternalUsagesIdIndexRoute,
   AppInventoryRepackingsIdIndexRoute: AppInventoryRepackingsIdIndexRoute,
+  AppProcurementPurchaseOrdersIdIndexRoute:
+    AppProcurementPurchaseOrdersIdIndexRoute,
+  AppProcurementPurchaseRequestsIdIndexRoute:
+    AppProcurementPurchaseRequestsIdIndexRoute,
   AppWarehouseReturnDispositionsIdIndexRoute:
     AppWarehouseReturnDispositionsIdIndexRoute,
 }

@@ -108,7 +108,18 @@ export const MENU: MenuGroup[] = [
         permission: "catalog.product.read",
         module: "catalog",
       },
-      ...items("Daftar Harga", "Aturan Harga"),
+      {
+        label: "Daftar Harga",
+        to: "/master/price-lists",
+        permission: ["pricing.price_list.read", "pricing.price_list.approve"],
+        module: "pricing",
+      },
+      {
+        label: "Aturan Harga",
+        to: "/master/price-rules",
+        permission: ["pricing.promotion.read", "pricing.special_price.read"],
+        module: "pricing",
+      },
       {
         label: "Pelanggan",
         to: "/master/customers",
@@ -176,31 +187,81 @@ export const MENU: MenuGroup[] = [
     label: "Pengadaan",
     icon: ShoppingCartIcon,
     modules: ["procurement"],
-    items: items(
-      "Purchase Request",
-      "Purchase Order",
-      "Purchase Order Maklon",
-      "Purchase Order Reprocess",
-      "Persetujuan Pengadaan",
-      "Penerimaan Barang",
-      "Reject & Waste",
-      "Tagihan Pemasok",
-      "Uang Muka Pembelian"
-    ),
+    items: [
+      {
+        label: "Purchase Request",
+        to: "/procurement/purchase-requests",
+        permission: "procurement.purchase_request.read",
+        module: "procurement",
+      },
+      {
+        label: "Purchase Order",
+        to: "/procurement/purchase-orders",
+        permission: "procurement.purchase_order.read",
+        module: "procurement",
+      },
+      {
+        label: "Purchase Order Maklon",
+        to: "/procurement/toll-orders",
+        permission: "procurement.purchase_order.read",
+        module: "procurement",
+      },
+      {
+        label: "Purchase Order Reprocess",
+        to: "/procurement/reprocess-orders",
+        permission: "procurement.purchase_order.read",
+        module: "procurement",
+      },
+      {
+        label: "Persetujuan Pengadaan",
+        to: "/procurement/approvals",
+        permission: [
+          "procurement.purchase_request.approve",
+          "procurement.purchase_order.approve",
+        ],
+        module: "procurement",
+      },
+      ...items("Penerimaan Barang", "Reject & Waste", "Tagihan Pemasok"),
+      {
+        label: "Uang Muka Pembelian",
+        to: "/procurement/purchase-advances",
+        permission: "procurement.purchase_advance.read",
+        module: "procurement",
+      },
+    ],
   },
   {
     label: "Gudang",
     icon: WarehouseIcon,
-    modules: ["warehouse", "inventory"],
+    modules: ["warehouse"],
     items: [
-      ...items(
-        "Inbound",
-        "Put-away",
-        "Transfer Stok",
-        "Stok dalam Pengiriman",
-        "Outbound",
-        "Stock Count"
-      ),
+      {
+        label: "Inbound",
+        to: "/warehouse/inbounds",
+        permission: "warehouse.inbound.read",
+      },
+      { label: "Put-away" },
+      {
+        label: "Transfer Stok",
+        to: "/warehouse/stock-transfers",
+        permission: "warehouse.stock_transfer.read",
+      },
+      {
+        label: "Permintaan Petty Stock",
+        to: "/warehouse/petty-stock-requests",
+        permission: "warehouse.stock_transfer.read",
+      },
+      {
+        label: "Stok dalam Pengiriman",
+        to: "/warehouse/in-transit",
+        permission: "warehouse.stock_transfer.read",
+      },
+      { label: "Outbound" },
+      {
+        label: "Stock Count",
+        to: "/warehouse/stock-counts",
+        permission: "warehouse.stock_count.read",
+      },
       {
         label: "Gudang Retur",
         to: "/warehouse/returns",
@@ -271,21 +332,33 @@ export const MENU: MenuGroup[] = [
   {
     label: "Penjualan",
     icon: ShoppingBagIcon,
-    modules: ["sales"],
-    items: items(
-      "Sales Order",
-      "Modern Trade",
-      "Konsinyasi",
-      "Penjualan Marketplace",
-      "Pesanan WhatsApp/Instagram",
-      "Penjualan Karyawan",
-      "Proforma Invoice",
-      "Invoice",
-      "Retur Penjualan",
-      "Nota Kredit",
-      "Rekonsiliasi Konsinyasi",
-      "Harga & Diskon"
-    ),
+    modules: ["sales", "pricing"],
+    items: [
+      ...items(
+        "Sales Order",
+        "Modern Trade",
+        "Konsinyasi",
+        "Penjualan Marketplace",
+        "Pesanan WhatsApp/Instagram",
+        "Penjualan Karyawan",
+        "Proforma Invoice",
+        "Invoice",
+        "Retur Penjualan",
+        "Nota Kredit",
+        "Rekonsiliasi Konsinyasi"
+      ),
+      {
+        label: "Harga & Diskon",
+        to: "/sales/pricing",
+        permission: [
+          "pricing.price_list.read",
+          "pricing.promotion.read",
+          "pricing.special_price.read",
+          "pricing.discount_limit.read",
+        ],
+        module: "pricing",
+      },
+    ],
   },
   {
     label: "Pipeline Penjualan",
