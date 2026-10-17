@@ -30,8 +30,10 @@ import { Route as AppMasterCustomersRouteImport } from './routes/_app/master/cus
 import { Route as AppMasterExpenseTypesRouteImport } from './routes/_app/master/expense-types'
 import { Route as AppMasterPartnerProductCodesRouteImport } from './routes/_app/master/partner-product-codes'
 import { Route as AppMasterPartnersRouteImport } from './routes/_app/master/partners'
+import { Route as AppMasterPriceRulesRouteImport } from './routes/_app/master/price-rules'
 import { Route as AppMasterReturnReasonsRouteImport } from './routes/_app/master/return-reasons'
 import { Route as AppMasterSuppliersRouteImport } from './routes/_app/master/suppliers'
+import { Route as AppSalesPricingRouteImport } from './routes/_app/sales/pricing'
 import { Route as AppSettingsApprovalPoliciesRouteImport } from './routes/_app/settings/approval-policies'
 import { Route as AppSettingsAuditLogsRouteImport } from './routes/_app/settings/audit-logs'
 import { Route as AppSettingsDocumentSequencesRouteImport } from './routes/_app/settings/document-sequences'
@@ -44,6 +46,8 @@ import { Route as AppMasterDataProductsIndexRouteImport } from './routes/_app/ma
 import { Route as AppMasterDataProductsIdRouteImport } from './routes/_app/master-data/products/$id'
 import { Route as AppMasterDataWarehousesIndexRouteImport } from './routes/_app/master-data/warehouses/index'
 import { Route as AppMasterDataWarehousesIdRouteImport } from './routes/_app/master-data/warehouses/$id'
+import { Route as AppMasterPriceListsIndexRouteImport } from './routes/_app/master/price-lists/index'
+import { Route as AppMasterPriceListsIdRouteImport } from './routes/_app/master/price-lists/$id'
 import { Route as AppFinanceJournalsIdIndexRouteImport } from './routes/_app/finance/journals/$id.index'
 import { Route as AppFinanceJournalsIdEditRouteImport } from './routes/_app/finance/journals/$id.edit'
 
@@ -154,6 +158,11 @@ const AppMasterPartnersRoute = AppMasterPartnersRouteImport.update({
   path: '/master/partners',
   getParentRoute: () => AppRoute,
 } as any)
+const AppMasterPriceRulesRoute = AppMasterPriceRulesRouteImport.update({
+  id: '/master/price-rules',
+  path: '/master/price-rules',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppMasterReturnReasonsRoute = AppMasterReturnReasonsRouteImport.update({
   id: '/master/return-reasons',
   path: '/master/return-reasons',
@@ -162,6 +171,11 @@ const AppMasterReturnReasonsRoute = AppMasterReturnReasonsRouteImport.update({
 const AppMasterSuppliersRoute = AppMasterSuppliersRouteImport.update({
   id: '/master/suppliers',
   path: '/master/suppliers',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSalesPricingRoute = AppSalesPricingRouteImport.update({
+  id: '/sales/pricing',
+  path: '/sales/pricing',
   getParentRoute: () => AppRoute,
 } as any)
 const AppSettingsApprovalPoliciesRoute =
@@ -229,6 +243,17 @@ const AppMasterDataWarehousesIdRoute =
     path: '/master-data/warehouses/$id',
     getParentRoute: () => AppRoute,
   } as any)
+const AppMasterPriceListsIndexRoute =
+  AppMasterPriceListsIndexRouteImport.update({
+    id: '/master/price-lists/',
+    path: '/master/price-lists/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppMasterPriceListsIdRoute = AppMasterPriceListsIdRouteImport.update({
+  id: '/master/price-lists/$id',
+  path: '/master/price-lists/$id',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppFinanceJournalsIdIndexRoute =
   AppFinanceJournalsIdIndexRouteImport.update({
     id: '/finance/journals/$id/',
@@ -263,8 +288,10 @@ export interface FileRoutesByFullPath {
   '/master/expense-types': typeof AppMasterExpenseTypesRoute
   '/master/partner-product-codes': typeof AppMasterPartnerProductCodesRoute
   '/master/partners': typeof AppMasterPartnersRoute
+  '/master/price-rules': typeof AppMasterPriceRulesRoute
   '/master/return-reasons': typeof AppMasterReturnReasonsRoute
   '/master/suppliers': typeof AppMasterSuppliersRoute
+  '/sales/pricing': typeof AppSalesPricingRoute
   '/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/settings/audit-logs': typeof AppSettingsAuditLogsRoute
   '/settings/document-sequences': typeof AppSettingsDocumentSequencesRoute
@@ -274,9 +301,11 @@ export interface FileRoutesByFullPath {
   '/finance/journals/new': typeof AppFinanceJournalsNewRoute
   '/master-data/products/$id': typeof AppMasterDataProductsIdRoute
   '/master-data/warehouses/$id': typeof AppMasterDataWarehousesIdRoute
+  '/master/price-lists/$id': typeof AppMasterPriceListsIdRoute
   '/finance/journals/': typeof AppFinanceJournalsIndexRoute
   '/master-data/products/': typeof AppMasterDataProductsIndexRoute
   '/master-data/warehouses/': typeof AppMasterDataWarehousesIndexRoute
+  '/master/price-lists/': typeof AppMasterPriceListsIndexRoute
   '/finance/journals/$id/edit': typeof AppFinanceJournalsIdEditRoute
   '/finance/journals/$id/': typeof AppFinanceJournalsIdIndexRoute
 }
@@ -301,8 +330,10 @@ export interface FileRoutesByTo {
   '/master/expense-types': typeof AppMasterExpenseTypesRoute
   '/master/partner-product-codes': typeof AppMasterPartnerProductCodesRoute
   '/master/partners': typeof AppMasterPartnersRoute
+  '/master/price-rules': typeof AppMasterPriceRulesRoute
   '/master/return-reasons': typeof AppMasterReturnReasonsRoute
   '/master/suppliers': typeof AppMasterSuppliersRoute
+  '/sales/pricing': typeof AppSalesPricingRoute
   '/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/settings/audit-logs': typeof AppSettingsAuditLogsRoute
   '/settings/document-sequences': typeof AppSettingsDocumentSequencesRoute
@@ -312,9 +343,11 @@ export interface FileRoutesByTo {
   '/finance/journals/new': typeof AppFinanceJournalsNewRoute
   '/master-data/products/$id': typeof AppMasterDataProductsIdRoute
   '/master-data/warehouses/$id': typeof AppMasterDataWarehousesIdRoute
+  '/master/price-lists/$id': typeof AppMasterPriceListsIdRoute
   '/finance/journals': typeof AppFinanceJournalsIndexRoute
   '/master-data/products': typeof AppMasterDataProductsIndexRoute
   '/master-data/warehouses': typeof AppMasterDataWarehousesIndexRoute
+  '/master/price-lists': typeof AppMasterPriceListsIndexRoute
   '/finance/journals/$id/edit': typeof AppFinanceJournalsIdEditRoute
   '/finance/journals/$id': typeof AppFinanceJournalsIdIndexRoute
 }
@@ -341,8 +374,10 @@ export interface FileRoutesById {
   '/_app/master/expense-types': typeof AppMasterExpenseTypesRoute
   '/_app/master/partner-product-codes': typeof AppMasterPartnerProductCodesRoute
   '/_app/master/partners': typeof AppMasterPartnersRoute
+  '/_app/master/price-rules': typeof AppMasterPriceRulesRoute
   '/_app/master/return-reasons': typeof AppMasterReturnReasonsRoute
   '/_app/master/suppliers': typeof AppMasterSuppliersRoute
+  '/_app/sales/pricing': typeof AppSalesPricingRoute
   '/_app/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/_app/settings/audit-logs': typeof AppSettingsAuditLogsRoute
   '/_app/settings/document-sequences': typeof AppSettingsDocumentSequencesRoute
@@ -352,9 +387,11 @@ export interface FileRoutesById {
   '/_app/finance/journals/new': typeof AppFinanceJournalsNewRoute
   '/_app/master-data/products/$id': typeof AppMasterDataProductsIdRoute
   '/_app/master-data/warehouses/$id': typeof AppMasterDataWarehousesIdRoute
+  '/_app/master/price-lists/$id': typeof AppMasterPriceListsIdRoute
   '/_app/finance/journals/': typeof AppFinanceJournalsIndexRoute
   '/_app/master-data/products/': typeof AppMasterDataProductsIndexRoute
   '/_app/master-data/warehouses/': typeof AppMasterDataWarehousesIndexRoute
+  '/_app/master/price-lists/': typeof AppMasterPriceListsIndexRoute
   '/_app/finance/journals/$id/edit': typeof AppFinanceJournalsIdEditRoute
   '/_app/finance/journals/$id/': typeof AppFinanceJournalsIdIndexRoute
 }
@@ -381,8 +418,10 @@ export interface FileRouteTypes {
     | '/master/expense-types'
     | '/master/partner-product-codes'
     | '/master/partners'
+    | '/master/price-rules'
     | '/master/return-reasons'
     | '/master/suppliers'
+    | '/sales/pricing'
     | '/settings/approval-policies'
     | '/settings/audit-logs'
     | '/settings/document-sequences'
@@ -392,9 +431,11 @@ export interface FileRouteTypes {
     | '/finance/journals/new'
     | '/master-data/products/$id'
     | '/master-data/warehouses/$id'
+    | '/master/price-lists/$id'
     | '/finance/journals/'
     | '/master-data/products/'
     | '/master-data/warehouses/'
+    | '/master/price-lists/'
     | '/finance/journals/$id/edit'
     | '/finance/journals/$id/'
   fileRoutesByTo: FileRoutesByTo
@@ -419,8 +460,10 @@ export interface FileRouteTypes {
     | '/master/expense-types'
     | '/master/partner-product-codes'
     | '/master/partners'
+    | '/master/price-rules'
     | '/master/return-reasons'
     | '/master/suppliers'
+    | '/sales/pricing'
     | '/settings/approval-policies'
     | '/settings/audit-logs'
     | '/settings/document-sequences'
@@ -430,9 +473,11 @@ export interface FileRouteTypes {
     | '/finance/journals/new'
     | '/master-data/products/$id'
     | '/master-data/warehouses/$id'
+    | '/master/price-lists/$id'
     | '/finance/journals'
     | '/master-data/products'
     | '/master-data/warehouses'
+    | '/master/price-lists'
     | '/finance/journals/$id/edit'
     | '/finance/journals/$id'
   id:
@@ -458,8 +503,10 @@ export interface FileRouteTypes {
     | '/_app/master/expense-types'
     | '/_app/master/partner-product-codes'
     | '/_app/master/partners'
+    | '/_app/master/price-rules'
     | '/_app/master/return-reasons'
     | '/_app/master/suppliers'
+    | '/_app/sales/pricing'
     | '/_app/settings/approval-policies'
     | '/_app/settings/audit-logs'
     | '/_app/settings/document-sequences'
@@ -469,9 +516,11 @@ export interface FileRouteTypes {
     | '/_app/finance/journals/new'
     | '/_app/master-data/products/$id'
     | '/_app/master-data/warehouses/$id'
+    | '/_app/master/price-lists/$id'
     | '/_app/finance/journals/'
     | '/_app/master-data/products/'
     | '/_app/master-data/warehouses/'
+    | '/_app/master/price-lists/'
     | '/_app/finance/journals/$id/edit'
     | '/_app/finance/journals/$id/'
   fileRoutesById: FileRoutesById
@@ -634,6 +683,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMasterPartnersRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/master/price-rules': {
+      id: '/_app/master/price-rules'
+      path: '/master/price-rules'
+      fullPath: '/master/price-rules'
+      preLoaderRoute: typeof AppMasterPriceRulesRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/master/return-reasons': {
       id: '/_app/master/return-reasons'
       path: '/master/return-reasons'
@@ -646,6 +702,13 @@ declare module '@tanstack/react-router' {
       path: '/master/suppliers'
       fullPath: '/master/suppliers'
       preLoaderRoute: typeof AppMasterSuppliersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/sales/pricing': {
+      id: '/_app/sales/pricing'
+      path: '/sales/pricing'
+      fullPath: '/sales/pricing'
+      preLoaderRoute: typeof AppSalesPricingRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/settings/approval-policies': {
@@ -732,6 +795,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMasterDataWarehousesIdRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/master/price-lists/': {
+      id: '/_app/master/price-lists/'
+      path: '/master/price-lists'
+      fullPath: '/master/price-lists/'
+      preLoaderRoute: typeof AppMasterPriceListsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/master/price-lists/$id': {
+      id: '/_app/master/price-lists/$id'
+      path: '/master/price-lists/$id'
+      fullPath: '/master/price-lists/$id'
+      preLoaderRoute: typeof AppMasterPriceListsIdRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/finance/journals/$id/': {
       id: '/_app/finance/journals/$id/'
       path: '/finance/journals/$id'
@@ -765,8 +842,10 @@ interface AppRouteChildren {
   AppMasterExpenseTypesRoute: typeof AppMasterExpenseTypesRoute
   AppMasterPartnerProductCodesRoute: typeof AppMasterPartnerProductCodesRoute
   AppMasterPartnersRoute: typeof AppMasterPartnersRoute
+  AppMasterPriceRulesRoute: typeof AppMasterPriceRulesRoute
   AppMasterReturnReasonsRoute: typeof AppMasterReturnReasonsRoute
   AppMasterSuppliersRoute: typeof AppMasterSuppliersRoute
+  AppSalesPricingRoute: typeof AppSalesPricingRoute
   AppSettingsApprovalPoliciesRoute: typeof AppSettingsApprovalPoliciesRoute
   AppSettingsAuditLogsRoute: typeof AppSettingsAuditLogsRoute
   AppSettingsDocumentSequencesRoute: typeof AppSettingsDocumentSequencesRoute
@@ -776,9 +855,11 @@ interface AppRouteChildren {
   AppFinanceJournalsNewRoute: typeof AppFinanceJournalsNewRoute
   AppMasterDataProductsIdRoute: typeof AppMasterDataProductsIdRoute
   AppMasterDataWarehousesIdRoute: typeof AppMasterDataWarehousesIdRoute
+  AppMasterPriceListsIdRoute: typeof AppMasterPriceListsIdRoute
   AppFinanceJournalsIndexRoute: typeof AppFinanceJournalsIndexRoute
   AppMasterDataProductsIndexRoute: typeof AppMasterDataProductsIndexRoute
   AppMasterDataWarehousesIndexRoute: typeof AppMasterDataWarehousesIndexRoute
+  AppMasterPriceListsIndexRoute: typeof AppMasterPriceListsIndexRoute
   AppFinanceJournalsIdEditRoute: typeof AppFinanceJournalsIdEditRoute
   AppFinanceJournalsIdIndexRoute: typeof AppFinanceJournalsIdIndexRoute
 }
@@ -799,8 +880,10 @@ const AppRouteChildren: AppRouteChildren = {
   AppMasterExpenseTypesRoute: AppMasterExpenseTypesRoute,
   AppMasterPartnerProductCodesRoute: AppMasterPartnerProductCodesRoute,
   AppMasterPartnersRoute: AppMasterPartnersRoute,
+  AppMasterPriceRulesRoute: AppMasterPriceRulesRoute,
   AppMasterReturnReasonsRoute: AppMasterReturnReasonsRoute,
   AppMasterSuppliersRoute: AppMasterSuppliersRoute,
+  AppSalesPricingRoute: AppSalesPricingRoute,
   AppSettingsApprovalPoliciesRoute: AppSettingsApprovalPoliciesRoute,
   AppSettingsAuditLogsRoute: AppSettingsAuditLogsRoute,
   AppSettingsDocumentSequencesRoute: AppSettingsDocumentSequencesRoute,
@@ -810,9 +893,11 @@ const AppRouteChildren: AppRouteChildren = {
   AppFinanceJournalsNewRoute: AppFinanceJournalsNewRoute,
   AppMasterDataProductsIdRoute: AppMasterDataProductsIdRoute,
   AppMasterDataWarehousesIdRoute: AppMasterDataWarehousesIdRoute,
+  AppMasterPriceListsIdRoute: AppMasterPriceListsIdRoute,
   AppFinanceJournalsIndexRoute: AppFinanceJournalsIndexRoute,
   AppMasterDataProductsIndexRoute: AppMasterDataProductsIndexRoute,
   AppMasterDataWarehousesIndexRoute: AppMasterDataWarehousesIndexRoute,
+  AppMasterPriceListsIndexRoute: AppMasterPriceListsIndexRoute,
   AppFinanceJournalsIdEditRoute: AppFinanceJournalsIdEditRoute,
   AppFinanceJournalsIdIndexRoute: AppFinanceJournalsIdIndexRoute,
 }
