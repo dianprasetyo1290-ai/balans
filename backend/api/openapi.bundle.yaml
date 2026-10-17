@@ -3486,66 +3486,47 @@ components:
         - b2b
         - reseller
         - employee
-    CustomerAddressInput:
+    CustomerAddress:
       type: object
       required:
+        - id
+        - label
         - recipientName
+        - phone
         - addressLine
+        - district
         - city
+        - province
+        - postalCode
         - isDefault
       properties:
         id:
           type: string
           format: uuid
-          description: Kosong = alamat baru.
         label:
           type: string
-          maxLength: 40
-          example: Rumah
         recipientName:
           type: string
-          minLength: 1
-          maxLength: 120
         phone:
           type: string
-          maxLength: 20
         addressLine:
           type: string
-          minLength: 1
-          maxLength: 500
         district:
           type: string
-          maxLength: 80
         city:
           type: string
-          minLength: 1
-          maxLength: 80
         province:
           type: string
-          maxLength: 80
         postalCode:
           type: string
-          maxLength: 10
         latitude:
           type: string
           nullable: true
-          description: Desimal derajat sebagai string, mis. `-6.200000`.
         longitude:
           type: string
           nullable: true
         isDefault:
           type: boolean
-    CustomerAddress:
-      allOf:
-        - $ref: '#/components/schemas/CustomerAddressInput'
-        - type: object
-          required:
-            - id
-            - label
-            - phone
-            - district
-            - province
-            - postalCode
     Customer:
       type: object
       required:
@@ -3625,6 +3606,55 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/Customer'
+    CustomerAddressInput:
+      type: object
+      required:
+        - recipientName
+        - addressLine
+        - city
+        - isDefault
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Kosong = alamat baru.
+        label:
+          type: string
+          maxLength: 40
+          example: Rumah
+        recipientName:
+          type: string
+          minLength: 1
+          maxLength: 120
+        phone:
+          type: string
+          maxLength: 20
+        addressLine:
+          type: string
+          minLength: 1
+          maxLength: 500
+        district:
+          type: string
+          maxLength: 80
+        city:
+          type: string
+          minLength: 1
+          maxLength: 80
+        province:
+          type: string
+          maxLength: 80
+        postalCode:
+          type: string
+          maxLength: 10
+        latitude:
+          type: string
+          nullable: true
+          description: Desimal derajat sebagai string, mis. `-6.200000`.
+        longitude:
+          type: string
+          nullable: true
+        isDefault:
+          type: boolean
     CustomerInput:
       type: object
       required:

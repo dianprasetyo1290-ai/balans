@@ -552,10 +552,36 @@ components:
         isDefault:
           type: boolean
     CustomerAddress:
-      allOf:
-        - $ref: "#/components/schemas/CustomerAddressInput"
-        - type: object
-          required: [id, label, phone, district, province, postalCode]
+      type: object
+      required: [id, label, recipientName, phone, addressLine, district, city, province, postalCode, isDefault]
+      properties:
+        id:
+          type: string
+          format: uuid
+        label:
+          type: string
+        recipientName:
+          type: string
+        phone:
+          type: string
+        addressLine:
+          type: string
+        district:
+          type: string
+        city:
+          type: string
+        province:
+          type: string
+        postalCode:
+          type: string
+        latitude:
+          type: string
+          nullable: true
+        longitude:
+          type: string
+          nullable: true
+        isDefault:
+          type: boolean
     CustomerInput:
       type: object
       required: [fullName, phone, customerType, marketingConsent, addresses]

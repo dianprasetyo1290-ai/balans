@@ -38,7 +38,7 @@ pnpm install
 pnpm dev                  # http://localhost:5173, /api diteruskan ke :8080
 ```
 
-Halaman yang tersedia: **Masuk** (`/login`), **Ringkasan Operasional** (`/`), **Persetujuan Saya** (`/approvals`), **Pengaturan › Pengguna & Role, Hak Akses, Matriks Persetujuan, Riwayat Perubahan**, **Tentang Sistem** (`/system/about`), simulasi pihak ketiga di `/_mock/` (pembayaran, pengiriman, kotak email Mailpit di `/_mock/mail/` — tautan undangan & atur ulang password muncul di sini).
+Halaman yang tersedia: **Masuk** (`/login`), **Ringkasan Operasional** (`/`), **Persetujuan Saya** (`/approvals`), **Data Master › Pelanggan, Mitra Konsinyasi, Kode Produk Mitra, Pemasok & Maklon, Karyawan**, **SDM › Data Karyawan**, **Pengaturan › Pengguna & Role, Hak Akses, Matriks Persetujuan, Riwayat Perubahan**, **Tentang Sistem** (`/system/about`), simulasi pihak ketiga di `/_mock/` (pembayaran, pengiriman, kotak email Mailpit di `/_mock/mail/` — tautan undangan & atur ulang password muncul di sini).
 
 Akun seed lokal: `admin@balans.local`, `purchasing@balans.local`, `staf.gudang@balans.local`, `logistik.leader@balans.local`, `fulfillment.leader@balans.local`, `merchandiser@balans.local`, `head.logistik@balans.local`, `finance@balans.local`, `head.finance@balans.local`, `sales.mt@balans.local`, `sales.ecommerce@balans.local`, `cs@balans.local`, `head.sales@balans.local`, `marketing@balans.local`, `hrga@balans.local`, `head.divisi@balans.local`, `direksi@balans.local`, `dirut@balans.local`. `cmd/devseed` menolak berjalan di luar `APP_ENV=local`. Di local tanpa `JWT_*`/`PII_*` dipakai kunci pengembangan deterministik; staging dan production wajib kunci asli (Runbook 3.1 – 3.2).
 

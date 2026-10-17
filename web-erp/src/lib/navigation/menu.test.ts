@@ -53,6 +53,31 @@ describe("menu", () => {
     ).not.toContain("Matriks Persetujuan")
   })
 
+  it("menampilkan data master party dan karyawan sesuai modul dan permission", () => {
+    const labels = (modules: string[], permissions?: string[]) =>
+      visibleMenu(modules, [], permissions).flatMap((g) =>
+        g.items.map((i) => `${g.label} › ${i.label}`)
+      )
+    expect(labels(["party", "hris"])).toEqual(
+      expect.arrayContaining([
+        "Data Master › Pelanggan",
+        "Data Master › Mitra Konsinyasi",
+        "Data Master › Kode Produk Mitra",
+        "Data Master › Pemasok & Maklon",
+        "Data Master › Karyawan",
+        "SDM (HRIS) › Data Karyawan",
+      ])
+    )
+    expect(labels(["party"])).not.toContain("Data Master › Karyawan")
+    expect(labels(["hris"])).not.toContain("Data Master › Pelanggan")
+    expect(labels(["party", "hris"], ["party.customer.read"])).toEqual(
+      expect.arrayContaining(["Data Master › Pelanggan"])
+    )
+    expect(labels(["party", "hris"], ["party.customer.read"])).not.toContain(
+      "Data Master › Pemasok & Maklon"
+    )
+  })
+
   it("menyembunyikan halaman yang permission-nya tidak dimiliki user", () => {
     const labels = visibleMenu([], [], ["identity.user.read"]).flatMap((g) =>
       g.items.map((i) => i.label)

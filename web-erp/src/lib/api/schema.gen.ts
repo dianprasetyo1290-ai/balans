@@ -1935,28 +1935,21 @@ export interface components {
     }
     /** @enum {string} */
     CustomerType: "retail" | "b2b" | "reseller" | "employee"
-    CustomerAddressInput: {
-      /**
-       * Format: uuid
-       * @description Kosong = alamat baru.
-       */
-      id?: string
-      /** @example Rumah */
-      label?: string
+    CustomerAddress: {
+      /** Format: uuid */
+      id: string
+      label: string
       recipientName: string
-      phone?: string
+      phone: string
       addressLine: string
-      district?: string
+      district: string
       city: string
-      province?: string
-      postalCode?: string
-      /** @description Desimal derajat sebagai string, mis. `-6.200000`. */
+      province: string
+      postalCode: string
       latitude?: string | null
       longitude?: string | null
       isDefault: boolean
     }
-    CustomerAddress: components["schemas"]["CustomerAddressInput"] &
-      Record<string, never>
     Customer: {
       /** Format: uuid */
       id: string
@@ -1987,6 +1980,26 @@ export interface components {
     }
     CustomerList: components["schemas"]["Pagination"] & {
       items: components["schemas"]["Customer"][]
+    }
+    CustomerAddressInput: {
+      /**
+       * Format: uuid
+       * @description Kosong = alamat baru.
+       */
+      id?: string
+      /** @example Rumah */
+      label?: string
+      recipientName: string
+      phone?: string
+      addressLine: string
+      district?: string
+      city: string
+      province?: string
+      postalCode?: string
+      /** @description Desimal derajat sebagai string, mis. `-6.200000`. */
+      latitude?: string | null
+      longitude?: string | null
+      isDefault: boolean
     }
     CustomerInput: {
       fullName: string

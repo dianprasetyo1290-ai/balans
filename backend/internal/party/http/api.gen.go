@@ -322,24 +322,18 @@ type Customer struct {
 
 // CustomerAddress defines model for CustomerAddress.
 type CustomerAddress struct {
-	AddressLine string `json:"addressLine"`
-	City        string `json:"city"`
-	District    string `json:"district"`
-
-	// Id Kosong = alamat baru.
-	Id        openapi_types.UUID `json:"id"`
-	IsDefault bool               `json:"isDefault"`
-
-	// Label Example: Rumah
-	Label string `json:"label"`
-
-	// Latitude Desimal derajat sebagai string, mis. `-6.200000`.
-	Latitude      *string `json:"latitude,omitempty"`
-	Longitude     *string `json:"longitude,omitempty"`
-	Phone         string  `json:"phone"`
-	PostalCode    string  `json:"postalCode"`
-	Province      string  `json:"province"`
-	RecipientName string  `json:"recipientName"`
+	AddressLine   string             `json:"addressLine"`
+	City          string             `json:"city"`
+	District      string             `json:"district"`
+	Id            openapi_types.UUID `json:"id"`
+	IsDefault     bool               `json:"isDefault"`
+	Label         string             `json:"label"`
+	Latitude      *string            `json:"latitude,omitempty"`
+	Longitude     *string            `json:"longitude,omitempty"`
+	Phone         string             `json:"phone"`
+	PostalCode    string             `json:"postalCode"`
+	Province      string             `json:"province"`
+	RecipientName string             `json:"recipientName"`
 }
 
 // CustomerAddressInput defines model for CustomerAddressInput.

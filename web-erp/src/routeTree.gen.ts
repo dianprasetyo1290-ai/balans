@@ -17,6 +17,11 @@ import { Route as MfaSetupRouteImport } from './routes/mfa-setup'
 import { Route as SetPasswordRouteImport } from './routes/set-password'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppApprovalsRouteImport } from './routes/_app/approvals'
+import { Route as AppHrisEmployeesRouteImport } from './routes/_app/hris/employees'
+import { Route as AppMasterCustomersRouteImport } from './routes/_app/master/customers'
+import { Route as AppMasterPartnerProductCodesRouteImport } from './routes/_app/master/partner-product-codes'
+import { Route as AppMasterPartnersRouteImport } from './routes/_app/master/partners'
+import { Route as AppMasterSuppliersRouteImport } from './routes/_app/master/suppliers'
 import { Route as AppSettingsApprovalPoliciesRouteImport } from './routes/_app/settings/approval-policies'
 import { Route as AppSettingsAuditLogsRouteImport } from './routes/_app/settings/audit-logs'
 import { Route as AppSettingsRolesRouteImport } from './routes/_app/settings/roles'
@@ -62,6 +67,32 @@ const AppApprovalsRoute = AppApprovalsRouteImport.update({
   path: '/approvals',
   getParentRoute: () => AppRoute,
 } as any)
+const AppHrisEmployeesRoute = AppHrisEmployeesRouteImport.update({
+  id: '/hris/employees',
+  path: '/hris/employees',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMasterCustomersRoute = AppMasterCustomersRouteImport.update({
+  id: '/master/customers',
+  path: '/master/customers',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMasterPartnerProductCodesRoute =
+  AppMasterPartnerProductCodesRouteImport.update({
+    id: '/master/partner-product-codes',
+    path: '/master/partner-product-codes',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppMasterPartnersRoute = AppMasterPartnersRouteImport.update({
+  id: '/master/partners',
+  path: '/master/partners',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMasterSuppliersRoute = AppMasterSuppliersRouteImport.update({
+  id: '/master/suppliers',
+  path: '/master/suppliers',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppSettingsApprovalPoliciesRoute =
   AppSettingsApprovalPoliciesRouteImport.update({
     id: '/settings/approval-policies',
@@ -97,6 +128,11 @@ export interface FileRoutesByFullPath {
   '/mfa-setup': typeof MfaSetupRoute
   '/set-password': typeof SetPasswordRoute
   '/approvals': typeof AppApprovalsRoute
+  '/hris/employees': typeof AppHrisEmployeesRoute
+  '/master/customers': typeof AppMasterCustomersRoute
+  '/master/partner-product-codes': typeof AppMasterPartnerProductCodesRoute
+  '/master/partners': typeof AppMasterPartnersRoute
+  '/master/suppliers': typeof AppMasterSuppliersRoute
   '/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/settings/audit-logs': typeof AppSettingsAuditLogsRoute
   '/settings/roles': typeof AppSettingsRolesRoute
@@ -111,6 +147,11 @@ export interface FileRoutesByTo {
   '/set-password': typeof SetPasswordRoute
   '/approvals': typeof AppApprovalsRoute
   '/': typeof AppIndexRoute
+  '/hris/employees': typeof AppHrisEmployeesRoute
+  '/master/customers': typeof AppMasterCustomersRoute
+  '/master/partner-product-codes': typeof AppMasterPartnerProductCodesRoute
+  '/master/partners': typeof AppMasterPartnersRoute
+  '/master/suppliers': typeof AppMasterSuppliersRoute
   '/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/settings/audit-logs': typeof AppSettingsAuditLogsRoute
   '/settings/roles': typeof AppSettingsRolesRoute
@@ -127,6 +168,11 @@ export interface FileRoutesById {
   '/set-password': typeof SetPasswordRoute
   '/_app/approvals': typeof AppApprovalsRoute
   '/_app/': typeof AppIndexRoute
+  '/_app/hris/employees': typeof AppHrisEmployeesRoute
+  '/_app/master/customers': typeof AppMasterCustomersRoute
+  '/_app/master/partner-product-codes': typeof AppMasterPartnerProductCodesRoute
+  '/_app/master/partners': typeof AppMasterPartnersRoute
+  '/_app/master/suppliers': typeof AppMasterSuppliersRoute
   '/_app/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/_app/settings/audit-logs': typeof AppSettingsAuditLogsRoute
   '/_app/settings/roles': typeof AppSettingsRolesRoute
@@ -143,6 +189,11 @@ export interface FileRouteTypes {
     | '/mfa-setup'
     | '/set-password'
     | '/approvals'
+    | '/hris/employees'
+    | '/master/customers'
+    | '/master/partner-product-codes'
+    | '/master/partners'
+    | '/master/suppliers'
     | '/settings/approval-policies'
     | '/settings/audit-logs'
     | '/settings/roles'
@@ -157,6 +208,11 @@ export interface FileRouteTypes {
     | '/set-password'
     | '/approvals'
     | '/'
+    | '/hris/employees'
+    | '/master/customers'
+    | '/master/partner-product-codes'
+    | '/master/partners'
+    | '/master/suppliers'
     | '/settings/approval-policies'
     | '/settings/audit-logs'
     | '/settings/roles'
@@ -172,6 +228,11 @@ export interface FileRouteTypes {
     | '/set-password'
     | '/_app/approvals'
     | '/_app/'
+    | '/_app/hris/employees'
+    | '/_app/master/customers'
+    | '/_app/master/partner-product-codes'
+    | '/_app/master/partners'
+    | '/_app/master/suppliers'
     | '/_app/settings/approval-policies'
     | '/_app/settings/audit-logs'
     | '/_app/settings/roles'
@@ -246,6 +307,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppApprovalsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/hris/employees': {
+      id: '/_app/hris/employees'
+      path: '/hris/employees'
+      fullPath: '/hris/employees'
+      preLoaderRoute: typeof AppHrisEmployeesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/master/customers': {
+      id: '/_app/master/customers'
+      path: '/master/customers'
+      fullPath: '/master/customers'
+      preLoaderRoute: typeof AppMasterCustomersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/master/partner-product-codes': {
+      id: '/_app/master/partner-product-codes'
+      path: '/master/partner-product-codes'
+      fullPath: '/master/partner-product-codes'
+      preLoaderRoute: typeof AppMasterPartnerProductCodesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/master/partners': {
+      id: '/_app/master/partners'
+      path: '/master/partners'
+      fullPath: '/master/partners'
+      preLoaderRoute: typeof AppMasterPartnersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/master/suppliers': {
+      id: '/_app/master/suppliers'
+      path: '/master/suppliers'
+      fullPath: '/master/suppliers'
+      preLoaderRoute: typeof AppMasterSuppliersRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/settings/approval-policies': {
       id: '/_app/settings/approval-policies'
       path: '/settings/approval-policies'
@@ -287,6 +383,11 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppApprovalsRoute: typeof AppApprovalsRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppHrisEmployeesRoute: typeof AppHrisEmployeesRoute
+  AppMasterCustomersRoute: typeof AppMasterCustomersRoute
+  AppMasterPartnerProductCodesRoute: typeof AppMasterPartnerProductCodesRoute
+  AppMasterPartnersRoute: typeof AppMasterPartnersRoute
+  AppMasterSuppliersRoute: typeof AppMasterSuppliersRoute
   AppSettingsApprovalPoliciesRoute: typeof AppSettingsApprovalPoliciesRoute
   AppSettingsAuditLogsRoute: typeof AppSettingsAuditLogsRoute
   AppSettingsRolesRoute: typeof AppSettingsRolesRoute
@@ -297,6 +398,11 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppApprovalsRoute: AppApprovalsRoute,
   AppIndexRoute: AppIndexRoute,
+  AppHrisEmployeesRoute: AppHrisEmployeesRoute,
+  AppMasterCustomersRoute: AppMasterCustomersRoute,
+  AppMasterPartnerProductCodesRoute: AppMasterPartnerProductCodesRoute,
+  AppMasterPartnersRoute: AppMasterPartnersRoute,
+  AppMasterSuppliersRoute: AppMasterSuppliersRoute,
   AppSettingsApprovalPoliciesRoute: AppSettingsApprovalPoliciesRoute,
   AppSettingsAuditLogsRoute: AppSettingsAuditLogsRoute,
   AppSettingsRolesRoute: AppSettingsRolesRoute,
