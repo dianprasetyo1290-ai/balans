@@ -14,7 +14,7 @@ import (
 
 const closedPeriodAfterExists = `-- name: ClosedPeriodAfterExists :one
 SELECT EXISTS (
-    SELECT 1 FROM fiscal_periods WHERE status = 'closed' AND (year * 12 + month - 1) > $1::integer
+    SELECT 1 FROM fiscal_periods WHERE status <> 'open' AND (year * 12 + month - 1) > $1::integer
 )::boolean
 `
 

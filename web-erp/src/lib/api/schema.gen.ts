@@ -2659,6 +2659,391 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/v1/trial-balance": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Neraca Saldo per rentang & dimensi (ACC-18)
+     * @description Hanya jurnal terposting. Saldo awal = sebelum `dateFrom`. Butuh `accounting.report.read` atau
+     *     `accounting.journal.read`. Drill-down ke Buku Besar per akun dengan filter yang sama.
+     */
+    get: operations["getTrialBalance"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/fixed-asset-classes": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Kelas aset tetap (umur manfaat & akun A-31)
+     * @description Permission `accounting.fixed_asset.read`.
+     */
+    get: operations["listFixedAssetClasses"]
+    put?: never
+    /**
+     * Menambah kelas aset
+     * @description Permission `accounting.fixed_asset.write`. Akun aset bersaldo debit, akun akumulasi bersaldo kredit (1xxx).
+     */
+    post: operations["createFixedAssetClass"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/fixed-asset-classes/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    /**
+     * Mengubah kelas aset
+     * @description Umur manfaat baru dipakai aset yang dibuat setelahnya.
+     */
+    put: operations["updateFixedAssetClass"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/fixed-assets": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Register Aset Tetap (ACC-21)
+     * @description Permission `accounting.fixed_asset.read` atau `accounting.report.read`.
+     */
+    get: operations["listFixedAssets"]
+    put?: never
+    /**
+     * Menambah aset tetap (Draft)
+     * @description Aset pembelian (`purchase`) wajib akun pembayaran dan dijurnal A-31 saat diaktifkan. Aset saldo awal
+     *     (`opening`) membutuhkan tanggal cut-over di Saldo Awal; nilainya masuk GL lewat A-36.
+     */
+    post: operations["createFixedAsset"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/fixed-assets/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    /** Detail aset beserta riwayat penyusutan */
+    get: operations["getFixedAsset"]
+    /** Mengubah aset Draft */
+    put: operations["updateFixedAsset"]
+    post?: never
+    /** Menghapus aset Draft */
+    delete: operations["deleteFixedAsset"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/fixed-assets/{id}/activate": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Mengaktifkan aset (jurnal A-31 perolehan untuk aset pembelian)
+     * @description Permission `accounting.fixed_asset.post`. Tanggal perolehan harus di periode terbuka (`PERIOD_LOCKED`).
+     */
+    post: operations["activateFixedAsset"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/fixed-assets/{id}/dispose": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Melepas aset (dijual/dihapusbukukan, jurnal A-31 pelepasan) */
+    post: operations["disposeFixedAsset"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/depreciation-runs": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Riwayat penyusutan per periode */
+    get: operations["listDepreciationRuns"]
+    put?: never
+    /**
+     * Menjalankan penyusutan satu periode (A-31)
+     * @description Sama dengan job `accounting.depreciate` (tanggal 1 pukul 01.00 WIB untuk bulan sebelumnya). Idempotent per
+     *     aset per periode; periode harus terbuka. Permission `accounting.fixed_asset.post`.
+     */
+    post: operations["runDepreciation"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/depreciation-runs/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail penyusutan per aset satu periode */
+    get: operations["getDepreciationRun"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/fiscal-periods/{id}/close-checklist": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Checklist Tutup Buku 9 langkah satu periode (BRD 5.15)
+     * @description Termasuk hasil pemeriksaan otomatis, hal yang menahan tutup periode, dan riwayat buka kembali.
+     */
+    get: operations["getCloseChecklist"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/fiscal-periods/{id}/close-checklist/{stepCode}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /**
+     * Mengubah status, PIC, atau catatan satu langkah
+     * @description Permission `accounting.fiscal_period.write` atau `.post`. Selesai butuh pemeriksaan otomatis lolos; Tidak Berlaku
+     *     wajib catatan; langkah 9 selesai saat Tutup Periode.
+     */
+    put: operations["updateCloseChecklistStep"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/fiscal-periods/{id}/close": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Tutup Periode (★ re-autentikasi)
+     * @description Permission `accounting.fiscal_period.post` dan re-autentikasi 5 menit terakhir (`AUTH_REAUTH_REQUIRED`).
+     *     Advisory lock per periode; periode sebelumnya harus Ditutup; langkah 1–8 selesai; neraca saldo balance.
+     */
+    post: operations["closeFiscalPeriod"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/fiscal-periods/{id}/reopen": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Ajukan Buka Kembali periode (★ re-autentikasi, approval Head F&A → Direksi)
+     * @description Permission `accounting.fiscal_period.reopen` dan re-autentikasi. Periode menjadi Menunggu Persetujuan (tetap
+     *     terkunci) sampai approval `fiscal_period_reopen` diputuskan.
+     */
+    post: operations["requestFiscalPeriodReopen"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/opening-balance": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Saldo Awal — tanggal cut-over dan Neraca Saldo Awal (A-36) */
+    get: operations["getOpeningBalance"]
+    /**
+     * Mengisi tanggal cut-over (akhir bulan)
+     * @description Permission `accounting.journal.write`; hanya selama saldo awal Draft.
+     */
+    put: operations["saveOpeningBalanceSet"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/opening-balance/lines": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Mengisi saldo awal satu akun neraca (akun yang sama diganti) */
+    post: operations["saveOpeningBalanceLine"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/opening-balance/lines/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Menghapus saldo awal satu akun */
+    delete: operations["deleteOpeningBalanceLine"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/opening-balance/post": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Memposting saldo awal sebagai jurnal A-36 (selisih ke 3901)
+     * @description Permission `accounting.journal.post`. Tanggal cut-over harus di periode terbuka.
+     */
+    post: operations["postOpeningBalance"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/opening-items": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Piutang & utang terbuka saldo awal per dokumen lama */
+    get: operations["listOpeningItems"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/cutover-reconciliation": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Pengecekan rekonsiliasi cut-over (sub-ledger vs GL)
+     * @description Neraca saldo awal balance, nilai persediaan per akun, piutang/utang terbuka, harga perolehan & akumulasi aset
+     *     tetap (Panduan Migrasi Data bagian 4). Sebelum saldo awal diposting, GL diambil dari Neraca Saldo Awal.
+     */
+    get: operations["getCutoverReconciliation"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/v1/document-sequences": {
     parameters: {
       query?: never
@@ -6601,8 +6986,11 @@ export interface components {
     }
     ExpenseTypeUpdate: components["schemas"]["ExpenseTypeFields"] &
       components["schemas"]["VersionInput"]
-    /** @enum {string} */
-    FiscalPeriodStatus: "open" | "closed"
+    /**
+     * @description `open` Terbuka, `closed` Ditutup, `pending_approval` Menunggu Persetujuan buka kembali (tetap terkunci).
+     * @enum {string}
+     */
+    FiscalPeriodStatus: "open" | "closed" | "pending_approval"
     FiscalPeriod: {
       /** Format: uuid */
       id: string
@@ -6736,6 +7124,8 @@ export interface components {
       businessDate: components["schemas"]["BusinessDate"]
       entryType: components["schemas"]["JournalEntryType"]
       sourceType: string
+      /** Format: uuid */
+      sourceId: string
       sourceLabel: string
       description: string
       lineNo: number
@@ -7539,6 +7929,380 @@ export interface components {
     FinalTaxRunInput: {
       year: number
       month: number
+    }
+    TrialBalanceRow: {
+      /** Format: uuid */
+      accountId: string
+      accountCode: string
+      accountName: string
+      group: number
+      groupLabel: string
+      normalBalance: components["schemas"]["NormalBalance"]
+      openingDebit: components["schemas"]["Money"]
+      openingCredit: components["schemas"]["Money"]
+      periodDebit: components["schemas"]["Money"]
+      periodCredit: components["schemas"]["Money"]
+      closingDebit: components["schemas"]["Money"]
+      closingCredit: components["schemas"]["Money"]
+    }
+    TrialBalanceTotals: {
+      openingDebit: components["schemas"]["Money"]
+      openingCredit: components["schemas"]["Money"]
+      periodDebit: components["schemas"]["Money"]
+      periodCredit: components["schemas"]["Money"]
+      closingDebit: components["schemas"]["Money"]
+      closingCredit: components["schemas"]["Money"]
+    }
+    TrialBalance: {
+      dateFrom: components["schemas"]["BusinessDate"]
+      dateTo: components["schemas"]["BusinessDate"]
+      rows: components["schemas"]["TrialBalanceRow"][]
+      totals: components["schemas"]["TrialBalanceTotals"]
+      balanced: boolean
+    }
+    FixedAssetClass: {
+      /** Format: uuid */
+      id: string
+      code: string
+      name: string
+      usefulLifeMonths: number
+      /** Format: uuid */
+      assetAccountId: string
+      assetAccountCode: string
+      /** Format: uuid */
+      accumulatedAccountId: string
+      accumulatedAccountCode: string
+      isActive: boolean
+      version: number
+    }
+    FixedAssetClassCreate: {
+      /** @example vending_machine */
+      code: string
+      name: string
+      usefulLifeMonths: number
+      /** Format: uuid */
+      assetAccountId: string
+      /** Format: uuid */
+      accumulatedAccountId: string
+      isActive: boolean
+    }
+    FixedAssetClassUpdate: {
+      name: string
+      usefulLifeMonths: number
+      /** Format: uuid */
+      assetAccountId: string
+      /** Format: uuid */
+      accumulatedAccountId: string
+      isActive: boolean
+      version: number
+    }
+    /**
+     * @description `draft` Draft, `active` Aktif, `disposed` Dilepas.
+     * @enum {string}
+     */
+    FixedAssetStatus: "draft" | "active" | "disposed"
+    /**
+     * @description `purchase` pembelian setelah go-live, `opening` saldo awal migrasi.
+     * @enum {string}
+     */
+    FixedAssetSource: "purchase" | "opening"
+    FixedAsset: {
+      /** Format: uuid */
+      id: string
+      code: string
+      name: string
+      /** Format: uuid */
+      classId: string
+      className: string
+      /** Format: uuid */
+      locationId?: string | null
+      locationLabel: string
+      /** Format: uuid */
+      divisionId: string
+      source: components["schemas"]["FixedAssetSource"]
+      acquisitionDate: components["schemas"]["BusinessDate"]
+      cost: components["schemas"]["Money"]
+      salvage: components["schemas"]["Money"]
+      usefulLifeMonths: number
+      depreciationStart: components["schemas"]["BusinessDate"]
+      openingAccumulated: components["schemas"]["Money"]
+      openingDepreciatedMonths: number
+      accumulated: components["schemas"]["Money"]
+      bookValue: components["schemas"]["Money"]
+      monthlyDepreciation: components["schemas"]["Money"]
+      /** Format: uuid */
+      paymentAccountId?: string | null
+      status: components["schemas"]["FixedAssetStatus"]
+      /** Format: uuid */
+      acquisitionJournalId?: string | null
+      disposalDate?: components["schemas"]["BusinessDate"] | null
+      disposalProceeds?: components["schemas"]["Money"] | null
+      /** Format: uuid */
+      disposalAccountId?: string | null
+      disposalReason: string
+      /** Format: uuid */
+      disposalJournalId?: string | null
+      note: string
+      allowedActions: ("edit" | "delete" | "activate" | "dispose")[]
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    FixedAssetList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["FixedAsset"][]
+    }
+    FixedAssetFields: {
+      name: string
+      /** Format: uuid */
+      classId: string
+      /** Format: uuid */
+      locationId?: string | null
+      locationLabel?: string
+      /** Format: uuid */
+      divisionId: string
+      source: components["schemas"]["FixedAssetSource"]
+      acquisitionDate: components["schemas"]["BusinessDate"]
+      cost: components["schemas"]["Money"]
+      salvage?: components["schemas"]["Money"]
+      /** @description Kosong/0 = umur manfaat kelas. */
+      usefulLifeMonths?: number
+      openingAccumulated?: components["schemas"]["Money"]
+      /** Format: uuid */
+      paymentAccountId?: string | null
+      note?: string
+    }
+    FixedAssetCreate: components["schemas"]["FixedAssetFields"] & {
+      /** @example AST-VM-001 */
+      code: string
+    }
+    DepreciationLine: {
+      /** Format: uuid */
+      id: string
+      /** Format: uuid */
+      runId: string
+      /** Format: uuid */
+      assetId: string
+      assetCode: string
+      assetName: string
+      periodLabel: string
+      amount: components["schemas"]["Money"]
+      accumulated: components["schemas"]["Money"]
+      bookValue: components["schemas"]["Money"]
+      /** Format: uuid */
+      journalEntryId: string
+      journalNumber: string
+    }
+    FixedAssetDetail: {
+      asset: components["schemas"]["FixedAsset"]
+      depreciation: components["schemas"]["DepreciationLine"][]
+    }
+    FixedAssetUpdate: components["schemas"]["FixedAssetFields"] & {
+      version: number
+    }
+    FixedAssetDisposeInput: {
+      version: number
+      disposalDate: components["schemas"]["BusinessDate"]
+      proceeds: components["schemas"]["Money"]
+      /** Format: uuid */
+      disposalAccountId?: string | null
+      reason: string
+    }
+    DepreciationRun: {
+      /** Format: uuid */
+      id: string
+      /** Format: uuid */
+      periodId: string
+      year: number
+      month: number
+      periodLabel: string
+      assetCount: number
+      total: components["schemas"]["Money"]
+      runCount: number
+      /** Format: date-time */
+      lastRunAt: string
+    }
+    DepreciationRunList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["DepreciationRun"][]
+    }
+    DepreciationRunInput: {
+      year: number
+      month: number
+    }
+    DepreciationRunDetail: {
+      run: components["schemas"]["DepreciationRun"]
+      lines: components["schemas"]["DepreciationLine"][]
+    }
+    /** @enum {string} */
+    CloseStepCode:
+      | "operational_documents"
+      | "consignment_vending_reconciliation"
+      | "settlement_reconciliation"
+      | "bank_petty_cash_reconciliation"
+      | "payroll"
+      | "depreciation"
+      | "tax_recap"
+      | "inventory_review"
+      | "financial_review"
+    /**
+     * @description `pending` Belum, `done` Selesai, `skipped` Tidak Berlaku.
+     * @enum {string}
+     */
+    CloseStepStatus: "pending" | "done" | "skipped"
+    CloseCheckResult: {
+      source: string
+      ok: boolean
+      message: string
+      link?: string
+    }
+    CloseChecklistStep: {
+      stepCode: components["schemas"]["CloseStepCode"]
+      order: number
+      title: string
+      /** @description PIC default BRD 5.15. */
+      picLabel: string
+      automatic: boolean
+      status: components["schemas"]["CloseStepStatus"]
+      /** Format: uuid */
+      picUserId?: string | null
+      picUserName?: string | null
+      /** Format: uuid */
+      completedBy?: string | null
+      completedByName?: string | null
+      /** Format: date-time */
+      completedAt?: string | null
+      note: string
+      checks: components["schemas"]["CloseCheckResult"][]
+      /** @description 0 = langkah belum pernah disimpan. */
+      version: number
+    }
+    FiscalPeriodReopenRequest: {
+      /** Format: uuid */
+      id: string
+      reason: string
+      /** @enum {string} */
+      status: "pending_approval" | "approved" | "rejected"
+      /** Format: uuid */
+      requestedBy: string
+      requestedByName?: string | null
+      /** Format: date-time */
+      requestedAt: string
+      /** Format: date-time */
+      decidedAt?: string | null
+      decisionNote: string
+    }
+    CloseChecklist: {
+      period: components["schemas"]["FiscalPeriod"]
+      steps: components["schemas"]["CloseChecklistStep"][]
+      /** @description Alasan periode belum bisa ditutup. */
+      blockers: string[]
+      reopenRequests: components["schemas"]["FiscalPeriodReopenRequest"][]
+      allowedActions: ("close" | "request_reopen" | "edit_checklist")[]
+    }
+    CloseChecklistStepInput: {
+      status: components["schemas"]["CloseStepStatus"]
+      /** Format: uuid */
+      picUserId?: string | null
+      note?: string
+      version: number
+    }
+    FiscalPeriodReopenInput: {
+      version: number
+      reason: string
+    }
+    OpeningBalanceLine: {
+      /** Format: uuid */
+      id: string
+      /** Format: uuid */
+      accountId: string
+      accountCode: string
+      accountName: string
+      debit: components["schemas"]["Money"]
+      credit: components["schemas"]["Money"]
+      note: string
+    }
+    OpeningBalance: {
+      /** Format: uuid */
+      id?: string | null
+      cutoverDate?: components["schemas"]["BusinessDate"] | null
+      /**
+       * @description `draft` Draft, `posted` Diposting.
+       * @enum {string|null}
+       */
+      status?: "draft" | "posted" | null
+      /** Format: uuid */
+      journalEntryId?: string | null
+      journalNumber?: string | null
+      /** Format: date-time */
+      postedAt?: string | null
+      version?: number | null
+      lines: components["schemas"]["OpeningBalanceLine"][]
+      totalDebit: components["schemas"]["Money"]
+      totalCredit: components["schemas"]["Money"]
+      difference: components["schemas"]["Money"]
+      allowedActions: ("edit" | "post")[]
+    }
+    OpeningBalanceSetInput: {
+      cutoverDate: components["schemas"]["BusinessDate"]
+      /** @description 0 saat membuat saldo awal pertama kali. */
+      version: number
+    }
+    OpeningBalanceLineInput: {
+      /** Format: uuid */
+      accountId: string
+      debit: components["schemas"]["Money"]
+      credit: components["schemas"]["Money"]
+      note?: string
+    }
+    /**
+     * @description `receivable` piutang, `payable` utang.
+     * @enum {string}
+     */
+    OpeningItemType: "receivable" | "payable"
+    OpeningItem: {
+      /** Format: uuid */
+      id: string
+      itemType: components["schemas"]["OpeningItemType"]
+      /** @enum {string} */
+      partyType: "customer" | "partner" | "supplier"
+      /** Format: uuid */
+      partyId: string
+      partyCode: string
+      documentNumber: string
+      documentDate: components["schemas"]["BusinessDate"]
+      dueDate: components["schemas"]["BusinessDate"]
+      amount: components["schemas"]["Money"]
+      openAmount: components["schemas"]["Money"]
+      settledAmount: components["schemas"]["Money"]
+      outstanding: components["schemas"]["Money"]
+      accountCode: string
+      /** Format: uuid */
+      channelId?: string | null
+      note: string
+    }
+    OpeningItemList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["OpeningItem"][]
+      outstandingTotal: components["schemas"]["Money"]
+    }
+    CutoverReconciliationCheck: {
+      code: string
+      label: string
+      accountCode: string
+      subledger: components["schemas"]["Money"]
+      ledger: components["schemas"]["Money"]
+      difference: components["schemas"]["Money"]
+      /** @enum {string} */
+      status: "ok" | "failed" | "skipped"
+      note: string
+    }
+    CutoverReconciliation: {
+      cutoverDate?: components["schemas"]["BusinessDate"] | null
+      /**
+       * @description `posted` = saldo GL terposting s.d. cut-over; `draft` = Neraca Saldo Awal belum diposting.
+       * @enum {string|null}
+       */
+      ledgerSource?: "posted" | "draft" | null
+      checks: components["schemas"]["CutoverReconciliationCheck"][]
+      passed: boolean
     }
     DocumentSequence: {
       /** @example JV */
@@ -9500,6 +10264,13 @@ export interface components {
     }
     ExportJobInput: {
       kind: string
+      /**
+       * @description Parameter ekspor laporan (mis. `year`, `month`, `dateFrom`, `dateTo`, `accountId`, `divisionId` untuk
+       *     Neraca Saldo / Buku Besar). Jenis data master mengabaikannya.
+       */
+      params?: {
+        [key: string]: string
+      }
     }
     PurchaseOption: {
       /** Format: uuid */
@@ -15285,6 +16056,678 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["FinalTaxRun"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getTrialBalance: {
+    parameters: {
+      query: {
+        dateFrom: components["schemas"]["BusinessDate"]
+        dateTo: components["schemas"]["BusinessDate"]
+        channelId?: string
+        subChannelId?: string
+        divisionId?: string
+        campaignId?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Neraca Saldo */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["TrialBalance"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listFixedAssetClasses: {
+    parameters: {
+      query?: {
+        includeInactive?: components["parameters"]["IncludeInactive"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar kelas aset */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["FixedAssetClass"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createFixedAssetClass: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["FixedAssetClassCreate"]
+      }
+    }
+    responses: {
+      /** @description Kelas dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["FixedAssetClass"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateFixedAssetClass: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["FixedAssetClassUpdate"]
+      }
+    }
+    responses: {
+      /** @description Kelas diubah */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["FixedAssetClass"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listFixedAssets: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["FixedAssetStatus"]
+        classId?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar aset */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["FixedAssetList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createFixedAsset: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["FixedAssetCreate"]
+      }
+    }
+    responses: {
+      /** @description Aset dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["FixedAssetDetail"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getFixedAsset: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Detail aset */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["FixedAssetDetail"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateFixedAsset: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["FixedAssetUpdate"]
+      }
+    }
+    responses: {
+      /** @description Aset diubah */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["FixedAssetDetail"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  deleteFixedAsset: {
+    parameters: {
+      query: {
+        /** @description Versi terakhir yang dilihat user (optimistic locking). */
+        version: components["parameters"]["Version"]
+      }
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Aset dihapus */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  activateFixedAsset: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Aset aktif */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["FixedAssetDetail"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  disposeFixedAsset: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["FixedAssetDisposeInput"]
+      }
+    }
+    responses: {
+      /** @description Aset dilepas */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["FixedAssetDetail"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listDepreciationRuns: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar run penyusutan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DepreciationRunList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  runDepreciation: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DepreciationRunInput"]
+      }
+    }
+    responses: {
+      /** @description Hasil penyusutan periode */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DepreciationRunDetail"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getDepreciationRun: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Detail run */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DepreciationRunDetail"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getCloseChecklist: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Checklist */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CloseChecklist"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateCloseChecklistStep: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+        stepCode: components["schemas"]["CloseStepCode"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CloseChecklistStepInput"]
+      }
+    }
+    responses: {
+      /** @description Checklist terbaru */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CloseChecklist"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  closeFiscalPeriod: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Periode ditutup */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CloseChecklist"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  requestFiscalPeriodReopen: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["FiscalPeriodReopenInput"]
+      }
+    }
+    responses: {
+      /** @description Permintaan diajukan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CloseChecklist"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getOpeningBalance: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Saldo awal */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["OpeningBalance"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  saveOpeningBalanceSet: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OpeningBalanceSetInput"]
+      }
+    }
+    responses: {
+      /** @description Saldo awal */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["OpeningBalance"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  saveOpeningBalanceLine: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OpeningBalanceLineInput"]
+      }
+    }
+    responses: {
+      /** @description Saldo awal */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["OpeningBalance"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  deleteOpeningBalanceLine: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Saldo awal */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["OpeningBalance"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  postOpeningBalance: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Saldo awal diposting */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["OpeningBalance"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listOpeningItems: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        itemType?: components["schemas"]["OpeningItemType"]
+        outstandingOnly?: boolean
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar saldo terbuka */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["OpeningItemList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getCutoverReconciliation: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Hasil rekonsiliasi */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CutoverReconciliation"]
         }
       }
       default: components["responses"]["Problem"]

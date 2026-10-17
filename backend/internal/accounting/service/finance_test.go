@@ -91,19 +91,19 @@ func (f *fakeFiles) SaveExport(_ context.Context, _ string, _ uuid.UUID, name, _
 	return service.DownloadLink{FileID: uuid.New(), URL: "/files/" + name, ExpiresAt: time.Now().Add(5 * time.Minute)}, nil
 }
 
-type fakeApprovals struct {
+type finApprovals struct {
 	mu       sync.Mutex
 	subjects []service.ApprovalSubject
 }
 
-func (f *fakeApprovals) RequestApproval(_ context.Context, s service.ApprovalSubject) error {
+func (f *finApprovals) RequestApproval(_ context.Context, s service.ApprovalSubject) error {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.subjects = append(f.subjects, s)
 	return nil
 }
 
-func (f *fakeApprovals) last() service.ApprovalSubject {
+func (f *finApprovals) last() service.ApprovalSubject {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	return f.subjects[len(f.subjects)-1]
@@ -132,7 +132,7 @@ type finHarness struct {
 	*harness
 	fin       *service.Service
 	files     *fakeFiles
-	approvals *fakeApprovals
+	approvals *finApprovals
 	notifier  *fakeNotifier
 	financeID uuid.UUID
 }
@@ -154,7 +154,7 @@ func setupFinance(t *testing.T) *finHarness {
 	key := bytes.Repeat([]byte{7}, 32)
 	cipher, err := pii.New("k1", map[string][]byte{"k1": key}, bytes.Repeat([]byte{9}, 32))
 	require.NoError(t, err)
-	h := &finHarness{harness: base, files: newFakeFiles(), approvals: &fakeApprovals{}, notifier: &fakeNotifier{}, financeID: uuid.New()}
+	h := &finHarness{harness: base, files: newFakeFiles(), approvals: &finApprovals{}, notifier: &fakeNotifier{}, financeID: uuid.New()}
 	h.fin = service.New(service.Deps{
 		Store: postgres.NewStore(pool), Tx: db.NewTxManager(pool), Audit: audit.New(audit.Deps{Pool: pool}), Clock: base.clock,
 		Log: base.svc.Log, Numberer: numberer{docs: document.New(document.Deps{Pool: pool, Clock: base.clock})},

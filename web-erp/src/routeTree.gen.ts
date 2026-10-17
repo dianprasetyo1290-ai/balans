@@ -19,11 +19,15 @@ import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppApprovalsRouteImport } from './routes/_app/approvals'
 import { Route as AppFinanceAccountsRouteImport } from './routes/_app/finance/accounts'
 import { Route as AppFinanceCashBankRouteImport } from './routes/_app/finance/cash-bank'
+import { Route as AppFinanceDepreciationRouteImport } from './routes/_app/finance/depreciation'
 import { Route as AppFinanceFiscalPeriodsRouteImport } from './routes/_app/finance/fiscal-periods'
 import { Route as AppFinanceGeneralLedgerRouteImport } from './routes/_app/finance/general-ledger'
 import { Route as AppFinanceGoodsReceivedNotInvoicedRouteImport } from './routes/_app/finance/goods-received-not-invoiced'
+import { Route as AppFinanceOpeningBalancesRouteImport } from './routes/_app/finance/opening-balances'
+import { Route as AppFinancePeriodCloseRouteImport } from './routes/_app/finance/period-close'
 import { Route as AppFinancePettyCashRouteImport } from './routes/_app/finance/petty-cash'
 import { Route as AppFinanceReceivablesRouteImport } from './routes/_app/finance/receivables'
+import { Route as AppFinanceReportsRouteImport } from './routes/_app/finance/reports'
 import { Route as AppFinanceTaxesRouteImport } from './routes/_app/finance/taxes'
 import { Route as AppHrisEmployeesRouteImport } from './routes/_app/hris/employees'
 import { Route as AppIntegrationsDataExchangeRouteImport } from './routes/_app/integrations/data-exchange'
@@ -65,6 +69,8 @@ import { Route as AppFinanceBankReconciliationIndexRouteImport } from './routes/
 import { Route as AppFinanceBankReconciliationIdRouteImport } from './routes/_app/finance/bank-reconciliation/$id'
 import { Route as AppFinanceExpenseClaimsIndexRouteImport } from './routes/_app/finance/expense-claims/index'
 import { Route as AppFinanceExpenseClaimsNewRouteImport } from './routes/_app/finance/expense-claims/new'
+import { Route as AppFinanceFixedAssetsIndexRouteImport } from './routes/_app/finance/fixed-assets/index'
+import { Route as AppFinanceFixedAssetsIdRouteImport } from './routes/_app/finance/fixed-assets/$id'
 import { Route as AppFinanceJournalsIndexRouteImport } from './routes/_app/finance/journals/index'
 import { Route as AppFinanceJournalsNewRouteImport } from './routes/_app/finance/journals/new'
 import { Route as AppInventoryDisposalsIndexRouteImport } from './routes/_app/inventory/disposals/index'
@@ -185,6 +191,11 @@ const AppFinanceCashBankRoute = AppFinanceCashBankRouteImport.update({
   path: '/finance/cash-bank',
   getParentRoute: () => AppRoute,
 } as any)
+const AppFinanceDepreciationRoute = AppFinanceDepreciationRouteImport.update({
+  id: '/finance/depreciation',
+  path: '/finance/depreciation',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppFinanceFiscalPeriodsRoute = AppFinanceFiscalPeriodsRouteImport.update({
   id: '/finance/fiscal-periods',
   path: '/finance/fiscal-periods',
@@ -201,6 +212,17 @@ const AppFinanceGoodsReceivedNotInvoicedRoute =
     path: '/finance/goods-received-not-invoiced',
     getParentRoute: () => AppRoute,
   } as any)
+const AppFinanceOpeningBalancesRoute =
+  AppFinanceOpeningBalancesRouteImport.update({
+    id: '/finance/opening-balances',
+    path: '/finance/opening-balances',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppFinancePeriodCloseRoute = AppFinancePeriodCloseRouteImport.update({
+  id: '/finance/period-close',
+  path: '/finance/period-close',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppFinancePettyCashRoute = AppFinancePettyCashRouteImport.update({
   id: '/finance/petty-cash',
   path: '/finance/petty-cash',
@@ -209,6 +231,11 @@ const AppFinancePettyCashRoute = AppFinancePettyCashRouteImport.update({
 const AppFinanceReceivablesRoute = AppFinanceReceivablesRouteImport.update({
   id: '/finance/receivables',
   path: '/finance/receivables',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFinanceReportsRoute = AppFinanceReportsRouteImport.update({
+  id: '/finance/reports',
+  path: '/finance/reports',
   getParentRoute: () => AppRoute,
 } as any)
 const AppFinanceTaxesRoute = AppFinanceTaxesRouteImport.update({
@@ -430,6 +457,17 @@ const AppFinanceExpenseClaimsNewRoute =
     path: '/finance/expense-claims/new',
     getParentRoute: () => AppRoute,
   } as any)
+const AppFinanceFixedAssetsIndexRoute =
+  AppFinanceFixedAssetsIndexRouteImport.update({
+    id: '/finance/fixed-assets/',
+    path: '/finance/fixed-assets/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppFinanceFixedAssetsIdRoute = AppFinanceFixedAssetsIdRouteImport.update({
+  id: '/finance/fixed-assets/$id',
+  path: '/finance/fixed-assets/$id',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppFinanceJournalsIndexRoute = AppFinanceJournalsIndexRouteImport.update({
   id: '/finance/journals/',
   path: '/finance/journals/',
@@ -849,11 +887,15 @@ export interface FileRoutesByFullPath {
   '/approvals': typeof AppApprovalsRoute
   '/finance/accounts': typeof AppFinanceAccountsRoute
   '/finance/cash-bank': typeof AppFinanceCashBankRoute
+  '/finance/depreciation': typeof AppFinanceDepreciationRoute
   '/finance/fiscal-periods': typeof AppFinanceFiscalPeriodsRoute
   '/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
   '/finance/goods-received-not-invoiced': typeof AppFinanceGoodsReceivedNotInvoicedRoute
+  '/finance/opening-balances': typeof AppFinanceOpeningBalancesRoute
+  '/finance/period-close': typeof AppFinancePeriodCloseRoute
   '/finance/petty-cash': typeof AppFinancePettyCashRoute
   '/finance/receivables': typeof AppFinanceReceivablesRoute
+  '/finance/reports': typeof AppFinanceReportsRoute
   '/finance/taxes': typeof AppFinanceTaxesRoute
   '/hris/employees': typeof AppHrisEmployeesRoute
   '/integrations/data-exchange': typeof AppIntegrationsDataExchangeRoute
@@ -893,6 +935,7 @@ export interface FileRoutesByFullPath {
   '/warehouse/returns': typeof AppWarehouseReturnsRoute
   '/finance/bank-reconciliation/$id': typeof AppFinanceBankReconciliationIdRoute
   '/finance/expense-claims/new': typeof AppFinanceExpenseClaimsNewRoute
+  '/finance/fixed-assets/$id': typeof AppFinanceFixedAssetsIdRoute
   '/finance/journals/new': typeof AppFinanceJournalsNewRoute
   '/inventory/disposals/new': typeof AppInventoryDisposalsNewRoute
   '/inventory/internal-usages/new': typeof AppInventoryInternalUsagesNewRoute
@@ -914,6 +957,7 @@ export interface FileRoutesByFullPath {
   '/warehouse/stock-transfers/$id': typeof AppWarehouseStockTransfersIdRoute
   '/finance/bank-reconciliation/': typeof AppFinanceBankReconciliationIndexRoute
   '/finance/expense-claims/': typeof AppFinanceExpenseClaimsIndexRoute
+  '/finance/fixed-assets/': typeof AppFinanceFixedAssetsIndexRoute
   '/finance/journals/': typeof AppFinanceJournalsIndexRoute
   '/inventory/disposals/': typeof AppInventoryDisposalsIndexRoute
   '/inventory/internal-usages/': typeof AppInventoryInternalUsagesIndexRoute
@@ -976,11 +1020,15 @@ export interface FileRoutesByTo {
   '/': typeof AppIndexRoute
   '/finance/accounts': typeof AppFinanceAccountsRoute
   '/finance/cash-bank': typeof AppFinanceCashBankRoute
+  '/finance/depreciation': typeof AppFinanceDepreciationRoute
   '/finance/fiscal-periods': typeof AppFinanceFiscalPeriodsRoute
   '/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
   '/finance/goods-received-not-invoiced': typeof AppFinanceGoodsReceivedNotInvoicedRoute
+  '/finance/opening-balances': typeof AppFinanceOpeningBalancesRoute
+  '/finance/period-close': typeof AppFinancePeriodCloseRoute
   '/finance/petty-cash': typeof AppFinancePettyCashRoute
   '/finance/receivables': typeof AppFinanceReceivablesRoute
+  '/finance/reports': typeof AppFinanceReportsRoute
   '/finance/taxes': typeof AppFinanceTaxesRoute
   '/hris/employees': typeof AppHrisEmployeesRoute
   '/integrations/data-exchange': typeof AppIntegrationsDataExchangeRoute
@@ -1020,6 +1068,7 @@ export interface FileRoutesByTo {
   '/warehouse/returns': typeof AppWarehouseReturnsRoute
   '/finance/bank-reconciliation/$id': typeof AppFinanceBankReconciliationIdRoute
   '/finance/expense-claims/new': typeof AppFinanceExpenseClaimsNewRoute
+  '/finance/fixed-assets/$id': typeof AppFinanceFixedAssetsIdRoute
   '/finance/journals/new': typeof AppFinanceJournalsNewRoute
   '/inventory/disposals/new': typeof AppInventoryDisposalsNewRoute
   '/inventory/internal-usages/new': typeof AppInventoryInternalUsagesNewRoute
@@ -1041,6 +1090,7 @@ export interface FileRoutesByTo {
   '/warehouse/stock-transfers/$id': typeof AppWarehouseStockTransfersIdRoute
   '/finance/bank-reconciliation': typeof AppFinanceBankReconciliationIndexRoute
   '/finance/expense-claims': typeof AppFinanceExpenseClaimsIndexRoute
+  '/finance/fixed-assets': typeof AppFinanceFixedAssetsIndexRoute
   '/finance/journals': typeof AppFinanceJournalsIndexRoute
   '/inventory/disposals': typeof AppInventoryDisposalsIndexRoute
   '/inventory/internal-usages': typeof AppInventoryInternalUsagesIndexRoute
@@ -1105,11 +1155,15 @@ export interface FileRoutesById {
   '/_app/': typeof AppIndexRoute
   '/_app/finance/accounts': typeof AppFinanceAccountsRoute
   '/_app/finance/cash-bank': typeof AppFinanceCashBankRoute
+  '/_app/finance/depreciation': typeof AppFinanceDepreciationRoute
   '/_app/finance/fiscal-periods': typeof AppFinanceFiscalPeriodsRoute
   '/_app/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
   '/_app/finance/goods-received-not-invoiced': typeof AppFinanceGoodsReceivedNotInvoicedRoute
+  '/_app/finance/opening-balances': typeof AppFinanceOpeningBalancesRoute
+  '/_app/finance/period-close': typeof AppFinancePeriodCloseRoute
   '/_app/finance/petty-cash': typeof AppFinancePettyCashRoute
   '/_app/finance/receivables': typeof AppFinanceReceivablesRoute
+  '/_app/finance/reports': typeof AppFinanceReportsRoute
   '/_app/finance/taxes': typeof AppFinanceTaxesRoute
   '/_app/hris/employees': typeof AppHrisEmployeesRoute
   '/_app/integrations/data-exchange': typeof AppIntegrationsDataExchangeRoute
@@ -1149,6 +1203,7 @@ export interface FileRoutesById {
   '/_app/warehouse/returns': typeof AppWarehouseReturnsRoute
   '/_app/finance/bank-reconciliation/$id': typeof AppFinanceBankReconciliationIdRoute
   '/_app/finance/expense-claims/new': typeof AppFinanceExpenseClaimsNewRoute
+  '/_app/finance/fixed-assets/$id': typeof AppFinanceFixedAssetsIdRoute
   '/_app/finance/journals/new': typeof AppFinanceJournalsNewRoute
   '/_app/inventory/disposals/new': typeof AppInventoryDisposalsNewRoute
   '/_app/inventory/internal-usages/new': typeof AppInventoryInternalUsagesNewRoute
@@ -1170,6 +1225,7 @@ export interface FileRoutesById {
   '/_app/warehouse/stock-transfers/$id': typeof AppWarehouseStockTransfersIdRoute
   '/_app/finance/bank-reconciliation/': typeof AppFinanceBankReconciliationIndexRoute
   '/_app/finance/expense-claims/': typeof AppFinanceExpenseClaimsIndexRoute
+  '/_app/finance/fixed-assets/': typeof AppFinanceFixedAssetsIndexRoute
   '/_app/finance/journals/': typeof AppFinanceJournalsIndexRoute
   '/_app/inventory/disposals/': typeof AppInventoryDisposalsIndexRoute
   '/_app/inventory/internal-usages/': typeof AppInventoryInternalUsagesIndexRoute
@@ -1234,11 +1290,15 @@ export interface FileRouteTypes {
     | '/approvals'
     | '/finance/accounts'
     | '/finance/cash-bank'
+    | '/finance/depreciation'
     | '/finance/fiscal-periods'
     | '/finance/general-ledger'
     | '/finance/goods-received-not-invoiced'
+    | '/finance/opening-balances'
+    | '/finance/period-close'
     | '/finance/petty-cash'
     | '/finance/receivables'
+    | '/finance/reports'
     | '/finance/taxes'
     | '/hris/employees'
     | '/integrations/data-exchange'
@@ -1278,6 +1338,7 @@ export interface FileRouteTypes {
     | '/warehouse/returns'
     | '/finance/bank-reconciliation/$id'
     | '/finance/expense-claims/new'
+    | '/finance/fixed-assets/$id'
     | '/finance/journals/new'
     | '/inventory/disposals/new'
     | '/inventory/internal-usages/new'
@@ -1299,6 +1360,7 @@ export interface FileRouteTypes {
     | '/warehouse/stock-transfers/$id'
     | '/finance/bank-reconciliation/'
     | '/finance/expense-claims/'
+    | '/finance/fixed-assets/'
     | '/finance/journals/'
     | '/inventory/disposals/'
     | '/inventory/internal-usages/'
@@ -1361,11 +1423,15 @@ export interface FileRouteTypes {
     | '/'
     | '/finance/accounts'
     | '/finance/cash-bank'
+    | '/finance/depreciation'
     | '/finance/fiscal-periods'
     | '/finance/general-ledger'
     | '/finance/goods-received-not-invoiced'
+    | '/finance/opening-balances'
+    | '/finance/period-close'
     | '/finance/petty-cash'
     | '/finance/receivables'
+    | '/finance/reports'
     | '/finance/taxes'
     | '/hris/employees'
     | '/integrations/data-exchange'
@@ -1405,6 +1471,7 @@ export interface FileRouteTypes {
     | '/warehouse/returns'
     | '/finance/bank-reconciliation/$id'
     | '/finance/expense-claims/new'
+    | '/finance/fixed-assets/$id'
     | '/finance/journals/new'
     | '/inventory/disposals/new'
     | '/inventory/internal-usages/new'
@@ -1426,6 +1493,7 @@ export interface FileRouteTypes {
     | '/warehouse/stock-transfers/$id'
     | '/finance/bank-reconciliation'
     | '/finance/expense-claims'
+    | '/finance/fixed-assets'
     | '/finance/journals'
     | '/inventory/disposals'
     | '/inventory/internal-usages'
@@ -1489,11 +1557,15 @@ export interface FileRouteTypes {
     | '/_app/'
     | '/_app/finance/accounts'
     | '/_app/finance/cash-bank'
+    | '/_app/finance/depreciation'
     | '/_app/finance/fiscal-periods'
     | '/_app/finance/general-ledger'
     | '/_app/finance/goods-received-not-invoiced'
+    | '/_app/finance/opening-balances'
+    | '/_app/finance/period-close'
     | '/_app/finance/petty-cash'
     | '/_app/finance/receivables'
+    | '/_app/finance/reports'
     | '/_app/finance/taxes'
     | '/_app/hris/employees'
     | '/_app/integrations/data-exchange'
@@ -1533,6 +1605,7 @@ export interface FileRouteTypes {
     | '/_app/warehouse/returns'
     | '/_app/finance/bank-reconciliation/$id'
     | '/_app/finance/expense-claims/new'
+    | '/_app/finance/fixed-assets/$id'
     | '/_app/finance/journals/new'
     | '/_app/inventory/disposals/new'
     | '/_app/inventory/internal-usages/new'
@@ -1554,6 +1627,7 @@ export interface FileRouteTypes {
     | '/_app/warehouse/stock-transfers/$id'
     | '/_app/finance/bank-reconciliation/'
     | '/_app/finance/expense-claims/'
+    | '/_app/finance/fixed-assets/'
     | '/_app/finance/journals/'
     | '/_app/inventory/disposals/'
     | '/_app/inventory/internal-usages/'
@@ -1688,6 +1762,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppFinanceCashBankRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/finance/depreciation': {
+      id: '/_app/finance/depreciation'
+      path: '/finance/depreciation'
+      fullPath: '/finance/depreciation'
+      preLoaderRoute: typeof AppFinanceDepreciationRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/finance/fiscal-periods': {
       id: '/_app/finance/fiscal-periods'
       path: '/finance/fiscal-periods'
@@ -1709,6 +1790,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppFinanceGoodsReceivedNotInvoicedRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/finance/opening-balances': {
+      id: '/_app/finance/opening-balances'
+      path: '/finance/opening-balances'
+      fullPath: '/finance/opening-balances'
+      preLoaderRoute: typeof AppFinanceOpeningBalancesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/finance/period-close': {
+      id: '/_app/finance/period-close'
+      path: '/finance/period-close'
+      fullPath: '/finance/period-close'
+      preLoaderRoute: typeof AppFinancePeriodCloseRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/finance/petty-cash': {
       id: '/_app/finance/petty-cash'
       path: '/finance/petty-cash'
@@ -1721,6 +1816,13 @@ declare module '@tanstack/react-router' {
       path: '/finance/receivables'
       fullPath: '/finance/receivables'
       preLoaderRoute: typeof AppFinanceReceivablesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/finance/reports': {
+      id: '/_app/finance/reports'
+      path: '/finance/reports'
+      fullPath: '/finance/reports'
+      preLoaderRoute: typeof AppFinanceReportsRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/finance/taxes': {
@@ -2008,6 +2110,20 @@ declare module '@tanstack/react-router' {
       path: '/finance/expense-claims/new'
       fullPath: '/finance/expense-claims/new'
       preLoaderRoute: typeof AppFinanceExpenseClaimsNewRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/finance/fixed-assets/': {
+      id: '/_app/finance/fixed-assets/'
+      path: '/finance/fixed-assets'
+      fullPath: '/finance/fixed-assets/'
+      preLoaderRoute: typeof AppFinanceFixedAssetsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/finance/fixed-assets/$id': {
+      id: '/_app/finance/fixed-assets/$id'
+      path: '/finance/fixed-assets/$id'
+      fullPath: '/finance/fixed-assets/$id'
+      preLoaderRoute: typeof AppFinanceFixedAssetsIdRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/finance/journals/': {
@@ -2508,11 +2624,15 @@ interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
   AppFinanceAccountsRoute: typeof AppFinanceAccountsRoute
   AppFinanceCashBankRoute: typeof AppFinanceCashBankRoute
+  AppFinanceDepreciationRoute: typeof AppFinanceDepreciationRoute
   AppFinanceFiscalPeriodsRoute: typeof AppFinanceFiscalPeriodsRoute
   AppFinanceGeneralLedgerRoute: typeof AppFinanceGeneralLedgerRoute
   AppFinanceGoodsReceivedNotInvoicedRoute: typeof AppFinanceGoodsReceivedNotInvoicedRoute
+  AppFinanceOpeningBalancesRoute: typeof AppFinanceOpeningBalancesRoute
+  AppFinancePeriodCloseRoute: typeof AppFinancePeriodCloseRoute
   AppFinancePettyCashRoute: typeof AppFinancePettyCashRoute
   AppFinanceReceivablesRoute: typeof AppFinanceReceivablesRoute
+  AppFinanceReportsRoute: typeof AppFinanceReportsRoute
   AppFinanceTaxesRoute: typeof AppFinanceTaxesRoute
   AppHrisEmployeesRoute: typeof AppHrisEmployeesRoute
   AppIntegrationsDataExchangeRoute: typeof AppIntegrationsDataExchangeRoute
@@ -2552,6 +2672,7 @@ interface AppRouteChildren {
   AppWarehouseReturnsRoute: typeof AppWarehouseReturnsRoute
   AppFinanceBankReconciliationIdRoute: typeof AppFinanceBankReconciliationIdRoute
   AppFinanceExpenseClaimsNewRoute: typeof AppFinanceExpenseClaimsNewRoute
+  AppFinanceFixedAssetsIdRoute: typeof AppFinanceFixedAssetsIdRoute
   AppFinanceJournalsNewRoute: typeof AppFinanceJournalsNewRoute
   AppInventoryDisposalsNewRoute: typeof AppInventoryDisposalsNewRoute
   AppInventoryInternalUsagesNewRoute: typeof AppInventoryInternalUsagesNewRoute
@@ -2573,6 +2694,7 @@ interface AppRouteChildren {
   AppWarehouseStockTransfersIdRoute: typeof AppWarehouseStockTransfersIdRoute
   AppFinanceBankReconciliationIndexRoute: typeof AppFinanceBankReconciliationIndexRoute
   AppFinanceExpenseClaimsIndexRoute: typeof AppFinanceExpenseClaimsIndexRoute
+  AppFinanceFixedAssetsIndexRoute: typeof AppFinanceFixedAssetsIndexRoute
   AppFinanceJournalsIndexRoute: typeof AppFinanceJournalsIndexRoute
   AppInventoryDisposalsIndexRoute: typeof AppInventoryDisposalsIndexRoute
   AppInventoryInternalUsagesIndexRoute: typeof AppInventoryInternalUsagesIndexRoute
@@ -2631,12 +2753,16 @@ const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
   AppFinanceAccountsRoute: AppFinanceAccountsRoute,
   AppFinanceCashBankRoute: AppFinanceCashBankRoute,
+  AppFinanceDepreciationRoute: AppFinanceDepreciationRoute,
   AppFinanceFiscalPeriodsRoute: AppFinanceFiscalPeriodsRoute,
   AppFinanceGeneralLedgerRoute: AppFinanceGeneralLedgerRoute,
   AppFinanceGoodsReceivedNotInvoicedRoute:
     AppFinanceGoodsReceivedNotInvoicedRoute,
+  AppFinanceOpeningBalancesRoute: AppFinanceOpeningBalancesRoute,
+  AppFinancePeriodCloseRoute: AppFinancePeriodCloseRoute,
   AppFinancePettyCashRoute: AppFinancePettyCashRoute,
   AppFinanceReceivablesRoute: AppFinanceReceivablesRoute,
+  AppFinanceReportsRoute: AppFinanceReportsRoute,
   AppFinanceTaxesRoute: AppFinanceTaxesRoute,
   AppHrisEmployeesRoute: AppHrisEmployeesRoute,
   AppIntegrationsDataExchangeRoute: AppIntegrationsDataExchangeRoute,
@@ -2676,6 +2802,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppWarehouseReturnsRoute: AppWarehouseReturnsRoute,
   AppFinanceBankReconciliationIdRoute: AppFinanceBankReconciliationIdRoute,
   AppFinanceExpenseClaimsNewRoute: AppFinanceExpenseClaimsNewRoute,
+  AppFinanceFixedAssetsIdRoute: AppFinanceFixedAssetsIdRoute,
   AppFinanceJournalsNewRoute: AppFinanceJournalsNewRoute,
   AppInventoryDisposalsNewRoute: AppInventoryDisposalsNewRoute,
   AppInventoryInternalUsagesNewRoute: AppInventoryInternalUsagesNewRoute,
@@ -2700,6 +2827,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppFinanceBankReconciliationIndexRoute:
     AppFinanceBankReconciliationIndexRoute,
   AppFinanceExpenseClaimsIndexRoute: AppFinanceExpenseClaimsIndexRoute,
+  AppFinanceFixedAssetsIndexRoute: AppFinanceFixedAssetsIndexRoute,
   AppFinanceJournalsIndexRoute: AppFinanceJournalsIndexRoute,
   AppInventoryDisposalsIndexRoute: AppInventoryDisposalsIndexRoute,
   AppInventoryInternalUsagesIndexRoute: AppInventoryInternalUsagesIndexRoute,

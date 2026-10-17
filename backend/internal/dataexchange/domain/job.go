@@ -127,8 +127,10 @@ const (
 
 // ExportJob adalah permintaan ekspor yang menghasilkan file xlsx di filestore.
 type ExportJob struct {
-	ID          uuid.UUID
-	Kind        string
+	ID   uuid.UUID
+	Kind string
+	// Params adalah parameter ekspor laporan (periode, akun, dimensi); kosong untuk master data.
+	Params      map[string]string
 	Status      ExportStatus
 	TotalRows   int
 	FileID      *uuid.UUID
@@ -149,13 +151,23 @@ type Spec struct {
 	// Sheet adalah nama sheet data di template (mis. `Produk`).
 	Sheet   string
 	Columns []tabular.Column
+	// Resource adalah resource permission bila berbeda dari Kind, mis. `dataexchange.transaction` untuk jenis
+	// data transaksi (saldo awal, jurnal, laporan); kosong = Kind.
+	Resource string
 }
 
-// ImportPermission adalah `<kind>.import`.
-func (s Spec) ImportPermission() string { return s.Kind + ".import" }
+func (s Spec) resource() string {
+	if s.Resource != "" {
+		return s.Resource
+	}
+	return s.Kind
+}
 
-// ExportPermission adalah `<kind>.export`.
-func (s Spec) ExportPermission() string { return s.Kind + ".export" }
+// ImportPermission adalah `<resource>.import`.
+func (s Spec) ImportPermission() string { return s.resource() + ".import" }
+
+// ExportPermission adalah `<resource>.export`.
+func (s Spec) ExportPermission() string { return s.resource() + ".export" }
 
 // FileName adalah nama file template/ekspor, mis. `Produk.xlsx`.
 func (s Spec) FileName(prefix string) string { return prefix + " " + s.Label + ".xlsx" }

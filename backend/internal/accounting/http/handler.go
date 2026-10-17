@@ -664,7 +664,7 @@ func (h *AccountingHandler) GetGeneralLedger(ctx context.Context, req GetGeneral
 	for i, line := range l.Lines {
 		items[i] = GeneralLedgerLine{
 			EntryId: line.EntryID, Number: optStr(line.Number), BusinessDate: toDate(line.BusinessDate),
-			EntryType: JournalEntryType(line.EntryType), SourceType: line.SourceType, SourceLabel: line.SourceLabel,
+			EntryType: JournalEntryType(line.EntryType), SourceType: line.SourceType, SourceId: line.SourceID, SourceLabel: line.SourceLabel,
 			Description: line.Description, LineNo: line.LineNo, Debit: line.Debit.String(), Credit: line.Credit.String(),
 			Balance: line.Balance.String(), Memo: line.Memo, Channel: refs.ref(line.Dimensions.ChannelID),
 			SubChannel: refs.ref(line.Dimensions.SubChannelID), Division: refs.ref(line.Dimensions.DivisionID),

@@ -17,5 +17,5 @@ SELECT * FROM fiscal_periods WHERE year = sqlc.arg('year') AND month = sqlc.arg(
 
 -- name: ClosedPeriodAfterExists :one
 SELECT EXISTS (
-    SELECT 1 FROM fiscal_periods WHERE status = 'closed' AND (year * 12 + month - 1) > sqlc.arg('period_index')::integer
+    SELECT 1 FROM fiscal_periods WHERE status <> 'open' AND (year * 12 + month - 1) > sqlc.arg('period_index')::integer
 )::boolean;

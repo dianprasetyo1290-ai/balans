@@ -31,7 +31,7 @@ tags:
   - name: inventory
     description: Ledger stok, batch, HPP FIFO, saran FEFO (R1.2)
   - name: accounting
-    description: COA, dimensi, jenis biaya, periode, posting rule, Jurnal Umum, Buku Besar (R1.1)
+    description: COA, dimensi, jenis biaya, periode, posting rule, Jurnal Umum, Buku Besar (R1.1); aset tetap, Neraca Saldo, tutup buku, saldo awal (R1.4)
   - name: document
     description: Penomoran dokumen (R1.1)
   - name: party
@@ -321,6 +321,44 @@ paths:
     $ref: "./paths/accounting_finance.yaml#/finalTaxSettings"
   /api/v1/final-tax/runs:
     $ref: "./paths/accounting_finance.yaml#/finalTaxRuns"
+  /api/v1/trial-balance:
+    $ref: "./paths/accounting_close.yaml#/trialBalance"
+  /api/v1/fixed-asset-classes:
+    $ref: "./paths/accounting_close.yaml#/fixedAssetClasses"
+  /api/v1/fixed-asset-classes/{id}:
+    $ref: "./paths/accounting_close.yaml#/fixedAssetClass"
+  /api/v1/fixed-assets:
+    $ref: "./paths/accounting_close.yaml#/fixedAssets"
+  /api/v1/fixed-assets/{id}:
+    $ref: "./paths/accounting_close.yaml#/fixedAsset"
+  /api/v1/fixed-assets/{id}/activate:
+    $ref: "./paths/accounting_close.yaml#/fixedAssetActivate"
+  /api/v1/fixed-assets/{id}/dispose:
+    $ref: "./paths/accounting_close.yaml#/fixedAssetDispose"
+  /api/v1/depreciation-runs:
+    $ref: "./paths/accounting_close.yaml#/depreciationRuns"
+  /api/v1/depreciation-runs/{id}:
+    $ref: "./paths/accounting_close.yaml#/depreciationRun"
+  /api/v1/fiscal-periods/{id}/close-checklist:
+    $ref: "./paths/accounting_close.yaml#/closeChecklist"
+  /api/v1/fiscal-periods/{id}/close-checklist/{stepCode}:
+    $ref: "./paths/accounting_close.yaml#/closeChecklistStep"
+  /api/v1/fiscal-periods/{id}/close:
+    $ref: "./paths/accounting_close.yaml#/fiscalPeriodClose"
+  /api/v1/fiscal-periods/{id}/reopen:
+    $ref: "./paths/accounting_close.yaml#/fiscalPeriodReopen"
+  /api/v1/opening-balance:
+    $ref: "./paths/accounting_close.yaml#/openingBalance"
+  /api/v1/opening-balance/lines:
+    $ref: "./paths/accounting_close.yaml#/openingBalanceLines"
+  /api/v1/opening-balance/lines/{id}:
+    $ref: "./paths/accounting_close.yaml#/openingBalanceLine"
+  /api/v1/opening-balance/post:
+    $ref: "./paths/accounting_close.yaml#/openingBalancePost"
+  /api/v1/opening-items:
+    $ref: "./paths/accounting_close.yaml#/openingItems"
+  /api/v1/cutover-reconciliation:
+    $ref: "./paths/accounting_close.yaml#/cutoverReconciliation"
   /api/v1/document-sequences:
     $ref: "./paths/document.yaml#/documentSequences"
   /api/v1/locations/{id}:

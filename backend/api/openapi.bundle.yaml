@@ -31,7 +31,7 @@ tags:
   - name: inventory
     description: Ledger stok, batch, HPP FIFO, saran FEFO (R1.2)
   - name: accounting
-    description: COA, dimensi, jenis biaya, periode, posting rule, Jurnal Umum, Buku Besar (R1.1)
+    description: COA, dimensi, jenis biaya, periode, posting rule, Jurnal Umum, Buku Besar (R1.1); aset tetap, Neraca Saldo, tutup buku, saldo awal (R1.4)
   - name: document
     description: Penomoran dokumen (R1.1)
   - name: party
@@ -4353,6 +4353,592 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FinalTaxRun'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/trial-balance:
+    get:
+      operationId: getTrialBalance
+      tags:
+        - accounting
+      summary: Neraca Saldo per rentang & dimensi (ACC-18)
+      description: |
+        Hanya jurnal terposting. Saldo awal = sebelum `dateFrom`. Butuh `accounting.report.read` atau
+        `accounting.journal.read`. Drill-down ke Buku Besar per akun dengan filter yang sama.
+      parameters:
+        - name: dateFrom
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+        - name: dateTo
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+        - name: channelId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: subChannelId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: divisionId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: campaignId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Neraca Saldo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrialBalance'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/fixed-asset-classes:
+    get:
+      operationId: listFixedAssetClasses
+      tags:
+        - accounting
+      summary: Kelas aset tetap (umur manfaat & akun A-31)
+      description: Permission `accounting.fixed_asset.read`.
+      parameters:
+        - $ref: '#/components/parameters/IncludeInactive'
+      responses:
+        '200':
+          description: Daftar kelas aset
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FixedAssetClass'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createFixedAssetClass
+      tags:
+        - accounting
+      summary: Menambah kelas aset
+      description: Permission `accounting.fixed_asset.write`. Akun aset bersaldo debit, akun akumulasi bersaldo kredit (1xxx).
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FixedAssetClassCreate'
+      responses:
+        '201':
+          description: Kelas dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FixedAssetClass'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/fixed-asset-classes/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    put:
+      operationId: updateFixedAssetClass
+      tags:
+        - accounting
+      summary: Mengubah kelas aset
+      description: Umur manfaat baru dipakai aset yang dibuat setelahnya.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FixedAssetClassUpdate'
+      responses:
+        '200':
+          description: Kelas diubah
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FixedAssetClass'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/fixed-assets:
+    get:
+      operationId: listFixedAssets
+      tags:
+        - accounting
+      summary: Register Aset Tetap (ACC-21)
+      description: Permission `accounting.fixed_asset.read` atau `accounting.report.read`.
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Search'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/FixedAssetStatus'
+        - name: classId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Daftar aset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FixedAssetList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createFixedAsset
+      tags:
+        - accounting
+      summary: Menambah aset tetap (Draft)
+      description: |
+        Aset pembelian (`purchase`) wajib akun pembayaran dan dijurnal A-31 saat diaktifkan. Aset saldo awal
+        (`opening`) membutuhkan tanggal cut-over di Saldo Awal; nilainya masuk GL lewat A-36.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FixedAssetCreate'
+      responses:
+        '201':
+          description: Aset dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FixedAssetDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/fixed-assets/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      operationId: getFixedAsset
+      tags:
+        - accounting
+      summary: Detail aset beserta riwayat penyusutan
+      responses:
+        '200':
+          description: Detail aset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FixedAssetDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      operationId: updateFixedAsset
+      tags:
+        - accounting
+      summary: Mengubah aset Draft
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FixedAssetUpdate'
+      responses:
+        '200':
+          description: Aset diubah
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FixedAssetDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+    delete:
+      operationId: deleteFixedAsset
+      tags:
+        - accounting
+      summary: Menghapus aset Draft
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/Version'
+      responses:
+        '204':
+          description: Aset dihapus
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/fixed-assets/{id}/activate:
+    post:
+      operationId: activateFixedAsset
+      tags:
+        - accounting
+      summary: Mengaktifkan aset (jurnal A-31 perolehan untuk aset pembelian)
+      description: Permission `accounting.fixed_asset.post`. Tanggal perolehan harus di periode terbuka (`PERIOD_LOCKED`).
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Aset aktif
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FixedAssetDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/fixed-assets/{id}/dispose:
+    post:
+      operationId: disposeFixedAsset
+      tags:
+        - accounting
+      summary: Melepas aset (dijual/dihapusbukukan, jurnal A-31 pelepasan)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FixedAssetDisposeInput'
+      responses:
+        '200':
+          description: Aset dilepas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FixedAssetDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/depreciation-runs:
+    get:
+      operationId: listDepreciationRuns
+      tags:
+        - accounting
+      summary: Riwayat penyusutan per periode
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Daftar run penyusutan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepreciationRunList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: runDepreciation
+      tags:
+        - accounting
+      summary: Menjalankan penyusutan satu periode (A-31)
+      description: |
+        Sama dengan job `accounting.depreciate` (tanggal 1 pukul 01.00 WIB untuk bulan sebelumnya). Idempotent per
+        aset per periode; periode harus terbuka. Permission `accounting.fixed_asset.post`.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepreciationRunInput'
+      responses:
+        '200':
+          description: Hasil penyusutan periode
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepreciationRunDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/depreciation-runs/{id}:
+    get:
+      operationId: getDepreciationRun
+      tags:
+        - accounting
+      summary: Detail penyusutan per aset satu periode
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Detail run
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepreciationRunDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/fiscal-periods/{id}/close-checklist:
+    get:
+      operationId: getCloseChecklist
+      tags:
+        - accounting
+      summary: Checklist Tutup Buku 9 langkah satu periode (BRD 5.15)
+      description: Termasuk hasil pemeriksaan otomatis, hal yang menahan tutup periode, dan riwayat buka kembali.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Checklist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CloseChecklist'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/fiscal-periods/{id}/close-checklist/{stepCode}:
+    put:
+      operationId: updateCloseChecklistStep
+      tags:
+        - accounting
+      summary: Mengubah status, PIC, atau catatan satu langkah
+      description: |
+        Permission `accounting.fiscal_period.write` atau `.post`. Selesai butuh pemeriksaan otomatis lolos; Tidak Berlaku
+        wajib catatan; langkah 9 selesai saat Tutup Periode.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - name: stepCode
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/CloseStepCode'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CloseChecklistStepInput'
+      responses:
+        '200':
+          description: Checklist terbaru
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CloseChecklist'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/fiscal-periods/{id}/close:
+    post:
+      operationId: closeFiscalPeriod
+      tags:
+        - accounting
+      summary: Tutup Periode (★ re-autentikasi)
+      description: |
+        Permission `accounting.fiscal_period.post` dan re-autentikasi 5 menit terakhir (`AUTH_REAUTH_REQUIRED`).
+        Advisory lock per periode; periode sebelumnya harus Ditutup; langkah 1–8 selesai; neraca saldo balance.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Periode ditutup
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CloseChecklist'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/fiscal-periods/{id}/reopen:
+    post:
+      operationId: requestFiscalPeriodReopen
+      tags:
+        - accounting
+      summary: Ajukan Buka Kembali periode (★ re-autentikasi, approval Head F&A → Direksi)
+      description: |
+        Permission `accounting.fiscal_period.reopen` dan re-autentikasi. Periode menjadi Menunggu Persetujuan (tetap
+        terkunci) sampai approval `fiscal_period_reopen` diputuskan.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FiscalPeriodReopenInput'
+      responses:
+        '200':
+          description: Permintaan diajukan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CloseChecklist'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/opening-balance:
+    get:
+      operationId: getOpeningBalance
+      tags:
+        - accounting
+      summary: Saldo Awal — tanggal cut-over dan Neraca Saldo Awal (A-36)
+      responses:
+        '200':
+          description: Saldo awal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpeningBalance'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      operationId: saveOpeningBalanceSet
+      tags:
+        - accounting
+      summary: Mengisi tanggal cut-over (akhir bulan)
+      description: Permission `accounting.journal.write`; hanya selama saldo awal Draft.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OpeningBalanceSetInput'
+      responses:
+        '200':
+          description: Saldo awal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpeningBalance'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/opening-balance/lines:
+    post:
+      operationId: saveOpeningBalanceLine
+      tags:
+        - accounting
+      summary: Mengisi saldo awal satu akun neraca (akun yang sama diganti)
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OpeningBalanceLineInput'
+      responses:
+        '200':
+          description: Saldo awal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpeningBalance'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/opening-balance/lines/{id}:
+    delete:
+      operationId: deleteOpeningBalanceLine
+      tags:
+        - accounting
+      summary: Menghapus saldo awal satu akun
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Saldo awal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpeningBalance'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/opening-balance/post:
+    post:
+      operationId: postOpeningBalance
+      tags:
+        - accounting
+      summary: Memposting saldo awal sebagai jurnal A-36 (selisih ke 3901)
+      description: Permission `accounting.journal.post`. Tanggal cut-over harus di periode terbuka.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Saldo awal diposting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpeningBalance'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/opening-items:
+    get:
+      operationId: listOpeningItems
+      tags:
+        - accounting
+      summary: Piutang & utang terbuka saldo awal per dokumen lama
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Search'
+        - name: itemType
+          in: query
+          schema:
+            $ref: '#/components/schemas/OpeningItemType'
+        - name: outstandingOnly
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Daftar saldo terbuka
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpeningItemList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/cutover-reconciliation:
+    get:
+      operationId: getCutoverReconciliation
+      tags:
+        - accounting
+      summary: Pengecekan rekonsiliasi cut-over (sub-ledger vs GL)
+      description: |
+        Neraca saldo awal balance, nilai persediaan per akun, piutang/utang terbuka, harga perolehan & akumulasi aset
+        tetap (Panduan Migrasi Data bagian 4). Sebelum saldo awal diposting, GL diambil dari Neraca Saldo Awal.
+      responses:
+        '200':
+          description: Hasil rekonsiliasi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CutoverReconciliation'
         default:
           $ref: '#/components/responses/Problem'
   /api/v1/document-sequences:
@@ -12035,9 +12621,11 @@ components:
         - $ref: '#/components/schemas/VersionInput'
     FiscalPeriodStatus:
       type: string
+      description: '`open` Terbuka, `closed` Ditutup, `pending_approval` Menunggu Persetujuan buka kembali (tetap terkunci).'
       enum:
         - open
         - closed
+        - pending_approval
     FiscalPeriod:
       type: object
       required:
@@ -12386,6 +12974,7 @@ components:
         - businessDate
         - entryType
         - sourceType
+        - sourceId
         - sourceLabel
         - description
         - lineNo
@@ -12406,6 +12995,9 @@ components:
           $ref: '#/components/schemas/JournalEntryType'
         sourceType:
           type: string
+        sourceId:
+          type: string
+          format: uuid
         sourceLabel:
           type: string
         description:
@@ -14306,6 +14898,944 @@ components:
           type: integer
           minimum: 1
           maximum: 12
+    TrialBalanceRow:
+      type: object
+      required:
+        - accountId
+        - accountCode
+        - accountName
+        - group
+        - groupLabel
+        - normalBalance
+        - openingDebit
+        - openingCredit
+        - periodDebit
+        - periodCredit
+        - closingDebit
+        - closingCredit
+      properties:
+        accountId:
+          type: string
+          format: uuid
+        accountCode:
+          type: string
+        accountName:
+          type: string
+        group:
+          type: integer
+        groupLabel:
+          type: string
+        normalBalance:
+          $ref: '#/components/schemas/NormalBalance'
+        openingDebit:
+          $ref: '#/components/schemas/Money'
+        openingCredit:
+          $ref: '#/components/schemas/Money'
+        periodDebit:
+          $ref: '#/components/schemas/Money'
+        periodCredit:
+          $ref: '#/components/schemas/Money'
+        closingDebit:
+          $ref: '#/components/schemas/Money'
+        closingCredit:
+          $ref: '#/components/schemas/Money'
+    TrialBalanceTotals:
+      type: object
+      required:
+        - openingDebit
+        - openingCredit
+        - periodDebit
+        - periodCredit
+        - closingDebit
+        - closingCredit
+      properties:
+        openingDebit:
+          $ref: '#/components/schemas/Money'
+        openingCredit:
+          $ref: '#/components/schemas/Money'
+        periodDebit:
+          $ref: '#/components/schemas/Money'
+        periodCredit:
+          $ref: '#/components/schemas/Money'
+        closingDebit:
+          $ref: '#/components/schemas/Money'
+        closingCredit:
+          $ref: '#/components/schemas/Money'
+    TrialBalance:
+      type: object
+      required:
+        - dateFrom
+        - dateTo
+        - rows
+        - totals
+        - balanced
+      properties:
+        dateFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        dateTo:
+          $ref: '#/components/schemas/BusinessDate'
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrialBalanceRow'
+        totals:
+          $ref: '#/components/schemas/TrialBalanceTotals'
+        balanced:
+          type: boolean
+    FixedAssetClass:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - usefulLifeMonths
+        - assetAccountId
+        - assetAccountCode
+        - accumulatedAccountId
+        - accumulatedAccountCode
+        - isActive
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        usefulLifeMonths:
+          type: integer
+        assetAccountId:
+          type: string
+          format: uuid
+        assetAccountCode:
+          type: string
+        accumulatedAccountId:
+          type: string
+          format: uuid
+        accumulatedAccountCode:
+          type: string
+        isActive:
+          type: boolean
+        version:
+          type: integer
+    FixedAssetClassCreate:
+      type: object
+      required:
+        - code
+        - name
+        - usefulLifeMonths
+        - assetAccountId
+        - accumulatedAccountId
+        - isActive
+      properties:
+        code:
+          type: string
+          example: vending_machine
+        name:
+          type: string
+        usefulLifeMonths:
+          type: integer
+          minimum: 1
+          maximum: 600
+        assetAccountId:
+          type: string
+          format: uuid
+        accumulatedAccountId:
+          type: string
+          format: uuid
+        isActive:
+          type: boolean
+    FixedAssetClassUpdate:
+      type: object
+      required:
+        - name
+        - usefulLifeMonths
+        - assetAccountId
+        - accumulatedAccountId
+        - isActive
+        - version
+      properties:
+        name:
+          type: string
+        usefulLifeMonths:
+          type: integer
+          minimum: 1
+          maximum: 600
+        assetAccountId:
+          type: string
+          format: uuid
+        accumulatedAccountId:
+          type: string
+          format: uuid
+        isActive:
+          type: boolean
+        version:
+          type: integer
+    FixedAssetStatus:
+      type: string
+      description: '`draft` Draft, `active` Aktif, `disposed` Dilepas.'
+      enum:
+        - draft
+        - active
+        - disposed
+    FixedAssetSource:
+      type: string
+      description: '`purchase` pembelian setelah go-live, `opening` saldo awal migrasi.'
+      enum:
+        - purchase
+        - opening
+    FixedAsset:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - classId
+        - className
+        - locationLabel
+        - divisionId
+        - source
+        - acquisitionDate
+        - cost
+        - salvage
+        - usefulLifeMonths
+        - depreciationStart
+        - openingAccumulated
+        - openingDepreciatedMonths
+        - accumulated
+        - bookValue
+        - monthlyDepreciation
+        - status
+        - disposalReason
+        - note
+        - allowedActions
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        classId:
+          type: string
+          format: uuid
+        className:
+          type: string
+        locationId:
+          type: string
+          format: uuid
+          nullable: true
+        locationLabel:
+          type: string
+        divisionId:
+          type: string
+          format: uuid
+        source:
+          $ref: '#/components/schemas/FixedAssetSource'
+        acquisitionDate:
+          $ref: '#/components/schemas/BusinessDate'
+        cost:
+          $ref: '#/components/schemas/Money'
+        salvage:
+          $ref: '#/components/schemas/Money'
+        usefulLifeMonths:
+          type: integer
+        depreciationStart:
+          $ref: '#/components/schemas/BusinessDate'
+        openingAccumulated:
+          $ref: '#/components/schemas/Money'
+        openingDepreciatedMonths:
+          type: integer
+        accumulated:
+          $ref: '#/components/schemas/Money'
+        bookValue:
+          $ref: '#/components/schemas/Money'
+        monthlyDepreciation:
+          $ref: '#/components/schemas/Money'
+        paymentAccountId:
+          type: string
+          format: uuid
+          nullable: true
+        status:
+          $ref: '#/components/schemas/FixedAssetStatus'
+        acquisitionJournalId:
+          type: string
+          format: uuid
+          nullable: true
+        disposalDate:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
+        disposalProceeds:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          nullable: true
+        disposalAccountId:
+          type: string
+          format: uuid
+          nullable: true
+        disposalReason:
+          type: string
+        disposalJournalId:
+          type: string
+          format: uuid
+          nullable: true
+        note:
+          type: string
+        allowedActions:
+          type: array
+          items:
+            type: string
+            enum:
+              - edit
+              - delete
+              - activate
+              - dispose
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    FixedAssetList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/FixedAsset'
+    FixedAssetFields:
+      type: object
+      required:
+        - name
+        - classId
+        - divisionId
+        - source
+        - acquisitionDate
+        - cost
+      properties:
+        name:
+          type: string
+        classId:
+          type: string
+          format: uuid
+        locationId:
+          type: string
+          format: uuid
+          nullable: true
+        locationLabel:
+          type: string
+        divisionId:
+          type: string
+          format: uuid
+        source:
+          $ref: '#/components/schemas/FixedAssetSource'
+        acquisitionDate:
+          $ref: '#/components/schemas/BusinessDate'
+        cost:
+          $ref: '#/components/schemas/Money'
+        salvage:
+          $ref: '#/components/schemas/Money'
+        usefulLifeMonths:
+          type: integer
+          description: Kosong/0 = umur manfaat kelas.
+        openingAccumulated:
+          $ref: '#/components/schemas/Money'
+        paymentAccountId:
+          type: string
+          format: uuid
+          nullable: true
+        note:
+          type: string
+    FixedAssetCreate:
+      allOf:
+        - $ref: '#/components/schemas/FixedAssetFields'
+        - type: object
+          required:
+            - code
+          properties:
+            code:
+              type: string
+              example: AST-VM-001
+    DepreciationLine:
+      type: object
+      required:
+        - id
+        - runId
+        - assetId
+        - assetCode
+        - assetName
+        - periodLabel
+        - amount
+        - accumulated
+        - bookValue
+        - journalEntryId
+        - journalNumber
+      properties:
+        id:
+          type: string
+          format: uuid
+        runId:
+          type: string
+          format: uuid
+        assetId:
+          type: string
+          format: uuid
+        assetCode:
+          type: string
+        assetName:
+          type: string
+        periodLabel:
+          type: string
+        amount:
+          $ref: '#/components/schemas/Money'
+        accumulated:
+          $ref: '#/components/schemas/Money'
+        bookValue:
+          $ref: '#/components/schemas/Money'
+        journalEntryId:
+          type: string
+          format: uuid
+        journalNumber:
+          type: string
+    FixedAssetDetail:
+      type: object
+      required:
+        - asset
+        - depreciation
+      properties:
+        asset:
+          $ref: '#/components/schemas/FixedAsset'
+        depreciation:
+          type: array
+          items:
+            $ref: '#/components/schemas/DepreciationLine'
+    FixedAssetUpdate:
+      allOf:
+        - $ref: '#/components/schemas/FixedAssetFields'
+        - type: object
+          required:
+            - version
+          properties:
+            version:
+              type: integer
+    FixedAssetDisposeInput:
+      type: object
+      required:
+        - version
+        - disposalDate
+        - proceeds
+        - reason
+      properties:
+        version:
+          type: integer
+        disposalDate:
+          $ref: '#/components/schemas/BusinessDate'
+        proceeds:
+          $ref: '#/components/schemas/Money'
+        disposalAccountId:
+          type: string
+          format: uuid
+          nullable: true
+        reason:
+          type: string
+    DepreciationRun:
+      type: object
+      required:
+        - id
+        - periodId
+        - year
+        - month
+        - periodLabel
+        - assetCount
+        - total
+        - runCount
+        - lastRunAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        periodId:
+          type: string
+          format: uuid
+        year:
+          type: integer
+        month:
+          type: integer
+        periodLabel:
+          type: string
+        assetCount:
+          type: integer
+        total:
+          $ref: '#/components/schemas/Money'
+        runCount:
+          type: integer
+        lastRunAt:
+          type: string
+          format: date-time
+    DepreciationRunList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/DepreciationRun'
+    DepreciationRunInput:
+      type: object
+      required:
+        - year
+        - month
+      properties:
+        year:
+          type: integer
+        month:
+          type: integer
+          minimum: 1
+          maximum: 12
+    DepreciationRunDetail:
+      type: object
+      required:
+        - run
+        - lines
+      properties:
+        run:
+          $ref: '#/components/schemas/DepreciationRun'
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/DepreciationLine'
+    CloseStepCode:
+      type: string
+      enum:
+        - operational_documents
+        - consignment_vending_reconciliation
+        - settlement_reconciliation
+        - bank_petty_cash_reconciliation
+        - payroll
+        - depreciation
+        - tax_recap
+        - inventory_review
+        - financial_review
+    CloseStepStatus:
+      type: string
+      description: '`pending` Belum, `done` Selesai, `skipped` Tidak Berlaku.'
+      enum:
+        - pending
+        - done
+        - skipped
+    CloseCheckResult:
+      type: object
+      required:
+        - source
+        - ok
+        - message
+      properties:
+        source:
+          type: string
+        ok:
+          type: boolean
+        message:
+          type: string
+        link:
+          type: string
+    CloseChecklistStep:
+      type: object
+      required:
+        - stepCode
+        - order
+        - title
+        - picLabel
+        - automatic
+        - status
+        - note
+        - checks
+        - version
+      properties:
+        stepCode:
+          $ref: '#/components/schemas/CloseStepCode'
+        order:
+          type: integer
+        title:
+          type: string
+        picLabel:
+          type: string
+          description: PIC default BRD 5.15.
+        automatic:
+          type: boolean
+        status:
+          $ref: '#/components/schemas/CloseStepStatus'
+        picUserId:
+          type: string
+          format: uuid
+          nullable: true
+        picUserName:
+          type: string
+          nullable: true
+        completedBy:
+          type: string
+          format: uuid
+          nullable: true
+        completedByName:
+          type: string
+          nullable: true
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        note:
+          type: string
+        checks:
+          type: array
+          items:
+            $ref: '#/components/schemas/CloseCheckResult'
+        version:
+          type: integer
+          description: 0 = langkah belum pernah disimpan.
+    FiscalPeriodReopenRequest:
+      type: object
+      required:
+        - id
+        - reason
+        - status
+        - requestedBy
+        - requestedAt
+        - decisionNote
+      properties:
+        id:
+          type: string
+          format: uuid
+        reason:
+          type: string
+        status:
+          type: string
+          enum:
+            - pending_approval
+            - approved
+            - rejected
+        requestedBy:
+          type: string
+          format: uuid
+        requestedByName:
+          type: string
+          nullable: true
+        requestedAt:
+          type: string
+          format: date-time
+        decidedAt:
+          type: string
+          format: date-time
+          nullable: true
+        decisionNote:
+          type: string
+    CloseChecklist:
+      type: object
+      required:
+        - period
+        - steps
+        - blockers
+        - reopenRequests
+        - allowedActions
+      properties:
+        period:
+          $ref: '#/components/schemas/FiscalPeriod'
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/CloseChecklistStep'
+        blockers:
+          type: array
+          description: Alasan periode belum bisa ditutup.
+          items:
+            type: string
+        reopenRequests:
+          type: array
+          items:
+            $ref: '#/components/schemas/FiscalPeriodReopenRequest'
+        allowedActions:
+          type: array
+          items:
+            type: string
+            enum:
+              - close
+              - request_reopen
+              - edit_checklist
+    CloseChecklistStepInput:
+      type: object
+      required:
+        - status
+        - version
+      properties:
+        status:
+          $ref: '#/components/schemas/CloseStepStatus'
+        picUserId:
+          type: string
+          format: uuid
+          nullable: true
+        note:
+          type: string
+        version:
+          type: integer
+    FiscalPeriodReopenInput:
+      type: object
+      required:
+        - version
+        - reason
+      properties:
+        version:
+          type: integer
+        reason:
+          type: string
+    OpeningBalanceLine:
+      type: object
+      required:
+        - id
+        - accountId
+        - accountCode
+        - accountName
+        - debit
+        - credit
+        - note
+      properties:
+        id:
+          type: string
+          format: uuid
+        accountId:
+          type: string
+          format: uuid
+        accountCode:
+          type: string
+        accountName:
+          type: string
+        debit:
+          $ref: '#/components/schemas/Money'
+        credit:
+          $ref: '#/components/schemas/Money'
+        note:
+          type: string
+    OpeningBalance:
+      type: object
+      required:
+        - lines
+        - totalDebit
+        - totalCredit
+        - difference
+        - allowedActions
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: true
+        cutoverDate:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
+        status:
+          type: string
+          description: '`draft` Draft, `posted` Diposting.'
+          enum:
+            - draft
+            - posted
+          nullable: true
+        journalEntryId:
+          type: string
+          format: uuid
+          nullable: true
+        journalNumber:
+          type: string
+          nullable: true
+        postedAt:
+          type: string
+          format: date-time
+          nullable: true
+        version:
+          type: integer
+          nullable: true
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/OpeningBalanceLine'
+        totalDebit:
+          $ref: '#/components/schemas/Money'
+        totalCredit:
+          $ref: '#/components/schemas/Money'
+        difference:
+          $ref: '#/components/schemas/Money'
+        allowedActions:
+          type: array
+          items:
+            type: string
+            enum:
+              - edit
+              - post
+    OpeningBalanceSetInput:
+      type: object
+      required:
+        - cutoverDate
+        - version
+      properties:
+        cutoverDate:
+          $ref: '#/components/schemas/BusinessDate'
+        version:
+          type: integer
+          description: 0 saat membuat saldo awal pertama kali.
+    OpeningBalanceLineInput:
+      type: object
+      required:
+        - accountId
+        - debit
+        - credit
+      properties:
+        accountId:
+          type: string
+          format: uuid
+        debit:
+          $ref: '#/components/schemas/Money'
+        credit:
+          $ref: '#/components/schemas/Money'
+        note:
+          type: string
+    OpeningItemType:
+      type: string
+      description: '`receivable` piutang, `payable` utang.'
+      enum:
+        - receivable
+        - payable
+    OpeningItem:
+      type: object
+      required:
+        - id
+        - itemType
+        - partyType
+        - partyId
+        - partyCode
+        - documentNumber
+        - documentDate
+        - dueDate
+        - amount
+        - openAmount
+        - settledAmount
+        - outstanding
+        - accountCode
+        - note
+      properties:
+        id:
+          type: string
+          format: uuid
+        itemType:
+          $ref: '#/components/schemas/OpeningItemType'
+        partyType:
+          type: string
+          enum:
+            - customer
+            - partner
+            - supplier
+        partyId:
+          type: string
+          format: uuid
+        partyCode:
+          type: string
+        documentNumber:
+          type: string
+        documentDate:
+          $ref: '#/components/schemas/BusinessDate'
+        dueDate:
+          $ref: '#/components/schemas/BusinessDate'
+        amount:
+          $ref: '#/components/schemas/Money'
+        openAmount:
+          $ref: '#/components/schemas/Money'
+        settledAmount:
+          $ref: '#/components/schemas/Money'
+        outstanding:
+          $ref: '#/components/schemas/Money'
+        accountCode:
+          type: string
+        channelId:
+          type: string
+          format: uuid
+          nullable: true
+        note:
+          type: string
+    OpeningItemList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+            - outstandingTotal
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/OpeningItem'
+            outstandingTotal:
+              $ref: '#/components/schemas/Money'
+    CutoverReconciliationCheck:
+      type: object
+      required:
+        - code
+        - label
+        - accountCode
+        - subledger
+        - ledger
+        - difference
+        - status
+        - note
+      properties:
+        code:
+          type: string
+        label:
+          type: string
+        accountCode:
+          type: string
+        subledger:
+          $ref: '#/components/schemas/Money'
+        ledger:
+          $ref: '#/components/schemas/Money'
+        difference:
+          $ref: '#/components/schemas/Money'
+        status:
+          type: string
+          enum:
+            - ok
+            - failed
+            - skipped
+        note:
+          type: string
+    CutoverReconciliation:
+      type: object
+      required:
+        - checks
+        - passed
+      properties:
+        cutoverDate:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
+        ledgerSource:
+          type: string
+          description: '`posted` = saldo GL terposting s.d. cut-over; `draft` = Neraca Saldo Awal belum diposting.'
+          enum:
+            - posted
+            - draft
+          nullable: true
+        checks:
+          type: array
+          items:
+            $ref: '#/components/schemas/CutoverReconciliationCheck'
+        passed:
+          type: boolean
     DocumentSequence:
       type: object
       required:
@@ -18999,6 +20529,13 @@ components:
       properties:
         kind:
           type: string
+        params:
+          type: object
+          description: |
+            Parameter ekspor laporan (mis. `year`, `month`, `dateFrom`, `dateTo`, `accountId`, `divisionId` untuk
+            Neraca Saldo / Buku Besar). Jenis data master mengabaikannya.
+          additionalProperties:
+            type: string
     PurchaseOption:
       type: object
       required:

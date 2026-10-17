@@ -41,17 +41,16 @@ type (
 	// WithholdingRecord adalah data bukti potong.
 	WithholdingRecord = domain.WithholdingRecord
 
-	// ApprovalSubject, Approvals, DocNumberer, Files, FileContent, DownloadLink, Users, Notifier, Suppliers diisi
-	// adapter saat wiring (ConnectFinance).
-	ApprovalSubject = service.ApprovalSubject
-	Approvals       = service.Approvals
-	DocNumberer     = service.DocNumberer
-	Files           = service.Files
-	FileContent     = service.FileContent
-	DownloadLink    = service.DownloadLink
-	Users           = service.Users
-	Notifier        = service.Notifier
-	Suppliers       = service.Suppliers
+	// Approvals, DocNumberer, Files, FileContent, DownloadLink, Users, Notifier, Suppliers diisi adapter saat
+	// wiring (ConnectFinance); ApprovalSubject dideklarasikan di close.go.
+	Approvals    = service.Approvals
+	DocNumberer  = service.DocNumberer
+	Files        = service.Files
+	FileContent  = service.FileContent
+	DownloadLink = service.DownloadLink
+	Users        = service.Users
+	Notifier     = service.Notifier
+	Suppliers    = service.Suppliers
 )
 
 // Arah pembayaran, sumber kandidat bawaan, jenis pemilik file, dan permission yang dipakai wiring.

@@ -337,6 +337,33 @@ type CustomerPaymentAllocation struct {
 	Amount    decimal.Decimal
 }
 
+type DepreciationLine struct {
+	ID                uuid.UUID
+	DepreciationRunID uuid.UUID
+	FixedAssetID      uuid.UUID
+	FiscalPeriodID    uuid.UUID
+	Amount            decimal.Decimal
+	AccumulatedAmount decimal.Decimal
+	BookValueAmount   decimal.Decimal
+	JournalEntryID    uuid.UUID
+	CreatedAt         time.Time
+	CreatedBy         uuid.UUID
+}
+
+type DepreciationRun struct {
+	ID             uuid.UUID
+	FiscalPeriodID uuid.UUID
+	AssetCount     int32
+	TotalAmount    decimal.Decimal
+	RunCount       int32
+	LastRunAt      time.Time
+	CreatedAt      time.Time
+	CreatedBy      uuid.UUID
+	UpdatedAt      time.Time
+	UpdatedBy      uuid.UUID
+	Version        int32
+}
+
 type DiscountLimit struct {
 	ID                         uuid.UUID
 	RoleCode                   string
@@ -527,6 +554,7 @@ type ExportJob struct {
 	UpdatedAt   time.Time
 	UpdatedBy   uuid.UUID
 	Version     int32
+	Params      []byte
 }
 
 type FileObject struct {
@@ -587,6 +615,73 @@ type FiscalPeriod struct {
 	UpdatedAt     time.Time
 	UpdatedBy     uuid.UUID
 	Version       int32
+}
+
+type FiscalPeriodReopen struct {
+	ID             uuid.UUID
+	FiscalPeriodID uuid.UUID
+	Reason         string
+	Status         string
+	RequestedBy    uuid.UUID
+	RequestedAt    time.Time
+	DecidedBy      uuid.NullUUID
+	DecidedAt      *time.Time
+	DecisionNote   string
+	CreatedAt      time.Time
+	CreatedBy      uuid.UUID
+	UpdatedAt      time.Time
+	UpdatedBy      uuid.UUID
+	Version        int32
+}
+
+type FixedAsset struct {
+	ID                       uuid.UUID
+	Code                     string
+	Name                     string
+	ClassID                  uuid.UUID
+	LocationID               uuid.NullUUID
+	LocationLabel            string
+	DivisionID               uuid.UUID
+	AcquisitionSource        string
+	AcquisitionDate          clock.BusinessDate
+	AcquisitionCostAmount    decimal.Decimal
+	SalvageAmount            decimal.Decimal
+	UsefulLifeMonths         int32
+	DepreciationStartDate    clock.BusinessDate
+	OpeningAccumulatedAmount decimal.Decimal
+	OpeningDepreciatedMonths int32
+	AccumulatedAmount        decimal.Decimal
+	PaymentAccountID         uuid.NullUUID
+	Status                   string
+	AcquisitionJournalID     uuid.NullUUID
+	DisposalDate             pgtype.Date
+	DisposalProceedsAmount   decimal.NullDecimal
+	DisposalAccountID        uuid.NullUUID
+	DisposalReason           string
+	DisposalJournalID        uuid.NullUUID
+	Note                     string
+	CreatedAt                time.Time
+	CreatedBy                uuid.UUID
+	UpdatedAt                time.Time
+	UpdatedBy                uuid.UUID
+	Version                  int32
+	DeletedAt                *time.Time
+	DeletedBy                uuid.NullUUID
+}
+
+type FixedAssetClass struct {
+	ID                   uuid.UUID
+	Code                 string
+	Name                 string
+	UsefulLifeMonths     int32
+	AssetAccountID       uuid.UUID
+	AccumulatedAccountID uuid.UUID
+	IsActive             bool
+	CreatedAt            time.Time
+	CreatedBy            uuid.UUID
+	UpdatedAt            time.Time
+	UpdatedBy            uuid.UUID
+	Version              int32
 }
 
 type GoodsReceipt struct {
@@ -870,6 +965,13 @@ type JournalEntry struct {
 	DeletedBy       uuid.NullUUID
 }
 
+type JournalImportRef struct {
+	ImportKey      string
+	Reference      string
+	JournalEntryID uuid.UUID
+	CreatedAt      time.Time
+}
+
 type JournalLine struct {
 	ID             uuid.UUID
 	JournalEntryID uuid.UUID
@@ -958,6 +1060,68 @@ type NotificationEmail struct {
 	LastError pgtype.Text
 	CreatedAt time.Time
 	SentAt    *time.Time
+}
+
+type OpeningBalanceLine struct {
+	ID                  uuid.UUID
+	OpeningBalanceSetID uuid.UUID
+	AccountID           uuid.UUID
+	DebitAmount         decimal.Decimal
+	CreditAmount        decimal.Decimal
+	Note                string
+	CreatedAt           time.Time
+	CreatedBy           uuid.UUID
+	UpdatedAt           time.Time
+	UpdatedBy           uuid.UUID
+	Version             int32
+}
+
+type OpeningBalanceSet struct {
+	ID             uuid.UUID
+	CutoverDate    clock.BusinessDate
+	Status         string
+	JournalEntryID uuid.NullUUID
+	PostedAt       *time.Time
+	PostedBy       uuid.NullUUID
+	CreatedAt      time.Time
+	CreatedBy      uuid.UUID
+	UpdatedAt      time.Time
+	UpdatedBy      uuid.UUID
+	Version        int32
+}
+
+type OpeningItem struct {
+	ID                  uuid.UUID
+	OpeningBalanceSetID uuid.UUID
+	ItemType            string
+	PartyType           string
+	PartyID             uuid.UUID
+	PartyCode           string
+	DocumentNumber      string
+	DocumentDate        clock.BusinessDate
+	DueDate             clock.BusinessDate
+	Amount              decimal.Decimal
+	OpenAmount          decimal.Decimal
+	SettledAmount       decimal.Decimal
+	AccountID           uuid.UUID
+	ChannelID           uuid.NullUUID
+	Note                string
+	CreatedAt           time.Time
+	CreatedBy           uuid.UUID
+	UpdatedAt           time.Time
+	UpdatedBy           uuid.UUID
+	Version             int32
+}
+
+type OpeningItemSettlement struct {
+	ID            uuid.UUID
+	OpeningItemID uuid.UUID
+	SourceType    string
+	SourceID      uuid.UUID
+	BusinessDate  clock.BusinessDate
+	Amount        decimal.Decimal
+	CreatedAt     time.Time
+	CreatedBy     uuid.UUID
 }
 
 type Partner struct {
@@ -1081,6 +1245,22 @@ type Payment struct {
 	Version          int32
 	DeletedAt        *time.Time
 	DeletedBy        uuid.NullUUID
+}
+
+type PeriodCloseChecklist struct {
+	ID             uuid.UUID
+	FiscalPeriodID uuid.UUID
+	StepCode       string
+	Status         string
+	PicUserID      uuid.NullUUID
+	CompletedBy    uuid.NullUUID
+	CompletedAt    *time.Time
+	Note           string
+	CreatedAt      time.Time
+	CreatedBy      uuid.UUID
+	UpdatedAt      time.Time
+	UpdatedBy      uuid.UUID
+	Version        int32
 }
 
 type Permission struct {

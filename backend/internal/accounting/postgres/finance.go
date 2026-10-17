@@ -106,14 +106,6 @@ func mapFinanceError(err error, what string) error {
 
 func nullDate(d *clock.BusinessDate) pgtype.Date { return date(d) }
 
-func datePtr(d pgtype.Date) *clock.BusinessDate {
-	if !d.Valid {
-		return nil
-	}
-	v := clock.NewBusinessDate(d.Time.Year(), d.Time.Month(), d.Time.Day())
-	return &v
-}
-
 func strOf(t pgtype.Text) string { return t.String }
 
 func numText(s string) pgtype.Text { return pgtype.Text{String: s, Valid: s != ""} }

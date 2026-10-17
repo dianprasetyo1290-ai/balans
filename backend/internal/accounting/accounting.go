@@ -144,14 +144,17 @@ func (m *Module) RegisterRoutes(r chi.Router) { accountinghttp.Register(r, m.h, 
 // RegisterWorkers mendaftarkan worker pembuatan periode.
 func (m *Module) RegisterWorkers(w *river.Workers) {
 	river.AddWorker(w, service.NewEnsurePeriodsWorker(m.svc))
+	river.AddWorker(w, service.NewDepreciateWorker(m.svc))
 }
 
-// PeriodicJobs menjadwalkan accounting.ensure_fiscal_periods harian 00.05 WIB, juga saat worker mulai.
+// PeriodicJobs menjadwalkan accounting.ensure_fiscal_periods harian 00.05 WIB (juga saat worker mulai) dan
+// accounting.depreciate tanggal 1 pukul 01.00 WIB untuk bulan sebelumnya.
 func (m *Module) PeriodicJobs() []*river.PeriodicJob {
 	return []*river.PeriodicJob{
 		river.NewPeriodicJob(jobqueue.DailyAt{Hour: 0, Minute: 5},
 			func() (river.JobArgs, *river.InsertOpts) { return service.EnsurePeriodsArgs{}, nil },
 			&river.PeriodicJobOpts{ID: service.EnsurePeriodsArgs{}.Kind(), RunOnStart: true}),
+		depreciationPeriodicJob(),
 	}
 }
 

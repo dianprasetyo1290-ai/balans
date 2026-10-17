@@ -59,3 +59,11 @@ SELECT * FROM (
 ) t
 ORDER BY t.business_date, t.created_at, t.posting_id, t.line_no
 LIMIT sqlc.arg('row_limit') OFFSET sqlc.arg('row_offset');
+
+-- name: StockValuesAsOf :many
+-- Nilai persediaan (Σ cost_amount bertanda) per produk & lokasi s.d. tanggal (rekonsiliasi cut-over).
+SELECT product_id, location_id, coalesce(sum(qty), 0)::numeric AS qty, coalesce(sum(cost_amount), 0)::numeric AS value_amount
+FROM stock_movements
+WHERE business_date <= sqlc.arg('as_of')::date
+GROUP BY product_id, location_id
+HAVING sum(qty) <> 0 OR sum(cost_amount) <> 0;

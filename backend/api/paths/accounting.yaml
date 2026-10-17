@@ -995,7 +995,8 @@ components:
         - $ref: "../components/common.yaml#/VersionInput"
     FiscalPeriodStatus:
       type: string
-      enum: [open, closed]
+      description: "`open` Terbuka, `closed` Ditutup, `pending_approval` Menunggu Persetujuan buka kembali (tetap terkunci)."
+      enum: [open, closed, pending_approval]
     FiscalPeriod:
       type: object
       required: [id, year, month, label, status, startDate, endDate, reopenedCount, version]
@@ -1287,7 +1288,7 @@ components:
           maxLength: 400
     GeneralLedgerLine:
       type: object
-      required: [entryId, businessDate, entryType, sourceType, sourceLabel, description, lineNo, debit, credit, balance, memo]
+      required: [entryId, businessDate, entryType, sourceType, sourceId, sourceLabel, description, lineNo, debit, credit, balance, memo]
       properties:
         entryId:
           type: string
@@ -1301,6 +1302,9 @@ components:
           $ref: "#/components/schemas/JournalEntryType"
         sourceType:
           type: string
+        sourceId:
+          type: string
+          format: uuid
         sourceLabel:
           type: string
         description:
