@@ -165,4 +165,24 @@ describe("menu", () => {
       expect(new Set(labels).size, group.label).toBe(labels.length)
     }
   })
+
+  it("menampilkan master MD-13 sesuai modul dan permission", () => {
+    const labels = (modules: string[], perms: string[]) =>
+      visibleMenu(modules, [], perms).flatMap((g) =>
+        g.items.map((i) => `${g.label} › ${i.label}`)
+      )
+    const perms = ["sales.return_reason.read", "accounting.expense_type.read"]
+    expect(labels(["sales", "accounting"], perms)).toEqual(
+      expect.arrayContaining([
+        "Data Master › Alasan Retur",
+        "Data Master › Jenis Biaya",
+      ])
+    )
+    expect(labels(["accounting"], perms)).not.toContain(
+      "Data Master › Alasan Retur"
+    )
+    expect(labels(["sales", "accounting"], [])).not.toContain(
+      "Data Master › Jenis Biaya"
+    )
+  })
 })

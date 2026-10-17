@@ -55,4 +55,6 @@ SELECT
     (SELECT count(*) FROM journal_lines l WHERE l.account_id = sqlc.arg('id')::uuid)::bigint AS journal_lines,
     (SELECT count(*) FROM accounts c WHERE c.parent_id = sqlc.arg('id') AND c.deleted_at IS NULL)::bigint AS children,
     (SELECT count(*) FROM posting_rule_accounts m WHERE m.account_id = sqlc.arg('id')
-        AND (m.valid_to IS NULL OR m.valid_to > CURRENT_DATE))::bigint AS rule_mappings;
+        AND (m.valid_to IS NULL OR m.valid_to > CURRENT_DATE))::bigint AS rule_mappings,
+    (SELECT count(*) FROM expense_types e WHERE e.expense_account_id = sqlc.arg('id')
+        AND e.deleted_at IS NULL)::bigint AS expense_types;

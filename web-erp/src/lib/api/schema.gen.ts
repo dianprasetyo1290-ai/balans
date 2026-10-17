@@ -80,6 +80,49 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/v1/return-reasons": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Data Master › Alasan Retur
+     * @description Butuh `sales.return_reason.read`, `sales.sales_return.read`, atau `procurement.purchase_return.read`
+     *     (dropdown dokumen retur). Filter `appliesTo` mengembalikan alasan untuk jenis itu dan alasan `both`.
+     */
+    get: operations["listReturnReasons"]
+    put?: never
+    /**
+     * Menambah alasan retur
+     * @description Kode unik permanen.
+     */
+    post: operations["createReturnReason"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/return-reasons/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Mengubah alasan retur (kode tetap) */
+    put: operations["updateReturnReason"]
+    post?: never
+    /** Menghapus (soft delete) alasan retur */
+    delete: operations["deleteReturnReason"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/v1/webhooks/biteship": {
     parameters: {
       query?: never
@@ -1246,6 +1289,48 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/v1/expense-types": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Data Master › Jenis Biaya
+     * @description Butuh `accounting.expense_type.read` atau `accounting.expense_claim.read` (dropdown pengajuan biaya).
+     */
+    get: operations["listExpenseTypes"]
+    put?: never
+    /**
+     * Menambah jenis biaya
+     * @description Kode unik permanen; akun beban wajib akun beban (6xxx/7xxx bersaldo debit) aktif yang bisa diposting.
+     */
+    post: operations["createExpenseType"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/expense-types/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Mengubah jenis biaya (kode tetap) */
+    put: operations["updateExpenseType"]
+    post?: never
+    /** Menghapus (soft delete) jenis biaya */
+    delete: operations["deleteExpenseType"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/v1/fiscal-periods": {
     parameters: {
       query?: never
@@ -2002,6 +2087,51 @@ export interface components {
       received: boolean
       duplicate: boolean
     }
+    /** @enum {string} */
+    ReturnReasonScope: "sales_return" | "purchase_return"
+    /**
+     * @description Dokumen yang memakai alasan ini.
+     * @enum {string}
+     */
+    ReturnReasonAppliesTo: "sales_return" | "purchase_return" | "both"
+    /**
+     * @description Disposisi barang retur (Disposisi Retur, WMS-07).
+     * @enum {string}
+     */
+    ReturnDisposition:
+      "restock" | "repack" | "reprocess" | "marketing_sample" | "dispose"
+    ReturnReason: {
+      /** Format: uuid */
+      id: string
+      /** @example DAMAGED_SHIPPING */
+      code: string
+      name: string
+      appliesTo: components["schemas"]["ReturnReasonAppliesTo"]
+      /** @description Usulan awal disposisi; staf gudang tetap memilih saat QC. */
+      defaultDisposition?: components["schemas"]["ReturnDisposition"] | null
+      description: string
+      isActive: boolean
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    ReturnReasonFields: {
+      name: string
+      appliesTo: components["schemas"]["ReturnReasonAppliesTo"]
+      defaultDisposition?: components["schemas"]["ReturnDisposition"] | null
+      description?: string
+      isActive: boolean
+    }
+    ReturnReasonInput: components["schemas"]["ReturnReasonFields"] & {
+      /** @example DAMAGED_SHIPPING */
+      code: string
+    }
+    VersionInput: {
+      /** @description Versi terakhir yang dilihat user (optimistic locking). */
+      version: number
+    }
+    ReturnReasonUpdate: components["schemas"]["ReturnReasonFields"] &
+      components["schemas"]["VersionInput"]
     /** @description Payload webhook status order Biteship (nama field milik Biteship). */
     BiteshipNotification: {
       /** @example order.status */
@@ -2125,10 +2255,6 @@ export interface components {
       divisionId?: string | null
       /** Format: uuid */
       employeeId?: string | null
-      version: number
-    }
-    VersionInput: {
-      /** @description Versi terakhir yang dilihat user (optimistic locking). */
       version: number
     }
     Role: {
@@ -2736,6 +2862,55 @@ export interface components {
     }
     CampaignUpdate: components["schemas"]["CampaignFields"] &
       components["schemas"]["VersionInput"]
+    /**
+     * @description Jenis PPh yang dipotong (pemasok, jenis biaya); tarif di master tarif PPh.
+     * @enum {string}
+     */
+    WithholdingType: "none" | "pph21" | "pph23" | "pph4_2"
+    /**
+     * @description Jenis dokumen approval (subject_type) yang dipakai dokumen biaya dengan jenis ini.
+     * @enum {string}
+     */
+    ExpenseApprovalSubject: "expense_claim" | "petty_cash_replenishment"
+    ExpenseType: {
+      /** Format: uuid */
+      id: string
+      /** @example OFFICE_SUPPLY */
+      code: string
+      name: string
+      /** Format: uuid */
+      expenseAccountId: string
+      /** @example 6303 */
+      expenseAccountCode: string
+      expenseAccountName: string
+      withholdingType: components["schemas"]["WithholdingType"]
+      requiresReceipt: boolean
+      /** @description Jurnal biaya jenis ini wajib dimensi kampanye. */
+      requiresCampaign: boolean
+      approvalSubject: components["schemas"]["ExpenseApprovalSubject"]
+      description: string
+      isActive: boolean
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    ExpenseTypeFields: {
+      name: string
+      /** Format: uuid */
+      expenseAccountId: string
+      withholdingType: components["schemas"]["WithholdingType"]
+      requiresReceipt: boolean
+      requiresCampaign: boolean
+      approvalSubject?: components["schemas"]["ExpenseApprovalSubject"]
+      description?: string
+      isActive: boolean
+    }
+    ExpenseTypeInput: components["schemas"]["ExpenseTypeFields"] & {
+      /** @example OFFICE_SUPPLY */
+      code: string
+    }
+    ExpenseTypeUpdate: components["schemas"]["ExpenseTypeFields"] &
+      components["schemas"]["VersionInput"]
     /** @enum {string} */
     FiscalPeriodStatus: "open" | "closed"
     FiscalPeriod: {
@@ -3167,11 +3342,6 @@ export interface components {
      * @enum {string}
      */
     SupplierType: "supplier" | "toll_manufacturer"
-    /**
-     * @description PPh yang dipotong default saat membayar tagihan pemasok.
-     * @enum {string}
-     */
-    WithholdingType: "none" | "pph23" | "pph21" | "pph4_2"
     SupplierBankAccount: {
       /** Format: uuid */
       id: string
@@ -3355,15 +3525,15 @@ export interface components {
     }
   }
   parameters: {
-    RefreshCookie: string
+    Search: string
     /** @description UUID per percobaan submit (Technical Guideline 7.1). */
     IdempotencyKey: string
+    Id: string
+    RefreshCookie: string
     Page: number
     PageSize: number
     /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
     Sort: string
-    Search: string
-    Id: string
     /** @description Versi terakhir yang dilihat user (optimistic locking). */
     Version: number
     IncludeInactive: boolean
@@ -3497,6 +3667,116 @@ export interface operations {
           "application/problem+json": components["schemas"]["Problem"]
         }
       }
+    }
+  }
+  listReturnReasons: {
+    parameters: {
+      query?: {
+        includeInactive?: boolean
+        appliesTo?: components["schemas"]["ReturnReasonScope"]
+        q?: components["parameters"]["Search"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Alasan retur urut kode */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ReturnReason"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createReturnReason: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ReturnReasonInput"]
+      }
+    }
+    responses: {
+      /** @description Alasan retur dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ReturnReason"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateReturnReason: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ReturnReasonUpdate"]
+      }
+    }
+    responses: {
+      /** @description Alasan retur diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ReturnReason"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  deleteReturnReason: {
+    parameters: {
+      query: {
+        /** @description Versi terakhir yang dilihat user (optimistic locking). */
+        version: number
+      }
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Alasan retur dihapus */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
     }
   }
   receiveBiteshipWebhook: {
@@ -5708,6 +5988,115 @@ export interface operations {
     requestBody?: never
     responses: {
       /** @description Kampanye dihapus */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listExpenseTypes: {
+    parameters: {
+      query?: {
+        includeInactive?: components["parameters"]["IncludeInactive"]
+        q?: components["parameters"]["Search"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Jenis biaya urut kode */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ExpenseType"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createExpenseType: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ExpenseTypeInput"]
+      }
+    }
+    responses: {
+      /** @description Jenis biaya dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ExpenseType"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateExpenseType: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ExpenseTypeUpdate"]
+      }
+    }
+    responses: {
+      /** @description Jenis biaya diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ExpenseType"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  deleteExpenseType: {
+    parameters: {
+      query: {
+        /** @description Versi terakhir yang dilihat user (optimistic locking). */
+        version: components["parameters"]["Version"]
+      }
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Jenis biaya dihapus */
       204: {
         headers: {
           [name: string]: unknown

@@ -8,6 +8,7 @@ import (
 	"log/slog"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/riverqueue/river"
 
@@ -44,6 +45,21 @@ type (
 	JournalLine = domain.Line
 	// Numberer mengambil nomor JV dari modul document.
 	Numberer = service.Numberer
+	// ExpenseType adalah master jenis biaya (MD-13): akun beban, PPh, wajib bukti/kampanye, approval.
+	ExpenseType = domain.ExpenseType
+	// WithholdingType adalah jenis PPh yang dipotong pada biaya.
+	WithholdingType = domain.WithholdingType
+)
+
+// Jenis PPh jenis biaya dan jenis dokumen approval yang dipakai jenis biaya.
+const (
+	WithholdingNone  = domain.WithholdingNone
+	WithholdingPPh21 = domain.WithholdingPPh21
+	WithholdingPPh23 = domain.WithholdingPPh23
+	WithholdingPPh42 = domain.WithholdingPPh42
+
+	ApprovalSubjectExpenseClaim           = domain.ApprovalSubjectExpenseClaim
+	ApprovalSubjectPettyCashReplenishment = domain.ApprovalSubjectPettyCashReplenishment
 )
 
 // Resolver akun yang bisa dikirim di PostingRequest.Accounts (lihat posting_rule_accounts).
@@ -140,4 +156,16 @@ func (m *Module) CheckPeriodOpen(ctx context.Context, businessDate clock.Busines
 // EnsureUpcomingPeriods membuat periode bulan berjalan dan berikutnya (dipakai job dan seed).
 func (m *Module) EnsureUpcomingPeriods(ctx context.Context) (int, error) {
 	return m.svc.EnsureUpcomingPeriods(ctx)
+}
+
+// ExpenseType membaca jenis biaya (belum dihapus) beserta akun bebannya untuk pengajuan biaya (S-404) dan kas
+// kecil (S-405); NOT_FOUND bila tidak ada. Tidak memeriksa permission. Pakai ExpenseType.UsableError sebelum
+// dipakai dokumen baru; akun beban dikirim ke Post lewat ResolverExpenseType.
+func (m *Module) ExpenseType(ctx context.Context, id uuid.UUID) (ExpenseType, error) {
+	return m.svc.ExpenseType(ctx, id)
+}
+
+// ExpenseTypeByCode membaca jenis biaya berdasarkan kode (impor data, seed).
+func (m *Module) ExpenseTypeByCode(ctx context.Context, code string) (ExpenseType, error) {
+	return m.svc.ExpenseTypeByCode(ctx, code)
 }

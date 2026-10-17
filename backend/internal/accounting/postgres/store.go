@@ -101,7 +101,8 @@ func mapWriteError(err error, what string) error {
 	case pe.Code == "23505" && pe.ConstraintName == "uq_journal_entries_source":
 		return &apperr.Error{Code: apperr.CodeInvalidStateTransition, Message: "Dokumen sumber sudah dijurnal untuk rule ini.", Err: ErrAlreadyPosted}
 	case pe.Code == "23505" && (pe.ConstraintName == "uq_accounts_code" || pe.ConstraintName == "uq_channels_code" ||
-		pe.ConstraintName == "uq_sub_channels_code" || pe.ConstraintName == "uq_divisions_code" || pe.ConstraintName == "uq_campaigns_code"):
+		pe.ConstraintName == "uq_sub_channels_code" || pe.ConstraintName == "uq_divisions_code" || pe.ConstraintName == "uq_campaigns_code" ||
+		pe.ConstraintName == "uq_expense_types_code"):
 		return &apperr.Error{Code: apperr.CodeDuplicateCode, Message: apperr.CodeDuplicateCode.DefaultMessage(),
 			Fields: map[string]string{"code": "Kode sudah dipakai (termasuk data yang sudah dihapus)"}, Err: err}
 	case pe.Code == "BL001":
@@ -235,7 +236,9 @@ func (s *Store) AccountUsage(ctx context.Context, id uuid.UUID) (domain.AccountU
 	if err != nil {
 		return domain.AccountUsage{}, fmt.Errorf("account usage: %w", err)
 	}
-	return domain.AccountUsage{JournalLines: r.JournalLines, Children: r.Children, RuleMappings: r.RuleMappings}, nil
+	return domain.AccountUsage{
+		JournalLines: r.JournalLines, Children: r.Children, RuleMappings: r.RuleMappings, ExpenseTypes: r.ExpenseTypes,
+	}, nil
 }
 
 // --- Dimensi ----------------------------------------------------------------------------------

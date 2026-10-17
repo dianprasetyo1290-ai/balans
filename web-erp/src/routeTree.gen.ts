@@ -27,8 +27,10 @@ import { Route as AppMasterDataPackagingMaterialsRouteImport } from './routes/_a
 import { Route as AppMasterCampaignsRouteImport } from './routes/_app/master/campaigns'
 import { Route as AppMasterChannelsRouteImport } from './routes/_app/master/channels'
 import { Route as AppMasterCustomersRouteImport } from './routes/_app/master/customers'
+import { Route as AppMasterExpenseTypesRouteImport } from './routes/_app/master/expense-types'
 import { Route as AppMasterPartnerProductCodesRouteImport } from './routes/_app/master/partner-product-codes'
 import { Route as AppMasterPartnersRouteImport } from './routes/_app/master/partners'
+import { Route as AppMasterReturnReasonsRouteImport } from './routes/_app/master/return-reasons'
 import { Route as AppMasterSuppliersRouteImport } from './routes/_app/master/suppliers'
 import { Route as AppSettingsApprovalPoliciesRouteImport } from './routes/_app/settings/approval-policies'
 import { Route as AppSettingsAuditLogsRouteImport } from './routes/_app/settings/audit-logs'
@@ -136,6 +138,11 @@ const AppMasterCustomersRoute = AppMasterCustomersRouteImport.update({
   path: '/master/customers',
   getParentRoute: () => AppRoute,
 } as any)
+const AppMasterExpenseTypesRoute = AppMasterExpenseTypesRouteImport.update({
+  id: '/master/expense-types',
+  path: '/master/expense-types',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppMasterPartnerProductCodesRoute =
   AppMasterPartnerProductCodesRouteImport.update({
     id: '/master/partner-product-codes',
@@ -145,6 +152,11 @@ const AppMasterPartnerProductCodesRoute =
 const AppMasterPartnersRoute = AppMasterPartnersRouteImport.update({
   id: '/master/partners',
   path: '/master/partners',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMasterReturnReasonsRoute = AppMasterReturnReasonsRouteImport.update({
+  id: '/master/return-reasons',
+  path: '/master/return-reasons',
   getParentRoute: () => AppRoute,
 } as any)
 const AppMasterSuppliersRoute = AppMasterSuppliersRouteImport.update({
@@ -248,8 +260,10 @@ export interface FileRoutesByFullPath {
   '/master/campaigns': typeof AppMasterCampaignsRoute
   '/master/channels': typeof AppMasterChannelsRoute
   '/master/customers': typeof AppMasterCustomersRoute
+  '/master/expense-types': typeof AppMasterExpenseTypesRoute
   '/master/partner-product-codes': typeof AppMasterPartnerProductCodesRoute
   '/master/partners': typeof AppMasterPartnersRoute
+  '/master/return-reasons': typeof AppMasterReturnReasonsRoute
   '/master/suppliers': typeof AppMasterSuppliersRoute
   '/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/settings/audit-logs': typeof AppSettingsAuditLogsRoute
@@ -284,8 +298,10 @@ export interface FileRoutesByTo {
   '/master/campaigns': typeof AppMasterCampaignsRoute
   '/master/channels': typeof AppMasterChannelsRoute
   '/master/customers': typeof AppMasterCustomersRoute
+  '/master/expense-types': typeof AppMasterExpenseTypesRoute
   '/master/partner-product-codes': typeof AppMasterPartnerProductCodesRoute
   '/master/partners': typeof AppMasterPartnersRoute
+  '/master/return-reasons': typeof AppMasterReturnReasonsRoute
   '/master/suppliers': typeof AppMasterSuppliersRoute
   '/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/settings/audit-logs': typeof AppSettingsAuditLogsRoute
@@ -322,8 +338,10 @@ export interface FileRoutesById {
   '/_app/master/campaigns': typeof AppMasterCampaignsRoute
   '/_app/master/channels': typeof AppMasterChannelsRoute
   '/_app/master/customers': typeof AppMasterCustomersRoute
+  '/_app/master/expense-types': typeof AppMasterExpenseTypesRoute
   '/_app/master/partner-product-codes': typeof AppMasterPartnerProductCodesRoute
   '/_app/master/partners': typeof AppMasterPartnersRoute
+  '/_app/master/return-reasons': typeof AppMasterReturnReasonsRoute
   '/_app/master/suppliers': typeof AppMasterSuppliersRoute
   '/_app/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/_app/settings/audit-logs': typeof AppSettingsAuditLogsRoute
@@ -360,8 +378,10 @@ export interface FileRouteTypes {
     | '/master/campaigns'
     | '/master/channels'
     | '/master/customers'
+    | '/master/expense-types'
     | '/master/partner-product-codes'
     | '/master/partners'
+    | '/master/return-reasons'
     | '/master/suppliers'
     | '/settings/approval-policies'
     | '/settings/audit-logs'
@@ -396,8 +416,10 @@ export interface FileRouteTypes {
     | '/master/campaigns'
     | '/master/channels'
     | '/master/customers'
+    | '/master/expense-types'
     | '/master/partner-product-codes'
     | '/master/partners'
+    | '/master/return-reasons'
     | '/master/suppliers'
     | '/settings/approval-policies'
     | '/settings/audit-logs'
@@ -433,8 +455,10 @@ export interface FileRouteTypes {
     | '/_app/master/campaigns'
     | '/_app/master/channels'
     | '/_app/master/customers'
+    | '/_app/master/expense-types'
     | '/_app/master/partner-product-codes'
     | '/_app/master/partners'
+    | '/_app/master/return-reasons'
     | '/_app/master/suppliers'
     | '/_app/settings/approval-policies'
     | '/_app/settings/audit-logs'
@@ -589,6 +613,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMasterCustomersRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/master/expense-types': {
+      id: '/_app/master/expense-types'
+      path: '/master/expense-types'
+      fullPath: '/master/expense-types'
+      preLoaderRoute: typeof AppMasterExpenseTypesRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/master/partner-product-codes': {
       id: '/_app/master/partner-product-codes'
       path: '/master/partner-product-codes'
@@ -601,6 +632,13 @@ declare module '@tanstack/react-router' {
       path: '/master/partners'
       fullPath: '/master/partners'
       preLoaderRoute: typeof AppMasterPartnersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/master/return-reasons': {
+      id: '/_app/master/return-reasons'
+      path: '/master/return-reasons'
+      fullPath: '/master/return-reasons'
+      preLoaderRoute: typeof AppMasterReturnReasonsRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/master/suppliers': {
@@ -724,8 +762,10 @@ interface AppRouteChildren {
   AppMasterCampaignsRoute: typeof AppMasterCampaignsRoute
   AppMasterChannelsRoute: typeof AppMasterChannelsRoute
   AppMasterCustomersRoute: typeof AppMasterCustomersRoute
+  AppMasterExpenseTypesRoute: typeof AppMasterExpenseTypesRoute
   AppMasterPartnerProductCodesRoute: typeof AppMasterPartnerProductCodesRoute
   AppMasterPartnersRoute: typeof AppMasterPartnersRoute
+  AppMasterReturnReasonsRoute: typeof AppMasterReturnReasonsRoute
   AppMasterSuppliersRoute: typeof AppMasterSuppliersRoute
   AppSettingsApprovalPoliciesRoute: typeof AppSettingsApprovalPoliciesRoute
   AppSettingsAuditLogsRoute: typeof AppSettingsAuditLogsRoute
@@ -756,8 +796,10 @@ const AppRouteChildren: AppRouteChildren = {
   AppMasterCampaignsRoute: AppMasterCampaignsRoute,
   AppMasterChannelsRoute: AppMasterChannelsRoute,
   AppMasterCustomersRoute: AppMasterCustomersRoute,
+  AppMasterExpenseTypesRoute: AppMasterExpenseTypesRoute,
   AppMasterPartnerProductCodesRoute: AppMasterPartnerProductCodesRoute,
   AppMasterPartnersRoute: AppMasterPartnersRoute,
+  AppMasterReturnReasonsRoute: AppMasterReturnReasonsRoute,
   AppMasterSuppliersRoute: AppMasterSuppliersRoute,
   AppSettingsApprovalPoliciesRoute: AppSettingsApprovalPoliciesRoute,
   AppSettingsAuditLogsRoute: AppSettingsAuditLogsRoute,

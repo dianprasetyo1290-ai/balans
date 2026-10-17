@@ -19,6 +19,12 @@ export type ManualJournalInput = components["schemas"]["ManualJournalFields"]
 export type ManualJournalLineInput =
   components["schemas"]["ManualJournalLineInput"]
 export type GeneralLedger = components["schemas"]["GeneralLedger"]
+export type ExpenseType = components["schemas"]["ExpenseType"]
+export type ExpenseTypeInput = components["schemas"]["ExpenseTypeInput"]
+export type ExpenseTypeUpdate = components["schemas"]["ExpenseTypeUpdate"]
+export type WithholdingType = components["schemas"]["WithholdingType"]
+export type ExpenseApprovalSubject =
+  components["schemas"]["ExpenseApprovalSubject"]
 
 const idem = (key: string) => ({ header: { "Idempotency-Key": key } })
 
@@ -194,6 +200,68 @@ export function deleteDimension(d: Dimension, key: string) {
     case "campaign":
       return unwrap(api.DELETE("/api/v1/campaigns/{id}", { params }))
   }
+}
+
+// --- Jenis biaya -----------------------------------------------------------------------------
+
+export const WITHHOLDING_LABELS: Record<WithholdingType, string> = {
+  none: "Tidak dipotong",
+  pph21: "PPh 21",
+  pph23: "PPh 23",
+  pph4_2: "PPh 4(2)",
+}
+
+export const EXPENSE_APPROVAL_LABELS: Record<ExpenseApprovalSubject, string> = {
+  expense_claim: "Pengajuan biaya / reimbursement",
+  petty_cash_replenishment: "Pengisian kembali kas kecil",
+}
+
+export const expenseTypesQuery = (includeInactive = false, q = "") =>
+  queryOptions({
+    queryKey: ["accounting", "expense-types", includeInactive, q],
+    queryFn: () =>
+      unwrap(
+        api.GET("/api/v1/expense-types", {
+          params: { query: { includeInactive, q: q || undefined } },
+        })
+      ),
+    staleTime: 60_000,
+    placeholderData: keepPreviousData,
+  })
+
+export function createExpenseType(body: ExpenseTypeInput, key: string) {
+  return unwrap(api.POST("/api/v1/expense-types", { params: idem(key), body }))
+}
+
+export function updateExpenseType(
+  id: string,
+  body: ExpenseTypeUpdate,
+  key: string
+) {
+  return unwrap(
+    api.PUT("/api/v1/expense-types/{id}", {
+      params: { path: { id }, ...idem(key) },
+      body,
+    })
+  )
+}
+
+export function deleteExpenseType(id: string, version: number, key: string) {
+  return unwrap(
+    api.DELETE("/api/v1/expense-types/{id}", {
+      params: { path: { id }, query: { version }, ...idem(key) },
+    })
+  )
+}
+
+/** Akun yang boleh menjadi akun beban jenis biaya: 6xxx atau 7xxx bersaldo debit, bisa diposting, aktif. */
+export function isExpenseAccount(a: Account) {
+  return (
+    (a.group === 6 || a.group === 7) &&
+    a.normalBalance === "debit" &&
+    a.isPostable &&
+    a.isActive
+  )
 }
 
 // --- Periode ----------------------------------------------------------------------------------

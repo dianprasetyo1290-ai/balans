@@ -987,10 +987,6 @@ components:
       type: string
       enum: [supplier, toll_manufacturer]
       description: "`toll_manufacturer` = maklon."
-    WithholdingType:
-      type: string
-      enum: [none, pph23, pph21, pph4_2]
-      description: PPh yang dipotong default saat membayar tagihan pemasok.
     SupplierBankAccountInput:
       type: object
       required: [bankName, accountName, isDefault]
@@ -1050,7 +1046,7 @@ components:
           type: string
           nullable: true
         defaultWithholding:
-          $ref: "#/components/schemas/WithholdingType"
+          $ref: "../components/common.yaml#/WithholdingType"
         paymentTermDays:
           type: integer
           minimum: 0
@@ -1098,7 +1094,7 @@ components:
           type: string
           nullable: true
         defaultWithholding:
-          $ref: "#/components/schemas/WithholdingType"
+          $ref: "../components/common.yaml#/WithholdingType"
         paymentTermDays:
           type: integer
         address:

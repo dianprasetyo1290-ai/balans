@@ -25,10 +25,14 @@ const (
 	PermFiscalPeriodRead = "accounting.fiscal_period.read"
 	// PermFiscalPeriodWrite membuat periode berikutnya lebih awal; tutup/buka kembali di R1.4.
 	PermFiscalPeriodWrite = "accounting.fiscal_period.write"
-	PermJournalRead       = domain.PermJournalRead
-	PermJournalWrite      = domain.PermJournalWrite
-	PermJournalPost       = domain.PermJournalPost
-	PermJournalReverse    = domain.PermJournalReverse
+	PermExpenseTypeRead   = "accounting.expense_type.read"
+	PermExpenseTypeWrite  = "accounting.expense_type.write"
+	// PermExpenseClaimRead: pengaju biaya memilih jenis biaya walau tanpa akses master (S-404).
+	PermExpenseClaimRead = "accounting.expense_claim.read"
+	PermJournalRead      = domain.PermJournalRead
+	PermJournalWrite     = domain.PermJournalWrite
+	PermJournalPost      = domain.PermJournalPost
+	PermJournalReverse   = domain.PermJournalReverse
 )
 
 // Numberer mengambil nomor dokumen JV dari modul document di transaksi aktif.
@@ -59,6 +63,13 @@ type store interface {
 	DimensionUsage(ctx context.Context, kind domain.DimensionKind, id uuid.UUID) (bool, int64, error)
 	CheckDimensions(ctx context.Context, d domain.Dimensions, at clock.BusinessDate) (domain.DimensionCheck, error)
 	DimensionNames(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID]postgres.DimensionName, error)
+
+	ListExpenseTypes(ctx context.Context, f postgres.ExpenseTypeFilter) ([]domain.ExpenseType, error)
+	GetExpenseType(ctx context.Context, id uuid.UUID, forUpdate bool) (domain.ExpenseType, error)
+	GetExpenseTypeByCode(ctx context.Context, code string) (domain.ExpenseType, error)
+	InsertExpenseType(ctx context.Context, e domain.ExpenseType, actorID uuid.UUID) (domain.ExpenseType, error)
+	UpdateExpenseType(ctx context.Context, e domain.ExpenseType, version int, actorID uuid.UUID) (domain.ExpenseType, error)
+	DeleteExpenseType(ctx context.Context, id uuid.UUID, version int, actorID uuid.UUID) error
 
 	ListPeriods(ctx context.Context, year int) ([]domain.Period, error)
 	EnsurePeriod(ctx context.Context, k domain.PeriodKey, actorID uuid.UUID) error

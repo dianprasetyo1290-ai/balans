@@ -38,6 +38,10 @@ BusinessDate:
   format: date
   description: Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
   example: "2026-10-19"
+WithholdingType:
+  type: string
+  description: Jenis PPh yang dipotong (pemasok, jenis biaya); tarif di master tarif PPh.
+  enum: [none, pph21, pph23, pph4_2]
 VersionInput:
   type: object
   required: [version]

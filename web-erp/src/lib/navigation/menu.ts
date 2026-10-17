@@ -69,7 +69,15 @@ export const MENU: MenuGroup[] = [
   {
     label: "Data Master",
     icon: DatabaseIcon,
-    modules: ["catalog", "pricing", "party", "warehouse", "hris", "accounting"],
+    modules: [
+      "catalog",
+      "pricing",
+      "party",
+      "warehouse",
+      "hris",
+      "accounting",
+      "sales",
+    ],
     items: [
       {
         label: "Produk",
@@ -89,10 +97,7 @@ export const MENU: MenuGroup[] = [
         permission: "catalog.product.read",
         module: "catalog",
       },
-      ...items(
-        "Daftar Harga",
-        "Aturan Harga"
-      ),
+      ...items("Daftar Harga", "Aturan Harga"),
       {
         label: "Pelanggan",
         to: "/master/customers",
@@ -130,7 +135,18 @@ export const MENU: MenuGroup[] = [
         permission: "hris.employee.read",
         module: "hris",
       },
-      ...items("Alasan Retur", "Jenis Biaya"),
+      {
+        label: "Alasan Retur",
+        to: "/master/return-reasons",
+        permission: "sales.return_reason.read",
+        module: "sales",
+      },
+      {
+        label: "Jenis Biaya",
+        to: "/master/expense-types",
+        permission: "accounting.expense_type.read",
+        module: "accounting",
+      },
       {
         label: "Kampanye",
         to: "/master/campaigns",

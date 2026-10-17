@@ -615,7 +615,7 @@ type Supplier struct {
 	Code         string                `json:"code"`
 	CreatedAt    time.Time             `json:"createdAt"`
 
-	// DefaultWithholding PPh yang dipotong default saat membayar tagihan pemasok.
+	// DefaultWithholding Jenis PPh yang dipotong (pemasok, jenis biaya); tarif di master tarif PPh.
 	DefaultWithholding WithholdingType    `json:"defaultWithholding"`
 	Email              string             `json:"email"`
 	HasNpwp            bool               `json:"hasNpwp"`
@@ -664,7 +664,7 @@ type SupplierInput struct {
 	BankAccounts []SupplierBankAccountInput `json:"bankAccounts"`
 	Code         string                     `json:"code"`
 
-	// DefaultWithholding PPh yang dipotong default saat membayar tagihan pemasok.
+	// DefaultWithholding Jenis PPh yang dipotong (pemasok, jenis biaya); tarif di master tarif PPh.
 	DefaultWithholding WithholdingType `json:"defaultWithholding"`
 	Email              *string         `json:"email,omitempty"`
 
@@ -699,7 +699,7 @@ type VersionInput struct {
 	Version int `json:"version"`
 }
 
-// WithholdingType PPh yang dipotong default saat membayar tagihan pemasok.
+// WithholdingType Jenis PPh yang dipotong (pemasok, jenis biaya); tarif di master tarif PPh.
 type WithholdingType string
 
 // Id defines model for Id.
@@ -983,7 +983,7 @@ type UpdateSupplierJSONBody struct {
 	BankAccounts []SupplierBankAccountInput `json:"bankAccounts"`
 	Code         string                     `json:"code"`
 
-	// DefaultWithholding PPh yang dipotong default saat membayar tagihan pemasok.
+	// DefaultWithholding Jenis PPh yang dipotong (pemasok, jenis biaya); tarif di master tarif PPh.
 	DefaultWithholding WithholdingType `json:"defaultWithholding"`
 	Email              *string         `json:"email,omitempty"`
 
