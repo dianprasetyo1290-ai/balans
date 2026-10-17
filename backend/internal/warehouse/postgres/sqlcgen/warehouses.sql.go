@@ -83,6 +83,17 @@ func (q *Queries) GetWarehouseForUpdate(ctx context.Context, id uuid.UUID) (Ware
 	return i, err
 }
 
+const getWarehouseIDByCode = `-- name: GetWarehouseIDByCode :one
+SELECT id FROM warehouses WHERE code = $1
+`
+
+func (q *Queries) GetWarehouseIDByCode(ctx context.Context, code string) (uuid.UUID, error) {
+	row := q.db.QueryRow(ctx, getWarehouseIDByCode, code)
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
+}
+
 const insertWarehouse = `-- name: InsertWarehouse :one
 INSERT INTO warehouses (code, name, address, is_active, created_by, updated_by)
 VALUES ($1, $2, $3, $4, $5, $5)

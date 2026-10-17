@@ -54,3 +54,6 @@ SET full_name = sqlc.arg('full_name'), division_id = sqlc.narg('division_id'),
     nik_enc = sqlc.arg('nik_enc'), nik_hash = sqlc.narg('nik_hash'), updated_at = now(),
     updated_by = sqlc.arg('actor_id'), version = version + 1
 WHERE id = sqlc.arg('id') AND version = sqlc.arg('version') AND deleted_at IS NULL;
+
+-- name: GetEmployeeIDByNumber :one
+SELECT id FROM employees WHERE employee_number = $1 AND deleted_at IS NULL;

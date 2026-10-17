@@ -1558,6 +1558,268 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/v1/inbounds": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Antrian Inbound — barang Karantina per dokumen asal (WMS-02, WMS-09)
+     * @description Terbaru lebih dulu. Permission `warehouse.inbound.read`.
+     */
+    get: operations["listInbounds"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/inbounds/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    /** Detail Inbound beserta baris dan catatan QC */
+    get: operations["getInbound"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/inbounds/{id}/lines/{lineId}/qc": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+        lineId: string
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * QC satu baris Inbound (checklist, qty lulus/ditolak, foto, lokasi tujuan)
+     * @description Qty lulus pindah Karantina → Tersedia di lokasi tujuan; qty ditolak tetap Karantina (ditahan di Inbound untuk
+     *     barang pemasok/maklon, atau pindah ke Gudang Retur). Qty lulus + ditolak = qty baris. Permission
+     *     `warehouse.inbound.post`.
+     */
+    post: operations["recordInboundQc"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/stock-transfers": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Daftar Transfer Stok atau Permintaan Petty Stock */
+    get: operations["listStockTransfers"]
+    put?: never
+    /** Membuat Transfer Stok / Permintaan Petty Stock berstatus Draft */
+    post: operations["createStockTransfer"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/stock-transfers/in-transit": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Stok dalam Pengiriman — baris transfer yang belum diterima penuh (WMS-10) */
+    get: operations["listStockInTransit"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/stock-transfers/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    /** Detail transfer */
+    get: operations["getStockTransfer"]
+    /** Mengubah transfer Draft */
+    put: operations["updateStockTransfer"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/stock-transfers/{id}/actions": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Aksi status transfer (submit, release, prepare, post, ship, receive, complete, cancel)
+     * @description Transfer langsung: `post` (dalam satu gudang, langsung Selesai) atau `ship` (antar gudang/eksternal →
+     *     Dalam Pengiriman), `receive` (qty diterima per baris), `complete` (sisa dicatat kekurangan). Permintaan
+     *     Petty Stock: `submit` (Fulfillment Leader), `release` (Logistik Leader; stok asal dialokasikan FEFO),
+     *     `prepare` (Staf Gudang), `receive` (Fulfillment Leader mengonfirmasi qty; sisa alokasi dilepas).
+     *     Aksi yang boleh dijalankan ada di `allowedActions`.
+     */
+    post: operations["actOnStockTransfer"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/stock-counts": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Daftar Stock Count (Merchandiser hanya lokasi konsinyasi mitra yang ditugaskan) */
+    get: operations["listStockCounts"]
+    put?: never
+    /** Membuat Stock Count Draft, satu dokumen per lokasi */
+    post: operations["createStockCounts"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/stock-counts/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    /** Detail Stock Count (hitung buta — qty sistem dan selisih kosong sampai hasil dikirim) */
+    get: operations["getStockCount"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/stock-counts/{id}/entries": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    /** Menyimpan isian hitung (autosave form HP), barang tambahan, dan foto */
+    put: operations["saveStockCountEntries"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/stock-counts/{id}/actions": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Aksi status Stock Count (start, submit, recount, cancel)
+     * @description `start` memberi nomor SC dan mengambil snapshot saldo sistem; `submit` menghitung selisih — ada selisih
+     *     pada stock count gudang → approval `stock_count` (nominal = nilai selisih absolut); tanpa selisih atau
+     *     konsinyasi/vending → Selesai. Setelah disetujui, penyesuaian stok + jurnal A-14 diposting otomatis.
+     */
+    post: operations["actOnStockCount"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/stock-count-schedules": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Jadwal Stock Count (cycle count, konsinyasi/vending bulanan, penuh akhir tahun) */
+    get: operations["listStockCountSchedules"]
+    put?: never
+    /** Membuat jadwal Stock Count */
+    post: operations["createStockCountSchedule"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/stock-count-schedules/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    /** Mengubah jadwal Stock Count */
+    put: operations["updateStockCountSchedule"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/v1/stock-balances": {
     parameters: {
       query?: never
@@ -2104,6 +2366,220 @@ export interface paths {
      *     isi file harus sesuai tipenya.
      */
     put: operations["putFileContent"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/data-exchange/kinds": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Jenis data yang boleh diimpor/diekspor user (MD-10, INT-02)
+     * @description Hanya jenis data dengan permission `<kind>.import` atau `<kind>.export` milik user. `uploadOwnerType`
+     *     dipakai sebagai `ownerType` saat meminta URL upload file (`POST /api/v1/files`).
+     */
+    get: operations["listDataExchangeKinds"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/data-exchange/kinds/{kind}/template": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Mengunduh template impor (xlsx) yang dihasilkan dari definisi kolom
+     * @description Template berisi sheet data (header oranye bertanda `*` wajib, abu-abu opsional, dropdown untuk kolom
+     *     pilihan) dan sheet Petunjuk berisi format, aturan, serta contoh baris. Butuh `<kind>.import`.
+     */
+    get: operations["getDataExchangeTemplate"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/import-jobs": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Riwayat impor (jenis data yang boleh diimpor user) */
+    get: operations["listImportJobs"]
+    put?: never
+    /**
+     * Memulai impor dari file xlsx yang sudah diunggah
+     * @description File diunggah dulu lewat `POST /api/v1/files` dengan `ownerType` dari `listDataExchangeKinds`. Pemeriksaan
+     *     per baris berjalan sebagai job `dataexchange.import` (antrean bulk); pantau progress lewat `getImportJob`.
+     *     File yang sama (SHA-256) untuk jenis data yang sama ditolak `IMPORT_ALREADY_PROCESSED`, kecuali job
+     *     sebelumnya gagal atau dibatalkan.
+     */
+    post: operations["createImportJob"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/import-jobs/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Status, progress, dan ringkasan job impor */
+    get: operations["getImportJob"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/import-jobs/{id}/rows": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Preview baris hasil pemeriksaan
+     * @description Data pribadi (NPWP, nomor rekening, NIK) ditampilkan tersamar.
+     */
+    get: operations["listImportJobRows"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/import-jobs/{id}/commit": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Menyimpan baris valid
+     * @description Hanya untuk status `validated` dengan minimal satu baris valid. Penyimpanan berjalan sebagai job; master
+     *     data disimpan dalam satu transaksi (gagal satu baris = tidak ada yang tersimpan, TG 5.15).
+     */
+    post: operations["commitImportJob"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/import-jobs/{id}/cancel": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Membatalkan impor yang menunggu konfirmasi */
+    post: operations["cancelImportJob"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/import-jobs/{id}/error-file": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** URL unduhan file baris error (xlsx dengan kolom Keterangan Error) */
+    get: operations["getImportJobErrorFile"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/export-jobs": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Riwayat ekspor (jenis data yang boleh diekspor user) */
+    get: operations["listExportJobs"]
+    put?: never
+    /**
+     * Memulai ekspor ke xlsx
+     * @description File dibuat job `dataexchange.export` (antrean bulk) dengan kolom yang sama dengan template impor, lalu
+     *     user mendapat notifikasi berisi tautan unduhan. Butuh `<kind>.export`.
+     */
+    post: operations["createExportJob"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/export-jobs/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Status job ekspor */
+    get: operations["getExportJob"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/export-jobs/{id}/download-url": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** URL unduhan file ekspor */
+    get: operations["getExportJobDownloadUrl"]
+    put?: never
     post?: never
     delete?: never
     options?: never
@@ -3227,6 +3703,401 @@ export interface components {
       isActive: boolean
     } & components["schemas"]["VersionInput"]
     /**
+     * @description `in_progress` Diproses, `completed` Selesai.
+     * @enum {string}
+     */
+    InboundStatus: "in_progress" | "completed"
+    WhLocationRef: {
+      /** Format: uuid */
+      id: string
+      code: string
+      name: string
+      locationType: components["schemas"]["LocationType"]
+      locationTypeLabel: string
+      isExternal: boolean
+      warehouseName?: string
+    }
+    InboundSummary: {
+      /** Format: uuid */
+      id: string
+      number: string
+      sourceType: string
+      sourceTypeLabel: string
+      sourceLabel: string
+      location: components["schemas"]["WhLocationRef"]
+      businessDate: components["schemas"]["BusinessDate"]
+      status: components["schemas"]["InboundStatus"]
+      lineCount: number
+      pendingCount: number
+      /** Format: date-time */
+      createdAt: string
+    }
+    InboundList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["InboundSummary"][]
+    }
+    /**
+     * @description `hold` ditahan di Inbound (reject ke pemasok/maklon), `returns` ke Gudang Retur.
+     * @enum {string}
+     */
+    InboundRejectAction: "hold" | "returns"
+    WhProductRef: {
+      /** Format: uuid */
+      id: string
+      sku: string
+      name: string
+      uom: string
+    }
+    WhBatchRef: {
+      /** Format: uuid */
+      id: string
+      number: string
+      expiryDate?: components["schemas"]["BusinessDate"]
+    }
+    /**
+     * @description Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+     * @example 12.000
+     */
+    WhQuantity: string
+    /**
+     * @description `quarantine` Karantina (belum QC), `posted` Diposting (lulus), `qc_rejected` Ditolak QC.
+     * @enum {string}
+     */
+    InboundLineStatus: "quarantine" | "posted" | "qc_rejected"
+    InboundLine: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      product: components["schemas"]["WhProductRef"]
+      batch?: components["schemas"]["WhBatchRef"]
+      qty: components["schemas"]["WhQuantity"]
+      passedQty: components["schemas"]["WhQuantity"]
+      rejectedQty: components["schemas"]["WhQuantity"]
+      destination: components["schemas"]["WhLocationRef"]
+      rejectLocation?: components["schemas"]["WhLocationRef"]
+      status: components["schemas"]["InboundLineStatus"]
+      rejectReason: string
+      checkedByName?: string
+      /** Format: date-time */
+      checkedAt?: string
+      allowedActions: "qc"[]
+    }
+    InboundQcChecklist: {
+      batch: boolean
+      expiry: boolean
+      condition: boolean
+      seal: boolean
+    }
+    InboundQualityCheck: {
+      /** Format: uuid */
+      id: string
+      /** Format: uuid */
+      lineId: string
+      /** @enum {string} */
+      result: "passed" | "rejected"
+      qty: components["schemas"]["WhQuantity"]
+      checks: components["schemas"]["InboundQcChecklist"]
+      note: string
+      photoFileIds: string[]
+      checkedByName: string
+      /** Format: date-time */
+      checkedAt: string
+    }
+    Inbound: components["schemas"]["InboundSummary"] & {
+      /** Format: uuid */
+      sourceId: string
+      rejectAction: components["schemas"]["InboundRejectAction"]
+      note: string
+      /** Format: date-time */
+      completedAt?: string
+      version: number
+      lines: components["schemas"]["InboundLine"][]
+      checks: components["schemas"]["InboundQualityCheck"][]
+    }
+    InboundQcInput: {
+      passedQty: components["schemas"]["WhQuantity"]
+      rejectedQty: components["schemas"]["WhQuantity"]
+      checks: components["schemas"]["InboundQcChecklist"]
+      rejectReason?: string
+      /** Format: uuid */
+      destinationLocationId?: string
+      note?: string
+      photoFileIds?: string[]
+    }
+    /**
+     * @description `direct` Transfer Stok, `request` Permintaan Petty Stock.
+     * @enum {string}
+     */
+    StockTransferType: "direct" | "request"
+    /** @enum {string} */
+    StockTransferStatus:
+      | "draft"
+      | "submitted"
+      | "in_progress"
+      | "in_transit"
+      | "partially_received"
+      | "received"
+      | "completed"
+      | "cancelled"
+    StockTransferSummary: {
+      /** Format: uuid */
+      id: string
+      number?: string
+      transferType: components["schemas"]["StockTransferType"]
+      from: components["schemas"]["WhLocationRef"]
+      to: components["schemas"]["WhLocationRef"]
+      requiresShipping: boolean
+      businessDate: components["schemas"]["BusinessDate"]
+      status: components["schemas"]["StockTransferStatus"]
+      requestedByName: string
+      lineCount: number
+      totalQty: components["schemas"]["WhQuantity"]
+      /** Format: date-time */
+      createdAt: string
+    }
+    StockTransferList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["StockTransferSummary"][]
+    }
+    StockTransferLineInput: {
+      /** Format: uuid */
+      productId: string
+      /** Format: uuid */
+      batchId?: string
+      qty: components["schemas"]["WhQuantity"]
+      batchReason?: string
+      note?: string
+    }
+    StockTransferInput: {
+      transferType: components["schemas"]["StockTransferType"]
+      /** Format: uuid */
+      fromLocationId: string
+      /** Format: uuid */
+      toLocationId: string
+      businessDate: components["schemas"]["BusinessDate"]
+      note?: string
+      lines: components["schemas"]["StockTransferLineInput"][]
+    }
+    StockTransferLine: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      product: components["schemas"]["WhProductRef"]
+      batch?: components["schemas"]["WhBatchRef"]
+      qty: components["schemas"]["WhQuantity"]
+      receivedQty: components["schemas"]["WhQuantity"]
+      shortageQty: components["schemas"]["WhQuantity"]
+      costAmount: components["schemas"]["Money"]
+      batchReason: string
+      note: string
+    }
+    /** @enum {string} */
+    StockTransferAction:
+      | "edit"
+      | "submit"
+      | "release"
+      | "prepare"
+      | "post"
+      | "ship"
+      | "receive"
+      | "complete"
+      | "cancel"
+    StockTransfer: components["schemas"]["StockTransferSummary"] & {
+      note: string
+      sourceType?: string
+      /** Format: uuid */
+      sourceId?: string
+      /** Format: date-time */
+      submittedAt?: string
+      releasedByName?: string
+      /** Format: date-time */
+      releasedAt?: string
+      preparedByName?: string
+      /** Format: date-time */
+      preparedAt?: string
+      shippedByName?: string
+      /** Format: date-time */
+      shippedAt?: string
+      receivedByName?: string
+      /** Format: date-time */
+      receivedAt?: string
+      /** Format: date-time */
+      completedAt?: string
+      /** Format: date-time */
+      cancelledAt?: string
+      cancelReason: string
+      version: number
+      lines: components["schemas"]["StockTransferLine"][]
+      allowedActions: components["schemas"]["StockTransferAction"][]
+    }
+    StockInTransitLine: {
+      /** Format: uuid */
+      transferId: string
+      number?: string
+      /** Format: uuid */
+      lineId: string
+      from: components["schemas"]["WhLocationRef"]
+      to: components["schemas"]["WhLocationRef"]
+      businessDate: components["schemas"]["BusinessDate"]
+      /** Format: date-time */
+      shippedAt?: string
+      status: components["schemas"]["StockTransferStatus"]
+      product: components["schemas"]["WhProductRef"]
+      batch?: components["schemas"]["WhBatchRef"]
+      qty: components["schemas"]["WhQuantity"]
+      receivedQty: components["schemas"]["WhQuantity"]
+      outstandingQty: components["schemas"]["WhQuantity"]
+      costAmount: components["schemas"]["Money"]
+    }
+    StockInTransitList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["StockInTransitLine"][]
+    }
+    StockTransferReceiveLine: {
+      /** Format: uuid */
+      lineId: string
+      qty: components["schemas"]["WhQuantity"]
+    }
+    StockTransferActionInput: {
+      action: components["schemas"]["StockTransferAction"]
+      version: number
+      reason?: string
+      lines?: components["schemas"]["StockTransferReceiveLine"][]
+    }
+    /** @enum {string} */
+    StockCountStatus:
+      | "draft"
+      | "in_progress"
+      | "pending_approval"
+      | "rejected"
+      | "posted"
+      | "completed"
+      | "cancelled"
+    /**
+     * @description `full` Penuh, `cycle` Cycle count, `consignment` Konsinyasi, `vending` Vending.
+     * @enum {string}
+     */
+    StockCountType: "full" | "cycle" | "consignment" | "vending"
+    StockCountSummary: {
+      /** Format: uuid */
+      id: string
+      number?: string
+      countType: components["schemas"]["StockCountType"]
+      location: components["schemas"]["WhLocationRef"]
+      businessDate: components["schemas"]["BusinessDate"]
+      status: components["schemas"]["StockCountStatus"]
+      /** Format: uuid */
+      scheduleId?: string
+      assignedToName: string
+      lineCount: number
+      countedCount: number
+      /** @description Kosong sampai hasil dikirim. */
+      varianceAmount?: components["schemas"]["Money"]
+      /** Format: date-time */
+      createdAt: string
+    }
+    StockCountList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["StockCountSummary"][]
+    }
+    StockCountInput: {
+      countType: components["schemas"]["StockCountType"]
+      locationIds: string[]
+      businessDate?: components["schemas"]["BusinessDate"]
+      note?: string
+    }
+    StockCountLine: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      product: components["schemas"]["WhProductRef"]
+      batch?: components["schemas"]["WhBatchRef"]
+      /** @description Kosong saat hitung buta (Draft, Diproses, Ditolak). */
+      systemQty?: components["schemas"]["WhQuantity"]
+      countedQty?: components["schemas"]["WhQuantity"]
+      varianceQty?: components["schemas"]["WhQuantity"]
+      unitCost?: string
+      varianceAmount?: components["schemas"]["Money"]
+      isExtra: boolean
+      /** Format: uuid */
+      photoFileId?: string
+      note: string
+      /** Format: date-time */
+      countedAt?: string
+    }
+    /** @enum {string} */
+    StockCountAction: "start" | "count" | "submit" | "recount" | "cancel"
+    StockCount: components["schemas"]["StockCountSummary"] & {
+      note: string
+      photoFileIds: string[]
+      /** @description true = qty sistem dan selisih ditampilkan (setelah hasil dikirim). */
+      revealed: boolean
+      /** Format: date-time */
+      snapshotAt?: string
+      startedByName?: string
+      submittedByName?: string
+      /** Format: date-time */
+      submittedAt?: string
+      netVariance?: components["schemas"]["Money"]
+      /** Format: date-time */
+      decidedAt?: string
+      decisionNote: string
+      /** Format: date-time */
+      postedAt?: string
+      /** Format: uuid */
+      journalEntryId?: string
+      version: number
+      lines: components["schemas"]["StockCountLine"][]
+      allowedActions: components["schemas"]["StockCountAction"][]
+    }
+    StockCountEntry: {
+      /** Format: uuid */
+      lineId: string
+      countedQty?: components["schemas"]["WhQuantity"]
+      note?: string
+      /** Format: uuid */
+      photoFileId?: string
+    }
+    StockCountExtraEntry: {
+      /** Format: uuid */
+      productId: string
+      /** Format: uuid */
+      batchId?: string
+      countedQty: components["schemas"]["WhQuantity"]
+      note?: string
+    }
+    StockCountEntriesInput: {
+      lines?: components["schemas"]["StockCountEntry"][]
+      extraLines?: components["schemas"]["StockCountExtraEntry"][]
+      /** @description Diisi = mengganti foto lokasi/rak; tidak dikirim = foto tidak berubah. */
+      photoFileIds?: string[]
+    }
+    StockCountActionInput: {
+      action: components["schemas"]["StockCountAction"]
+      version: number
+      reason?: string
+    }
+    /** @enum {string} */
+    StockCountFrequency: "weekly" | "monthly" | "yearly"
+    StockCountScheduleInput: {
+      name: string
+      countType: components["schemas"]["StockCountType"]
+      frequency: components["schemas"]["StockCountFrequency"]
+      dayOfWeek?: number
+      dayOfMonth?: number
+      monthOfYear?: number
+      /** Format: uuid */
+      warehouseId?: string
+      locationIds?: string[]
+      /** Format: uuid */
+      assigneeUserId?: string
+      isActive: boolean
+    }
+    StockCountSchedule: components["schemas"]["StockCountScheduleInput"] & {
+      /** Format: uuid */
+      id: string
+      assigneeName: string
+      nextRunDate: components["schemas"]["BusinessDate"]
+      lastRunDate?: components["schemas"]["BusinessDate"]
+      version: number
+    }
+    /**
      * @description `available` Tersedia, `quarantine` Karantina, `in_transit` Dalam Pengiriman, `reserved` Dialokasikan.
      * @enum {string}
      */
@@ -3839,6 +4710,125 @@ export interface components {
       /** Format: date-time */
       expiresAt: string
     }
+    DataExchangeColumn: {
+      /** @description Nama field (dipakai di `values` dan `errors[].column` preview). */
+      key: string
+      header: string
+      required: boolean
+      /** @enum {string} */
+      columnType: "text" | "integer" | "decimal" | "date" | "choice" | "bool"
+      options: string[]
+      sensitive?: boolean
+    }
+    DataExchangeKind: {
+      /** @example catalog.product */
+      kind: string
+      /** @example Produk */
+      label: string
+      canImport: boolean
+      canExport: boolean
+      /** @example import.catalog.product */
+      uploadOwnerType: string
+      /** Format: int64 */
+      maxFileBytes?: number
+      columns: components["schemas"]["DataExchangeColumn"][]
+    }
+    DataExchangeKindList: {
+      items: components["schemas"]["DataExchangeKind"][]
+    }
+    ImportJob: {
+      /** Format: uuid */
+      id: string
+      kind: string
+      kindLabel: string
+      fileName: string
+      /** @enum {string} */
+      status:
+        | "uploaded"
+        | "validating"
+        | "validated"
+        | "committing"
+        | "completed"
+        | "failed"
+        | "cancelled"
+      totalRows: number
+      processedRows: number
+      validRows: number
+      errorRows: number
+      committedRows: number
+      progress: number
+      /** @description Alasan gagal untuk status `failed`. */
+      message: string
+      allowedActions: ("commit" | "cancel" | "download_errors")[]
+      /** Format: date-time */
+      validatedAt?: string | null
+      /** Format: date-time */
+      completedAt?: string | null
+      /** Format: uuid */
+      createdBy: string
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+    }
+    ImportJobList: {
+      items: components["schemas"]["ImportJob"][]
+      pagination: components["schemas"]["Pagination"]
+    }
+    ImportJobInput: {
+      kind: string
+      /** Format: uuid */
+      fileId: string
+    }
+    ImportJobRowError: {
+      /** @description Key kolom; kosong = error baris. */
+      column?: string
+      message: string
+    }
+    ImportJobRow: {
+      /** @description Nomor baris di Excel (header = 1). */
+      rowNumber: number
+      isValid: boolean
+      values: {
+        [key: string]: string
+      }
+      errors: components["schemas"]["ImportJobRowError"][]
+    }
+    ImportJobRowList: {
+      items: components["schemas"]["ImportJobRow"][]
+      pagination: components["schemas"]["Pagination"]
+    }
+    DataExchangeFileLink: {
+      url: string
+      /** Format: date-time */
+      expiresAt: string
+    }
+    ExportJob: {
+      /** Format: uuid */
+      id: string
+      kind: string
+      kindLabel: string
+      /** @enum {string} */
+      status: "queued" | "running" | "completed" | "failed"
+      totalRows: number
+      fileName: string
+      message: string
+      /** Format: date-time */
+      completedAt?: string | null
+      /** Format: uuid */
+      createdBy: string
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+    }
+    ExportJobList: {
+      items: components["schemas"]["ExportJob"][]
+      pagination: components["schemas"]["Pagination"]
+    }
+    ExportJobInput: {
+      kind: string
+    }
   }
   responses: {
     /** @description Error standar (problem+json) */
@@ -3869,6 +4859,9 @@ export interface components {
     /** @description Waktu kedaluwarsa URL (Unix detik). */
     FileExpires: number
     FileSignature: string
+    /** @description Jenis data = resource permission, mis. `catalog.product`. */
+    DataExchangeKindPath: string
+    DataExchangeKindQuery: string
   }
   requestBodies: never
   headers: never
@@ -6857,6 +7850,478 @@ export interface operations {
       default: components["responses"]["Problem"]
     }
   }
+  listInbounds: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["InboundStatus"]
+        sourceType?: string
+        warehouseId?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar Inbound */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["InboundList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getInbound: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Detail Inbound */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Inbound"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  recordInboundQc: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+        lineId: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["InboundQcInput"]
+      }
+    }
+    responses: {
+      /** @description Inbound setelah QC */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Inbound"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listStockTransfers: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        transferType?: components["schemas"]["StockTransferType"]
+        /** @description Bisa lebih dari satu. */
+        status?: components["schemas"]["StockTransferStatus"][]
+        locationId?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar transfer */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockTransferList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createStockTransfer: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["StockTransferInput"]
+      }
+    }
+    responses: {
+      /** @description Transfer dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockTransfer"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listStockInTransit: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        locationId?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Baris Dalam Pengiriman */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockInTransitList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getStockTransfer: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Detail transfer */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockTransfer"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateStockTransfer: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["StockTransferInput"] &
+          components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Transfer diubah */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockTransfer"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  actOnStockTransfer: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["StockTransferActionInput"]
+      }
+    }
+    responses: {
+      /** @description Transfer setelah aksi */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockTransfer"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listStockCounts: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        /** @description Bisa lebih dari satu. */
+        status?: components["schemas"]["StockCountStatus"][]
+        countType?: components["schemas"]["StockCountType"]
+        locationId?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar stock count */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockCountList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createStockCounts: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["StockCountInput"]
+      }
+    }
+    responses: {
+      /** @description Stock count dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": {
+            items: components["schemas"]["StockCountSummary"][]
+          }
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getStockCount: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Detail stock count */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockCount"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  saveStockCountEntries: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["StockCountEntriesInput"]
+      }
+    }
+    responses: {
+      /** @description Stock count setelah disimpan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockCount"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  actOnStockCount: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["StockCountActionInput"]
+      }
+    }
+    responses: {
+      /** @description Stock count setelah aksi */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockCount"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listStockCountSchedules: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Jadwal */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": {
+            items: components["schemas"]["StockCountSchedule"][]
+          }
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createStockCountSchedule: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["StockCountScheduleInput"]
+      }
+    }
+    responses: {
+      /** @description Jadwal dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockCountSchedule"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateStockCountSchedule: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["StockCountScheduleInput"] &
+          components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Jadwal diubah */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockCountSchedule"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
   listStockBalances: {
     parameters: {
       query?: {
@@ -8000,6 +9465,329 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listDataExchangeKinds: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Jenis data */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DataExchangeKindList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getDataExchangeTemplate: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Jenis data = resource permission, mis. `catalog.product`. */
+        kind: components["parameters"]["DataExchangeKindPath"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description File template */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listImportJobs: {
+    parameters: {
+      query?: {
+        kind?: components["parameters"]["DataExchangeKindQuery"]
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Riwayat impor, terbaru dulu */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ImportJobList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createImportJob: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ImportJobInput"]
+      }
+    }
+    responses: {
+      /** @description Job impor dibuat */
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ImportJob"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getImportJob: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Job impor */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ImportJob"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listImportJobRows: {
+    parameters: {
+      query?: {
+        /** @description true = hanya baris valid, false = hanya baris error, kosong = semua. */
+        valid?: boolean
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+      }
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Baris preview */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ImportJobRowList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  commitImportJob: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Penyimpanan dijadwalkan */
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ImportJob"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  cancelImportJob: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Impor dibatalkan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ImportJob"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getImportJobErrorFile: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description URL unduhan berumur 5 menit */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DataExchangeFileLink"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listExportJobs: {
+    parameters: {
+      query?: {
+        kind?: components["parameters"]["DataExchangeKindQuery"]
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Riwayat ekspor, terbaru dulu */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ExportJobList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createExportJob: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ExportJobInput"]
+      }
+    }
+    responses: {
+      /** @description Job ekspor dibuat */
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ExportJob"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getExportJob: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Job ekspor */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ExportJob"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getExportJobDownloadUrl: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description URL unduhan berumur 5 menit */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DataExchangeFileLink"]
+        }
       }
       default: components["responses"]["Problem"]
     }

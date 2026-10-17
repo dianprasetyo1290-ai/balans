@@ -27,7 +27,7 @@ tags:
   - name: catalog
     description: Master produk, packaging, material, bundling (R1.1)
   - name: warehouse
-    description: Gudang dan lokasi stok (R1.1)
+    description: Gudang dan lokasi stok (R1.1); Inbound/QC, Transfer Stok, Petty Stock, Stock Count (R1.2)
   - name: inventory
     description: Ledger stok, batch, HPP FIFO, saran FEFO (R1.2)
   - name: accounting
@@ -40,6 +40,8 @@ tags:
     description: Data karyawan dasar (R1.1)
   - name: filestore
     description: Upload dan unduhan file bertanda tangan (R1.1)
+  - name: dataexchange
+    description: Impor/ekspor Excel master data (R1.1)
 paths:
   /healthz:
     get:
@@ -2572,6 +2574,449 @@ paths:
                 $ref: '#/components/schemas/Location'
         default:
           $ref: '#/components/responses/Problem'
+  /api/v1/inbounds:
+    get:
+      operationId: listInbounds
+      tags:
+        - warehouse
+      summary: Antrian Inbound — barang Karantina per dokumen asal (WMS-02, WMS-09)
+      description: Terbaru lebih dulu. Permission `warehouse.inbound.read`.
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Search'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/InboundStatus'
+        - name: sourceType
+          in: query
+          schema:
+            type: string
+        - name: warehouseId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Daftar Inbound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InboundList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/inbounds/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      operationId: getInbound
+      tags:
+        - warehouse
+      summary: Detail Inbound beserta baris dan catatan QC
+      responses:
+        '200':
+          description: Detail Inbound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inbound'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/inbounds/{id}/lines/{lineId}/qc:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+      - name: lineId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      operationId: recordInboundQc
+      tags:
+        - warehouse
+      summary: QC satu baris Inbound (checklist, qty lulus/ditolak, foto, lokasi tujuan)
+      description: |
+        Qty lulus pindah Karantina → Tersedia di lokasi tujuan; qty ditolak tetap Karantina (ditahan di Inbound untuk
+        barang pemasok/maklon, atau pindah ke Gudang Retur). Qty lulus + ditolak = qty baris. Permission
+        `warehouse.inbound.post`.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InboundQcInput'
+      responses:
+        '200':
+          description: Inbound setelah QC
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inbound'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/stock-transfers:
+    get:
+      operationId: listStockTransfers
+      tags:
+        - warehouse
+      summary: Daftar Transfer Stok atau Permintaan Petty Stock
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Search'
+        - name: transferType
+          in: query
+          schema:
+            $ref: '#/components/schemas/StockTransferType'
+        - name: status
+          in: query
+          description: Bisa lebih dari satu.
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/StockTransferStatus'
+        - name: locationId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Daftar transfer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockTransferList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createStockTransfer
+      tags:
+        - warehouse
+      summary: Membuat Transfer Stok / Permintaan Petty Stock berstatus Draft
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockTransferInput'
+      responses:
+        '201':
+          description: Transfer dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockTransfer'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/stock-transfers/in-transit:
+    get:
+      operationId: listStockInTransit
+      tags:
+        - warehouse
+      summary: Stok dalam Pengiriman — baris transfer yang belum diterima penuh (WMS-10)
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - name: locationId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Baris Dalam Pengiriman
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockInTransitList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/stock-transfers/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      operationId: getStockTransfer
+      tags:
+        - warehouse
+      summary: Detail transfer
+      responses:
+        '200':
+          description: Detail transfer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockTransfer'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      operationId: updateStockTransfer
+      tags:
+        - warehouse
+      summary: Mengubah transfer Draft
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/StockTransferInput'
+                - $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Transfer diubah
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockTransfer'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/stock-transfers/{id}/actions:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      operationId: actOnStockTransfer
+      tags:
+        - warehouse
+      summary: Aksi status transfer (submit, release, prepare, post, ship, receive, complete, cancel)
+      description: |
+        Transfer langsung: `post` (dalam satu gudang, langsung Selesai) atau `ship` (antar gudang/eksternal →
+        Dalam Pengiriman), `receive` (qty diterima per baris), `complete` (sisa dicatat kekurangan). Permintaan
+        Petty Stock: `submit` (Fulfillment Leader), `release` (Logistik Leader; stok asal dialokasikan FEFO),
+        `prepare` (Staf Gudang), `receive` (Fulfillment Leader mengonfirmasi qty; sisa alokasi dilepas).
+        Aksi yang boleh dijalankan ada di `allowedActions`.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockTransferActionInput'
+      responses:
+        '200':
+          description: Transfer setelah aksi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockTransfer'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/stock-counts:
+    get:
+      operationId: listStockCounts
+      tags:
+        - warehouse
+      summary: Daftar Stock Count (Merchandiser hanya lokasi konsinyasi mitra yang ditugaskan)
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Search'
+        - name: status
+          in: query
+          description: Bisa lebih dari satu.
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/StockCountStatus'
+        - name: countType
+          in: query
+          schema:
+            $ref: '#/components/schemas/StockCountType'
+        - name: locationId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Daftar stock count
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockCountList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createStockCounts
+      tags:
+        - warehouse
+      summary: Membuat Stock Count Draft, satu dokumen per lokasi
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockCountInput'
+      responses:
+        '201':
+          description: Stock count dibuat
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StockCountSummary'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/stock-counts/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      operationId: getStockCount
+      tags:
+        - warehouse
+      summary: Detail Stock Count (hitung buta — qty sistem dan selisih kosong sampai hasil dikirim)
+      responses:
+        '200':
+          description: Detail stock count
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockCount'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/stock-counts/{id}/entries:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    put:
+      operationId: saveStockCountEntries
+      tags:
+        - warehouse
+      summary: Menyimpan isian hitung (autosave form HP), barang tambahan, dan foto
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockCountEntriesInput'
+      responses:
+        '200':
+          description: Stock count setelah disimpan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockCount'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/stock-counts/{id}/actions:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      operationId: actOnStockCount
+      tags:
+        - warehouse
+      summary: Aksi status Stock Count (start, submit, recount, cancel)
+      description: |
+        `start` memberi nomor SC dan mengambil snapshot saldo sistem; `submit` menghitung selisih — ada selisih
+        pada stock count gudang → approval `stock_count` (nominal = nilai selisih absolut); tanpa selisih atau
+        konsinyasi/vending → Selesai. Setelah disetujui, penyesuaian stok + jurnal A-14 diposting otomatis.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockCountActionInput'
+      responses:
+        '200':
+          description: Stock count setelah aksi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockCount'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/stock-count-schedules:
+    get:
+      operationId: listStockCountSchedules
+      tags:
+        - warehouse
+      summary: Jadwal Stock Count (cycle count, konsinyasi/vending bulanan, penuh akhir tahun)
+      responses:
+        '200':
+          description: Jadwal
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StockCountSchedule'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createStockCountSchedule
+      tags:
+        - warehouse
+      summary: Membuat jadwal Stock Count
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockCountScheduleInput'
+      responses:
+        '201':
+          description: Jadwal dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockCountSchedule'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/stock-count-schedules/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    put:
+      operationId: updateStockCountSchedule
+      tags:
+        - warehouse
+      summary: Mengubah jadwal Stock Count
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/StockCountScheduleInput'
+                - $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Jadwal diubah
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockCountSchedule'
+        default:
+          $ref: '#/components/responses/Problem'
   /api/v1/stock-balances:
     get:
       operationId: listStockBalances
@@ -3600,6 +4045,267 @@ paths:
               schema:
                 type: string
                 format: binary
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/data-exchange/kinds:
+    get:
+      operationId: listDataExchangeKinds
+      tags:
+        - dataexchange
+      summary: Jenis data yang boleh diimpor/diekspor user (MD-10, INT-02)
+      description: |
+        Hanya jenis data dengan permission `<kind>.import` atau `<kind>.export` milik user. `uploadOwnerType`
+        dipakai sebagai `ownerType` saat meminta URL upload file (`POST /api/v1/files`).
+      responses:
+        '200':
+          description: Jenis data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataExchangeKindList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/data-exchange/kinds/{kind}/template:
+    get:
+      operationId: getDataExchangeTemplate
+      tags:
+        - dataexchange
+      summary: Mengunduh template impor (xlsx) yang dihasilkan dari definisi kolom
+      description: |
+        Template berisi sheet data (header oranye bertanda `*` wajib, abu-abu opsional, dropdown untuk kolom
+        pilihan) dan sheet Petunjuk berisi format, aturan, serta contoh baris. Butuh `<kind>.import`.
+      parameters:
+        - $ref: '#/components/parameters/DataExchangeKindPath'
+      responses:
+        '200':
+          description: File template
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/import-jobs:
+    get:
+      operationId: listImportJobs
+      tags:
+        - dataexchange
+      summary: Riwayat impor (jenis data yang boleh diimpor user)
+      parameters:
+        - $ref: '#/components/parameters/DataExchangeKindQuery'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Riwayat impor, terbaru dulu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJobList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createImportJob
+      tags:
+        - dataexchange
+      summary: Memulai impor dari file xlsx yang sudah diunggah
+      description: |
+        File diunggah dulu lewat `POST /api/v1/files` dengan `ownerType` dari `listDataExchangeKinds`. Pemeriksaan
+        per baris berjalan sebagai job `dataexchange.import` (antrean bulk); pantau progress lewat `getImportJob`.
+        File yang sama (SHA-256) untuk jenis data yang sama ditolak `IMPORT_ALREADY_PROCESSED`, kecuali job
+        sebelumnya gagal atau dibatalkan.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportJobInput'
+      responses:
+        '202':
+          description: Job impor dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJob'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/import-jobs/{id}:
+    get:
+      operationId: getImportJob
+      tags:
+        - dataexchange
+      summary: Status, progress, dan ringkasan job impor
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Job impor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJob'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/import-jobs/{id}/rows:
+    get:
+      operationId: listImportJobRows
+      tags:
+        - dataexchange
+      summary: Preview baris hasil pemeriksaan
+      description: Data pribadi (NPWP, nomor rekening, NIK) ditampilkan tersamar.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - name: valid
+          in: query
+          description: true = hanya baris valid, false = hanya baris error, kosong = semua.
+          schema:
+            type: boolean
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Baris preview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJobRowList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/import-jobs/{id}/commit:
+    post:
+      operationId: commitImportJob
+      tags:
+        - dataexchange
+      summary: Menyimpan baris valid
+      description: |
+        Hanya untuk status `validated` dengan minimal satu baris valid. Penyimpanan berjalan sebagai job; master
+        data disimpan dalam satu transaksi (gagal satu baris = tidak ada yang tersimpan, TG 5.15).
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '202':
+          description: Penyimpanan dijadwalkan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJob'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/import-jobs/{id}/cancel:
+    post:
+      operationId: cancelImportJob
+      tags:
+        - dataexchange
+      summary: Membatalkan impor yang menunggu konfirmasi
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Impor dibatalkan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJob'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/import-jobs/{id}/error-file:
+    get:
+      operationId: getImportJobErrorFile
+      tags:
+        - dataexchange
+      summary: URL unduhan file baris error (xlsx dengan kolom Keterangan Error)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: URL unduhan berumur 5 menit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataExchangeFileLink'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/export-jobs:
+    get:
+      operationId: listExportJobs
+      tags:
+        - dataexchange
+      summary: Riwayat ekspor (jenis data yang boleh diekspor user)
+      parameters:
+        - $ref: '#/components/parameters/DataExchangeKindQuery'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Riwayat ekspor, terbaru dulu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportJobList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createExportJob
+      tags:
+        - dataexchange
+      summary: Memulai ekspor ke xlsx
+      description: |
+        File dibuat job `dataexchange.export` (antrean bulk) dengan kolom yang sama dengan template impor, lalu
+        user mendapat notifikasi berisi tautan unduhan. Butuh `<kind>.export`.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExportJobInput'
+      responses:
+        '202':
+          description: Job ekspor dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportJob'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/export-jobs/{id}:
+    get:
+      operationId: getExportJob
+      tags:
+        - dataexchange
+      summary: Status job ekspor
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Job ekspor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportJob'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/export-jobs/{id}/download-url:
+    get:
+      operationId: getExportJobDownloadUrl
+      tags:
+        - dataexchange
+      summary: URL unduhan file ekspor
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: URL unduhan berumur 5 menit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataExchangeFileLink'
         default:
           $ref: '#/components/responses/Problem'
 components:
@@ -6271,6 +6977,935 @@ components:
             isActive:
               type: boolean
         - $ref: '#/components/schemas/VersionInput'
+    InboundStatus:
+      type: string
+      description: '`in_progress` Diproses, `completed` Selesai.'
+      enum:
+        - in_progress
+        - completed
+    WhLocationRef:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - locationType
+        - locationTypeLabel
+        - isExternal
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        locationType:
+          $ref: '#/components/schemas/LocationType'
+        locationTypeLabel:
+          type: string
+        isExternal:
+          type: boolean
+        warehouseName:
+          type: string
+    InboundSummary:
+      type: object
+      required:
+        - id
+        - number
+        - sourceType
+        - sourceTypeLabel
+        - sourceLabel
+        - location
+        - businessDate
+        - status
+        - lineCount
+        - pendingCount
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        sourceType:
+          type: string
+        sourceTypeLabel:
+          type: string
+        sourceLabel:
+          type: string
+        location:
+          $ref: '#/components/schemas/WhLocationRef'
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        status:
+          $ref: '#/components/schemas/InboundStatus'
+        lineCount:
+          type: integer
+        pendingCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+    InboundList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/InboundSummary'
+    InboundRejectAction:
+      type: string
+      description: '`hold` ditahan di Inbound (reject ke pemasok/maklon), `returns` ke Gudang Retur.'
+      enum:
+        - hold
+        - returns
+    WhProductRef:
+      type: object
+      required:
+        - id
+        - sku
+        - name
+        - uom
+      properties:
+        id:
+          type: string
+          format: uuid
+        sku:
+          type: string
+        name:
+          type: string
+        uom:
+          type: string
+    WhBatchRef:
+      type: object
+      required:
+        - id
+        - number
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        expiryDate:
+          $ref: '#/components/schemas/BusinessDate'
+    WhQuantity:
+      type: string
+      description: Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+      pattern: ^-?[0-9]{1,15}(\.[0-9]{1,3})?$
+      example: '12.000'
+    InboundLineStatus:
+      type: string
+      description: '`quarantine` Karantina (belum QC), `posted` Diposting (lulus), `qc_rejected` Ditolak QC.'
+      enum:
+        - quarantine
+        - posted
+        - qc_rejected
+    InboundLine:
+      type: object
+      required:
+        - id
+        - lineNo
+        - product
+        - qty
+        - passedQty
+        - rejectedQty
+        - destination
+        - status
+        - rejectReason
+        - allowedActions
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        product:
+          $ref: '#/components/schemas/WhProductRef'
+        batch:
+          $ref: '#/components/schemas/WhBatchRef'
+        qty:
+          $ref: '#/components/schemas/WhQuantity'
+        passedQty:
+          $ref: '#/components/schemas/WhQuantity'
+        rejectedQty:
+          $ref: '#/components/schemas/WhQuantity'
+        destination:
+          $ref: '#/components/schemas/WhLocationRef'
+        rejectLocation:
+          $ref: '#/components/schemas/WhLocationRef'
+        status:
+          $ref: '#/components/schemas/InboundLineStatus'
+        rejectReason:
+          type: string
+        checkedByName:
+          type: string
+        checkedAt:
+          type: string
+          format: date-time
+        allowedActions:
+          type: array
+          items:
+            type: string
+            enum:
+              - qc
+    InboundQcChecklist:
+      type: object
+      required:
+        - batch
+        - expiry
+        - condition
+        - seal
+      properties:
+        batch:
+          type: boolean
+        expiry:
+          type: boolean
+        condition:
+          type: boolean
+        seal:
+          type: boolean
+    InboundQualityCheck:
+      type: object
+      required:
+        - id
+        - lineId
+        - result
+        - qty
+        - checks
+        - note
+        - photoFileIds
+        - checkedByName
+        - checkedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineId:
+          type: string
+          format: uuid
+        result:
+          type: string
+          enum:
+            - passed
+            - rejected
+        qty:
+          $ref: '#/components/schemas/WhQuantity'
+        checks:
+          $ref: '#/components/schemas/InboundQcChecklist'
+        note:
+          type: string
+        photoFileIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        checkedByName:
+          type: string
+        checkedAt:
+          type: string
+          format: date-time
+    Inbound:
+      allOf:
+        - $ref: '#/components/schemas/InboundSummary'
+        - type: object
+          required:
+            - sourceId
+            - rejectAction
+            - note
+            - lines
+            - checks
+            - version
+          properties:
+            sourceId:
+              type: string
+              format: uuid
+            rejectAction:
+              $ref: '#/components/schemas/InboundRejectAction'
+            note:
+              type: string
+            completedAt:
+              type: string
+              format: date-time
+            version:
+              type: integer
+            lines:
+              type: array
+              items:
+                $ref: '#/components/schemas/InboundLine'
+            checks:
+              type: array
+              items:
+                $ref: '#/components/schemas/InboundQualityCheck'
+    InboundQcInput:
+      type: object
+      required:
+        - passedQty
+        - rejectedQty
+        - checks
+      properties:
+        passedQty:
+          $ref: '#/components/schemas/WhQuantity'
+        rejectedQty:
+          $ref: '#/components/schemas/WhQuantity'
+        checks:
+          $ref: '#/components/schemas/InboundQcChecklist'
+        rejectReason:
+          type: string
+          maxLength: 500
+        destinationLocationId:
+          type: string
+          format: uuid
+        note:
+          type: string
+          maxLength: 500
+        photoFileIds:
+          type: array
+          maxItems: 5
+          items:
+            type: string
+            format: uuid
+    StockTransferType:
+      type: string
+      description: '`direct` Transfer Stok, `request` Permintaan Petty Stock.'
+      enum:
+        - direct
+        - request
+    StockTransferStatus:
+      type: string
+      enum:
+        - draft
+        - submitted
+        - in_progress
+        - in_transit
+        - partially_received
+        - received
+        - completed
+        - cancelled
+    StockTransferSummary:
+      type: object
+      required:
+        - id
+        - transferType
+        - from
+        - to
+        - requiresShipping
+        - businessDate
+        - status
+        - requestedByName
+        - lineCount
+        - totalQty
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        transferType:
+          $ref: '#/components/schemas/StockTransferType'
+        from:
+          $ref: '#/components/schemas/WhLocationRef'
+        to:
+          $ref: '#/components/schemas/WhLocationRef'
+        requiresShipping:
+          type: boolean
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        status:
+          $ref: '#/components/schemas/StockTransferStatus'
+        requestedByName:
+          type: string
+        lineCount:
+          type: integer
+        totalQty:
+          $ref: '#/components/schemas/WhQuantity'
+        createdAt:
+          type: string
+          format: date-time
+    StockTransferList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/StockTransferSummary'
+    StockTransferLineInput:
+      type: object
+      required:
+        - productId
+        - qty
+      properties:
+        productId:
+          type: string
+          format: uuid
+        batchId:
+          type: string
+          format: uuid
+        qty:
+          $ref: '#/components/schemas/WhQuantity'
+        batchReason:
+          type: string
+          maxLength: 500
+        note:
+          type: string
+          maxLength: 500
+    StockTransferInput:
+      type: object
+      required:
+        - transferType
+        - fromLocationId
+        - toLocationId
+        - businessDate
+        - lines
+      properties:
+        transferType:
+          $ref: '#/components/schemas/StockTransferType'
+        fromLocationId:
+          type: string
+          format: uuid
+        toLocationId:
+          type: string
+          format: uuid
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        note:
+          type: string
+          maxLength: 500
+        lines:
+          type: array
+          minItems: 1
+          maxItems: 200
+          items:
+            $ref: '#/components/schemas/StockTransferLineInput'
+    StockTransferLine:
+      type: object
+      required:
+        - id
+        - lineNo
+        - product
+        - qty
+        - receivedQty
+        - shortageQty
+        - costAmount
+        - batchReason
+        - note
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        product:
+          $ref: '#/components/schemas/WhProductRef'
+        batch:
+          $ref: '#/components/schemas/WhBatchRef'
+        qty:
+          $ref: '#/components/schemas/WhQuantity'
+        receivedQty:
+          $ref: '#/components/schemas/WhQuantity'
+        shortageQty:
+          $ref: '#/components/schemas/WhQuantity'
+        costAmount:
+          $ref: '#/components/schemas/Money'
+        batchReason:
+          type: string
+        note:
+          type: string
+    StockTransferAction:
+      type: string
+      enum:
+        - edit
+        - submit
+        - release
+        - prepare
+        - post
+        - ship
+        - receive
+        - complete
+        - cancel
+    StockTransfer:
+      allOf:
+        - $ref: '#/components/schemas/StockTransferSummary'
+        - type: object
+          required:
+            - note
+            - lines
+            - version
+            - allowedActions
+            - cancelReason
+          properties:
+            note:
+              type: string
+            sourceType:
+              type: string
+            sourceId:
+              type: string
+              format: uuid
+            submittedAt:
+              type: string
+              format: date-time
+            releasedByName:
+              type: string
+            releasedAt:
+              type: string
+              format: date-time
+            preparedByName:
+              type: string
+            preparedAt:
+              type: string
+              format: date-time
+            shippedByName:
+              type: string
+            shippedAt:
+              type: string
+              format: date-time
+            receivedByName:
+              type: string
+            receivedAt:
+              type: string
+              format: date-time
+            completedAt:
+              type: string
+              format: date-time
+            cancelledAt:
+              type: string
+              format: date-time
+            cancelReason:
+              type: string
+            version:
+              type: integer
+            lines:
+              type: array
+              items:
+                $ref: '#/components/schemas/StockTransferLine'
+            allowedActions:
+              type: array
+              items:
+                $ref: '#/components/schemas/StockTransferAction'
+    StockInTransitLine:
+      type: object
+      required:
+        - transferId
+        - lineId
+        - from
+        - to
+        - businessDate
+        - status
+        - product
+        - qty
+        - receivedQty
+        - outstandingQty
+        - costAmount
+      properties:
+        transferId:
+          type: string
+          format: uuid
+        number:
+          type: string
+        lineId:
+          type: string
+          format: uuid
+        from:
+          $ref: '#/components/schemas/WhLocationRef'
+        to:
+          $ref: '#/components/schemas/WhLocationRef'
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        shippedAt:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/StockTransferStatus'
+        product:
+          $ref: '#/components/schemas/WhProductRef'
+        batch:
+          $ref: '#/components/schemas/WhBatchRef'
+        qty:
+          $ref: '#/components/schemas/WhQuantity'
+        receivedQty:
+          $ref: '#/components/schemas/WhQuantity'
+        outstandingQty:
+          $ref: '#/components/schemas/WhQuantity'
+        costAmount:
+          $ref: '#/components/schemas/Money'
+    StockInTransitList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/StockInTransitLine'
+    StockTransferReceiveLine:
+      type: object
+      required:
+        - lineId
+        - qty
+      properties:
+        lineId:
+          type: string
+          format: uuid
+        qty:
+          $ref: '#/components/schemas/WhQuantity'
+    StockTransferActionInput:
+      type: object
+      required:
+        - action
+        - version
+      properties:
+        action:
+          $ref: '#/components/schemas/StockTransferAction'
+        version:
+          type: integer
+        reason:
+          type: string
+          maxLength: 500
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockTransferReceiveLine'
+    StockCountStatus:
+      type: string
+      enum:
+        - draft
+        - in_progress
+        - pending_approval
+        - rejected
+        - posted
+        - completed
+        - cancelled
+    StockCountType:
+      type: string
+      description: '`full` Penuh, `cycle` Cycle count, `consignment` Konsinyasi, `vending` Vending.'
+      enum:
+        - full
+        - cycle
+        - consignment
+        - vending
+    StockCountSummary:
+      type: object
+      required:
+        - id
+        - countType
+        - location
+        - businessDate
+        - status
+        - lineCount
+        - countedCount
+        - assignedToName
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        countType:
+          $ref: '#/components/schemas/StockCountType'
+        location:
+          $ref: '#/components/schemas/WhLocationRef'
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        status:
+          $ref: '#/components/schemas/StockCountStatus'
+        scheduleId:
+          type: string
+          format: uuid
+        assignedToName:
+          type: string
+        lineCount:
+          type: integer
+        countedCount:
+          type: integer
+        varianceAmount:
+          description: Kosong sampai hasil dikirim.
+          allOf:
+            - $ref: '#/components/schemas/Money'
+        createdAt:
+          type: string
+          format: date-time
+    StockCountList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/StockCountSummary'
+    StockCountInput:
+      type: object
+      required:
+        - countType
+        - locationIds
+      properties:
+        countType:
+          $ref: '#/components/schemas/StockCountType'
+        locationIds:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items:
+            type: string
+            format: uuid
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        note:
+          type: string
+          maxLength: 500
+    StockCountLine:
+      type: object
+      required:
+        - id
+        - lineNo
+        - product
+        - isExtra
+        - note
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        product:
+          $ref: '#/components/schemas/WhProductRef'
+        batch:
+          $ref: '#/components/schemas/WhBatchRef'
+        systemQty:
+          description: Kosong saat hitung buta (Draft, Diproses, Ditolak).
+          allOf:
+            - $ref: '#/components/schemas/WhQuantity'
+        countedQty:
+          $ref: '#/components/schemas/WhQuantity'
+        varianceQty:
+          $ref: '#/components/schemas/WhQuantity'
+        unitCost:
+          type: string
+        varianceAmount:
+          $ref: '#/components/schemas/Money'
+        isExtra:
+          type: boolean
+        photoFileId:
+          type: string
+          format: uuid
+        note:
+          type: string
+        countedAt:
+          type: string
+          format: date-time
+    StockCountAction:
+      type: string
+      enum:
+        - start
+        - count
+        - submit
+        - recount
+        - cancel
+    StockCount:
+      allOf:
+        - $ref: '#/components/schemas/StockCountSummary'
+        - type: object
+          required:
+            - note
+            - photoFileIds
+            - lines
+            - version
+            - allowedActions
+            - revealed
+            - decisionNote
+          properties:
+            note:
+              type: string
+            photoFileIds:
+              type: array
+              items:
+                type: string
+                format: uuid
+            revealed:
+              type: boolean
+              description: true = qty sistem dan selisih ditampilkan (setelah hasil dikirim).
+            snapshotAt:
+              type: string
+              format: date-time
+            startedByName:
+              type: string
+            submittedByName:
+              type: string
+            submittedAt:
+              type: string
+              format: date-time
+            netVariance:
+              $ref: '#/components/schemas/Money'
+            decidedAt:
+              type: string
+              format: date-time
+            decisionNote:
+              type: string
+            postedAt:
+              type: string
+              format: date-time
+            journalEntryId:
+              type: string
+              format: uuid
+            version:
+              type: integer
+            lines:
+              type: array
+              items:
+                $ref: '#/components/schemas/StockCountLine'
+            allowedActions:
+              type: array
+              items:
+                $ref: '#/components/schemas/StockCountAction'
+    StockCountEntry:
+      type: object
+      required:
+        - lineId
+      properties:
+        lineId:
+          type: string
+          format: uuid
+        countedQty:
+          $ref: '#/components/schemas/WhQuantity'
+        note:
+          type: string
+          maxLength: 500
+        photoFileId:
+          type: string
+          format: uuid
+    StockCountExtraEntry:
+      type: object
+      required:
+        - productId
+        - countedQty
+      properties:
+        productId:
+          type: string
+          format: uuid
+        batchId:
+          type: string
+          format: uuid
+        countedQty:
+          $ref: '#/components/schemas/WhQuantity'
+        note:
+          type: string
+          maxLength: 500
+    StockCountEntriesInput:
+      type: object
+      properties:
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockCountEntry'
+        extraLines:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockCountExtraEntry'
+        photoFileIds:
+          description: Diisi = mengganti foto lokasi/rak; tidak dikirim = foto tidak berubah.
+          type: array
+          maxItems: 10
+          items:
+            type: string
+            format: uuid
+    StockCountActionInput:
+      type: object
+      required:
+        - action
+        - version
+      properties:
+        action:
+          $ref: '#/components/schemas/StockCountAction'
+        version:
+          type: integer
+        reason:
+          type: string
+          maxLength: 500
+    StockCountFrequency:
+      type: string
+      enum:
+        - weekly
+        - monthly
+        - yearly
+    StockCountScheduleInput:
+      type: object
+      required:
+        - name
+        - countType
+        - frequency
+        - isActive
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        countType:
+          $ref: '#/components/schemas/StockCountType'
+        frequency:
+          $ref: '#/components/schemas/StockCountFrequency'
+        dayOfWeek:
+          type: integer
+          minimum: 1
+          maximum: 7
+        dayOfMonth:
+          type: integer
+          minimum: 1
+          maximum: 31
+        monthOfYear:
+          type: integer
+          minimum: 1
+          maximum: 12
+        warehouseId:
+          type: string
+          format: uuid
+        locationIds:
+          type: array
+          maxItems: 100
+          items:
+            type: string
+            format: uuid
+        assigneeUserId:
+          type: string
+          format: uuid
+        isActive:
+          type: boolean
+    StockCountSchedule:
+      allOf:
+        - $ref: '#/components/schemas/StockCountScheduleInput'
+        - type: object
+          required:
+            - id
+            - nextRunDate
+            - version
+            - locationIds
+            - assigneeName
+          properties:
+            id:
+              type: string
+              format: uuid
+            assigneeName:
+              type: string
+            nextRunDate:
+              $ref: '#/components/schemas/BusinessDate'
+            lastRunDate:
+              $ref: '#/components/schemas/BusinessDate'
+            version:
+              type: integer
     StockStatus:
       type: string
       description: '`available` Tersedia, `quarantine` Karantina, `in_transit` Dalam Pengiriman, `reserved` Dialokasikan.'
@@ -7756,6 +9391,300 @@ components:
         expiresAt:
           type: string
           format: date-time
+    DataExchangeColumn:
+      type: object
+      required:
+        - key
+        - header
+        - required
+        - columnType
+        - options
+      properties:
+        key:
+          type: string
+          description: Nama field (dipakai di `values` dan `errors[].column` preview).
+        header:
+          type: string
+        required:
+          type: boolean
+        columnType:
+          type: string
+          enum:
+            - text
+            - integer
+            - decimal
+            - date
+            - choice
+            - bool
+        options:
+          type: array
+          items:
+            type: string
+        sensitive:
+          type: boolean
+    DataExchangeKind:
+      type: object
+      required:
+        - kind
+        - label
+        - canImport
+        - canExport
+        - uploadOwnerType
+        - columns
+      properties:
+        kind:
+          type: string
+          example: catalog.product
+        label:
+          type: string
+          example: Produk
+        canImport:
+          type: boolean
+        canExport:
+          type: boolean
+        uploadOwnerType:
+          type: string
+          example: import.catalog.product
+        maxFileBytes:
+          type: integer
+          format: int64
+        columns:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataExchangeColumn'
+    DataExchangeKindList:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataExchangeKind'
+    ImportJob:
+      type: object
+      required:
+        - id
+        - kind
+        - kindLabel
+        - fileName
+        - status
+        - totalRows
+        - processedRows
+        - validRows
+        - errorRows
+        - committedRows
+        - progress
+        - message
+        - allowedActions
+        - createdBy
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        kind:
+          type: string
+        kindLabel:
+          type: string
+        fileName:
+          type: string
+        status:
+          type: string
+          enum:
+            - uploaded
+            - validating
+            - validated
+            - committing
+            - completed
+            - failed
+            - cancelled
+        totalRows:
+          type: integer
+        processedRows:
+          type: integer
+        validRows:
+          type: integer
+        errorRows:
+          type: integer
+        committedRows:
+          type: integer
+        progress:
+          type: integer
+          minimum: 0
+          maximum: 100
+        message:
+          type: string
+          description: Alasan gagal untuk status `failed`.
+        allowedActions:
+          type: array
+          items:
+            type: string
+            enum:
+              - commit
+              - cancel
+              - download_errors
+        validatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdBy:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ImportJobList:
+      type: object
+      required:
+        - items
+        - pagination
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImportJob'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    ImportJobInput:
+      type: object
+      required:
+        - kind
+        - fileId
+      properties:
+        kind:
+          type: string
+        fileId:
+          type: string
+          format: uuid
+    ImportJobRowError:
+      type: object
+      required:
+        - message
+      properties:
+        column:
+          type: string
+          description: Key kolom; kosong = error baris.
+        message:
+          type: string
+    ImportJobRow:
+      type: object
+      required:
+        - rowNumber
+        - isValid
+        - values
+        - errors
+      properties:
+        rowNumber:
+          type: integer
+          description: Nomor baris di Excel (header = 1).
+        isValid:
+          type: boolean
+        values:
+          type: object
+          additionalProperties:
+            type: string
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImportJobRowError'
+    ImportJobRowList:
+      type: object
+      required:
+        - items
+        - pagination
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImportJobRow'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    DataExchangeFileLink:
+      type: object
+      required:
+        - url
+        - expiresAt
+      properties:
+        url:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+    ExportJob:
+      type: object
+      required:
+        - id
+        - kind
+        - kindLabel
+        - status
+        - totalRows
+        - fileName
+        - message
+        - createdBy
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        kind:
+          type: string
+        kindLabel:
+          type: string
+        status:
+          type: string
+          enum:
+            - queued
+            - running
+            - completed
+            - failed
+        totalRows:
+          type: integer
+        fileName:
+          type: string
+        message:
+          type: string
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdBy:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ExportJobList:
+      type: object
+      required:
+        - items
+        - pagination
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExportJob'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    ExportJobInput:
+      type: object
+      required:
+        - kind
+      properties:
+        kind:
+          type: string
   parameters:
     Search:
       name: q
@@ -7836,6 +9765,18 @@ components:
       name: sig
       in: query
       required: true
+      schema:
+        type: string
+    DataExchangeKindPath:
+      name: kind
+      in: path
+      required: true
+      description: Jenis data = resource permission, mis. `catalog.product`.
+      schema:
+        type: string
+    DataExchangeKindQuery:
+      name: kind
+      in: query
       schema:
         type: string
   responses:

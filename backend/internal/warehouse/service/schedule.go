@@ -42,9 +42,11 @@ func (s *Service) CreateSchedule(ctx context.Context, in domain.ScheduleInput) (
 	if err != nil {
 		return domain.CountSchedule{}, err
 	}
-	if _, err := s.deps(); err != nil {
+	d, err := s.deps()
+	if err != nil {
 		return domain.CountSchedule{}, err
 	}
+	in.AssigneeName = s.assigneeName(ctx, d, in.AssigneeUserID)
 	sc, err := domain.NewSchedule(in, clockToday(s))
 	if err != nil {
 		return sc, err
@@ -69,9 +71,11 @@ func (s *Service) UpdateSchedule(ctx context.Context, id uuid.UUID, version int,
 	if err != nil {
 		return domain.CountSchedule{}, err
 	}
-	if _, err := s.deps(); err != nil {
+	d, err := s.deps()
+	if err != nil {
 		return domain.CountSchedule{}, err
 	}
+	in.AssigneeName = s.assigneeName(ctx, d, in.AssigneeUserID)
 	var sc domain.CountSchedule
 	err = s.Tx.WithTx(ctx, func(ctx context.Context) error {
 		if sc, err = s.Docs.GetSchedule(ctx, id); err != nil {
@@ -178,6 +182,7 @@ func (s *Service) RunSchedules(ctx context.Context) (int, error) {
 				if assignee == nil && l.Type == domain.LocationConsignment && l.PartyID != nil && d.Partners != nil {
 					if p, err := d.Partners.PartnerByID(ctx, *l.PartyID); err == nil && p.MerchandiserUserID != nil {
 						assignee = p.MerchandiserUserID
+						name = s.assigneeName(ctx, d, assignee)
 					}
 				}
 				id := sc.ID

@@ -638,6 +638,30 @@ func (s *AuthService) ChangePassword(ctx context.Context, current, next string) 
 	return tokens, err
 }
 
+// ActorFor menyusun actor dari role dan permission terbaru user untuk proses latar (mis. job impor Excel yang
+// berjalan atas nama pembuatnya). User nonaktif ditolak FORBIDDEN.
+func (s *AuthService) ActorFor(ctx context.Context, userID uuid.UUID) (actor.Actor, error) {
+	user, err := s.Store.GetUser(ctx, userID)
+	if err != nil {
+		return actor.Actor{}, err
+	}
+	if !user.IsActive {
+		return actor.Actor{}, apperr.New(apperr.CodeForbidden)
+	}
+	perms, err := s.Store.UserPermissions(ctx, userID)
+	if err != nil {
+		return actor.Actor{}, err
+	}
+	set := make(map[string]struct{}, len(perms))
+	for _, p := range perms {
+		set[p] = struct{}{}
+	}
+	return actor.Actor{
+		UserID: user.ID, Email: user.Email, FullName: user.FullName, Roles: user.RoleCodes(),
+		Permissions: set, DivisionIDs: user.DivisionScope(),
+	}, nil
+}
+
 // Authenticate memverifikasi access token dan menyusun actor. Status user dan sesi di-cache 30 detik.
 func (s *AuthService) Authenticate(ctx context.Context, raw string) (actor.Actor, bool, error) {
 	claims, err := s.Tokens.Parse(raw)

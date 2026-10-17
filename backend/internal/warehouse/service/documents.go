@@ -221,6 +221,19 @@ type Notifier interface {
 // Users mencari user aktif per role (diisi adapter identity).
 type Users interface {
 	UserIDsWithRole(ctx context.Context, role string) ([]uuid.UUID, error)
+	UserName(ctx context.Context, id uuid.UUID) (string, error)
+}
+
+// assigneeName mengisi nama petugas dari modul identity bila tersedia.
+func (s *Service) assigneeName(ctx context.Context, d DocumentDeps, id *uuid.UUID) string {
+	if id == nil || d.Users == nil {
+		return ""
+	}
+	name, err := d.Users.UserName(ctx, *id)
+	if err != nil {
+		return ""
+	}
+	return name
 }
 
 // InboundOutcome adalah hasil QC satu baris Inbound yang diteruskan ke modul asal.

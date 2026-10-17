@@ -87,3 +87,6 @@ SET deleted_at = now(), deleted_by = sqlc.arg('actor_id')::uuid, updated_at = no
     is_default = false, version = version + 1
 WHERE party_type = sqlc.arg('party_type') AND party_id = sqlc.arg('party_id')
   AND id = ANY(sqlc.arg('ids')::uuid[]) AND deleted_at IS NULL;
+
+-- name: GetSupplierIDByCode :one
+SELECT id FROM suppliers WHERE code = $1 AND deleted_at IS NULL;

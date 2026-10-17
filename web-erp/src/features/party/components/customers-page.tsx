@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { usePermissions } from "@/features/auth/api/auth-api"
+import { DataExchangeButtons } from "@/features/dataexchange/components/data-exchange-buttons"
 import { systemInfoQuery } from "@/features/system/api/system-queries"
 import { parseProblem } from "@/lib/api/problem"
 import { useIdempotentMutation } from "@/lib/api/use-idempotent-mutation"
@@ -168,11 +169,14 @@ export function CustomersPage() {
             Data pelanggan bersama untuk penjualan, pengiriman, dan CRM.
           </p>
         </div>
-        {canWrite ? (
-          <Button className="min-h-11 sm:min-h-9" onClick={() => setForm({})}>
-            <PlusIcon /> Tambah Pelanggan
-          </Button>
-        ) : null}
+        <div className="flex flex-wrap gap-2">
+          <DataExchangeButtons kind="party.customer" />
+          {canWrite ? (
+            <Button className="min-h-11 sm:min-h-9" onClick={() => setForm({})}>
+              <PlusIcon /> Tambah Pelanggan
+            </Button>
+          ) : null}
+        </div>
       </div>
       <div className="flex flex-wrap gap-2">
         <form

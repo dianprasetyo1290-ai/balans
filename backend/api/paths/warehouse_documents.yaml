@@ -1,0 +1,1164 @@
+inbounds:
+  get:
+    operationId: listInbounds
+    tags: [warehouse]
+    summary: Antrian Inbound — barang Karantina per dokumen asal (WMS-02, WMS-09)
+    description: Terbaru lebih dulu. Permission `warehouse.inbound.read`.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - $ref: "../components/common.yaml#/parameters/Search"
+      - name: status
+        in: query
+        schema:
+          $ref: "#/components/schemas/InboundStatus"
+      - name: sourceType
+        in: query
+        schema:
+          type: string
+      - name: warehouseId
+        in: query
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Daftar Inbound
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InboundList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+inbound:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  get:
+    operationId: getInbound
+    tags: [warehouse]
+    summary: Detail Inbound beserta baris dan catatan QC
+    responses:
+      "200":
+        description: Detail Inbound
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Inbound"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+inboundLineQc:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+    - name: lineId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  post:
+    operationId: recordInboundQc
+    tags: [warehouse]
+    summary: QC satu baris Inbound (checklist, qty lulus/ditolak, foto, lokasi tujuan)
+    description: |
+      Qty lulus pindah Karantina → Tersedia di lokasi tujuan; qty ditolak tetap Karantina (ditahan di Inbound untuk
+      barang pemasok/maklon, atau pindah ke Gudang Retur). Qty lulus + ditolak = qty baris. Permission
+      `warehouse.inbound.post`.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/InboundQcInput"
+    responses:
+      "200":
+        description: Inbound setelah QC
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Inbound"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+stockTransfers:
+  get:
+    operationId: listStockTransfers
+    tags: [warehouse]
+    summary: Daftar Transfer Stok atau Permintaan Petty Stock
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - $ref: "../components/common.yaml#/parameters/Search"
+      - name: transferType
+        in: query
+        schema:
+          $ref: "#/components/schemas/StockTransferType"
+      - name: status
+        in: query
+        description: Bisa lebih dari satu.
+        schema:
+          type: array
+          items:
+            $ref: "#/components/schemas/StockTransferStatus"
+      - name: locationId
+        in: query
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Daftar transfer
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StockTransferList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createStockTransfer
+    tags: [warehouse]
+    summary: Membuat Transfer Stok / Permintaan Petty Stock berstatus Draft
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/StockTransferInput"
+    responses:
+      "201":
+        description: Transfer dibuat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StockTransfer"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+stockTransfersInTransit:
+  get:
+    operationId: listStockInTransit
+    tags: [warehouse]
+    summary: Stok dalam Pengiriman — baris transfer yang belum diterima penuh (WMS-10)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - name: locationId
+        in: query
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Baris Dalam Pengiriman
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StockInTransitList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+stockTransfer:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  get:
+    operationId: getStockTransfer
+    tags: [warehouse]
+    summary: Detail transfer
+    responses:
+      "200":
+        description: Detail transfer
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StockTransfer"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  put:
+    operationId: updateStockTransfer
+    tags: [warehouse]
+    summary: Mengubah transfer Draft
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/StockTransferInput"
+              - $ref: "../components/common.yaml#/VersionInput"
+    responses:
+      "200":
+        description: Transfer diubah
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StockTransfer"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+stockTransferActions:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  post:
+    operationId: actOnStockTransfer
+    tags: [warehouse]
+    summary: Aksi status transfer (submit, release, prepare, post, ship, receive, complete, cancel)
+    description: |
+      Transfer langsung: `post` (dalam satu gudang, langsung Selesai) atau `ship` (antar gudang/eksternal →
+      Dalam Pengiriman), `receive` (qty diterima per baris), `complete` (sisa dicatat kekurangan). Permintaan
+      Petty Stock: `submit` (Fulfillment Leader), `release` (Logistik Leader; stok asal dialokasikan FEFO),
+      `prepare` (Staf Gudang), `receive` (Fulfillment Leader mengonfirmasi qty; sisa alokasi dilepas).
+      Aksi yang boleh dijalankan ada di `allowedActions`.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/StockTransferActionInput"
+    responses:
+      "200":
+        description: Transfer setelah aksi
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StockTransfer"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+stockCounts:
+  get:
+    operationId: listStockCounts
+    tags: [warehouse]
+    summary: Daftar Stock Count (Merchandiser hanya lokasi konsinyasi mitra yang ditugaskan)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - $ref: "../components/common.yaml#/parameters/Search"
+      - name: status
+        in: query
+        description: Bisa lebih dari satu.
+        schema:
+          type: array
+          items:
+            $ref: "#/components/schemas/StockCountStatus"
+      - name: countType
+        in: query
+        schema:
+          $ref: "#/components/schemas/StockCountType"
+      - name: locationId
+        in: query
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Daftar stock count
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StockCountList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createStockCounts
+    tags: [warehouse]
+    summary: Membuat Stock Count Draft, satu dokumen per lokasi
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/StockCountInput"
+    responses:
+      "201":
+        description: Stock count dibuat
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [items]
+              properties:
+                items:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/StockCountSummary"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+stockCount:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  get:
+    operationId: getStockCount
+    tags: [warehouse]
+    summary: Detail Stock Count (hitung buta — qty sistem dan selisih kosong sampai hasil dikirim)
+    responses:
+      "200":
+        description: Detail stock count
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StockCount"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+stockCountEntries:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  put:
+    operationId: saveStockCountEntries
+    tags: [warehouse]
+    summary: Menyimpan isian hitung (autosave form HP), barang tambahan, dan foto
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/StockCountEntriesInput"
+    responses:
+      "200":
+        description: Stock count setelah disimpan
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StockCount"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+stockCountActions:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  post:
+    operationId: actOnStockCount
+    tags: [warehouse]
+    summary: Aksi status Stock Count (start, submit, recount, cancel)
+    description: |
+      `start` memberi nomor SC dan mengambil snapshot saldo sistem; `submit` menghitung selisih — ada selisih
+      pada stock count gudang → approval `stock_count` (nominal = nilai selisih absolut); tanpa selisih atau
+      konsinyasi/vending → Selesai. Setelah disetujui, penyesuaian stok + jurnal A-14 diposting otomatis.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/StockCountActionInput"
+    responses:
+      "200":
+        description: Stock count setelah aksi
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StockCount"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+stockCountSchedules:
+  get:
+    operationId: listStockCountSchedules
+    tags: [warehouse]
+    summary: Jadwal Stock Count (cycle count, konsinyasi/vending bulanan, penuh akhir tahun)
+    responses:
+      "200":
+        description: Jadwal
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [items]
+              properties:
+                items:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/StockCountSchedule"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createStockCountSchedule
+    tags: [warehouse]
+    summary: Membuat jadwal Stock Count
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/StockCountScheduleInput"
+    responses:
+      "201":
+        description: Jadwal dibuat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StockCountSchedule"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+stockCountSchedule:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  put:
+    operationId: updateStockCountSchedule
+    tags: [warehouse]
+    summary: Mengubah jadwal Stock Count
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/StockCountScheduleInput"
+              - $ref: "../components/common.yaml#/VersionInput"
+    responses:
+      "200":
+        description: Jadwal diubah
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StockCountSchedule"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+components:
+  schemas:
+    WhQuantity:
+      type: string
+      description: Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+      pattern: "^-?[0-9]{1,15}(\\.[0-9]{1,3})?$"
+      example: "12.000"
+    WhProductRef:
+      type: object
+      required: [id, sku, name, uom]
+      properties:
+        id:
+          type: string
+          format: uuid
+        sku:
+          type: string
+        name:
+          type: string
+        uom:
+          type: string
+    WhBatchRef:
+      type: object
+      required: [id, number]
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        expiryDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+    WhLocationRef:
+      type: object
+      required: [id, code, name, locationType, locationTypeLabel, isExternal]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        locationType:
+          $ref: "./warehouse.yaml#/components/schemas/LocationType"
+        locationTypeLabel:
+          type: string
+        isExternal:
+          type: boolean
+        warehouseName:
+          type: string
+    InboundStatus:
+      type: string
+      description: "`in_progress` Diproses, `completed` Selesai."
+      enum: [in_progress, completed]
+    InboundLineStatus:
+      type: string
+      description: "`quarantine` Karantina (belum QC), `posted` Diposting (lulus), `qc_rejected` Ditolak QC."
+      enum: [quarantine, posted, qc_rejected]
+    InboundRejectAction:
+      type: string
+      description: "`hold` ditahan di Inbound (reject ke pemasok/maklon), `returns` ke Gudang Retur."
+      enum: [hold, returns]
+    InboundQcChecklist:
+      type: object
+      required: [batch, expiry, condition, seal]
+      properties:
+        batch:
+          type: boolean
+        expiry:
+          type: boolean
+        condition:
+          type: boolean
+        seal:
+          type: boolean
+    InboundQcInput:
+      type: object
+      required: [passedQty, rejectedQty, checks]
+      properties:
+        passedQty:
+          $ref: "#/components/schemas/WhQuantity"
+        rejectedQty:
+          $ref: "#/components/schemas/WhQuantity"
+        checks:
+          $ref: "#/components/schemas/InboundQcChecklist"
+        rejectReason:
+          type: string
+          maxLength: 500
+        destinationLocationId:
+          type: string
+          format: uuid
+        note:
+          type: string
+          maxLength: 500
+        photoFileIds:
+          type: array
+          maxItems: 5
+          items:
+            type: string
+            format: uuid
+    InboundQualityCheck:
+      type: object
+      required: [id, lineId, result, qty, checks, note, photoFileIds, checkedByName, checkedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineId:
+          type: string
+          format: uuid
+        result:
+          type: string
+          enum: [passed, rejected]
+        qty:
+          $ref: "#/components/schemas/WhQuantity"
+        checks:
+          $ref: "#/components/schemas/InboundQcChecklist"
+        note:
+          type: string
+        photoFileIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        checkedByName:
+          type: string
+        checkedAt:
+          type: string
+          format: date-time
+    InboundLine:
+      type: object
+      required: [id, lineNo, product, qty, passedQty, rejectedQty, destination, status, rejectReason, allowedActions]
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        product:
+          $ref: "#/components/schemas/WhProductRef"
+        batch:
+          $ref: "#/components/schemas/WhBatchRef"
+        qty:
+          $ref: "#/components/schemas/WhQuantity"
+        passedQty:
+          $ref: "#/components/schemas/WhQuantity"
+        rejectedQty:
+          $ref: "#/components/schemas/WhQuantity"
+        destination:
+          $ref: "#/components/schemas/WhLocationRef"
+        rejectLocation:
+          $ref: "#/components/schemas/WhLocationRef"
+        status:
+          $ref: "#/components/schemas/InboundLineStatus"
+        rejectReason:
+          type: string
+        checkedByName:
+          type: string
+        checkedAt:
+          type: string
+          format: date-time
+        allowedActions:
+          type: array
+          items:
+            type: string
+            enum: [qc]
+    InboundSummary:
+      type: object
+      required: [id, number, sourceType, sourceTypeLabel, sourceLabel, location, businessDate, status, lineCount, pendingCount, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        sourceType:
+          type: string
+        sourceTypeLabel:
+          type: string
+        sourceLabel:
+          type: string
+        location:
+          $ref: "#/components/schemas/WhLocationRef"
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        status:
+          $ref: "#/components/schemas/InboundStatus"
+        lineCount:
+          type: integer
+        pendingCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+    InboundList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/InboundSummary"
+    Inbound:
+      allOf:
+        - $ref: "#/components/schemas/InboundSummary"
+        - type: object
+          required: [sourceId, rejectAction, note, lines, checks, version]
+          properties:
+            sourceId:
+              type: string
+              format: uuid
+            rejectAction:
+              $ref: "#/components/schemas/InboundRejectAction"
+            note:
+              type: string
+            completedAt:
+              type: string
+              format: date-time
+            version:
+              type: integer
+            lines:
+              type: array
+              items:
+                $ref: "#/components/schemas/InboundLine"
+            checks:
+              type: array
+              items:
+                $ref: "#/components/schemas/InboundQualityCheck"
+    StockTransferType:
+      type: string
+      description: "`direct` Transfer Stok, `request` Permintaan Petty Stock."
+      enum: [direct, request]
+    StockTransferStatus:
+      type: string
+      enum: [draft, submitted, in_progress, in_transit, partially_received, received, completed, cancelled]
+    StockTransferAction:
+      type: string
+      enum: [edit, submit, release, prepare, post, ship, receive, complete, cancel]
+    StockTransferLineInput:
+      type: object
+      required: [productId, qty]
+      properties:
+        productId:
+          type: string
+          format: uuid
+        batchId:
+          type: string
+          format: uuid
+        qty:
+          $ref: "#/components/schemas/WhQuantity"
+        batchReason:
+          type: string
+          maxLength: 500
+        note:
+          type: string
+          maxLength: 500
+    StockTransferInput:
+      type: object
+      required: [transferType, fromLocationId, toLocationId, businessDate, lines]
+      properties:
+        transferType:
+          $ref: "#/components/schemas/StockTransferType"
+        fromLocationId:
+          type: string
+          format: uuid
+        toLocationId:
+          type: string
+          format: uuid
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        note:
+          type: string
+          maxLength: 500
+        lines:
+          type: array
+          minItems: 1
+          maxItems: 200
+          items:
+            $ref: "#/components/schemas/StockTransferLineInput"
+    StockTransferReceiveLine:
+      type: object
+      required: [lineId, qty]
+      properties:
+        lineId:
+          type: string
+          format: uuid
+        qty:
+          $ref: "#/components/schemas/WhQuantity"
+    StockTransferActionInput:
+      type: object
+      required: [action, version]
+      properties:
+        action:
+          $ref: "#/components/schemas/StockTransferAction"
+        version:
+          type: integer
+        reason:
+          type: string
+          maxLength: 500
+        lines:
+          type: array
+          items:
+            $ref: "#/components/schemas/StockTransferReceiveLine"
+    StockTransferLine:
+      type: object
+      required: [id, lineNo, product, qty, receivedQty, shortageQty, costAmount, batchReason, note]
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        product:
+          $ref: "#/components/schemas/WhProductRef"
+        batch:
+          $ref: "#/components/schemas/WhBatchRef"
+        qty:
+          $ref: "#/components/schemas/WhQuantity"
+        receivedQty:
+          $ref: "#/components/schemas/WhQuantity"
+        shortageQty:
+          $ref: "#/components/schemas/WhQuantity"
+        costAmount:
+          $ref: "../components/common.yaml#/Money"
+        batchReason:
+          type: string
+        note:
+          type: string
+    StockTransferSummary:
+      type: object
+      required: [id, transferType, from, to, requiresShipping, businessDate, status, requestedByName, lineCount, totalQty, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        transferType:
+          $ref: "#/components/schemas/StockTransferType"
+        from:
+          $ref: "#/components/schemas/WhLocationRef"
+        to:
+          $ref: "#/components/schemas/WhLocationRef"
+        requiresShipping:
+          type: boolean
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        status:
+          $ref: "#/components/schemas/StockTransferStatus"
+        requestedByName:
+          type: string
+        lineCount:
+          type: integer
+        totalQty:
+          $ref: "#/components/schemas/WhQuantity"
+        createdAt:
+          type: string
+          format: date-time
+    StockTransferList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/StockTransferSummary"
+    StockTransfer:
+      allOf:
+        - $ref: "#/components/schemas/StockTransferSummary"
+        - type: object
+          required: [note, lines, version, allowedActions, cancelReason]
+          properties:
+            note:
+              type: string
+            sourceType:
+              type: string
+            sourceId:
+              type: string
+              format: uuid
+            submittedAt:
+              type: string
+              format: date-time
+            releasedByName:
+              type: string
+            releasedAt:
+              type: string
+              format: date-time
+            preparedByName:
+              type: string
+            preparedAt:
+              type: string
+              format: date-time
+            shippedByName:
+              type: string
+            shippedAt:
+              type: string
+              format: date-time
+            receivedByName:
+              type: string
+            receivedAt:
+              type: string
+              format: date-time
+            completedAt:
+              type: string
+              format: date-time
+            cancelledAt:
+              type: string
+              format: date-time
+            cancelReason:
+              type: string
+            version:
+              type: integer
+            lines:
+              type: array
+              items:
+                $ref: "#/components/schemas/StockTransferLine"
+            allowedActions:
+              type: array
+              items:
+                $ref: "#/components/schemas/StockTransferAction"
+    StockInTransitLine:
+      type: object
+      required: [transferId, lineId, from, to, businessDate, status, product, qty, receivedQty, outstandingQty, costAmount]
+      properties:
+        transferId:
+          type: string
+          format: uuid
+        number:
+          type: string
+        lineId:
+          type: string
+          format: uuid
+        from:
+          $ref: "#/components/schemas/WhLocationRef"
+        to:
+          $ref: "#/components/schemas/WhLocationRef"
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        shippedAt:
+          type: string
+          format: date-time
+        status:
+          $ref: "#/components/schemas/StockTransferStatus"
+        product:
+          $ref: "#/components/schemas/WhProductRef"
+        batch:
+          $ref: "#/components/schemas/WhBatchRef"
+        qty:
+          $ref: "#/components/schemas/WhQuantity"
+        receivedQty:
+          $ref: "#/components/schemas/WhQuantity"
+        outstandingQty:
+          $ref: "#/components/schemas/WhQuantity"
+        costAmount:
+          $ref: "../components/common.yaml#/Money"
+    StockInTransitList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/StockInTransitLine"
+    StockCountType:
+      type: string
+      description: "`full` Penuh, `cycle` Cycle count, `consignment` Konsinyasi, `vending` Vending."
+      enum: [full, cycle, consignment, vending]
+    StockCountStatus:
+      type: string
+      enum: [draft, in_progress, pending_approval, rejected, posted, completed, cancelled]
+    StockCountAction:
+      type: string
+      enum: [start, count, submit, recount, cancel]
+    StockCountInput:
+      type: object
+      required: [countType, locationIds]
+      properties:
+        countType:
+          $ref: "#/components/schemas/StockCountType"
+        locationIds:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items:
+            type: string
+            format: uuid
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        note:
+          type: string
+          maxLength: 500
+    StockCountEntry:
+      type: object
+      required: [lineId]
+      properties:
+        lineId:
+          type: string
+          format: uuid
+        countedQty:
+          $ref: "#/components/schemas/WhQuantity"
+        note:
+          type: string
+          maxLength: 500
+        photoFileId:
+          type: string
+          format: uuid
+    StockCountExtraEntry:
+      type: object
+      required: [productId, countedQty]
+      properties:
+        productId:
+          type: string
+          format: uuid
+        batchId:
+          type: string
+          format: uuid
+        countedQty:
+          $ref: "#/components/schemas/WhQuantity"
+        note:
+          type: string
+          maxLength: 500
+    StockCountEntriesInput:
+      type: object
+      properties:
+        lines:
+          type: array
+          items:
+            $ref: "#/components/schemas/StockCountEntry"
+        extraLines:
+          type: array
+          items:
+            $ref: "#/components/schemas/StockCountExtraEntry"
+        photoFileIds:
+          description: Diisi = mengganti foto lokasi/rak; tidak dikirim = foto tidak berubah.
+          type: array
+          maxItems: 10
+          items:
+            type: string
+            format: uuid
+    StockCountActionInput:
+      type: object
+      required: [action, version]
+      properties:
+        action:
+          $ref: "#/components/schemas/StockCountAction"
+        version:
+          type: integer
+        reason:
+          type: string
+          maxLength: 500
+    StockCountLine:
+      type: object
+      required: [id, lineNo, product, isExtra, note]
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        product:
+          $ref: "#/components/schemas/WhProductRef"
+        batch:
+          $ref: "#/components/schemas/WhBatchRef"
+        systemQty:
+          description: Kosong saat hitung buta (Draft, Diproses, Ditolak).
+          allOf:
+            - $ref: "#/components/schemas/WhQuantity"
+        countedQty:
+          $ref: "#/components/schemas/WhQuantity"
+        varianceQty:
+          $ref: "#/components/schemas/WhQuantity"
+        unitCost:
+          type: string
+        varianceAmount:
+          $ref: "../components/common.yaml#/Money"
+        isExtra:
+          type: boolean
+        photoFileId:
+          type: string
+          format: uuid
+        note:
+          type: string
+        countedAt:
+          type: string
+          format: date-time
+    StockCountSummary:
+      type: object
+      required: [id, countType, location, businessDate, status, lineCount, countedCount, assignedToName, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        countType:
+          $ref: "#/components/schemas/StockCountType"
+        location:
+          $ref: "#/components/schemas/WhLocationRef"
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        status:
+          $ref: "#/components/schemas/StockCountStatus"
+        scheduleId:
+          type: string
+          format: uuid
+        assignedToName:
+          type: string
+        lineCount:
+          type: integer
+        countedCount:
+          type: integer
+        varianceAmount:
+          description: Kosong sampai hasil dikirim.
+          allOf:
+            - $ref: "../components/common.yaml#/Money"
+        createdAt:
+          type: string
+          format: date-time
+    StockCountList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/StockCountSummary"
+    StockCount:
+      allOf:
+        - $ref: "#/components/schemas/StockCountSummary"
+        - type: object
+          required: [note, photoFileIds, lines, version, allowedActions, revealed, decisionNote]
+          properties:
+            note:
+              type: string
+            photoFileIds:
+              type: array
+              items:
+                type: string
+                format: uuid
+            revealed:
+              type: boolean
+              description: true = qty sistem dan selisih ditampilkan (setelah hasil dikirim).
+            snapshotAt:
+              type: string
+              format: date-time
+            startedByName:
+              type: string
+            submittedByName:
+              type: string
+            submittedAt:
+              type: string
+              format: date-time
+            netVariance:
+              $ref: "../components/common.yaml#/Money"
+            decidedAt:
+              type: string
+              format: date-time
+            decisionNote:
+              type: string
+            postedAt:
+              type: string
+              format: date-time
+            journalEntryId:
+              type: string
+              format: uuid
+            version:
+              type: integer
+            lines:
+              type: array
+              items:
+                $ref: "#/components/schemas/StockCountLine"
+            allowedActions:
+              type: array
+              items:
+                $ref: "#/components/schemas/StockCountAction"
+    StockCountFrequency:
+      type: string
+      enum: [weekly, monthly, yearly]
+    StockCountScheduleInput:
+      type: object
+      required: [name, countType, frequency, isActive]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        countType:
+          $ref: "#/components/schemas/StockCountType"
+        frequency:
+          $ref: "#/components/schemas/StockCountFrequency"
+        dayOfWeek:
+          type: integer
+          minimum: 1
+          maximum: 7
+        dayOfMonth:
+          type: integer
+          minimum: 1
+          maximum: 31
+        monthOfYear:
+          type: integer
+          minimum: 1
+          maximum: 12
+        warehouseId:
+          type: string
+          format: uuid
+        locationIds:
+          type: array
+          maxItems: 100
+          items:
+            type: string
+            format: uuid
+        assigneeUserId:
+          type: string
+          format: uuid
+        isActive:
+          type: boolean
+    StockCountSchedule:
+      allOf:
+        - $ref: "#/components/schemas/StockCountScheduleInput"
+        - type: object
+          required: [id, nextRunDate, version, locationIds, assigneeName]
+          properties:
+            id:
+              type: string
+              format: uuid
+            assigneeName:
+              type: string
+            nextRunDate:
+              $ref: "../components/common.yaml#/BusinessDate"
+            lastRunDate:
+              $ref: "../components/common.yaml#/BusinessDate"
+            version:
+              type: integer

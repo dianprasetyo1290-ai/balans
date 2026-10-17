@@ -27,7 +27,7 @@ tags:
   - name: catalog
     description: Master produk, packaging, material, bundling (R1.1)
   - name: warehouse
-    description: Gudang dan lokasi stok (R1.1)
+    description: Gudang dan lokasi stok (R1.1); Inbound/QC, Transfer Stok, Petty Stock, Stock Count (R1.2)
   - name: inventory
     description: Ledger stok, batch, HPP FIFO, saran FEFO (R1.2)
   - name: accounting
@@ -40,6 +40,8 @@ tags:
     description: Data karyawan dasar (R1.1)
   - name: filestore
     description: Upload dan unduhan file bertanda tangan (R1.1)
+  - name: dataexchange
+    description: Impor/ekspor Excel master data (R1.1)
 paths:
   /healthz:
     $ref: "./paths/system.yaml#/healthz"
@@ -199,6 +201,32 @@ paths:
     $ref: "./paths/warehouse.yaml#/location"
   /api/v1/locations/{id}/restore:
     $ref: "./paths/warehouse.yaml#/locationRestore"
+  /api/v1/inbounds:
+    $ref: "./paths/warehouse_documents.yaml#/inbounds"
+  /api/v1/inbounds/{id}:
+    $ref: "./paths/warehouse_documents.yaml#/inbound"
+  /api/v1/inbounds/{id}/lines/{lineId}/qc:
+    $ref: "./paths/warehouse_documents.yaml#/inboundLineQc"
+  /api/v1/stock-transfers:
+    $ref: "./paths/warehouse_documents.yaml#/stockTransfers"
+  /api/v1/stock-transfers/in-transit:
+    $ref: "./paths/warehouse_documents.yaml#/stockTransfersInTransit"
+  /api/v1/stock-transfers/{id}:
+    $ref: "./paths/warehouse_documents.yaml#/stockTransfer"
+  /api/v1/stock-transfers/{id}/actions:
+    $ref: "./paths/warehouse_documents.yaml#/stockTransferActions"
+  /api/v1/stock-counts:
+    $ref: "./paths/warehouse_documents.yaml#/stockCounts"
+  /api/v1/stock-counts/{id}:
+    $ref: "./paths/warehouse_documents.yaml#/stockCount"
+  /api/v1/stock-counts/{id}/entries:
+    $ref: "./paths/warehouse_documents.yaml#/stockCountEntries"
+  /api/v1/stock-counts/{id}/actions:
+    $ref: "./paths/warehouse_documents.yaml#/stockCountActions"
+  /api/v1/stock-count-schedules:
+    $ref: "./paths/warehouse_documents.yaml#/stockCountSchedules"
+  /api/v1/stock-count-schedules/{id}:
+    $ref: "./paths/warehouse_documents.yaml#/stockCountSchedule"
   /api/v1/stock-balances:
     $ref: "./paths/inventory.yaml#/stockBalances"
   /api/v1/stock-card:
@@ -251,6 +279,28 @@ paths:
     $ref: "./paths/filestore.yaml#/fileDownloadUrl"
   /api/v1/file-content/{id}:
     $ref: "./paths/filestore.yaml#/fileContent"
+  /api/v1/data-exchange/kinds:
+    $ref: "./paths/dataexchange.yaml#/dataExchangeKinds"
+  /api/v1/data-exchange/kinds/{kind}/template:
+    $ref: "./paths/dataexchange.yaml#/dataExchangeTemplate"
+  /api/v1/import-jobs:
+    $ref: "./paths/dataexchange.yaml#/importJobs"
+  /api/v1/import-jobs/{id}:
+    $ref: "./paths/dataexchange.yaml#/importJob"
+  /api/v1/import-jobs/{id}/rows:
+    $ref: "./paths/dataexchange.yaml#/importJobRows"
+  /api/v1/import-jobs/{id}/commit:
+    $ref: "./paths/dataexchange.yaml#/importJobCommit"
+  /api/v1/import-jobs/{id}/cancel:
+    $ref: "./paths/dataexchange.yaml#/importJobCancel"
+  /api/v1/import-jobs/{id}/error-file:
+    $ref: "./paths/dataexchange.yaml#/importJobErrorFile"
+  /api/v1/export-jobs:
+    $ref: "./paths/dataexchange.yaml#/exportJobs"
+  /api/v1/export-jobs/{id}:
+    $ref: "./paths/dataexchange.yaml#/exportJob"
+  /api/v1/export-jobs/{id}/download-url:
+    $ref: "./paths/dataexchange.yaml#/exportJobDownload"
 components:
   securitySchemes:
     bearerAuth:

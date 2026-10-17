@@ -30,6 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { usePermissions } from "@/features/auth/api/auth-api"
+import { DataExchangeButtons } from "@/features/dataexchange/components/data-exchange-buttons"
 import { bundleAvailabilityQuery } from "@/features/inventory/api/inventory-api"
 import { systemInfoQuery } from "@/features/system/api/system-queries"
 import { parseProblem } from "@/lib/api/problem"
@@ -314,6 +315,7 @@ export function ProductsPage({
           <p className="text-sm text-muted-foreground">{cfg.description}</p>
         </div>
         <div className="flex flex-wrap gap-2">
+          <DataExchangeButtons kind="catalog.product" />
           {kind === "finished" && canPrint ? (
             <Button
               variant="outline"

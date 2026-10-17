@@ -80,6 +80,11 @@ func TestMarkUploaded(t *testing.T) {
 	assert.Equal(t, apperr.CodeBadRequest, code(f.MarkUploaded(99, nil, "application/pdf", now)))
 	assert.Equal(t, apperr.CodeFileTypeNotAllowed, code(f.MarkUploaded(100, nil, "text/html; charset=utf-8", now)))
 	assert.Equal(t, domain.StatusPending, f.Status)
+
+	// xlsx terdeteksi sebagai arsip zip.
+	x := domain.File{ContentType: domain.TypeXLSX, SizeBytes: 10, Status: domain.StatusPending}
+	assert.Equal(t, apperr.CodeFileTypeNotAllowed, code(x.MarkUploaded(10, nil, domain.TypeXLSX, now)))
+	require.NoError(t, x.MarkUploaded(10, []byte{1}, "application/zip", now))
 }
 
 func TestAttachToAndCanRead(t *testing.T) {
