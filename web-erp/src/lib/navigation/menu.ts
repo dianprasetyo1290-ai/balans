@@ -471,16 +471,39 @@ export const MENU: MenuGroup[] = [
         permission: "accounting.journal.read",
         module: "accounting",
       },
-      ...items(
-        "Piutang Usaha",
-        "Utang Usaha",
-        "Kas & Bank",
-        "Rekonsiliasi Bank",
-        "Kas Kecil",
-        "Biaya Operasional"
-      ),
+      ...items("Piutang Usaha", "Utang Usaha"),
+      {
+        label: "Kas & Bank",
+        to: "/finance/cash-bank",
+        permission: "accounting.payment.read",
+        module: "accounting",
+      },
+      {
+        label: "Rekonsiliasi Bank",
+        to: "/finance/bank-reconciliation",
+        permission: "accounting.bank_reconciliation.read",
+        module: "accounting",
+      },
+      {
+        label: "Kas Kecil",
+        to: "/finance/petty-cash",
+        permission: "accounting.petty_cash.read",
+        module: "accounting",
+      },
+      {
+        label: "Biaya Operasional",
+        to: "/finance/expense-claims",
+        permission: "accounting.expense_claim.read",
+        module: "accounting",
+      },
       { label: "Anggaran Biaya", optional: "U-13" },
-      ...items("Pajak & Bukti Potong", "Aset Tetap", "Penyusutan"),
+      {
+        label: "Pajak & Bukti Potong",
+        to: "/finance/taxes",
+        permission: "accounting.withholding.read",
+        module: "accounting",
+      },
+      ...items("Aset Tetap", "Penyusutan"),
       {
         label: "Periode Akuntansi",
         to: "/finance/fiscal-periods",

@@ -18,8 +18,11 @@ import { Route as SetPasswordRouteImport } from './routes/set-password'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppApprovalsRouteImport } from './routes/_app/approvals'
 import { Route as AppFinanceAccountsRouteImport } from './routes/_app/finance/accounts'
+import { Route as AppFinanceCashBankRouteImport } from './routes/_app/finance/cash-bank'
 import { Route as AppFinanceFiscalPeriodsRouteImport } from './routes/_app/finance/fiscal-periods'
 import { Route as AppFinanceGeneralLedgerRouteImport } from './routes/_app/finance/general-ledger'
+import { Route as AppFinancePettyCashRouteImport } from './routes/_app/finance/petty-cash'
+import { Route as AppFinanceTaxesRouteImport } from './routes/_app/finance/taxes'
 import { Route as AppHrisEmployeesRouteImport } from './routes/_app/hris/employees'
 import { Route as AppIntegrationsDataExchangeRouteImport } from './routes/_app/integrations/data-exchange'
 import { Route as AppInventoryBatchAllocationRouteImport } from './routes/_app/inventory/batch-allocation'
@@ -50,6 +53,10 @@ import { Route as AppSettingsRolesRouteImport } from './routes/_app/settings/rol
 import { Route as AppSettingsUsersRouteImport } from './routes/_app/settings/users'
 import { Route as AppSystemAboutRouteImport } from './routes/_app/system/about'
 import { Route as AppWarehouseInTransitRouteImport } from './routes/_app/warehouse/in-transit'
+import { Route as AppFinanceBankReconciliationIndexRouteImport } from './routes/_app/finance/bank-reconciliation/index'
+import { Route as AppFinanceBankReconciliationIdRouteImport } from './routes/_app/finance/bank-reconciliation/$id'
+import { Route as AppFinanceExpenseClaimsIndexRouteImport } from './routes/_app/finance/expense-claims/index'
+import { Route as AppFinanceExpenseClaimsNewRouteImport } from './routes/_app/finance/expense-claims/new'
 import { Route as AppFinanceJournalsIndexRouteImport } from './routes/_app/finance/journals/index'
 import { Route as AppFinanceJournalsNewRouteImport } from './routes/_app/finance/journals/new'
 import { Route as AppMasterDataProductsIndexRouteImport } from './routes/_app/master-data/products/index'
@@ -72,6 +79,8 @@ import { Route as AppWarehouseStockCountsIndexRouteImport } from './routes/_app/
 import { Route as AppWarehouseStockCountsIdRouteImport } from './routes/_app/warehouse/stock-counts/$id'
 import { Route as AppWarehouseStockTransfersIndexRouteImport } from './routes/_app/warehouse/stock-transfers/index'
 import { Route as AppWarehouseStockTransfersIdRouteImport } from './routes/_app/warehouse/stock-transfers/$id'
+import { Route as AppFinanceExpenseClaimsIdIndexRouteImport } from './routes/_app/finance/expense-claims/$id.index'
+import { Route as AppFinanceExpenseClaimsIdEditRouteImport } from './routes/_app/finance/expense-claims/$id.edit'
 import { Route as AppFinanceJournalsIdIndexRouteImport } from './routes/_app/finance/journals/$id.index'
 import { Route as AppFinanceJournalsIdEditRouteImport } from './routes/_app/finance/journals/$id.edit'
 import { Route as AppProcurementPurchaseOrdersIdIndexRouteImport } from './routes/_app/procurement/purchase-orders/$id.index'
@@ -124,6 +133,11 @@ const AppFinanceAccountsRoute = AppFinanceAccountsRouteImport.update({
   path: '/finance/accounts',
   getParentRoute: () => AppRoute,
 } as any)
+const AppFinanceCashBankRoute = AppFinanceCashBankRouteImport.update({
+  id: '/finance/cash-bank',
+  path: '/finance/cash-bank',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppFinanceFiscalPeriodsRoute = AppFinanceFiscalPeriodsRouteImport.update({
   id: '/finance/fiscal-periods',
   path: '/finance/fiscal-periods',
@@ -132,6 +146,16 @@ const AppFinanceFiscalPeriodsRoute = AppFinanceFiscalPeriodsRouteImport.update({
 const AppFinanceGeneralLedgerRoute = AppFinanceGeneralLedgerRouteImport.update({
   id: '/finance/general-ledger',
   path: '/finance/general-ledger',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFinancePettyCashRoute = AppFinancePettyCashRouteImport.update({
+  id: '/finance/petty-cash',
+  path: '/finance/petty-cash',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFinanceTaxesRoute = AppFinanceTaxesRouteImport.update({
+  id: '/finance/taxes',
+  path: '/finance/taxes',
   getParentRoute: () => AppRoute,
 } as any)
 const AppHrisEmployeesRoute = AppHrisEmployeesRouteImport.update({
@@ -293,6 +317,30 @@ const AppWarehouseInTransitRoute = AppWarehouseInTransitRouteImport.update({
   path: '/warehouse/in-transit',
   getParentRoute: () => AppRoute,
 } as any)
+const AppFinanceBankReconciliationIndexRoute =
+  AppFinanceBankReconciliationIndexRouteImport.update({
+    id: '/finance/bank-reconciliation/',
+    path: '/finance/bank-reconciliation/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppFinanceBankReconciliationIdRoute =
+  AppFinanceBankReconciliationIdRouteImport.update({
+    id: '/finance/bank-reconciliation/$id',
+    path: '/finance/bank-reconciliation/$id',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppFinanceExpenseClaimsIndexRoute =
+  AppFinanceExpenseClaimsIndexRouteImport.update({
+    id: '/finance/expense-claims/',
+    path: '/finance/expense-claims/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppFinanceExpenseClaimsNewRoute =
+  AppFinanceExpenseClaimsNewRouteImport.update({
+    id: '/finance/expense-claims/new',
+    path: '/finance/expense-claims/new',
+    getParentRoute: () => AppRoute,
+  } as any)
 const AppFinanceJournalsIndexRoute = AppFinanceJournalsIndexRouteImport.update({
   id: '/finance/journals/',
   path: '/finance/journals/',
@@ -420,6 +468,18 @@ const AppWarehouseStockTransfersIdRoute =
     path: '/warehouse/stock-transfers/$id',
     getParentRoute: () => AppRoute,
   } as any)
+const AppFinanceExpenseClaimsIdIndexRoute =
+  AppFinanceExpenseClaimsIdIndexRouteImport.update({
+    id: '/finance/expense-claims/$id/',
+    path: '/finance/expense-claims/$id/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppFinanceExpenseClaimsIdEditRoute =
+  AppFinanceExpenseClaimsIdEditRouteImport.update({
+    id: '/finance/expense-claims/$id/edit',
+    path: '/finance/expense-claims/$id/edit',
+    getParentRoute: () => AppRoute,
+  } as any)
 const AppFinanceJournalsIdIndexRoute =
   AppFinanceJournalsIdIndexRouteImport.update({
     id: '/finance/journals/$id/',
@@ -472,8 +532,11 @@ export interface FileRoutesByFullPath {
   '/set-password': typeof SetPasswordRoute
   '/approvals': typeof AppApprovalsRoute
   '/finance/accounts': typeof AppFinanceAccountsRoute
+  '/finance/cash-bank': typeof AppFinanceCashBankRoute
   '/finance/fiscal-periods': typeof AppFinanceFiscalPeriodsRoute
   '/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
+  '/finance/petty-cash': typeof AppFinancePettyCashRoute
+  '/finance/taxes': typeof AppFinanceTaxesRoute
   '/hris/employees': typeof AppHrisEmployeesRoute
   '/integrations/data-exchange': typeof AppIntegrationsDataExchangeRoute
   '/inventory/batch-allocation': typeof AppInventoryBatchAllocationRoute
@@ -504,6 +567,8 @@ export interface FileRoutesByFullPath {
   '/settings/users': typeof AppSettingsUsersRoute
   '/system/about': typeof AppSystemAboutRoute
   '/warehouse/in-transit': typeof AppWarehouseInTransitRoute
+  '/finance/bank-reconciliation/$id': typeof AppFinanceBankReconciliationIdRoute
+  '/finance/expense-claims/new': typeof AppFinanceExpenseClaimsNewRoute
   '/finance/journals/new': typeof AppFinanceJournalsNewRoute
   '/master-data/products/$id': typeof AppMasterDataProductsIdRoute
   '/master-data/warehouses/$id': typeof AppMasterDataWarehousesIdRoute
@@ -515,6 +580,8 @@ export interface FileRoutesByFullPath {
   '/warehouse/petty-stock-requests/$id': typeof AppWarehousePettyStockRequestsIdRoute
   '/warehouse/stock-counts/$id': typeof AppWarehouseStockCountsIdRoute
   '/warehouse/stock-transfers/$id': typeof AppWarehouseStockTransfersIdRoute
+  '/finance/bank-reconciliation/': typeof AppFinanceBankReconciliationIndexRoute
+  '/finance/expense-claims/': typeof AppFinanceExpenseClaimsIndexRoute
   '/finance/journals/': typeof AppFinanceJournalsIndexRoute
   '/master-data/products/': typeof AppMasterDataProductsIndexRoute
   '/master-data/warehouses/': typeof AppMasterDataWarehousesIndexRoute
@@ -526,10 +593,12 @@ export interface FileRoutesByFullPath {
   '/warehouse/petty-stock-requests/': typeof AppWarehousePettyStockRequestsIndexRoute
   '/warehouse/stock-counts/': typeof AppWarehouseStockCountsIndexRoute
   '/warehouse/stock-transfers/': typeof AppWarehouseStockTransfersIndexRoute
+  '/finance/expense-claims/$id/edit': typeof AppFinanceExpenseClaimsIdEditRoute
   '/finance/journals/$id/edit': typeof AppFinanceJournalsIdEditRoute
   '/procurement/purchase-orders/$id/edit': typeof AppProcurementPurchaseOrdersIdEditRoute
   '/procurement/purchase-orders/$id/print': typeof AppProcurementPurchaseOrdersIdPrintRoute
   '/procurement/purchase-requests/$id/edit': typeof AppProcurementPurchaseRequestsIdEditRoute
+  '/finance/expense-claims/$id/': typeof AppFinanceExpenseClaimsIdIndexRoute
   '/finance/journals/$id/': typeof AppFinanceJournalsIdIndexRoute
   '/procurement/purchase-orders/$id/': typeof AppProcurementPurchaseOrdersIdIndexRoute
   '/procurement/purchase-requests/$id/': typeof AppProcurementPurchaseRequestsIdIndexRoute
@@ -543,8 +612,11 @@ export interface FileRoutesByTo {
   '/approvals': typeof AppApprovalsRoute
   '/': typeof AppIndexRoute
   '/finance/accounts': typeof AppFinanceAccountsRoute
+  '/finance/cash-bank': typeof AppFinanceCashBankRoute
   '/finance/fiscal-periods': typeof AppFinanceFiscalPeriodsRoute
   '/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
+  '/finance/petty-cash': typeof AppFinancePettyCashRoute
+  '/finance/taxes': typeof AppFinanceTaxesRoute
   '/hris/employees': typeof AppHrisEmployeesRoute
   '/integrations/data-exchange': typeof AppIntegrationsDataExchangeRoute
   '/inventory/batch-allocation': typeof AppInventoryBatchAllocationRoute
@@ -575,6 +647,8 @@ export interface FileRoutesByTo {
   '/settings/users': typeof AppSettingsUsersRoute
   '/system/about': typeof AppSystemAboutRoute
   '/warehouse/in-transit': typeof AppWarehouseInTransitRoute
+  '/finance/bank-reconciliation/$id': typeof AppFinanceBankReconciliationIdRoute
+  '/finance/expense-claims/new': typeof AppFinanceExpenseClaimsNewRoute
   '/finance/journals/new': typeof AppFinanceJournalsNewRoute
   '/master-data/products/$id': typeof AppMasterDataProductsIdRoute
   '/master-data/warehouses/$id': typeof AppMasterDataWarehousesIdRoute
@@ -586,6 +660,8 @@ export interface FileRoutesByTo {
   '/warehouse/petty-stock-requests/$id': typeof AppWarehousePettyStockRequestsIdRoute
   '/warehouse/stock-counts/$id': typeof AppWarehouseStockCountsIdRoute
   '/warehouse/stock-transfers/$id': typeof AppWarehouseStockTransfersIdRoute
+  '/finance/bank-reconciliation': typeof AppFinanceBankReconciliationIndexRoute
+  '/finance/expense-claims': typeof AppFinanceExpenseClaimsIndexRoute
   '/finance/journals': typeof AppFinanceJournalsIndexRoute
   '/master-data/products': typeof AppMasterDataProductsIndexRoute
   '/master-data/warehouses': typeof AppMasterDataWarehousesIndexRoute
@@ -597,10 +673,12 @@ export interface FileRoutesByTo {
   '/warehouse/petty-stock-requests': typeof AppWarehousePettyStockRequestsIndexRoute
   '/warehouse/stock-counts': typeof AppWarehouseStockCountsIndexRoute
   '/warehouse/stock-transfers': typeof AppWarehouseStockTransfersIndexRoute
+  '/finance/expense-claims/$id/edit': typeof AppFinanceExpenseClaimsIdEditRoute
   '/finance/journals/$id/edit': typeof AppFinanceJournalsIdEditRoute
   '/procurement/purchase-orders/$id/edit': typeof AppProcurementPurchaseOrdersIdEditRoute
   '/procurement/purchase-orders/$id/print': typeof AppProcurementPurchaseOrdersIdPrintRoute
   '/procurement/purchase-requests/$id/edit': typeof AppProcurementPurchaseRequestsIdEditRoute
+  '/finance/expense-claims/$id': typeof AppFinanceExpenseClaimsIdIndexRoute
   '/finance/journals/$id': typeof AppFinanceJournalsIdIndexRoute
   '/procurement/purchase-orders/$id': typeof AppProcurementPurchaseOrdersIdIndexRoute
   '/procurement/purchase-requests/$id': typeof AppProcurementPurchaseRequestsIdIndexRoute
@@ -616,8 +694,11 @@ export interface FileRoutesById {
   '/_app/approvals': typeof AppApprovalsRoute
   '/_app/': typeof AppIndexRoute
   '/_app/finance/accounts': typeof AppFinanceAccountsRoute
+  '/_app/finance/cash-bank': typeof AppFinanceCashBankRoute
   '/_app/finance/fiscal-periods': typeof AppFinanceFiscalPeriodsRoute
   '/_app/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
+  '/_app/finance/petty-cash': typeof AppFinancePettyCashRoute
+  '/_app/finance/taxes': typeof AppFinanceTaxesRoute
   '/_app/hris/employees': typeof AppHrisEmployeesRoute
   '/_app/integrations/data-exchange': typeof AppIntegrationsDataExchangeRoute
   '/_app/inventory/batch-allocation': typeof AppInventoryBatchAllocationRoute
@@ -648,6 +729,8 @@ export interface FileRoutesById {
   '/_app/settings/users': typeof AppSettingsUsersRoute
   '/_app/system/about': typeof AppSystemAboutRoute
   '/_app/warehouse/in-transit': typeof AppWarehouseInTransitRoute
+  '/_app/finance/bank-reconciliation/$id': typeof AppFinanceBankReconciliationIdRoute
+  '/_app/finance/expense-claims/new': typeof AppFinanceExpenseClaimsNewRoute
   '/_app/finance/journals/new': typeof AppFinanceJournalsNewRoute
   '/_app/master-data/products/$id': typeof AppMasterDataProductsIdRoute
   '/_app/master-data/warehouses/$id': typeof AppMasterDataWarehousesIdRoute
@@ -659,6 +742,8 @@ export interface FileRoutesById {
   '/_app/warehouse/petty-stock-requests/$id': typeof AppWarehousePettyStockRequestsIdRoute
   '/_app/warehouse/stock-counts/$id': typeof AppWarehouseStockCountsIdRoute
   '/_app/warehouse/stock-transfers/$id': typeof AppWarehouseStockTransfersIdRoute
+  '/_app/finance/bank-reconciliation/': typeof AppFinanceBankReconciliationIndexRoute
+  '/_app/finance/expense-claims/': typeof AppFinanceExpenseClaimsIndexRoute
   '/_app/finance/journals/': typeof AppFinanceJournalsIndexRoute
   '/_app/master-data/products/': typeof AppMasterDataProductsIndexRoute
   '/_app/master-data/warehouses/': typeof AppMasterDataWarehousesIndexRoute
@@ -670,10 +755,12 @@ export interface FileRoutesById {
   '/_app/warehouse/petty-stock-requests/': typeof AppWarehousePettyStockRequestsIndexRoute
   '/_app/warehouse/stock-counts/': typeof AppWarehouseStockCountsIndexRoute
   '/_app/warehouse/stock-transfers/': typeof AppWarehouseStockTransfersIndexRoute
+  '/_app/finance/expense-claims/$id/edit': typeof AppFinanceExpenseClaimsIdEditRoute
   '/_app/finance/journals/$id/edit': typeof AppFinanceJournalsIdEditRoute
   '/_app/procurement/purchase-orders/$id/edit': typeof AppProcurementPurchaseOrdersIdEditRoute
   '/_app/procurement/purchase-orders/$id/print': typeof AppProcurementPurchaseOrdersIdPrintRoute
   '/_app/procurement/purchase-requests/$id/edit': typeof AppProcurementPurchaseRequestsIdEditRoute
+  '/_app/finance/expense-claims/$id/': typeof AppFinanceExpenseClaimsIdIndexRoute
   '/_app/finance/journals/$id/': typeof AppFinanceJournalsIdIndexRoute
   '/_app/procurement/purchase-orders/$id/': typeof AppProcurementPurchaseOrdersIdIndexRoute
   '/_app/procurement/purchase-requests/$id/': typeof AppProcurementPurchaseRequestsIdIndexRoute
@@ -689,8 +776,11 @@ export interface FileRouteTypes {
     | '/set-password'
     | '/approvals'
     | '/finance/accounts'
+    | '/finance/cash-bank'
     | '/finance/fiscal-periods'
     | '/finance/general-ledger'
+    | '/finance/petty-cash'
+    | '/finance/taxes'
     | '/hris/employees'
     | '/integrations/data-exchange'
     | '/inventory/batch-allocation'
@@ -721,6 +811,8 @@ export interface FileRouteTypes {
     | '/settings/users'
     | '/system/about'
     | '/warehouse/in-transit'
+    | '/finance/bank-reconciliation/$id'
+    | '/finance/expense-claims/new'
     | '/finance/journals/new'
     | '/master-data/products/$id'
     | '/master-data/warehouses/$id'
@@ -732,6 +824,8 @@ export interface FileRouteTypes {
     | '/warehouse/petty-stock-requests/$id'
     | '/warehouse/stock-counts/$id'
     | '/warehouse/stock-transfers/$id'
+    | '/finance/bank-reconciliation/'
+    | '/finance/expense-claims/'
     | '/finance/journals/'
     | '/master-data/products/'
     | '/master-data/warehouses/'
@@ -743,10 +837,12 @@ export interface FileRouteTypes {
     | '/warehouse/petty-stock-requests/'
     | '/warehouse/stock-counts/'
     | '/warehouse/stock-transfers/'
+    | '/finance/expense-claims/$id/edit'
     | '/finance/journals/$id/edit'
     | '/procurement/purchase-orders/$id/edit'
     | '/procurement/purchase-orders/$id/print'
     | '/procurement/purchase-requests/$id/edit'
+    | '/finance/expense-claims/$id/'
     | '/finance/journals/$id/'
     | '/procurement/purchase-orders/$id/'
     | '/procurement/purchase-requests/$id/'
@@ -760,8 +856,11 @@ export interface FileRouteTypes {
     | '/approvals'
     | '/'
     | '/finance/accounts'
+    | '/finance/cash-bank'
     | '/finance/fiscal-periods'
     | '/finance/general-ledger'
+    | '/finance/petty-cash'
+    | '/finance/taxes'
     | '/hris/employees'
     | '/integrations/data-exchange'
     | '/inventory/batch-allocation'
@@ -792,6 +891,8 @@ export interface FileRouteTypes {
     | '/settings/users'
     | '/system/about'
     | '/warehouse/in-transit'
+    | '/finance/bank-reconciliation/$id'
+    | '/finance/expense-claims/new'
     | '/finance/journals/new'
     | '/master-data/products/$id'
     | '/master-data/warehouses/$id'
@@ -803,6 +904,8 @@ export interface FileRouteTypes {
     | '/warehouse/petty-stock-requests/$id'
     | '/warehouse/stock-counts/$id'
     | '/warehouse/stock-transfers/$id'
+    | '/finance/bank-reconciliation'
+    | '/finance/expense-claims'
     | '/finance/journals'
     | '/master-data/products'
     | '/master-data/warehouses'
@@ -814,10 +917,12 @@ export interface FileRouteTypes {
     | '/warehouse/petty-stock-requests'
     | '/warehouse/stock-counts'
     | '/warehouse/stock-transfers'
+    | '/finance/expense-claims/$id/edit'
     | '/finance/journals/$id/edit'
     | '/procurement/purchase-orders/$id/edit'
     | '/procurement/purchase-orders/$id/print'
     | '/procurement/purchase-requests/$id/edit'
+    | '/finance/expense-claims/$id'
     | '/finance/journals/$id'
     | '/procurement/purchase-orders/$id'
     | '/procurement/purchase-requests/$id'
@@ -832,8 +937,11 @@ export interface FileRouteTypes {
     | '/_app/approvals'
     | '/_app/'
     | '/_app/finance/accounts'
+    | '/_app/finance/cash-bank'
     | '/_app/finance/fiscal-periods'
     | '/_app/finance/general-ledger'
+    | '/_app/finance/petty-cash'
+    | '/_app/finance/taxes'
     | '/_app/hris/employees'
     | '/_app/integrations/data-exchange'
     | '/_app/inventory/batch-allocation'
@@ -864,6 +972,8 @@ export interface FileRouteTypes {
     | '/_app/settings/users'
     | '/_app/system/about'
     | '/_app/warehouse/in-transit'
+    | '/_app/finance/bank-reconciliation/$id'
+    | '/_app/finance/expense-claims/new'
     | '/_app/finance/journals/new'
     | '/_app/master-data/products/$id'
     | '/_app/master-data/warehouses/$id'
@@ -875,6 +985,8 @@ export interface FileRouteTypes {
     | '/_app/warehouse/petty-stock-requests/$id'
     | '/_app/warehouse/stock-counts/$id'
     | '/_app/warehouse/stock-transfers/$id'
+    | '/_app/finance/bank-reconciliation/'
+    | '/_app/finance/expense-claims/'
     | '/_app/finance/journals/'
     | '/_app/master-data/products/'
     | '/_app/master-data/warehouses/'
@@ -886,10 +998,12 @@ export interface FileRouteTypes {
     | '/_app/warehouse/petty-stock-requests/'
     | '/_app/warehouse/stock-counts/'
     | '/_app/warehouse/stock-transfers/'
+    | '/_app/finance/expense-claims/$id/edit'
     | '/_app/finance/journals/$id/edit'
     | '/_app/procurement/purchase-orders/$id/edit'
     | '/_app/procurement/purchase-orders/$id/print'
     | '/_app/procurement/purchase-requests/$id/edit'
+    | '/_app/finance/expense-claims/$id/'
     | '/_app/finance/journals/$id/'
     | '/_app/procurement/purchase-orders/$id/'
     | '/_app/procurement/purchase-requests/$id/'
@@ -969,6 +1083,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppFinanceAccountsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/finance/cash-bank': {
+      id: '/_app/finance/cash-bank'
+      path: '/finance/cash-bank'
+      fullPath: '/finance/cash-bank'
+      preLoaderRoute: typeof AppFinanceCashBankRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/finance/fiscal-periods': {
       id: '/_app/finance/fiscal-periods'
       path: '/finance/fiscal-periods'
@@ -981,6 +1102,20 @@ declare module '@tanstack/react-router' {
       path: '/finance/general-ledger'
       fullPath: '/finance/general-ledger'
       preLoaderRoute: typeof AppFinanceGeneralLedgerRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/finance/petty-cash': {
+      id: '/_app/finance/petty-cash'
+      path: '/finance/petty-cash'
+      fullPath: '/finance/petty-cash'
+      preLoaderRoute: typeof AppFinancePettyCashRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/finance/taxes': {
+      id: '/_app/finance/taxes'
+      path: '/finance/taxes'
+      fullPath: '/finance/taxes'
+      preLoaderRoute: typeof AppFinanceTaxesRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/hris/employees': {
@@ -1193,6 +1328,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppWarehouseInTransitRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/finance/bank-reconciliation/': {
+      id: '/_app/finance/bank-reconciliation/'
+      path: '/finance/bank-reconciliation'
+      fullPath: '/finance/bank-reconciliation/'
+      preLoaderRoute: typeof AppFinanceBankReconciliationIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/finance/bank-reconciliation/$id': {
+      id: '/_app/finance/bank-reconciliation/$id'
+      path: '/finance/bank-reconciliation/$id'
+      fullPath: '/finance/bank-reconciliation/$id'
+      preLoaderRoute: typeof AppFinanceBankReconciliationIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/finance/expense-claims/': {
+      id: '/_app/finance/expense-claims/'
+      path: '/finance/expense-claims'
+      fullPath: '/finance/expense-claims/'
+      preLoaderRoute: typeof AppFinanceExpenseClaimsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/finance/expense-claims/new': {
+      id: '/_app/finance/expense-claims/new'
+      path: '/finance/expense-claims/new'
+      fullPath: '/finance/expense-claims/new'
+      preLoaderRoute: typeof AppFinanceExpenseClaimsNewRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/finance/journals/': {
       id: '/_app/finance/journals/'
       path: '/finance/journals'
@@ -1347,6 +1510,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppWarehouseStockTransfersIdRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/finance/expense-claims/$id/': {
+      id: '/_app/finance/expense-claims/$id/'
+      path: '/finance/expense-claims/$id'
+      fullPath: '/finance/expense-claims/$id/'
+      preLoaderRoute: typeof AppFinanceExpenseClaimsIdIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/finance/expense-claims/$id/edit': {
+      id: '/_app/finance/expense-claims/$id/edit'
+      path: '/finance/expense-claims/$id/edit'
+      fullPath: '/finance/expense-claims/$id/edit'
+      preLoaderRoute: typeof AppFinanceExpenseClaimsIdEditRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/finance/journals/$id/': {
       id: '/_app/finance/journals/$id/'
       path: '/finance/journals/$id'
@@ -1403,8 +1580,11 @@ interface AppRouteChildren {
   AppApprovalsRoute: typeof AppApprovalsRoute
   AppIndexRoute: typeof AppIndexRoute
   AppFinanceAccountsRoute: typeof AppFinanceAccountsRoute
+  AppFinanceCashBankRoute: typeof AppFinanceCashBankRoute
   AppFinanceFiscalPeriodsRoute: typeof AppFinanceFiscalPeriodsRoute
   AppFinanceGeneralLedgerRoute: typeof AppFinanceGeneralLedgerRoute
+  AppFinancePettyCashRoute: typeof AppFinancePettyCashRoute
+  AppFinanceTaxesRoute: typeof AppFinanceTaxesRoute
   AppHrisEmployeesRoute: typeof AppHrisEmployeesRoute
   AppIntegrationsDataExchangeRoute: typeof AppIntegrationsDataExchangeRoute
   AppInventoryBatchAllocationRoute: typeof AppInventoryBatchAllocationRoute
@@ -1435,6 +1615,8 @@ interface AppRouteChildren {
   AppSettingsUsersRoute: typeof AppSettingsUsersRoute
   AppSystemAboutRoute: typeof AppSystemAboutRoute
   AppWarehouseInTransitRoute: typeof AppWarehouseInTransitRoute
+  AppFinanceBankReconciliationIdRoute: typeof AppFinanceBankReconciliationIdRoute
+  AppFinanceExpenseClaimsNewRoute: typeof AppFinanceExpenseClaimsNewRoute
   AppFinanceJournalsNewRoute: typeof AppFinanceJournalsNewRoute
   AppMasterDataProductsIdRoute: typeof AppMasterDataProductsIdRoute
   AppMasterDataWarehousesIdRoute: typeof AppMasterDataWarehousesIdRoute
@@ -1446,6 +1628,8 @@ interface AppRouteChildren {
   AppWarehousePettyStockRequestsIdRoute: typeof AppWarehousePettyStockRequestsIdRoute
   AppWarehouseStockCountsIdRoute: typeof AppWarehouseStockCountsIdRoute
   AppWarehouseStockTransfersIdRoute: typeof AppWarehouseStockTransfersIdRoute
+  AppFinanceBankReconciliationIndexRoute: typeof AppFinanceBankReconciliationIndexRoute
+  AppFinanceExpenseClaimsIndexRoute: typeof AppFinanceExpenseClaimsIndexRoute
   AppFinanceJournalsIndexRoute: typeof AppFinanceJournalsIndexRoute
   AppMasterDataProductsIndexRoute: typeof AppMasterDataProductsIndexRoute
   AppMasterDataWarehousesIndexRoute: typeof AppMasterDataWarehousesIndexRoute
@@ -1457,10 +1641,12 @@ interface AppRouteChildren {
   AppWarehousePettyStockRequestsIndexRoute: typeof AppWarehousePettyStockRequestsIndexRoute
   AppWarehouseStockCountsIndexRoute: typeof AppWarehouseStockCountsIndexRoute
   AppWarehouseStockTransfersIndexRoute: typeof AppWarehouseStockTransfersIndexRoute
+  AppFinanceExpenseClaimsIdEditRoute: typeof AppFinanceExpenseClaimsIdEditRoute
   AppFinanceJournalsIdEditRoute: typeof AppFinanceJournalsIdEditRoute
   AppProcurementPurchaseOrdersIdEditRoute: typeof AppProcurementPurchaseOrdersIdEditRoute
   AppProcurementPurchaseOrdersIdPrintRoute: typeof AppProcurementPurchaseOrdersIdPrintRoute
   AppProcurementPurchaseRequestsIdEditRoute: typeof AppProcurementPurchaseRequestsIdEditRoute
+  AppFinanceExpenseClaimsIdIndexRoute: typeof AppFinanceExpenseClaimsIdIndexRoute
   AppFinanceJournalsIdIndexRoute: typeof AppFinanceJournalsIdIndexRoute
   AppProcurementPurchaseOrdersIdIndexRoute: typeof AppProcurementPurchaseOrdersIdIndexRoute
   AppProcurementPurchaseRequestsIdIndexRoute: typeof AppProcurementPurchaseRequestsIdIndexRoute
@@ -1470,8 +1656,11 @@ const AppRouteChildren: AppRouteChildren = {
   AppApprovalsRoute: AppApprovalsRoute,
   AppIndexRoute: AppIndexRoute,
   AppFinanceAccountsRoute: AppFinanceAccountsRoute,
+  AppFinanceCashBankRoute: AppFinanceCashBankRoute,
   AppFinanceFiscalPeriodsRoute: AppFinanceFiscalPeriodsRoute,
   AppFinanceGeneralLedgerRoute: AppFinanceGeneralLedgerRoute,
+  AppFinancePettyCashRoute: AppFinancePettyCashRoute,
+  AppFinanceTaxesRoute: AppFinanceTaxesRoute,
   AppHrisEmployeesRoute: AppHrisEmployeesRoute,
   AppIntegrationsDataExchangeRoute: AppIntegrationsDataExchangeRoute,
   AppInventoryBatchAllocationRoute: AppInventoryBatchAllocationRoute,
@@ -1502,6 +1691,8 @@ const AppRouteChildren: AppRouteChildren = {
   AppSettingsUsersRoute: AppSettingsUsersRoute,
   AppSystemAboutRoute: AppSystemAboutRoute,
   AppWarehouseInTransitRoute: AppWarehouseInTransitRoute,
+  AppFinanceBankReconciliationIdRoute: AppFinanceBankReconciliationIdRoute,
+  AppFinanceExpenseClaimsNewRoute: AppFinanceExpenseClaimsNewRoute,
   AppFinanceJournalsNewRoute: AppFinanceJournalsNewRoute,
   AppMasterDataProductsIdRoute: AppMasterDataProductsIdRoute,
   AppMasterDataWarehousesIdRoute: AppMasterDataWarehousesIdRoute,
@@ -1514,6 +1705,9 @@ const AppRouteChildren: AppRouteChildren = {
   AppWarehousePettyStockRequestsIdRoute: AppWarehousePettyStockRequestsIdRoute,
   AppWarehouseStockCountsIdRoute: AppWarehouseStockCountsIdRoute,
   AppWarehouseStockTransfersIdRoute: AppWarehouseStockTransfersIdRoute,
+  AppFinanceBankReconciliationIndexRoute:
+    AppFinanceBankReconciliationIndexRoute,
+  AppFinanceExpenseClaimsIndexRoute: AppFinanceExpenseClaimsIndexRoute,
   AppFinanceJournalsIndexRoute: AppFinanceJournalsIndexRoute,
   AppMasterDataProductsIndexRoute: AppMasterDataProductsIndexRoute,
   AppMasterDataWarehousesIndexRoute: AppMasterDataWarehousesIndexRoute,
@@ -1529,6 +1723,7 @@ const AppRouteChildren: AppRouteChildren = {
     AppWarehousePettyStockRequestsIndexRoute,
   AppWarehouseStockCountsIndexRoute: AppWarehouseStockCountsIndexRoute,
   AppWarehouseStockTransfersIndexRoute: AppWarehouseStockTransfersIndexRoute,
+  AppFinanceExpenseClaimsIdEditRoute: AppFinanceExpenseClaimsIdEditRoute,
   AppFinanceJournalsIdEditRoute: AppFinanceJournalsIdEditRoute,
   AppProcurementPurchaseOrdersIdEditRoute:
     AppProcurementPurchaseOrdersIdEditRoute,
@@ -1536,6 +1731,7 @@ const AppRouteChildren: AppRouteChildren = {
     AppProcurementPurchaseOrdersIdPrintRoute,
   AppProcurementPurchaseRequestsIdEditRoute:
     AppProcurementPurchaseRequestsIdEditRoute,
+  AppFinanceExpenseClaimsIdIndexRoute: AppFinanceExpenseClaimsIdIndexRoute,
   AppFinanceJournalsIdIndexRoute: AppFinanceJournalsIdIndexRoute,
   AppProcurementPurchaseOrdersIdIndexRoute:
     AppProcurementPurchaseOrdersIdIndexRoute,
