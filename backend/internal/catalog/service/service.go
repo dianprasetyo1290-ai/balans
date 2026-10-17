@@ -216,7 +216,8 @@ func (s *Service) RestoreCategory(ctx context.Context, id uuid.UUID) (domain.Cat
 
 // --- Produk -----------------------------------------------------------------------------------
 
-// productSnapshot adalah bentuk produk untuk audit trail (nama field mengikuti JSON API).
+// productSnapshot adalah bentuk produk untuk audit trail (nama field mengikuti JSON API; kategori dicatat
+// dengan namanya agar tab Riwayat mudah dibaca).
 func productSnapshot(p domain.Product) map[string]any {
 	barcodes := make([]string, len(p.Barcodes))
 	for i, b := range p.Barcodes {
@@ -234,13 +235,18 @@ func productSnapshot(p domain.Product) map[string]any {
 		components[i] = fmt.Sprintf("%s × %s", label, c.Qty.String())
 	}
 	m := map[string]any{
-		"sku": p.SKU, "name": p.Name, "variant": p.Variant, "productType": p.Type, "packagingType": p.PackagingType,
+		"sku": p.SKU, "name": p.Name, "variant": p.Variant, "productType": p.Type, "packagingType": string(p.PackagingType),
 		"uom": p.UOM, "shelfLifeDays": p.ShelfLifeDays, "hasBatch": p.HasBatch, "isBundle": p.IsBundle,
-		"categoryId": p.CategoryID, "unitsPerCarton": p.UnitsPerCarton, "isActive": p.IsActive, "barcodes": barcodes,
+		"category": p.CategoryName, "unitsPerCarton": p.UnitsPerCarton, "isActive": p.IsActive, "barcodes": barcodes,
 		"minStockQty": nil,
 	}
 	if p.MinStockQty != nil {
 		m["minStockQty"] = p.MinStockQty.String()
+	}
+	for k, v := range m {
+		if v == "" {
+			delete(m, k)
+		}
 	}
 	if p.IsBundle {
 		m["bundleComponents"] = components
@@ -296,6 +302,7 @@ func (s *Service) FindByCode(ctx context.Context, code string) (domain.Product, 
 // Nama, SKU, dan satuan komponen diisi untuk audit trail.
 func (s *Service) validateReferences(ctx context.Context, p *domain.Product) error {
 	fields := map[string]string{}
+	p.CategoryName = ""
 	if p.CategoryID != nil {
 		c, err := s.Store.GetCategory(ctx, *p.CategoryID, false)
 		switch {
@@ -303,6 +310,8 @@ func (s *Service) validateReferences(ctx context.Context, p *domain.Product) err
 			fields["categoryId"] = "Kategori tidak ditemukan atau sudah dihapus"
 		case err != nil:
 			return err
+		default:
+			p.CategoryName = c.Name
 		}
 	}
 	codes := make([]string, len(p.Barcodes))
