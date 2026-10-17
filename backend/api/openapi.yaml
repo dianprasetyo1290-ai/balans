@@ -95,6 +95,38 @@ paths:
     $ref: "./paths/sales.yaml#/customerPaymentCancel"
   /api/v1/sales/receivable-aging:
     $ref: "./paths/sales.yaml#/receivableAging"
+  /api/v1/sales/return-sources:
+    $ref: "./paths/sales_returns.yaml#/salesReturnSources"
+  /api/v1/sales/return-sources/{id}:
+    $ref: "./paths/sales_returns.yaml#/salesReturnSource"
+  /api/v1/sales/return-pickup-users:
+    $ref: "./paths/sales_returns.yaml#/salesReturnPickupUsers"
+  /api/v1/sales/returns:
+    $ref: "./paths/sales_returns.yaml#/salesReturns"
+  /api/v1/sales/returns/{id}:
+    $ref: "./paths/sales_returns.yaml#/salesReturn"
+  /api/v1/sales/returns/{id}/submit:
+    $ref: "./paths/sales_returns.yaml#/salesReturnSubmit"
+  /api/v1/sales/returns/{id}/send-back:
+    $ref: "./paths/sales_returns.yaml#/salesReturnSendBack"
+  /api/v1/sales/returns/{id}/verify:
+    $ref: "./paths/sales_returns.yaml#/salesReturnVerify"
+  /api/v1/sales/returns/{id}/assign-pickup:
+    $ref: "./paths/sales_returns.yaml#/salesReturnAssignPickup"
+  /api/v1/sales/returns/{id}/pickup:
+    $ref: "./paths/sales_returns.yaml#/salesReturnPickup"
+  /api/v1/sales/returns/{id}/receive:
+    $ref: "./paths/sales_returns.yaml#/salesReturnReceive"
+  /api/v1/sales/returns/{id}/cancel:
+    $ref: "./paths/sales_returns.yaml#/salesReturnCancel"
+  /api/v1/sales/credit-notes:
+    $ref: "./paths/sales_returns.yaml#/creditNotes"
+  /api/v1/sales/credit-notes/{id}:
+    $ref: "./paths/sales_returns.yaml#/creditNote"
+  /api/v1/sales/credit-notes/{id}/apply:
+    $ref: "./paths/sales_returns.yaml#/creditNoteApply"
+  /api/v1/sales/credit-notes/{id}/pay-refund:
+    $ref: "./paths/sales_returns.yaml#/creditNotePayRefund"
   /api/v1/webhooks/biteship:
     $ref: "./paths/logistics.yaml#/biteshipWebhook"
   /api/v1/auth/login:

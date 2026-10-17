@@ -780,6 +780,435 @@ paths:
                 $ref: '#/components/schemas/ReceivableAgingReport'
         default:
           $ref: '#/components/responses/Problem'
+  /api/v1/sales/return-sources:
+    get:
+      operationId: listSalesReturnSources
+      tags:
+        - sales
+      summary: Cari Sales Order yang barangnya sudah dikirim untuk diretur (maks. 20)
+      parameters:
+        - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: Sales Order sumber retur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReturnSourceList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/return-sources/{id}:
+    get:
+      operationId: getSalesReturnSource
+      tags:
+        - sales
+      summary: Baris Sales Order yang bisa diretur (qty terkirim − qty retur lain, harga bersih, batch)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Sumber retur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReturnSourceDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/return-pickup-users:
+    get:
+      operationId: listSalesReturnPickupUsers
+      tags:
+        - sales
+      summary: Merchandiser aktif untuk penugasan pickup retur
+      responses:
+        '200':
+          description: Merchandiser
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReturnPickupUserList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/returns:
+    get:
+      operationId: listSalesReturns
+      tags:
+        - sales
+      summary: Daftar Retur Penjualan (S-314, S-317)
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Search'
+        - name: status
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/SalesReturnStatus'
+        - name: salesOrderId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: partyId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: assignedToMe
+          in: query
+          description: Hanya retur yang ditugaskan pickup ke user ini (Merchandiser).
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Retur terbaru lebih dulu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReturnList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createSalesReturn
+      tags:
+        - sales
+      summary: Menyimpan draft Retur Penjualan dari baris Sales Order yang sudah dikirim
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesReturnInput'
+      responses:
+        '201':
+          description: Draft dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReturn'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/returns/{id}:
+    get:
+      operationId: getSalesReturn
+      tags:
+        - sales
+      summary: Detail Retur Penjualan
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Retur Penjualan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReturn'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      operationId: updateSalesReturn
+      tags:
+        - sales
+      summary: Mengubah draft Retur Penjualan
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesReturnUpdate'
+      responses:
+        '200':
+          description: Draft diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReturn'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/returns/{id}/submit:
+    post:
+      operationId: submitSalesReturn
+      tags:
+        - sales
+      summary: Ajukan retur (nomor RJ)
+      description: |
+        Retur MT/reseller (mitra) → Diajukan, menunggu verifikasi Logistik Leader. Retur pelanggan langsung dan
+        marketplace → barang diterima ke lokasi Inbound berstatus Karantina dan Inbound dibuat (Diproses).
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Diajukan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReturn'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/returns/{id}/send-back:
+    post:
+      operationId: sendBackSalesReturn
+      tags:
+        - sales
+      summary: Kembalikan retur ke Draft (tidak sesuai SOP retur, catatan wajib)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesReturnNoteInput'
+      responses:
+        '200':
+          description: Kembali Draft
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReturn'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/returns/{id}/verify:
+    post:
+      operationId: verifySalesReturn
+      tags:
+        - sales
+      summary: Verifikasi retur MT oleh Logistik Leader (tentukan pickup Merchandiser atau dikirim partner)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesReturnVerifyInput'
+      responses:
+        '200':
+          description: Terverifikasi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReturn'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/returns/{id}/assign-pickup:
+    post:
+      operationId: assignSalesReturnPickup
+      tags:
+        - sales
+      summary: Tugaskan Merchandiser untuk pickup (Fulfillment Leader)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesReturnAssignPickupInput'
+      responses:
+        '200':
+          description: Ditugaskan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReturn'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/returns/{id}/pickup:
+    post:
+      operationId: recordSalesReturnPickup
+      tags:
+        - sales
+      summary: Catat pickup barang di lokasi partner (Merchandiser yang ditugaskan, foto wajib)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesReturnPickupInput'
+      responses:
+        '200':
+          description: Pickup dicatat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReturn'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/returns/{id}/receive:
+    post:
+      operationId: receiveSalesReturn
+      tags:
+        - sales
+      summary: Terima barang retur MT (cek ulang, foto & form retur) → Inbound
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesReturnReceiveInput'
+      responses:
+        '200':
+          description: Diproses
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReturn'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/returns/{id}/cancel:
+    post:
+      operationId: cancelSalesReturn
+      tags:
+        - sales
+      summary: Batalkan retur sebelum barang masuk Inbound
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesCancelInput'
+      responses:
+        '200':
+          description: Dibatalkan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReturn'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/credit-notes:
+    get:
+      operationId: listCreditNotes
+      tags:
+        - sales
+      summary: Daftar Nota Kredit
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Search'
+        - name: status
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/CreditNoteStatus'
+        - name: partyType
+          in: query
+          schema:
+            $ref: '#/components/schemas/SalesPartyType'
+        - name: partyId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: settlementMethod
+          in: query
+          schema:
+            $ref: '#/components/schemas/CreditNoteSettlement'
+      responses:
+        '200':
+          description: Nota kredit terbaru lebih dulu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditNoteList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/credit-notes/{id}:
+    get:
+      operationId: getCreditNote
+      tags:
+        - sales
+      summary: Detail Nota Kredit beserta alokasi dan invoice terbuka pihak yang sama
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Nota kredit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditNote'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/credit-notes/{id}/apply:
+    post:
+      operationId: applyCreditNote
+      tags:
+        - sales
+      summary: Alokasikan saldo nota kredit ke invoice terbuka pihak yang sama (F&A)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditNoteApplyInput'
+      responses:
+        '200':
+          description: Dialokasikan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditNote'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/credit-notes/{id}/pay-refund:
+    post:
+      operationId: payCreditNoteRefund
+      tags:
+        - sales
+      summary: Bayar refund yang sudah disetujui Head F&A (aksi ★ re-autentikasi; jurnal A-PB)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditNoteRefundInput'
+      responses:
+        '200':
+          description: Refund dibayar
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditNote'
+        default:
+          $ref: '#/components/responses/Problem'
   /api/v1/webhooks/biteship:
     post:
       operationId: receiveBiteshipWebhook
@@ -8861,6 +9290,784 @@ components:
             $ref: '#/components/schemas/ReceivableAgingRow'
         totals:
           $ref: '#/components/schemas/ReceivableAgingRow'
+    SalesReturnSource:
+      type: object
+      required:
+        - id
+        - number
+        - orderType
+        - partyName
+        - businessDate
+        - status
+        - totalAmount
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        orderType:
+          $ref: '#/components/schemas/SalesOrderType'
+        partyName:
+          type: string
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        status:
+          $ref: '#/components/schemas/SalesDocumentStatus'
+        totalAmount:
+          $ref: '#/components/schemas/Money'
+    SalesReturnSourceList:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesReturnSource'
+    SalesReturnBatchOption:
+      type: object
+      required:
+        - id
+        - number
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+    SalesReturnableLine:
+      type: object
+      required:
+        - salesOrderLineId
+        - lineNo
+        - product
+        - isBundle
+        - orderedQty
+        - shippedQty
+        - returnedQty
+        - availableQty
+        - unitPrice
+        - unitCost
+        - batches
+      properties:
+        salesOrderLineId:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        product:
+          $ref: '#/components/schemas/SalesProductRef'
+        isBundle:
+          type: boolean
+        orderedQty:
+          $ref: '#/components/schemas/SalesQuantity'
+        shippedQty:
+          $ref: '#/components/schemas/SalesQuantity'
+        returnedQty:
+          $ref: '#/components/schemas/SalesQuantity'
+        availableQty:
+          $ref: '#/components/schemas/SalesQuantity'
+        unitPrice:
+          $ref: '#/components/schemas/Money'
+        unitCost:
+          type: string
+          description: HPP asal per unit (4 desimal).
+        batches:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesReturnBatchOption'
+    SalesReturnSourceDetail:
+      type: object
+      required:
+        - order
+        - requiresVerification
+        - lines
+      properties:
+        order:
+          $ref: '#/components/schemas/SalesReturnSource'
+        invoiceNumber:
+          type: string
+          nullable: true
+        requiresVerification:
+          type: boolean
+          description: Retur dari mitra (MT/reseller) diverifikasi Logistik Leader sebelum barang diambil.
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesReturnableLine'
+    SalesReturnPickupUser:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+    SalesReturnPickupUserList:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesReturnPickupUser'
+    SalesReturnStatus:
+      type: string
+      description: Status Retur Penjualan (Desain Status Dokumen 5.5).
+      enum:
+        - draft
+        - submitted
+        - verified
+        - in_progress
+        - posted
+        - cancelled
+    SalesReturnSettlement:
+      type: string
+      description: |
+        `credit_note` nota kredit (mengurangi piutang invoice asal, sisanya untuk invoice berikutnya), `refund`
+        dibayar kembali (approval Head F&A), `marketplace` mengurangi Piutang Marketplace 121x.
+      enum:
+        - credit_note
+        - refund
+        - marketplace
+    SalesReturnSummary:
+      type: object
+      required:
+        - id
+        - status
+        - salesOrderId
+        - salesOrderNumber
+        - orderType
+        - partyName
+        - returnDate
+        - settlementMethod
+        - requiresVerification
+        - pickupRequired
+        - returnAmount
+        - costAmount
+        - createdAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/SalesReturnStatus'
+        salesOrderId:
+          type: string
+          format: uuid
+        salesOrderNumber:
+          type: string
+        invoiceId:
+          type: string
+          format: uuid
+          nullable: true
+        invoiceNumber:
+          type: string
+          nullable: true
+        orderType:
+          $ref: '#/components/schemas/SalesOrderType'
+        partyName:
+          type: string
+        returnDate:
+          $ref: '#/components/schemas/BusinessDate'
+        settlementMethod:
+          $ref: '#/components/schemas/SalesReturnSettlement'
+        requiresVerification:
+          type: boolean
+        pickupRequired:
+          type: boolean
+        pickupUserId:
+          type: string
+          format: uuid
+          nullable: true
+        inboundNumber:
+          type: string
+          nullable: true
+        returnAmount:
+          $ref: '#/components/schemas/Money'
+        costAmount:
+          $ref: '#/components/schemas/Money'
+        createdAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    SalesReturnList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/SalesReturnSummary'
+    SalesReturnLineInput:
+      type: object
+      required:
+        - salesOrderLineId
+        - qty
+        - returnReasonId
+      properties:
+        salesOrderLineId:
+          type: string
+          format: uuid
+        batchId:
+          type: string
+          format: uuid
+          nullable: true
+        qty:
+          $ref: '#/components/schemas/SalesQuantity'
+        returnReasonId:
+          type: string
+          format: uuid
+        note:
+          type: string
+          maxLength: 200
+    SalesReturnFields:
+      type: object
+      required:
+        - returnDate
+        - lines
+      properties:
+        returnDate:
+          $ref: '#/components/schemas/BusinessDate'
+        settlementMethod:
+          $ref: '#/components/schemas/SalesReturnSettlement'
+        note:
+          type: string
+          maxLength: 1000
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesReturnLineInput'
+    SalesReturnInput:
+      allOf:
+        - type: object
+          required:
+            - salesOrderId
+          properties:
+            salesOrderId:
+              type: string
+              format: uuid
+        - $ref: '#/components/schemas/SalesReturnFields'
+    SalesReturnFile:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+    CreditNoteSettlement:
+      type: string
+      enum:
+        - credit_note
+        - refund
+    CreditNoteStatus:
+      type: string
+      description: '`posted` ada saldo, `completed` saldo habis teralokasi, refund: `pending_approval` → `awaiting_payment` → `paid`.'
+      enum:
+        - posted
+        - completed
+        - pending_approval
+        - awaiting_payment
+        - paid
+    SalesReturnCreditNoteRef:
+      type: object
+      required:
+        - id
+        - number
+        - settlementMethod
+        - status
+        - amount
+        - remainingAmount
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        settlementMethod:
+          $ref: '#/components/schemas/CreditNoteSettlement'
+        status:
+          $ref: '#/components/schemas/CreditNoteStatus'
+        amount:
+          $ref: '#/components/schemas/Money'
+        remainingAmount:
+          $ref: '#/components/schemas/Money'
+    SalesReturnReasonRef:
+      type: object
+      required:
+        - id
+        - code
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        defaultDisposition:
+          allOf:
+            - $ref: '#/components/schemas/ReturnDisposition'
+          nullable: true
+    SalesReturnLine:
+      type: object
+      required:
+        - id
+        - lineNo
+        - salesOrderLineId
+        - product
+        - qty
+        - returnReason
+        - unitPrice
+        - lineAmount
+        - unitCost
+        - costAmount
+        - note
+        - passedQty
+        - rejectedQty
+        - qcDone
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        salesOrderLineId:
+          type: string
+          format: uuid
+        product:
+          $ref: '#/components/schemas/SalesProductRef'
+        batchId:
+          type: string
+          format: uuid
+          nullable: true
+        batchNumber:
+          type: string
+          nullable: true
+        qty:
+          $ref: '#/components/schemas/SalesQuantity'
+        returnReason:
+          $ref: '#/components/schemas/SalesReturnReasonRef'
+        unitPrice:
+          $ref: '#/components/schemas/Money'
+        lineAmount:
+          $ref: '#/components/schemas/Money'
+        unitCost:
+          type: string
+        costAmount:
+          $ref: '#/components/schemas/Money'
+        note:
+          type: string
+        passedQty:
+          $ref: '#/components/schemas/SalesQuantity'
+        rejectedQty:
+          $ref: '#/components/schemas/SalesQuantity'
+        qcDone:
+          type: boolean
+    SalesReturn:
+      allOf:
+        - $ref: '#/components/schemas/SalesReturnSummary'
+        - type: object
+          required:
+            - note
+            - sendBackNote
+            - verifyNote
+            - pickupNote
+            - receiveNote
+            - cancelReason
+            - createdByName
+            - pickupFiles
+            - documentationFiles
+            - lines
+            - allowedActions
+          properties:
+            note:
+              type: string
+            sendBackNote:
+              type: string
+            verifiedByName:
+              type: string
+              nullable: true
+            verifiedAt:
+              type: string
+              format: date-time
+              nullable: true
+            verifyNote:
+              type: string
+            pickupUserName:
+              type: string
+              nullable: true
+            pickupAssignedAt:
+              type: string
+              format: date-time
+              nullable: true
+            pickedUpAt:
+              type: string
+              format: date-time
+              nullable: true
+            pickupNote:
+              type: string
+            pickupFiles:
+              type: array
+              items:
+                $ref: '#/components/schemas/SalesReturnFile'
+            receivedByName:
+              type: string
+              nullable: true
+            receivedAt:
+              type: string
+              format: date-time
+              nullable: true
+            receiveNote:
+              type: string
+            documentationFiles:
+              type: array
+              items:
+                $ref: '#/components/schemas/SalesReturnFile'
+            inboundId:
+              type: string
+              format: uuid
+              nullable: true
+            cancelReason:
+              type: string
+            postedAt:
+              type: string
+              format: date-time
+              nullable: true
+            journalEntryId:
+              type: string
+              format: uuid
+              nullable: true
+            createdByName:
+              type: string
+            creditNote:
+              allOf:
+                - $ref: '#/components/schemas/SalesReturnCreditNoteRef'
+              nullable: true
+            lines:
+              type: array
+              items:
+                $ref: '#/components/schemas/SalesReturnLine'
+            allowedActions:
+              type: array
+              items:
+                type: string
+                enum:
+                  - edit
+                  - submit
+                  - cancel
+                  - verify
+                  - send_back
+                  - assign_pickup
+                  - record_pickup
+                  - receive
+    SalesReturnUpdate:
+      allOf:
+        - $ref: '#/components/schemas/SalesReturnFields'
+        - $ref: '#/components/schemas/VersionInput'
+    SalesReturnNoteInput:
+      type: object
+      required:
+        - version
+        - note
+      properties:
+        version:
+          type: integer
+        note:
+          type: string
+          maxLength: 1000
+    SalesReturnVerifyInput:
+      type: object
+      required:
+        - version
+        - pickupRequired
+      properties:
+        version:
+          type: integer
+        pickupRequired:
+          type: boolean
+        note:
+          type: string
+          maxLength: 1000
+    SalesReturnAssignPickupInput:
+      type: object
+      required:
+        - version
+        - pickupUserId
+      properties:
+        version:
+          type: integer
+        pickupUserId:
+          type: string
+          format: uuid
+    SalesReturnPickupInput:
+      type: object
+      required:
+        - version
+        - photoFileIds
+      properties:
+        version:
+          type: integer
+        note:
+          type: string
+          maxLength: 1000
+        photoFileIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+    SalesReturnReceivedQty:
+      type: object
+      required:
+        - lineId
+        - qty
+      properties:
+        lineId:
+          type: string
+          format: uuid
+        qty:
+          $ref: '#/components/schemas/SalesQuantity'
+    SalesReturnReceiveInput:
+      type: object
+      required:
+        - version
+        - documentationFileIds
+      properties:
+        version:
+          type: integer
+        note:
+          type: string
+          maxLength: 1000
+        documentationFileIds:
+          type: array
+          description: Foto barang dan form retur yang ditandatangani.
+          items:
+            type: string
+            format: uuid
+        lines:
+          type: array
+          description: Qty hasil cek ulang bila kurang dari qty retur (baris lain tetap).
+          items:
+            $ref: '#/components/schemas/SalesReturnReceivedQty'
+    CreditNoteSummary:
+      type: object
+      required:
+        - id
+        - number
+        - salesReturnId
+        - salesReturnNumber
+        - partyType
+        - partyId
+        - partyName
+        - settlementMethod
+        - issueDate
+        - amount
+        - appliedAmount
+        - refundedAmount
+        - remainingAmount
+        - status
+        - createdAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        salesReturnId:
+          type: string
+          format: uuid
+        salesReturnNumber:
+          type: string
+        invoiceId:
+          type: string
+          format: uuid
+          nullable: true
+        invoiceNumber:
+          type: string
+          nullable: true
+        partyType:
+          $ref: '#/components/schemas/SalesPartyType'
+        partyId:
+          type: string
+          format: uuid
+        partyName:
+          type: string
+        settlementMethod:
+          $ref: '#/components/schemas/CreditNoteSettlement'
+        issueDate:
+          $ref: '#/components/schemas/BusinessDate'
+        amount:
+          $ref: '#/components/schemas/Money'
+        appliedAmount:
+          $ref: '#/components/schemas/Money'
+        refundedAmount:
+          $ref: '#/components/schemas/Money'
+        remainingAmount:
+          $ref: '#/components/schemas/Money'
+        status:
+          $ref: '#/components/schemas/CreditNoteStatus'
+        createdAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    CreditNoteList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/CreditNoteSummary'
+    CreditNoteApplication:
+      type: object
+      required:
+        - id
+        - invoiceId
+        - invoiceNumber
+        - amount
+        - appliedDate
+      properties:
+        id:
+          type: string
+          format: uuid
+        invoiceId:
+          type: string
+          format: uuid
+        invoiceNumber:
+          type: string
+        amount:
+          $ref: '#/components/schemas/Money'
+        appliedDate:
+          $ref: '#/components/schemas/BusinessDate'
+    CreditNoteOpenInvoice:
+      type: object
+      required:
+        - id
+        - number
+        - invoiceDate
+        - dueDate
+        - totalAmount
+        - outstandingAmount
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        invoiceDate:
+          $ref: '#/components/schemas/BusinessDate'
+        dueDate:
+          $ref: '#/components/schemas/BusinessDate'
+        totalAmount:
+          $ref: '#/components/schemas/Money'
+        outstandingAmount:
+          $ref: '#/components/schemas/Money'
+    CreditNote:
+      allOf:
+        - $ref: '#/components/schemas/CreditNoteSummary'
+        - type: object
+          required:
+            - decisionNote
+            - refundAccountCode
+            - refundReference
+            - applications
+            - openInvoices
+            - allowedActions
+          properties:
+            decisionNote:
+              type: string
+            refundDate:
+              allOf:
+                - $ref: '#/components/schemas/BusinessDate'
+              nullable: true
+            refundAccountCode:
+              type: string
+            refundReference:
+              type: string
+            refundJournalEntryId:
+              type: string
+              format: uuid
+              nullable: true
+            applications:
+              type: array
+              items:
+                $ref: '#/components/schemas/CreditNoteApplication'
+            openInvoices:
+              type: array
+              description: Invoice terbuka pihak yang sama (pilihan alokasi saat saldo masih ada).
+              items:
+                $ref: '#/components/schemas/CreditNoteOpenInvoice'
+            allowedActions:
+              type: array
+              items:
+                type: string
+                enum:
+                  - print
+                  - apply
+                  - pay_refund
+    CreditNoteAllocationInput:
+      type: object
+      required:
+        - invoiceId
+        - amount
+      properties:
+        invoiceId:
+          type: string
+          format: uuid
+        amount:
+          $ref: '#/components/schemas/Money'
+    CreditNoteApplyInput:
+      type: object
+      required:
+        - version
+        - allocations
+      properties:
+        version:
+          type: integer
+        allocations:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreditNoteAllocationInput'
+    CreditNoteRefundInput:
+      type: object
+      required:
+        - version
+        - paymentDate
+        - accountCode
+      properties:
+        version:
+          type: integer
+        paymentDate:
+          $ref: '#/components/schemas/BusinessDate'
+        accountCode:
+          type: string
+          description: Kode akun Kas & Bank sumber pembayaran.
+        reference:
+          type: string
+          maxLength: 200
     BiteshipNotification:
       type: object
       description: Payload webhook status order Biteship (nama field milik Biteship).

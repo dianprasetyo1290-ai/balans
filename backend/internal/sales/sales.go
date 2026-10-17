@@ -196,6 +196,7 @@ type Module struct {
 	webhooks *service.PaymentWebhookService
 	reasons  *service.ReturnReasonService
 	docs     *service.DocumentService
+	returns  *service.ReturnService
 	rs       *httpx.Responder
 }
 
@@ -205,7 +206,7 @@ func New(d Deps) *Module {
 	if d.Clock == nil {
 		d.Clock = clock.System{}
 	}
-	return &Module{
+	m := &Module{
 		webhooks: service.NewPaymentWebhookService(d.Gateway, d.Inbox, d.Log),
 		reasons:  service.NewReturnReasonService(store, d.Tx, d.Audit),
 		docs: service.NewDocumentService(service.Deps{
@@ -215,6 +216,8 @@ func New(d Deps) *Module {
 		}),
 		rs: d.Responder,
 	}
+	m.returns = service.NewReturnService(m.docs)
+	return m
 }
 
 // Name mengembalikan nama modul.
@@ -222,7 +225,7 @@ func (m *Module) Name() string { return Name }
 
 // RegisterRoutes mendaftarkan route webhook Midtrans, master alasan retur, dokumen penjualan, dan piutang.
 func (m *Module) RegisterRoutes(r chi.Router) {
-	saleshttp.Register(r, saleshttp.NewHandler(m.reasons, m.docs), saleshttp.NewWebhookHandler(m.webhooks, m.rs), m.rs)
+	saleshttp.Register(r, saleshttp.NewHandler(m.reasons, m.docs).WithReturns(m.returns), saleshttp.NewWebhookHandler(m.webhooks, m.rs), m.rs)
 }
 
 // RegisterWorkers mendaftarkan worker job modul.

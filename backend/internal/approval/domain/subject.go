@@ -29,6 +29,7 @@ const (
 	SubjectPurchaseReturn            SubjectType = "purchase_return"
 	SubjectPettyCashReplenishment    SubjectType = "petty_cash_replenishment"
 	SubjectFiscalPeriodReopen        SubjectType = "fiscal_period_reopen"
+	SubjectSalesRefund               SubjectType = "sales_refund"
 )
 
 // ConditionHasDisposal: dokumen memuat baris pemusnahan (disposisi retur level 2 dan 3).
@@ -65,6 +66,7 @@ var subjectTypes = []SubjectTypeInfo{
 	{SubjectPurchaseReturn, "Retur Pembelian", "Nilai retur", nil},
 	{SubjectPettyCashReplenishment, "Pengisian Kembali Kas Kecil", "Nilai pengisian", nil},
 	{SubjectFiscalPeriodReopen, "Buka Kembali Periode", "—", nil},
+	{SubjectSalesRefund, "Refund Nota Kredit", "Nilai refund", nil},
 }
 
 // SubjectTypes mengembalikan jenis dokumen yang dikenal engine, berurutan seperti matriks approval.

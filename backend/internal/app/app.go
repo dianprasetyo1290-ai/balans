@@ -238,6 +238,7 @@ func (a *App) buildModules() error {
 	if err != nil {
 		return err
 	}
+	a.wireSalesReturns(mailer)
 	if gateway != nil {
 		console.Payments = gateway
 	}

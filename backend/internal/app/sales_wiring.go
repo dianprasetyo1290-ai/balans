@@ -295,6 +295,10 @@ func (n salesNumberer) Next(ctx context.Context, t sales.DocumentType, businessD
 		dt = document.TypeInvoice
 	case sales.DocPayment:
 		dt = document.TypePayment
+	case sales.DocSalesReturn:
+		dt = document.TypeSalesReturn
+	case sales.DocCreditNote:
+		dt = document.TypeCreditNote
 	default:
 		return "", fmt.Errorf("jenis nomor dokumen sales %q tidak dikenal", t)
 	}
