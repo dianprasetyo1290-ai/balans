@@ -77,3 +77,10 @@ func TestPasswordTokenUsable(t *testing.T) {
 	assert.False(t, tok.Usable(now), "sudah dipakai")
 	assert.False(t, domain.PasswordToken{Expires: now.Add(time.Hour)}.Usable(now), "user nonaktif")
 }
+
+func TestPresidentDirectorCanOpenPurchaseOrders(t *testing.T) {
+	for _, code := range []string{"procurement.purchase_order.read", "procurement.purchase_order.approve"} {
+		p := find(t, code)
+		assert.Contains(t, p.DefaultRoles, domain.RolePresidentDirector, "Direktur Utama menyetujui PO > Rp50 jt dan harus bisa membuka detailnya")
+	}
+}
