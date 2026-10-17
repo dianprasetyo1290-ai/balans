@@ -21,6 +21,7 @@ import (
 	"balans/internal/platform/clock"
 	"balans/internal/platform/db"
 	"balans/internal/platform/httpx"
+	"balans/internal/platform/tabular"
 )
 
 // Name adalah nama modul di ENABLED_MODULES.
@@ -124,6 +125,20 @@ func (m *Module) BundleComponents(ctx context.Context, bundleID uuid.UUID) ([]Bu
 		return nil, err
 	}
 	return p.Components, nil
+}
+
+// ProductColumns adalah kolom template impor/ekspor produk (S-125).
+func ProductColumns() []tabular.Column { return service.ProductColumns }
+
+// ImportProductRow membuat atau memperbarui produk (kunci SKU) dari satu baris Excel di transaksi aktif.
+// Butuh catalog.product.import dan catalog.product.write.
+func (m *Module) ImportProductRow(ctx context.Context, row tabular.Row) error {
+	return m.svc.ImportProductRow(ctx, row)
+}
+
+// ExportProducts mengalirkan semua produk aktif (belum dihapus) sebagai baris Excel. Butuh catalog.product.export.
+func (m *Module) ExportProducts(ctx context.Context, emit func(tabular.Row) error) error {
+	return m.svc.ExportProducts(ctx, emit)
 }
 
 // SeedDev membuat kategori dan produk contoh untuk demo lokal (APP_ENV=local). Aman diulang: kode yang sudah

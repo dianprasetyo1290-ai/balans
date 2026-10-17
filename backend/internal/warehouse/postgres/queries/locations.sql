@@ -80,3 +80,6 @@ UPDATE locations
 SET deleted_at = NULL, deleted_by = NULL, updated_at = now(), updated_by = sqlc.arg('actor_id'), version = version + 1
 WHERE warehouse_id = sqlc.arg('warehouse_id') AND deleted_at = sqlc.arg('deleted_at')
 RETURNING id;
+
+-- name: GetLocationIDByCode :one
+SELECT id FROM locations WHERE code = $1;

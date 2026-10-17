@@ -1979,6 +1979,220 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/v1/data-exchange/kinds": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Jenis data yang boleh diimpor/diekspor user (MD-10, INT-02)
+     * @description Hanya jenis data dengan permission `<kind>.import` atau `<kind>.export` milik user. `uploadOwnerType`
+     *     dipakai sebagai `ownerType` saat meminta URL upload file (`POST /api/v1/files`).
+     */
+    get: operations["listDataExchangeKinds"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/data-exchange/kinds/{kind}/template": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Mengunduh template impor (xlsx) yang dihasilkan dari definisi kolom
+     * @description Template berisi sheet data (header oranye bertanda `*` wajib, abu-abu opsional, dropdown untuk kolom
+     *     pilihan) dan sheet Petunjuk berisi format, aturan, serta contoh baris. Butuh `<kind>.import`.
+     */
+    get: operations["getDataExchangeTemplate"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/import-jobs": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Riwayat impor (jenis data yang boleh diimpor user) */
+    get: operations["listImportJobs"]
+    put?: never
+    /**
+     * Memulai impor dari file xlsx yang sudah diunggah
+     * @description File diunggah dulu lewat `POST /api/v1/files` dengan `ownerType` dari `listDataExchangeKinds`. Pemeriksaan
+     *     per baris berjalan sebagai job `dataexchange.import` (antrean bulk); pantau progress lewat `getImportJob`.
+     *     File yang sama (SHA-256) untuk jenis data yang sama ditolak `IMPORT_ALREADY_PROCESSED`, kecuali job
+     *     sebelumnya gagal atau dibatalkan.
+     */
+    post: operations["createImportJob"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/import-jobs/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Status, progress, dan ringkasan job impor */
+    get: operations["getImportJob"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/import-jobs/{id}/rows": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Preview baris hasil pemeriksaan
+     * @description Data pribadi (NPWP, nomor rekening, NIK) ditampilkan tersamar.
+     */
+    get: operations["listImportJobRows"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/import-jobs/{id}/commit": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Menyimpan baris valid
+     * @description Hanya untuk status `validated` dengan minimal satu baris valid. Penyimpanan berjalan sebagai job; master
+     *     data disimpan dalam satu transaksi (gagal satu baris = tidak ada yang tersimpan, TG 5.15).
+     */
+    post: operations["commitImportJob"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/import-jobs/{id}/cancel": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Membatalkan impor yang menunggu konfirmasi */
+    post: operations["cancelImportJob"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/import-jobs/{id}/error-file": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** URL unduhan file baris error (xlsx dengan kolom Keterangan Error) */
+    get: operations["getImportJobErrorFile"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/export-jobs": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Riwayat ekspor (jenis data yang boleh diekspor user) */
+    get: operations["listExportJobs"]
+    put?: never
+    /**
+     * Memulai ekspor ke xlsx
+     * @description File dibuat job `dataexchange.export` (antrean bulk) dengan kolom yang sama dengan template impor, lalu
+     *     user mendapat notifikasi berisi tautan unduhan. Butuh `<kind>.export`.
+     */
+    post: operations["createExportJob"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/export-jobs/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Status job ekspor */
+    get: operations["getExportJob"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/export-jobs/{id}/download-url": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** URL unduhan file ekspor */
+    get: operations["getExportJobDownloadUrl"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -3512,6 +3726,125 @@ export interface components {
       /** Format: date-time */
       expiresAt: string
     }
+    DataExchangeColumn: {
+      /** @description Nama field (dipakai di `values` dan `errors[].column` preview). */
+      key: string
+      header: string
+      required: boolean
+      /** @enum {string} */
+      columnType: "text" | "integer" | "decimal" | "date" | "choice" | "bool"
+      options: string[]
+      sensitive?: boolean
+    }
+    DataExchangeKind: {
+      /** @example catalog.product */
+      kind: string
+      /** @example Produk */
+      label: string
+      canImport: boolean
+      canExport: boolean
+      /** @example import.catalog.product */
+      uploadOwnerType: string
+      /** Format: int64 */
+      maxFileBytes?: number
+      columns: components["schemas"]["DataExchangeColumn"][]
+    }
+    DataExchangeKindList: {
+      items: components["schemas"]["DataExchangeKind"][]
+    }
+    ImportJob: {
+      /** Format: uuid */
+      id: string
+      kind: string
+      kindLabel: string
+      fileName: string
+      /** @enum {string} */
+      status:
+        | "uploaded"
+        | "validating"
+        | "validated"
+        | "committing"
+        | "completed"
+        | "failed"
+        | "cancelled"
+      totalRows: number
+      processedRows: number
+      validRows: number
+      errorRows: number
+      committedRows: number
+      progress: number
+      /** @description Alasan gagal untuk status `failed`. */
+      message: string
+      allowedActions: ("commit" | "cancel" | "download_errors")[]
+      /** Format: date-time */
+      validatedAt?: string | null
+      /** Format: date-time */
+      completedAt?: string | null
+      /** Format: uuid */
+      createdBy: string
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+    }
+    ImportJobList: {
+      items: components["schemas"]["ImportJob"][]
+      pagination: components["schemas"]["Pagination"]
+    }
+    ImportJobInput: {
+      kind: string
+      /** Format: uuid */
+      fileId: string
+    }
+    ImportJobRowError: {
+      /** @description Key kolom; kosong = error baris. */
+      column?: string
+      message: string
+    }
+    ImportJobRow: {
+      /** @description Nomor baris di Excel (header = 1). */
+      rowNumber: number
+      isValid: boolean
+      values: {
+        [key: string]: string
+      }
+      errors: components["schemas"]["ImportJobRowError"][]
+    }
+    ImportJobRowList: {
+      items: components["schemas"]["ImportJobRow"][]
+      pagination: components["schemas"]["Pagination"]
+    }
+    DataExchangeFileLink: {
+      url: string
+      /** Format: date-time */
+      expiresAt: string
+    }
+    ExportJob: {
+      /** Format: uuid */
+      id: string
+      kind: string
+      kindLabel: string
+      /** @enum {string} */
+      status: "queued" | "running" | "completed" | "failed"
+      totalRows: number
+      fileName: string
+      message: string
+      /** Format: date-time */
+      completedAt?: string | null
+      /** Format: uuid */
+      createdBy: string
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+    }
+    ExportJobList: {
+      items: components["schemas"]["ExportJob"][]
+      pagination: components["schemas"]["Pagination"]
+    }
+    ExportJobInput: {
+      kind: string
+    }
   }
   responses: {
     /** @description Error standar (problem+json) */
@@ -3542,6 +3875,9 @@ export interface components {
     /** @description Waktu kedaluwarsa URL (Unix detik). */
     FileExpires: number
     FileSignature: string
+    /** @description Jenis data = resource permission, mis. `catalog.product`. */
+    DataExchangeKindPath: string
+    DataExchangeKindQuery: string
   }
   requestBodies: never
   headers: never
@@ -7481,6 +7817,329 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listDataExchangeKinds: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Jenis data */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DataExchangeKindList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getDataExchangeTemplate: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Jenis data = resource permission, mis. `catalog.product`. */
+        kind: components["parameters"]["DataExchangeKindPath"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description File template */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listImportJobs: {
+    parameters: {
+      query?: {
+        kind?: components["parameters"]["DataExchangeKindQuery"]
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Riwayat impor, terbaru dulu */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ImportJobList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createImportJob: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ImportJobInput"]
+      }
+    }
+    responses: {
+      /** @description Job impor dibuat */
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ImportJob"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getImportJob: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Job impor */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ImportJob"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listImportJobRows: {
+    parameters: {
+      query?: {
+        /** @description true = hanya baris valid, false = hanya baris error, kosong = semua. */
+        valid?: boolean
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+      }
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Baris preview */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ImportJobRowList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  commitImportJob: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Penyimpanan dijadwalkan */
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ImportJob"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  cancelImportJob: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Impor dibatalkan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ImportJob"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getImportJobErrorFile: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description URL unduhan berumur 5 menit */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DataExchangeFileLink"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listExportJobs: {
+    parameters: {
+      query?: {
+        kind?: components["parameters"]["DataExchangeKindQuery"]
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Riwayat ekspor, terbaru dulu */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ExportJobList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createExportJob: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ExportJobInput"]
+      }
+    }
+    responses: {
+      /** @description Job ekspor dibuat */
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ExportJob"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getExportJob: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Job ekspor */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ExportJob"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getExportJobDownloadUrl: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description URL unduhan berumur 5 menit */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DataExchangeFileLink"]
+        }
       }
       default: components["responses"]["Problem"]
     }

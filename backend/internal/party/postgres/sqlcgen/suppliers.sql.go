@@ -112,6 +112,17 @@ func (q *Queries) GetSupplierForUpdate(ctx context.Context, id uuid.UUID) (Suppl
 	return i, err
 }
 
+const getSupplierIDByCode = `-- name: GetSupplierIDByCode :one
+SELECT id FROM suppliers WHERE code = $1 AND deleted_at IS NULL
+`
+
+func (q *Queries) GetSupplierIDByCode(ctx context.Context, code string) (uuid.UUID, error) {
+	row := q.db.QueryRow(ctx, getSupplierIDByCode, code)
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
+}
+
 const insertBankAccount = `-- name: InsertBankAccount :one
 INSERT INTO party_bank_accounts (
     party_type, party_id, bank_name, account_number_enc, account_name, is_default, created_by, updated_by)

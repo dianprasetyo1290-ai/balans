@@ -20,6 +20,7 @@ import (
 	"balans/internal/platform/clock"
 	"balans/internal/platform/db"
 	"balans/internal/platform/httpx"
+	"balans/internal/platform/tabular"
 )
 
 // Name adalah nama modul di ENABLED_MODULES.
@@ -201,6 +202,65 @@ func (m *Module) RequireActiveAgreement(ctx context.Context, partnerID uuid.UUID
 // ProductCodeFor mengembalikan kode artikel & barcode retailer satu SKU di satu mitra; ok=false jika belum ada.
 func (m *Module) ProductCodeFor(ctx context.Context, partnerID, productID uuid.UUID) (ProductCode, bool, error) {
 	return m.svc.ProductCodeFor(ctx, partnerID, productID)
+}
+
+// CustomerColumns, SupplierColumns, dan ProductCodeColumns adalah kolom template impor/ekspor (S-125, S-134).
+func CustomerColumns() []tabular.Column    { return service.CustomerColumns }
+func SupplierColumns() []tabular.Column    { return service.SupplierColumns }
+func ProductCodeColumns() []tabular.Column { return service.ProductCodeColumns }
+
+// EmployeeNumbers opsional pada Employees: mencari karyawan dari nomor karyawan (impor pelanggan).
+type EmployeeNumbers = service.EmployeeNumbers
+
+// ProductSKUs opsional pada Products: mencari produk dari SKU (impor kode produk mitra).
+type ProductSKUs = service.ProductSKUs
+
+// SetProducts memasang pembaca produk modul catalog.
+func (m *Module) SetProducts(p Products) { m.svc.Products = p }
+
+// ValidateCustomerRow memeriksa satu baris impor pelanggan tanpa menyimpan (kode pelanggan dari sequence).
+func (m *Module) ValidateCustomerRow(ctx context.Context, row tabular.Row) error {
+	return m.svc.ValidateCustomerRow(ctx, row)
+}
+
+// ImportCustomerRow membuat atau memperbarui pelanggan (kunci kode atau nomor HP) dari satu baris Excel.
+func (m *Module) ImportCustomerRow(ctx context.Context, row tabular.Row) error {
+	return m.svc.ImportCustomerRow(ctx, row)
+}
+
+// ExportCustomers mengalirkan pelanggan sebagai baris Excel.
+func (m *Module) ExportCustomers(ctx context.Context, emit func(tabular.Row) error) error {
+	return m.svc.ExportCustomers(ctx, emit)
+}
+
+// ImportSupplierRow membuat atau memperbarui pemasok/maklon (kunci kode) dari satu baris Excel.
+func (m *Module) ImportSupplierRow(ctx context.Context, row tabular.Row) error {
+	return m.svc.ImportSupplierRow(ctx, row)
+}
+
+// ExportSuppliers mengalirkan pemasok sebagai baris Excel (NPWP dan rekening tersamar).
+func (m *Module) ExportSuppliers(ctx context.Context, emit func(tabular.Row) error) error {
+	return m.svc.ExportSuppliers(ctx, emit)
+}
+
+// ImportProductCodeRow membuat atau memperbarui kode produk mitra (kunci mitra–SKU) dari satu baris Excel.
+func (m *Module) ImportProductCodeRow(ctx context.Context, row tabular.Row) error {
+	return m.svc.ImportProductCodeRow(ctx, row)
+}
+
+// ExportProductCodes mengalirkan kode produk mitra sebagai baris Excel.
+func (m *Module) ExportProductCodes(ctx context.Context, emit func(tabular.Row) error) error {
+	return m.svc.ExportProductCodes(ctx, emit)
+}
+
+// SupplierIDByCode mencari pemasok dari kode (dipakai impor lokasi maklon).
+func (m *Module) SupplierIDByCode(ctx context.Context, code string) (uuid.UUID, bool, error) {
+	return m.svc.Store.SupplierIDByCode(ctx, code)
+}
+
+// PartnerIDByCode mencari mitra dari kode (dipakai impor lokasi konsinyasi).
+func (m *Module) PartnerIDByCode(ctx context.Context, code string) (uuid.UUID, bool, error) {
+	return m.svc.Store.PartnerIDByCode(ctx, code)
 }
 
 // SupplierByID mengembalikan pemasok beserta rekening (nomor terdekripsi; tampilkan tersamar).

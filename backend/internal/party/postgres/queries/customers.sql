@@ -93,3 +93,6 @@ UPDATE customer_addresses
 SET deleted_at = now(), deleted_by = sqlc.arg('actor_id')::uuid, updated_at = now(), updated_by = sqlc.arg('actor_id'),
     is_default = false, version = version + 1
 WHERE customer_id = sqlc.arg('customer_id') AND id = ANY(sqlc.arg('ids')::uuid[]) AND deleted_at IS NULL;
+
+-- name: GetCustomerIDByCode :one
+SELECT id FROM customers WHERE code = $1 AND deleted_at IS NULL;

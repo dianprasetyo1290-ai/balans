@@ -58,6 +58,8 @@ type store interface {
 	InsertLocation(ctx context.Context, l domain.Location, actorID uuid.UUID) (domain.Location, error)
 	UpdateLocation(ctx context.Context, l domain.Location, version int, actorID uuid.UUID) (domain.Location, error)
 	SetLocationDeleted(ctx context.Context, l domain.Location, actorID uuid.UUID) (domain.Location, error)
+	LocationIDByCode(ctx context.Context, code string) (uuid.UUID, bool, error)
+	WarehouseIDByCode(ctx context.Context, code string) (uuid.UUID, bool, error)
 }
 
 // Deps adalah dependensi Service.
@@ -66,6 +68,8 @@ type Deps struct {
 	Tx    txRunner
 	Audit audit.Recorder
 	Clock clock.Clock
+	// Parties mencari pihak pemilik lokasi eksternal dari kode (impor Excel). Nil = belum tersedia.
+	Parties Parties
 }
 
 // Service adalah use case modul warehouse (bagian master).

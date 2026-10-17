@@ -15,6 +15,7 @@ import (
 	"balans/internal/approval"
 	"balans/internal/audit"
 	"balans/internal/catalog"
+	"balans/internal/dataexchange"
 	"balans/internal/document"
 	"balans/internal/filestore"
 	"balans/internal/hris"
@@ -50,21 +51,23 @@ type App struct {
 	Responder *httpx.Responder
 	Migrator  *db.Migrator
 
-	idempotency *idempotency.Store
-	system      *system.Module
-	audit       *audit.Module
-	identity    *identity.Module
-	approval    *approval.Module
-	document    *document.Module
-	accounting  *accounting.Module
-	catalog     *catalog.Module
-	warehouse   *warehouse.Module
-	filestore   *filestore.Module
-	party       *party.Module
-	hris        *hris.Module
-	cipher      *pii.Cipher
-	modules     []module
-	console     *mockconsole.Console
+	idempotency  *idempotency.Store
+	system       *system.Module
+	audit        *audit.Module
+	identity     *identity.Module
+	approval     *approval.Module
+	document     *document.Module
+	accounting   *accounting.Module
+	catalog      *catalog.Module
+	warehouse    *warehouse.Module
+	filestore    *filestore.Module
+	party        *party.Module
+	hris         *hris.Module
+	notification *notification.Module
+	dataexchange *dataexchange.Module
+	cipher       *pii.Cipher
+	modules      []module
+	console      *mockconsole.Console
 }
 
 // New membuka koneksi database dan menyusun modul sesuai ENABLED_MODULES.
@@ -146,6 +149,7 @@ func (a *App) buildModules() error {
 			Responder: a.Responder,
 		})
 		a.modules = append(a.modules, mailer)
+		a.notification = mailer
 		console.Email = mailer
 	}
 	if cfg.IsEnabled(identity.Name) {
@@ -206,6 +210,10 @@ func (a *App) buildModules() error {
 		registerAuditEntities(a.audit, warehouse.AuditEntities())
 	}
 	if err := a.buildMasterData(); err != nil {
+		return err
+	}
+	a.connectMasterData()
+	if err := a.buildDataExchange(); err != nil {
 		return err
 	}
 	if cfg.IsEnabled(sales.Name) {

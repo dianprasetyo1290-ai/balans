@@ -100,6 +100,17 @@ func (q *Queries) GetEmployeeForUpdate(ctx context.Context, id uuid.UUID) (Emplo
 	return i, err
 }
 
+const getEmployeeIDByNumber = `-- name: GetEmployeeIDByNumber :one
+SELECT id FROM employees WHERE employee_number = $1 AND deleted_at IS NULL
+`
+
+func (q *Queries) GetEmployeeIDByNumber(ctx context.Context, employeeNumber string) (uuid.UUID, error) {
+	row := q.db.QueryRow(ctx, getEmployeeIDByNumber, employeeNumber)
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
+}
+
 const insertEmployee = `-- name: InsertEmployee :one
 INSERT INTO employees (
     employee_number, full_name, division_id, position_title, join_date, work_email, phone, nik_enc, nik_hash,
