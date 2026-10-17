@@ -1558,6 +1558,138 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/v1/stock-balances": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Stok per Lokasi — saldo per produk × lokasi × batch × status (INV-01, WMS-01)
+     * @description Hanya saldo > 0. `unitCost` adalah HPP rata-rata sisa cost layer batch (FIFO di dalam batch), `value` =
+     *     qty × unitCost. Permission `inventory.stock.read`.
+     */
+    get: operations["listStockBalances"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/stock-card": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Kartu Stok per SKU (opsional lokasi, batch, status) dengan saldo qty & nilai berjalan (INV-01) */
+    get: operations["getStockCard"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/batches": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Batch & Kedaluwarsa — batch berurutan FEFO dengan qty per status (INV-04, INV-09) */
+    get: operations["listBatches"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/batch-suggestions": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Alokasi Batch (FEFO) — saran batch untuk mengambil qty dari satu lokasi (S-215)
+     * @description Batch stok Tersedia diurutkan kedaluwarsa terdekat; batch kedaluwarsa dan stok Karantina tidak diusulkan.
+     *     Pemilihan batch manual yang bukan saran FEFO wajib alasan saat diposting.
+     */
+    get: operations["suggestBatches"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/cost-layers": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** HPP per Batch — cost layer FIFO per penerimaan (INV-03) */
+    get: operations["listCostLayers"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/cost-layers/{id}/consumptions": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    /** Jejak konsumsi HPP satu cost layer (RPT-04) */
+    get: operations["listCostLayerConsumptions"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/bundle-availability": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Stok tersedia bundel virtual = min(floor(stok komponen ÷ qty)) (S-115, MD-03)
+     * @description Stok komponen = stok Tersedia di lokasi `locationId`, atau di semua lokasi yang bisa dijual bila kosong.
+     */
+    get: operations["listBundleAvailability"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/v1/customers": {
     parameters: {
       query?: never
@@ -1972,6 +2104,220 @@ export interface paths {
      *     isi file harus sesuai tipenya.
      */
     put: operations["putFileContent"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/data-exchange/kinds": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Jenis data yang boleh diimpor/diekspor user (MD-10, INT-02)
+     * @description Hanya jenis data dengan permission `<kind>.import` atau `<kind>.export` milik user. `uploadOwnerType`
+     *     dipakai sebagai `ownerType` saat meminta URL upload file (`POST /api/v1/files`).
+     */
+    get: operations["listDataExchangeKinds"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/data-exchange/kinds/{kind}/template": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Mengunduh template impor (xlsx) yang dihasilkan dari definisi kolom
+     * @description Template berisi sheet data (header oranye bertanda `*` wajib, abu-abu opsional, dropdown untuk kolom
+     *     pilihan) dan sheet Petunjuk berisi format, aturan, serta contoh baris. Butuh `<kind>.import`.
+     */
+    get: operations["getDataExchangeTemplate"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/import-jobs": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Riwayat impor (jenis data yang boleh diimpor user) */
+    get: operations["listImportJobs"]
+    put?: never
+    /**
+     * Memulai impor dari file xlsx yang sudah diunggah
+     * @description File diunggah dulu lewat `POST /api/v1/files` dengan `ownerType` dari `listDataExchangeKinds`. Pemeriksaan
+     *     per baris berjalan sebagai job `dataexchange.import` (antrean bulk); pantau progress lewat `getImportJob`.
+     *     File yang sama (SHA-256) untuk jenis data yang sama ditolak `IMPORT_ALREADY_PROCESSED`, kecuali job
+     *     sebelumnya gagal atau dibatalkan.
+     */
+    post: operations["createImportJob"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/import-jobs/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Status, progress, dan ringkasan job impor */
+    get: operations["getImportJob"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/import-jobs/{id}/rows": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Preview baris hasil pemeriksaan
+     * @description Data pribadi (NPWP, nomor rekening, NIK) ditampilkan tersamar.
+     */
+    get: operations["listImportJobRows"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/import-jobs/{id}/commit": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Menyimpan baris valid
+     * @description Hanya untuk status `validated` dengan minimal satu baris valid. Penyimpanan berjalan sebagai job; master
+     *     data disimpan dalam satu transaksi (gagal satu baris = tidak ada yang tersimpan, TG 5.15).
+     */
+    post: operations["commitImportJob"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/import-jobs/{id}/cancel": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Membatalkan impor yang menunggu konfirmasi */
+    post: operations["cancelImportJob"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/import-jobs/{id}/error-file": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** URL unduhan file baris error (xlsx dengan kolom Keterangan Error) */
+    get: operations["getImportJobErrorFile"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/export-jobs": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Riwayat ekspor (jenis data yang boleh diekspor user) */
+    get: operations["listExportJobs"]
+    put?: never
+    /**
+     * Memulai ekspor ke xlsx
+     * @description File dibuat job `dataexchange.export` (antrean bulk) dengan kolom yang sama dengan template impor, lalu
+     *     user mendapat notifikasi berisi tautan unduhan. Butuh `<kind>.export`.
+     */
+    post: operations["createExportJob"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/export-jobs/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Status job ekspor */
+    get: operations["getExportJob"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/export-jobs/{id}/download-url": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** URL unduhan file ekspor */
+    get: operations["getExportJobDownloadUrl"]
+    put?: never
     post?: never
     delete?: never
     options?: never
@@ -3439,6 +3785,201 @@ export interface components {
       name: string
       isActive: boolean
     } & components["schemas"]["VersionInput"]
+    /**
+     * @description `available` Tersedia, `quarantine` Karantina, `in_transit` Dalam Pengiriman, `reserved` Dialokasikan.
+     * @enum {string}
+     */
+    StockStatus: "available" | "quarantine" | "in_transit" | "reserved"
+    StockProductRef: {
+      /** Format: uuid */
+      id: string
+      sku: string
+      name: string
+      uom: string
+    }
+    StockLocationRef: {
+      /** Format: uuid */
+      id: string
+      code: string
+      name: string
+      warehouseName?: string
+    }
+    /**
+     * @description `expired` Kedaluwarsa, `near_expiry` Segera kedaluwarsa, `ok` Aman, `no_expiry` Tanpa kedaluwarsa.
+     * @enum {string}
+     */
+    ExpiryState: "expired" | "near_expiry" | "ok" | "no_expiry"
+    /**
+     * @description Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string; bisa negatif di kartu stok.
+     * @example 12.000
+     */
+    StockQuantity: string
+    /**
+     * @description HPP per unit 4 desimal sebagai string.
+     * @example 12500.0000
+     */
+    UnitCost: string
+    StockBalance: {
+      product: components["schemas"]["StockProductRef"]
+      location: components["schemas"]["StockLocationRef"]
+      /** Format: uuid */
+      batchId?: string
+      batchNumber?: string
+      productionDate?: components["schemas"]["BusinessDate"]
+      expiryDate?: components["schemas"]["BusinessDate"]
+      expiryState?: components["schemas"]["ExpiryState"]
+      status: components["schemas"]["StockStatus"]
+      statusLabel: string
+      qty: components["schemas"]["StockQuantity"]
+      unitCost: components["schemas"]["UnitCost"]
+      value: components["schemas"]["Money"]
+      /** Format: date-time */
+      updatedAt: string
+    }
+    StockBalanceList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["StockBalance"][]
+      totalQty: components["schemas"]["StockQuantity"]
+    }
+    /** @enum {string} */
+    StockMovementType: "receive" | "issue" | "move_out" | "move_in"
+    StockCardLine: {
+      /** Format: uuid */
+      movementId: string
+      businessDate: components["schemas"]["BusinessDate"]
+      /** Format: date-time */
+      createdAt: string
+      sourceType: string
+      /** Format: uuid */
+      sourceId: string
+      sourceLabel: string
+      movementType: components["schemas"]["StockMovementType"]
+      movementTypeLabel: string
+      location: components["schemas"]["StockLocationRef"]
+      /** Format: uuid */
+      batchId?: string
+      batchNumber?: string
+      status: components["schemas"]["StockStatus"]
+      statusLabel: string
+      qtyIn: components["schemas"]["StockQuantity"]
+      qtyOut: components["schemas"]["StockQuantity"]
+      unitCost: components["schemas"]["UnitCost"]
+      costAmount: components["schemas"]["Money"]
+      runningQty: components["schemas"]["StockQuantity"]
+      runningValue: components["schemas"]["Money"]
+      batchReason?: string
+      note: string
+    }
+    StockCard: components["schemas"]["Pagination"] & {
+      product: components["schemas"]["StockProductRef"]
+      openingQty: components["schemas"]["StockQuantity"]
+      openingValue: components["schemas"]["Money"]
+      qtyIn: components["schemas"]["StockQuantity"]
+      qtyOut: components["schemas"]["StockQuantity"]
+      closingQty: components["schemas"]["StockQuantity"]
+      closingValue: components["schemas"]["Money"]
+      items: components["schemas"]["StockCardLine"][]
+    }
+    BatchSummary: {
+      /** Format: uuid */
+      id: string
+      product: components["schemas"]["StockProductRef"]
+      batchNumber: string
+      productionDate?: components["schemas"]["BusinessDate"]
+      expiryDate?: components["schemas"]["BusinessDate"]
+      /** @description Sisa hari sampai kedaluwarsa (negatif = sudah lewat). */
+      daysToExpiry?: number
+      expiryState: components["schemas"]["ExpiryState"]
+      qtyAvailable: components["schemas"]["StockQuantity"]
+      qtyQuarantine: components["schemas"]["StockQuantity"]
+      qtyInTransit: components["schemas"]["StockQuantity"]
+      qtyReserved: components["schemas"]["StockQuantity"]
+      qtyTotal: components["schemas"]["StockQuantity"]
+      /** Format: date-time */
+      createdAt: string
+    }
+    BatchList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["BatchSummary"][]
+      nearExpiryDays: number
+    }
+    SuggestedBatch: {
+      /** Format: uuid */
+      batchId?: string
+      batchNumber: string
+      productionDate?: components["schemas"]["BusinessDate"]
+      expiryDate?: components["schemas"]["BusinessDate"]
+      availableQty: components["schemas"]["StockQuantity"]
+      suggestedQty: components["schemas"]["StockQuantity"]
+    }
+    BatchSuggestion: {
+      product: components["schemas"]["StockProductRef"]
+      location: components["schemas"]["StockLocationRef"]
+      requestedQty: components["schemas"]["StockQuantity"]
+      allocatedQty: components["schemas"]["StockQuantity"]
+      shortfallQty: components["schemas"]["StockQuantity"]
+      quarantineQty: components["schemas"]["StockQuantity"]
+      /** @description Batch Tersedia yang belum kedaluwarsa dalam urutan FEFO; suggestedQty 0 = tidak perlu diambil. */
+      items: components["schemas"]["SuggestedBatch"][]
+      /** @description Batch Tersedia yang sudah kedaluwarsa (tidak diusulkan). */
+      expired: components["schemas"]["SuggestedBatch"][]
+    }
+    CostLayer: {
+      /** Format: uuid */
+      id: string
+      product: components["schemas"]["StockProductRef"]
+      /** Format: uuid */
+      batchId?: string
+      batchNumber?: string
+      expiryDate?: components["schemas"]["BusinessDate"]
+      sourceType: string
+      /** Format: uuid */
+      sourceId: string
+      sourceLabel: string
+      businessDate: components["schemas"]["BusinessDate"]
+      receivedQty: components["schemas"]["StockQuantity"]
+      remainingQty: components["schemas"]["StockQuantity"]
+      consumedQty: components["schemas"]["StockQuantity"]
+      unitCost: components["schemas"]["UnitCost"]
+      remainingValue: components["schemas"]["Money"]
+      /** Format: date-time */
+      createdAt: string
+    }
+    CostLayerList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["CostLayer"][]
+    }
+    CostLayerConsumption: {
+      /** Format: uuid */
+      id: string
+      /** Format: uuid */
+      movementId: string
+      businessDate: components["schemas"]["BusinessDate"]
+      sourceType: string
+      /** Format: uuid */
+      sourceId: string
+      sourceLabel: string
+      location: components["schemas"]["StockLocationRef"]
+      qty: components["schemas"]["StockQuantity"]
+      unitCost: components["schemas"]["UnitCost"]
+      amount: components["schemas"]["Money"]
+    }
+    CostLayerConsumptionList: {
+      layer: components["schemas"]["CostLayer"]
+      items: components["schemas"]["CostLayerConsumption"][]
+    }
+    BundleComponentAvailability: {
+      /** Format: uuid */
+      productId: string
+      qtyPerBundle: components["schemas"]["StockQuantity"]
+      availableQty: components["schemas"]["StockQuantity"]
+    }
+    BundleAvailability: {
+      /** Format: uuid */
+      bundleId: string
+      availableQty: components["schemas"]["StockQuantity"]
+      components: components["schemas"]["BundleComponentAvailability"][]
+    }
+    BundleAvailabilityList: {
+      items: components["schemas"]["BundleAvailability"][]
+    }
     /** @enum {string} */
     CustomerType: "retail" | "b2b" | "reseller" | "employee"
     CustomerAddress: {
@@ -3857,6 +4398,125 @@ export interface components {
       /** Format: date-time */
       expiresAt: string
     }
+    DataExchangeColumn: {
+      /** @description Nama field (dipakai di `values` dan `errors[].column` preview). */
+      key: string
+      header: string
+      required: boolean
+      /** @enum {string} */
+      columnType: "text" | "integer" | "decimal" | "date" | "choice" | "bool"
+      options: string[]
+      sensitive?: boolean
+    }
+    DataExchangeKind: {
+      /** @example catalog.product */
+      kind: string
+      /** @example Produk */
+      label: string
+      canImport: boolean
+      canExport: boolean
+      /** @example import.catalog.product */
+      uploadOwnerType: string
+      /** Format: int64 */
+      maxFileBytes?: number
+      columns: components["schemas"]["DataExchangeColumn"][]
+    }
+    DataExchangeKindList: {
+      items: components["schemas"]["DataExchangeKind"][]
+    }
+    ImportJob: {
+      /** Format: uuid */
+      id: string
+      kind: string
+      kindLabel: string
+      fileName: string
+      /** @enum {string} */
+      status:
+        | "uploaded"
+        | "validating"
+        | "validated"
+        | "committing"
+        | "completed"
+        | "failed"
+        | "cancelled"
+      totalRows: number
+      processedRows: number
+      validRows: number
+      errorRows: number
+      committedRows: number
+      progress: number
+      /** @description Alasan gagal untuk status `failed`. */
+      message: string
+      allowedActions: ("commit" | "cancel" | "download_errors")[]
+      /** Format: date-time */
+      validatedAt?: string | null
+      /** Format: date-time */
+      completedAt?: string | null
+      /** Format: uuid */
+      createdBy: string
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+    }
+    ImportJobList: {
+      items: components["schemas"]["ImportJob"][]
+      pagination: components["schemas"]["Pagination"]
+    }
+    ImportJobInput: {
+      kind: string
+      /** Format: uuid */
+      fileId: string
+    }
+    ImportJobRowError: {
+      /** @description Key kolom; kosong = error baris. */
+      column?: string
+      message: string
+    }
+    ImportJobRow: {
+      /** @description Nomor baris di Excel (header = 1). */
+      rowNumber: number
+      isValid: boolean
+      values: {
+        [key: string]: string
+      }
+      errors: components["schemas"]["ImportJobRowError"][]
+    }
+    ImportJobRowList: {
+      items: components["schemas"]["ImportJobRow"][]
+      pagination: components["schemas"]["Pagination"]
+    }
+    DataExchangeFileLink: {
+      url: string
+      /** Format: date-time */
+      expiresAt: string
+    }
+    ExportJob: {
+      /** Format: uuid */
+      id: string
+      kind: string
+      kindLabel: string
+      /** @enum {string} */
+      status: "queued" | "running" | "completed" | "failed"
+      totalRows: number
+      fileName: string
+      message: string
+      /** Format: date-time */
+      completedAt?: string | null
+      /** Format: uuid */
+      createdBy: string
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+    }
+    ExportJobList: {
+      items: components["schemas"]["ExportJob"][]
+      pagination: components["schemas"]["Pagination"]
+    }
+    ExportJobInput: {
+      kind: string
+    }
     PurchaseOption: {
       /** Format: uuid */
       id: string
@@ -4210,6 +4870,9 @@ export interface components {
     /** @description Waktu kedaluwarsa URL (Unix detik). */
     FileExpires: number
     FileSignature: string
+    /** @description Jenis data = resource permission, mis. `catalog.product`. */
+    DataExchangeKindPath: string
+    DataExchangeKindQuery: string
   }
   requestBodies: never
   headers: never
@@ -7198,6 +7861,198 @@ export interface operations {
       default: components["responses"]["Problem"]
     }
   }
+  listStockBalances: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        productId?: string
+        /** @description Bisa lebih dari satu. */
+        locationId?: string[]
+        batchId?: string
+        /** @description Bisa lebih dari satu. */
+        status?: components["schemas"]["StockStatus"][]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Saldo stok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockBalanceList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getStockCard: {
+    parameters: {
+      query: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        productId: string
+        locationId?: string
+        batchId?: string
+        status?: components["schemas"]["StockStatus"]
+        dateFrom: string
+        dateTo: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Kartu stok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockCard"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listBatches: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        productId?: string
+        expiryState?: components["schemas"]["ExpiryState"]
+        /** @description Batas hari "Segera kedaluwarsa" (default 90). */
+        nearExpiryDays?: number
+        /** @description Default `true` — hanya batch yang masih punya stok. */
+        withStock?: boolean
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar batch */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["BatchList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  suggestBatches: {
+    parameters: {
+      query: {
+        productId: string
+        locationId: string
+        qty: components["schemas"]["StockQuantity"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Saran batch */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["BatchSuggestion"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listCostLayers: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        productId?: string
+        batchId?: string
+        /** @description Hanya layer yang masih bersisa. */
+        openOnly?: boolean
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Cost layer */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CostLayerList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listCostLayerConsumptions: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Jejak konsumsi */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CostLayerConsumptionList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listBundleAvailability: {
+    parameters: {
+      query: {
+        /** @description Maks. 200. */
+        bundleId: string[]
+        locationId?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Stok tersedia per bundel */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["BundleAvailabilityList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
   listCustomers: {
     parameters: {
       query?: {
@@ -8149,6 +9004,329 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listDataExchangeKinds: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Jenis data */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DataExchangeKindList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getDataExchangeTemplate: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Jenis data = resource permission, mis. `catalog.product`. */
+        kind: components["parameters"]["DataExchangeKindPath"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description File template */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listImportJobs: {
+    parameters: {
+      query?: {
+        kind?: components["parameters"]["DataExchangeKindQuery"]
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Riwayat impor, terbaru dulu */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ImportJobList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createImportJob: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ImportJobInput"]
+      }
+    }
+    responses: {
+      /** @description Job impor dibuat */
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ImportJob"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getImportJob: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Job impor */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ImportJob"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listImportJobRows: {
+    parameters: {
+      query?: {
+        /** @description true = hanya baris valid, false = hanya baris error, kosong = semua. */
+        valid?: boolean
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+      }
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Baris preview */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ImportJobRowList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  commitImportJob: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Penyimpanan dijadwalkan */
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ImportJob"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  cancelImportJob: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Impor dibatalkan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ImportJob"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getImportJobErrorFile: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description URL unduhan berumur 5 menit */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DataExchangeFileLink"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listExportJobs: {
+    parameters: {
+      query?: {
+        kind?: components["parameters"]["DataExchangeKindQuery"]
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Riwayat ekspor, terbaru dulu */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ExportJobList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createExportJob: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ExportJobInput"]
+      }
+    }
+    responses: {
+      /** @description Job ekspor dibuat */
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ExportJob"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getExportJob: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Job ekspor */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ExportJob"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getExportJobDownloadUrl: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description URL unduhan berumur 5 menit */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DataExchangeFileLink"]
+        }
       }
       default: components["responses"]["Problem"]
     }

@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/jackc/pgx/v5"
@@ -9,6 +10,38 @@ import (
 
 	"balans/internal/platform/retry"
 )
+
+// ErrNoTransaction dikembalikan Savepoint di luar transaksi.
+var ErrNoTransaction = errors.New("savepoint membutuhkan transaksi aktif")
+
+// Savepoint menjalankan fn di savepoint transaksi aktif. Jika fn gagal, hanya perubahan fn yang dibatalkan
+// dan transaksi luar tetap bisa dipakai (mis. validasi per baris impor Excel). Di luar transaksi ditolak.
+func Savepoint(ctx context.Context, fn func(ctx context.Context) error) error {
+	tx, ok := Tx(ctx)
+	if !ok {
+		return ErrNoTransaction
+	}
+	sp, err := tx.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("begin savepoint: %w", err)
+	}
+	if err := fn(withTx(ctx, sp)); err != nil {
+		if rerr := sp.Rollback(ctx); rerr != nil {
+			return errors.Join(err, fmt.Errorf("rollback savepoint: %w", rerr))
+		}
+		return err
+	}
+	if err := sp.Commit(ctx); err != nil {
+		return fmt.Errorf("release savepoint: %w", err)
+	}
+	return nil
+}
+
+// WithoutTx melepas transaksi aktif dari context sehingga query berikutnya memakai pool, mis. untuk menulis
+// progress job yang harus tetap tersimpan walau transaksi utama nanti dibatalkan.
+func WithoutTx(ctx context.Context) context.Context {
+	return context.WithValue(ctx, txKey{}, nil)
+}
 
 // TxManager membuka transaksi di layer service. Repository mengambil koneksi lewat Conn,
 // sehingga beberapa repository dan modul berjalan dalam satu transaksi.

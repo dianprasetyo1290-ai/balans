@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { usePermissions } from "@/features/auth/api/auth-api"
+import { DataExchangeButtons } from "@/features/dataexchange/components/data-exchange-buttons"
 import { parseProblem } from "@/lib/api/problem"
 import { useIdempotentMutation } from "@/lib/api/use-idempotent-mutation"
 import { showErrorDialog } from "@/stores/error-dialog-store"
@@ -179,21 +180,24 @@ export function WarehousesPage({
             maklon, mitra konsinyasi, buffer vending, dan mesin vending.
           </p>
         </div>
-        {search.tab === "warehouses" && canWriteWarehouse ? (
-          <Button
-            onClick={() => {
-              setEditing(undefined)
-              setFormOpen(true)
-            }}
-          >
-            <PlusIcon /> Tambah Gudang
-          </Button>
-        ) : null}
-        {search.tab === "external" && canWriteLocation ? (
-          <Button onClick={() => setLocationOpen(true)}>
-            <PlusIcon /> Tambah Lokasi Eksternal
-          </Button>
-        ) : null}
+        <div className="flex flex-wrap gap-2">
+          <DataExchangeButtons kind="warehouse.location" />
+          {search.tab === "warehouses" && canWriteWarehouse ? (
+            <Button
+              onClick={() => {
+                setEditing(undefined)
+                setFormOpen(true)
+              }}
+            >
+              <PlusIcon /> Tambah Gudang
+            </Button>
+          ) : null}
+          {search.tab === "external" && canWriteLocation ? (
+            <Button onClick={() => setLocationOpen(true)}>
+              <PlusIcon /> Tambah Lokasi Eksternal
+            </Button>
+          ) : null}
+        </div>
       </div>
       <PageTabs
         label="Bagian gudang dan lokasi"

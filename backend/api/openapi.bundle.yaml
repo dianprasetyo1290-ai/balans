@@ -28,6 +28,8 @@ tags:
     description: Master produk, packaging, material, bundling (R1.1)
   - name: warehouse
     description: Gudang dan lokasi stok (R1.1)
+  - name: inventory
+    description: Ledger stok, batch, HPP FIFO, saran FEFO (R1.2)
   - name: accounting
     description: COA, dimensi, jenis biaya, periode, posting rule, Jurnal Umum, Buku Besar (R1.1)
   - name: document
@@ -40,6 +42,8 @@ tags:
     description: Purchase Request, Purchase Order (barang, maklon, reprocess), uang muka pembelian (R1.2)
   - name: filestore
     description: Upload dan unduhan file bertanda tangan (R1.1)
+  - name: dataexchange
+    description: Impor/ekspor Excel master data (R1.1)
 paths:
   /healthz:
     get:
@@ -2572,6 +2576,260 @@ paths:
                 $ref: '#/components/schemas/Location'
         default:
           $ref: '#/components/responses/Problem'
+  /api/v1/stock-balances:
+    get:
+      operationId: listStockBalances
+      tags:
+        - inventory
+      summary: Stok per Lokasi — saldo per produk × lokasi × batch × status (INV-01, WMS-01)
+      description: |
+        Hanya saldo > 0. `unitCost` adalah HPP rata-rata sisa cost layer batch (FIFO di dalam batch), `value` =
+        qty × unitCost. Permission `inventory.stock.read`.
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - name: productId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: locationId
+          in: query
+          description: Bisa lebih dari satu.
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+        - name: batchId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          description: Bisa lebih dari satu.
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/StockStatus'
+      responses:
+        '200':
+          description: Saldo stok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockBalanceList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/stock-card:
+    get:
+      operationId: getStockCard
+      tags:
+        - inventory
+      summary: Kartu Stok per SKU (opsional lokasi, batch, status) dengan saldo qty & nilai berjalan (INV-01)
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - name: productId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: locationId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: batchId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/StockStatus'
+        - name: dateFrom
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: dateTo
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Kartu stok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockCard'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/batches:
+    get:
+      operationId: listBatches
+      tags:
+        - inventory
+      summary: Batch & Kedaluwarsa — batch berurutan FEFO dengan qty per status (INV-04, INV-09)
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Search'
+        - name: productId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: expiryState
+          in: query
+          schema:
+            $ref: '#/components/schemas/ExpiryState'
+        - name: nearExpiryDays
+          in: query
+          description: Batas hari "Segera kedaluwarsa" (default 90).
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 730
+        - name: withStock
+          in: query
+          description: Default `true` — hanya batch yang masih punya stok.
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Daftar batch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/batch-suggestions:
+    get:
+      operationId: suggestBatches
+      tags:
+        - inventory
+      summary: Alokasi Batch (FEFO) — saran batch untuk mengambil qty dari satu lokasi (S-215)
+      description: |
+        Batch stok Tersedia diurutkan kedaluwarsa terdekat; batch kedaluwarsa dan stok Karantina tidak diusulkan.
+        Pemilihan batch manual yang bukan saran FEFO wajib alasan saat diposting.
+      parameters:
+        - name: productId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: locationId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: qty
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/StockQuantity'
+      responses:
+        '200':
+          description: Saran batch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchSuggestion'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/cost-layers:
+    get:
+      operationId: listCostLayers
+      tags:
+        - inventory
+      summary: HPP per Batch — cost layer FIFO per penerimaan (INV-03)
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - name: productId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: batchId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: openOnly
+          in: query
+          description: Hanya layer yang masih bersisa.
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Cost layer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CostLayerList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/cost-layers/{id}/consumptions:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      operationId: listCostLayerConsumptions
+      tags:
+        - inventory
+      summary: Jejak konsumsi HPP satu cost layer (RPT-04)
+      responses:
+        '200':
+          description: Jejak konsumsi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CostLayerConsumptionList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/bundle-availability:
+    get:
+      operationId: listBundleAvailability
+      tags:
+        - inventory
+      summary: Stok tersedia bundel virtual = min(floor(stok komponen ÷ qty)) (S-115, MD-03)
+      description: |
+        Stok komponen = stok Tersedia di lokasi `locationId`, atau di semua lokasi yang bisa dijual bila kosong.
+      parameters:
+        - name: bundleId
+          in: query
+          required: true
+          description: Maks. 200.
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+        - name: locationId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Stok tersedia per bundel
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BundleAvailabilityList'
+        default:
+          $ref: '#/components/responses/Problem'
   /api/v1/customers:
     get:
       operationId: listCustomers
@@ -3346,6 +3604,267 @@ paths:
               schema:
                 type: string
                 format: binary
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/data-exchange/kinds:
+    get:
+      operationId: listDataExchangeKinds
+      tags:
+        - dataexchange
+      summary: Jenis data yang boleh diimpor/diekspor user (MD-10, INT-02)
+      description: |
+        Hanya jenis data dengan permission `<kind>.import` atau `<kind>.export` milik user. `uploadOwnerType`
+        dipakai sebagai `ownerType` saat meminta URL upload file (`POST /api/v1/files`).
+      responses:
+        '200':
+          description: Jenis data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataExchangeKindList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/data-exchange/kinds/{kind}/template:
+    get:
+      operationId: getDataExchangeTemplate
+      tags:
+        - dataexchange
+      summary: Mengunduh template impor (xlsx) yang dihasilkan dari definisi kolom
+      description: |
+        Template berisi sheet data (header oranye bertanda `*` wajib, abu-abu opsional, dropdown untuk kolom
+        pilihan) dan sheet Petunjuk berisi format, aturan, serta contoh baris. Butuh `<kind>.import`.
+      parameters:
+        - $ref: '#/components/parameters/DataExchangeKindPath'
+      responses:
+        '200':
+          description: File template
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/import-jobs:
+    get:
+      operationId: listImportJobs
+      tags:
+        - dataexchange
+      summary: Riwayat impor (jenis data yang boleh diimpor user)
+      parameters:
+        - $ref: '#/components/parameters/DataExchangeKindQuery'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Riwayat impor, terbaru dulu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJobList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createImportJob
+      tags:
+        - dataexchange
+      summary: Memulai impor dari file xlsx yang sudah diunggah
+      description: |
+        File diunggah dulu lewat `POST /api/v1/files` dengan `ownerType` dari `listDataExchangeKinds`. Pemeriksaan
+        per baris berjalan sebagai job `dataexchange.import` (antrean bulk); pantau progress lewat `getImportJob`.
+        File yang sama (SHA-256) untuk jenis data yang sama ditolak `IMPORT_ALREADY_PROCESSED`, kecuali job
+        sebelumnya gagal atau dibatalkan.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportJobInput'
+      responses:
+        '202':
+          description: Job impor dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJob'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/import-jobs/{id}:
+    get:
+      operationId: getImportJob
+      tags:
+        - dataexchange
+      summary: Status, progress, dan ringkasan job impor
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Job impor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJob'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/import-jobs/{id}/rows:
+    get:
+      operationId: listImportJobRows
+      tags:
+        - dataexchange
+      summary: Preview baris hasil pemeriksaan
+      description: Data pribadi (NPWP, nomor rekening, NIK) ditampilkan tersamar.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - name: valid
+          in: query
+          description: true = hanya baris valid, false = hanya baris error, kosong = semua.
+          schema:
+            type: boolean
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Baris preview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJobRowList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/import-jobs/{id}/commit:
+    post:
+      operationId: commitImportJob
+      tags:
+        - dataexchange
+      summary: Menyimpan baris valid
+      description: |
+        Hanya untuk status `validated` dengan minimal satu baris valid. Penyimpanan berjalan sebagai job; master
+        data disimpan dalam satu transaksi (gagal satu baris = tidak ada yang tersimpan, TG 5.15).
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '202':
+          description: Penyimpanan dijadwalkan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJob'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/import-jobs/{id}/cancel:
+    post:
+      operationId: cancelImportJob
+      tags:
+        - dataexchange
+      summary: Membatalkan impor yang menunggu konfirmasi
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Impor dibatalkan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJob'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/import-jobs/{id}/error-file:
+    get:
+      operationId: getImportJobErrorFile
+      tags:
+        - dataexchange
+      summary: URL unduhan file baris error (xlsx dengan kolom Keterangan Error)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: URL unduhan berumur 5 menit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataExchangeFileLink'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/export-jobs:
+    get:
+      operationId: listExportJobs
+      tags:
+        - dataexchange
+      summary: Riwayat ekspor (jenis data yang boleh diekspor user)
+      parameters:
+        - $ref: '#/components/parameters/DataExchangeKindQuery'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Riwayat ekspor, terbaru dulu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportJobList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createExportJob
+      tags:
+        - dataexchange
+      summary: Memulai ekspor ke xlsx
+      description: |
+        File dibuat job `dataexchange.export` (antrean bulk) dengan kolom yang sama dengan template impor, lalu
+        user mendapat notifikasi berisi tautan unduhan. Butuh `<kind>.export`.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExportJobInput'
+      responses:
+        '202':
+          description: Job ekspor dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportJob'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/export-jobs/{id}:
+    get:
+      operationId: getExportJob
+      tags:
+        - dataexchange
+      summary: Status job ekspor
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Job ekspor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportJob'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/export-jobs/{id}/download-url:
+    get:
+      operationId: getExportJobDownloadUrl
+      tags:
+        - dataexchange
+      summary: URL unduhan file ekspor
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: URL unduhan berumur 5 menit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataExchangeFileLink'
         default:
           $ref: '#/components/responses/Problem'
   /api/v1/procurement/division-options:
@@ -6632,6 +7151,485 @@ components:
             isActive:
               type: boolean
         - $ref: '#/components/schemas/VersionInput'
+    StockStatus:
+      type: string
+      description: '`available` Tersedia, `quarantine` Karantina, `in_transit` Dalam Pengiriman, `reserved` Dialokasikan.'
+      enum:
+        - available
+        - quarantine
+        - in_transit
+        - reserved
+    StockProductRef:
+      type: object
+      required:
+        - id
+        - sku
+        - name
+        - uom
+      properties:
+        id:
+          type: string
+          format: uuid
+        sku:
+          type: string
+        name:
+          type: string
+        uom:
+          type: string
+    StockLocationRef:
+      type: object
+      required:
+        - id
+        - code
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        warehouseName:
+          type: string
+    ExpiryState:
+      type: string
+      description: '`expired` Kedaluwarsa, `near_expiry` Segera kedaluwarsa, `ok` Aman, `no_expiry` Tanpa kedaluwarsa.'
+      enum:
+        - expired
+        - near_expiry
+        - ok
+        - no_expiry
+    StockQuantity:
+      type: string
+      description: Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string; bisa negatif di kartu stok.
+      pattern: ^-?[0-9]{1,15}(\.[0-9]{1,3})?$
+      example: '12.000'
+    UnitCost:
+      type: string
+      description: HPP per unit 4 desimal sebagai string.
+      example: '12500.0000'
+    StockBalance:
+      type: object
+      required:
+        - product
+        - location
+        - status
+        - statusLabel
+        - qty
+        - unitCost
+        - value
+        - updatedAt
+      properties:
+        product:
+          $ref: '#/components/schemas/StockProductRef'
+        location:
+          $ref: '#/components/schemas/StockLocationRef'
+        batchId:
+          type: string
+          format: uuid
+        batchNumber:
+          type: string
+        productionDate:
+          $ref: '#/components/schemas/BusinessDate'
+        expiryDate:
+          $ref: '#/components/schemas/BusinessDate'
+        expiryState:
+          $ref: '#/components/schemas/ExpiryState'
+        status:
+          $ref: '#/components/schemas/StockStatus'
+        statusLabel:
+          type: string
+        qty:
+          $ref: '#/components/schemas/StockQuantity'
+        unitCost:
+          $ref: '#/components/schemas/UnitCost'
+        value:
+          $ref: '#/components/schemas/Money'
+        updatedAt:
+          type: string
+          format: date-time
+    StockBalanceList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+            - totalQty
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/StockBalance'
+            totalQty:
+              $ref: '#/components/schemas/StockQuantity'
+    StockMovementType:
+      type: string
+      enum:
+        - receive
+        - issue
+        - move_out
+        - move_in
+    StockCardLine:
+      type: object
+      required:
+        - movementId
+        - businessDate
+        - createdAt
+        - sourceType
+        - sourceId
+        - sourceLabel
+        - movementType
+        - movementTypeLabel
+        - location
+        - status
+        - statusLabel
+        - qtyIn
+        - qtyOut
+        - unitCost
+        - costAmount
+        - runningQty
+        - runningValue
+        - note
+      properties:
+        movementId:
+          type: string
+          format: uuid
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        createdAt:
+          type: string
+          format: date-time
+        sourceType:
+          type: string
+        sourceId:
+          type: string
+          format: uuid
+        sourceLabel:
+          type: string
+        movementType:
+          $ref: '#/components/schemas/StockMovementType'
+        movementTypeLabel:
+          type: string
+        location:
+          $ref: '#/components/schemas/StockLocationRef'
+        batchId:
+          type: string
+          format: uuid
+        batchNumber:
+          type: string
+        status:
+          $ref: '#/components/schemas/StockStatus'
+        statusLabel:
+          type: string
+        qtyIn:
+          $ref: '#/components/schemas/StockQuantity'
+        qtyOut:
+          $ref: '#/components/schemas/StockQuantity'
+        unitCost:
+          $ref: '#/components/schemas/UnitCost'
+        costAmount:
+          $ref: '#/components/schemas/Money'
+        runningQty:
+          $ref: '#/components/schemas/StockQuantity'
+        runningValue:
+          $ref: '#/components/schemas/Money'
+        batchReason:
+          type: string
+        note:
+          type: string
+    StockCard:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - product
+            - openingQty
+            - openingValue
+            - qtyIn
+            - qtyOut
+            - closingQty
+            - closingValue
+            - items
+          properties:
+            product:
+              $ref: '#/components/schemas/StockProductRef'
+            openingQty:
+              $ref: '#/components/schemas/StockQuantity'
+            openingValue:
+              $ref: '#/components/schemas/Money'
+            qtyIn:
+              $ref: '#/components/schemas/StockQuantity'
+            qtyOut:
+              $ref: '#/components/schemas/StockQuantity'
+            closingQty:
+              $ref: '#/components/schemas/StockQuantity'
+            closingValue:
+              $ref: '#/components/schemas/Money'
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/StockCardLine'
+    BatchSummary:
+      type: object
+      required:
+        - id
+        - product
+        - batchNumber
+        - expiryState
+        - qtyAvailable
+        - qtyQuarantine
+        - qtyInTransit
+        - qtyReserved
+        - qtyTotal
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        product:
+          $ref: '#/components/schemas/StockProductRef'
+        batchNumber:
+          type: string
+        productionDate:
+          $ref: '#/components/schemas/BusinessDate'
+        expiryDate:
+          $ref: '#/components/schemas/BusinessDate'
+        daysToExpiry:
+          type: integer
+          description: Sisa hari sampai kedaluwarsa (negatif = sudah lewat).
+        expiryState:
+          $ref: '#/components/schemas/ExpiryState'
+        qtyAvailable:
+          $ref: '#/components/schemas/StockQuantity'
+        qtyQuarantine:
+          $ref: '#/components/schemas/StockQuantity'
+        qtyInTransit:
+          $ref: '#/components/schemas/StockQuantity'
+        qtyReserved:
+          $ref: '#/components/schemas/StockQuantity'
+        qtyTotal:
+          $ref: '#/components/schemas/StockQuantity'
+        createdAt:
+          type: string
+          format: date-time
+    BatchList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+            - nearExpiryDays
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/BatchSummary'
+            nearExpiryDays:
+              type: integer
+    SuggestedBatch:
+      type: object
+      required:
+        - batchNumber
+        - availableQty
+        - suggestedQty
+      properties:
+        batchId:
+          type: string
+          format: uuid
+        batchNumber:
+          type: string
+        productionDate:
+          $ref: '#/components/schemas/BusinessDate'
+        expiryDate:
+          $ref: '#/components/schemas/BusinessDate'
+        availableQty:
+          $ref: '#/components/schemas/StockQuantity'
+        suggestedQty:
+          $ref: '#/components/schemas/StockQuantity'
+    BatchSuggestion:
+      type: object
+      required:
+        - product
+        - location
+        - requestedQty
+        - allocatedQty
+        - shortfallQty
+        - quarantineQty
+        - items
+        - expired
+      properties:
+        product:
+          $ref: '#/components/schemas/StockProductRef'
+        location:
+          $ref: '#/components/schemas/StockLocationRef'
+        requestedQty:
+          $ref: '#/components/schemas/StockQuantity'
+        allocatedQty:
+          $ref: '#/components/schemas/StockQuantity'
+        shortfallQty:
+          $ref: '#/components/schemas/StockQuantity'
+        quarantineQty:
+          $ref: '#/components/schemas/StockQuantity'
+        items:
+          type: array
+          description: Batch Tersedia yang belum kedaluwarsa dalam urutan FEFO; suggestedQty 0 = tidak perlu diambil.
+          items:
+            $ref: '#/components/schemas/SuggestedBatch'
+        expired:
+          type: array
+          description: Batch Tersedia yang sudah kedaluwarsa (tidak diusulkan).
+          items:
+            $ref: '#/components/schemas/SuggestedBatch'
+    CostLayer:
+      type: object
+      required:
+        - id
+        - product
+        - sourceType
+        - sourceId
+        - sourceLabel
+        - businessDate
+        - receivedQty
+        - remainingQty
+        - consumedQty
+        - unitCost
+        - remainingValue
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        product:
+          $ref: '#/components/schemas/StockProductRef'
+        batchId:
+          type: string
+          format: uuid
+        batchNumber:
+          type: string
+        expiryDate:
+          $ref: '#/components/schemas/BusinessDate'
+        sourceType:
+          type: string
+        sourceId:
+          type: string
+          format: uuid
+        sourceLabel:
+          type: string
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        receivedQty:
+          $ref: '#/components/schemas/StockQuantity'
+        remainingQty:
+          $ref: '#/components/schemas/StockQuantity'
+        consumedQty:
+          $ref: '#/components/schemas/StockQuantity'
+        unitCost:
+          $ref: '#/components/schemas/UnitCost'
+        remainingValue:
+          $ref: '#/components/schemas/Money'
+        createdAt:
+          type: string
+          format: date-time
+    CostLayerList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/CostLayer'
+    CostLayerConsumption:
+      type: object
+      required:
+        - id
+        - movementId
+        - businessDate
+        - sourceType
+        - sourceId
+        - sourceLabel
+        - location
+        - qty
+        - unitCost
+        - amount
+      properties:
+        id:
+          type: string
+          format: uuid
+        movementId:
+          type: string
+          format: uuid
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        sourceType:
+          type: string
+        sourceId:
+          type: string
+          format: uuid
+        sourceLabel:
+          type: string
+        location:
+          $ref: '#/components/schemas/StockLocationRef'
+        qty:
+          $ref: '#/components/schemas/StockQuantity'
+        unitCost:
+          $ref: '#/components/schemas/UnitCost'
+        amount:
+          $ref: '#/components/schemas/Money'
+    CostLayerConsumptionList:
+      type: object
+      required:
+        - layer
+        - items
+      properties:
+        layer:
+          $ref: '#/components/schemas/CostLayer'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CostLayerConsumption'
+    BundleComponentAvailability:
+      type: object
+      required:
+        - productId
+        - qtyPerBundle
+        - availableQty
+      properties:
+        productId:
+          type: string
+          format: uuid
+        qtyPerBundle:
+          $ref: '#/components/schemas/StockQuantity'
+        availableQty:
+          $ref: '#/components/schemas/StockQuantity'
+    BundleAvailability:
+      type: object
+      required:
+        - bundleId
+        - availableQty
+        - components
+      properties:
+        bundleId:
+          type: string
+          format: uuid
+        availableQty:
+          $ref: '#/components/schemas/StockQuantity'
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/BundleComponentAvailability'
+    BundleAvailabilityList:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/BundleAvailability'
     CustomerType:
       type: string
       enum:
@@ -7638,6 +8636,300 @@ components:
         expiresAt:
           type: string
           format: date-time
+    DataExchangeColumn:
+      type: object
+      required:
+        - key
+        - header
+        - required
+        - columnType
+        - options
+      properties:
+        key:
+          type: string
+          description: Nama field (dipakai di `values` dan `errors[].column` preview).
+        header:
+          type: string
+        required:
+          type: boolean
+        columnType:
+          type: string
+          enum:
+            - text
+            - integer
+            - decimal
+            - date
+            - choice
+            - bool
+        options:
+          type: array
+          items:
+            type: string
+        sensitive:
+          type: boolean
+    DataExchangeKind:
+      type: object
+      required:
+        - kind
+        - label
+        - canImport
+        - canExport
+        - uploadOwnerType
+        - columns
+      properties:
+        kind:
+          type: string
+          example: catalog.product
+        label:
+          type: string
+          example: Produk
+        canImport:
+          type: boolean
+        canExport:
+          type: boolean
+        uploadOwnerType:
+          type: string
+          example: import.catalog.product
+        maxFileBytes:
+          type: integer
+          format: int64
+        columns:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataExchangeColumn'
+    DataExchangeKindList:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataExchangeKind'
+    ImportJob:
+      type: object
+      required:
+        - id
+        - kind
+        - kindLabel
+        - fileName
+        - status
+        - totalRows
+        - processedRows
+        - validRows
+        - errorRows
+        - committedRows
+        - progress
+        - message
+        - allowedActions
+        - createdBy
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        kind:
+          type: string
+        kindLabel:
+          type: string
+        fileName:
+          type: string
+        status:
+          type: string
+          enum:
+            - uploaded
+            - validating
+            - validated
+            - committing
+            - completed
+            - failed
+            - cancelled
+        totalRows:
+          type: integer
+        processedRows:
+          type: integer
+        validRows:
+          type: integer
+        errorRows:
+          type: integer
+        committedRows:
+          type: integer
+        progress:
+          type: integer
+          minimum: 0
+          maximum: 100
+        message:
+          type: string
+          description: Alasan gagal untuk status `failed`.
+        allowedActions:
+          type: array
+          items:
+            type: string
+            enum:
+              - commit
+              - cancel
+              - download_errors
+        validatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdBy:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ImportJobList:
+      type: object
+      required:
+        - items
+        - pagination
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImportJob'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    ImportJobInput:
+      type: object
+      required:
+        - kind
+        - fileId
+      properties:
+        kind:
+          type: string
+        fileId:
+          type: string
+          format: uuid
+    ImportJobRowError:
+      type: object
+      required:
+        - message
+      properties:
+        column:
+          type: string
+          description: Key kolom; kosong = error baris.
+        message:
+          type: string
+    ImportJobRow:
+      type: object
+      required:
+        - rowNumber
+        - isValid
+        - values
+        - errors
+      properties:
+        rowNumber:
+          type: integer
+          description: Nomor baris di Excel (header = 1).
+        isValid:
+          type: boolean
+        values:
+          type: object
+          additionalProperties:
+            type: string
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImportJobRowError'
+    ImportJobRowList:
+      type: object
+      required:
+        - items
+        - pagination
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImportJobRow'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    DataExchangeFileLink:
+      type: object
+      required:
+        - url
+        - expiresAt
+      properties:
+        url:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+    ExportJob:
+      type: object
+      required:
+        - id
+        - kind
+        - kindLabel
+        - status
+        - totalRows
+        - fileName
+        - message
+        - createdBy
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        kind:
+          type: string
+        kindLabel:
+          type: string
+        status:
+          type: string
+          enum:
+            - queued
+            - running
+            - completed
+            - failed
+        totalRows:
+          type: integer
+        fileName:
+          type: string
+        message:
+          type: string
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdBy:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ExportJobList:
+      type: object
+      required:
+        - items
+        - pagination
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExportJob'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    ExportJobInput:
+      type: object
+      required:
+        - kind
+      properties:
+        kind:
+          type: string
     PurchaseOption:
       type: object
       required:
@@ -8505,6 +9797,18 @@ components:
       name: sig
       in: query
       required: true
+      schema:
+        type: string
+    DataExchangeKindPath:
+      name: kind
+      in: path
+      required: true
+      description: Jenis data = resource permission, mis. `catalog.product`.
+      schema:
+        type: string
+    DataExchangeKindQuery:
+      name: kind
+      in: query
       schema:
         type: string
   responses:

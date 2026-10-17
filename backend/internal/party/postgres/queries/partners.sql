@@ -156,3 +156,6 @@ UPDATE partner_product_codes
 SET deleted_at = now(), deleted_by = sqlc.arg('actor_id')::uuid, updated_at = now(), updated_by = sqlc.arg('actor_id'),
     version = version + 1
 WHERE id = sqlc.arg('id') AND version = sqlc.arg('version') AND deleted_at IS NULL;
+
+-- name: GetPartnerIDByCode :one
+SELECT id FROM partners WHERE code = $1 AND deleted_at IS NULL;

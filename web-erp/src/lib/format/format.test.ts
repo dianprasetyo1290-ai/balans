@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 
 import { formatDate, formatDateTime, parseBusinessDate, todayBusinessDate, toBusinessDate } from "./date"
-import { formatMoneyInput, formatRupiah, parseMoneyInput } from "./money"
+import { formatMoneyInput, formatRupiah, formatUnitCost, parseMoneyInput } from "./money"
 import { formatPercent, formatQuantity, parseQuantityInput } from "./number"
 import { statusLabel, STATUS_LABELS } from "./status-labels"
 
@@ -20,6 +20,15 @@ describe("formatRupiah", () => {
     expect(formatRupiah(null)).toBe("-")
     expect(formatRupiah("")).toBe("-")
     expect(formatRupiah("abc")).toBe("-")
+  })
+})
+
+describe("formatUnitCost", () => {
+  it("menampilkan HPP per unit sampai 4 desimal", () => {
+    expect(formatUnitCost("12500.3333")).toBe("Rp12.500,3333")
+    expect(formatUnitCost("12500.0000")).toBe("Rp12.500")
+    expect(formatUnitCost("")).toBe("-")
+    expect(formatUnitCost("x")).toBe("-")
   })
 })
 

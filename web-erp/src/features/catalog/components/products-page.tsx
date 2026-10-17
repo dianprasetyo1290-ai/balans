@@ -30,6 +30,9 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { usePermissions } from "@/features/auth/api/auth-api"
+import { DataExchangeButtons } from "@/features/dataexchange/components/data-exchange-buttons"
+import { bundleAvailabilityQuery } from "@/features/inventory/api/inventory-api"
+import { systemInfoQuery } from "@/features/system/api/system-queries"
 import { parseProblem } from "@/lib/api/problem"
 import { useIdempotentMutation } from "@/lib/api/use-idempotent-mutation"
 import { formatQuantity } from "@/lib/format/number"
@@ -82,6 +85,20 @@ export function ProductsPage({
   const [pending, setPending] = useState<Pending | null>(null)
   const canWrite = can("catalog.product.write")
   const canPrint = canAny("logistics.label.post", "logistics.label.read")
+  const info = useQuery(systemInfoQuery)
+  const bundleIds =
+    kind === "bundle" ? (products.data?.items ?? []).map((p) => p.id) : []
+  // Stok tersedia bundel = min(floor(stok komponen ÷ qty)) dari modul inventory (S-115).
+  const showAvailability =
+    kind === "bundle" &&
+    can("inventory.stock.read") &&
+    (info.data?.enabledModules.includes("inventory") ?? false)
+  const availability = useQuery({
+    ...bundleAvailabilityQuery(bundleIds),
+    enabled: showAvailability && bundleIds.length > 0,
+  })
+  const availableQty = (id: string) =>
+    availability.data?.items.find((a) => a.bundleId === id)?.availableQty
 
   const action = useIdempotentMutation({
     mutationFn: (p: Pending, key) =>
@@ -159,6 +176,22 @@ export function ProductsPage({
               </ul>
             ),
           },
+          ...(showAvailability
+            ? [
+                {
+                  id: "available",
+                  header: "Stok tersedia",
+                  align: "right" as const,
+                  cell: (p: Product) => (
+                    <span className="whitespace-nowrap tabular-nums">
+                      {availability.isPending
+                        ? "…"
+                        : `${formatQuantity(availableQty(p.id) ?? "0")} ${p.uom}`}
+                    </span>
+                  ),
+                },
+              ]
+            : []),
         ]
       : [
           {
@@ -282,6 +315,7 @@ export function ProductsPage({
           <p className="text-sm text-muted-foreground">{cfg.description}</p>
         </div>
         <div className="flex flex-wrap gap-2">
+          <DataExchangeButtons kind="catalog.product" />
           {kind === "finished" && canPrint ? (
             <Button
               variant="outline"

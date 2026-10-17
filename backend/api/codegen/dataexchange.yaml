@@ -1,0 +1,8 @@
+package: http
+generate:
+  chi-server: true
+  strict-server: true
+  models: true
+output: internal/dataexchange/http/api.gen.go
+output-options:
+  include-tags: [dataexchange]

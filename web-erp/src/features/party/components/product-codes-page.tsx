@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { usePermissions } from "@/features/auth/api/auth-api"
+import { DataExchangeButtons } from "@/features/dataexchange/components/data-exchange-buttons"
 import { systemInfoQuery } from "@/features/system/api/system-queries"
 import { parseProblem } from "@/lib/api/problem"
 import { useIdempotentMutation } from "@/lib/api/use-idempotent-mutation"
@@ -172,15 +173,18 @@ export function ProductCodesPage() {
             mitra.
           </p>
         </div>
-        {canWrite ? (
-          <Button
-            className="min-h-11 sm:min-h-9"
-            disabled={!catalogEnabled}
-            onClick={() => setForm({})}
-          >
-            <PlusIcon /> Tambah Kode Produk Mitra
-          </Button>
-        ) : null}
+        <div className="flex flex-wrap gap-2">
+          <DataExchangeButtons kind="party.partner_product_code" />
+          {canWrite ? (
+            <Button
+              className="min-h-11 sm:min-h-9"
+              disabled={!catalogEnabled}
+              onClick={() => setForm({})}
+            >
+              <PlusIcon /> Tambah Kode Produk Mitra
+            </Button>
+          ) : null}
+        </div>
       </div>
       {canWrite && !catalogEnabled ? (
         <p className="rounded-md bg-amber-500/10 px-3 py-2 text-sm text-amber-800 dark:text-amber-300">

@@ -117,11 +117,23 @@ sql:
         <<: *go
         out: internal/hris/postgres/sqlcgen
   - <<: *pkg
+    queries: internal/dataexchange/postgres/queries
+    gen:
+      go:
+        <<: *go
+        out: internal/dataexchange/postgres/sqlcgen
+  - <<: *pkg
     queries: internal/sales/postgres/queries
     gen:
       go:
         <<: *go
         out: internal/sales/postgres/sqlcgen
+  - <<: *pkg
+    queries: internal/inventory/postgres/queries
+    gen:
+      go:
+        <<: *go
+        out: internal/inventory/postgres/sqlcgen
   - <<: *pkg
     queries: internal/procurement/postgres/queries
     gen:

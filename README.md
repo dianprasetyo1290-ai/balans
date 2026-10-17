@@ -24,7 +24,7 @@ POSTGRES_PORT=5432 SMTP_PORT=1025 MAILPIT_PORT=8025 docker compose -f deploy/com
 # 2. Backend (terminal 1 dan 2)
 cd backend
 export DATABASE_URL="postgres://balans:balans@localhost:5432/balans?sslmode=disable"
-export APP_ENV=local ENABLED_MODULES=identity,audit,notification,approval,document,accounting,catalog,warehouse,filestore,party,hris,procurement,sales,logistics
+export APP_ENV=local ENABLED_MODULES=identity,audit,notification,approval,document,accounting,catalog,warehouse,inventory,filestore,party,hris,dataexchange,procurement,sales,logistics
 export MIDTRANS_SERVER_KEY=local BITESHIP_WEBHOOK_SECRET=local
 export DEV_SKIP_MFA=true  # opsional, hanya local: login tanpa kode autentikator
 go run ./cmd/migrate up
@@ -38,7 +38,7 @@ pnpm install
 pnpm dev                  # http://localhost:5173, /api diteruskan ke :8080
 ```
 
-Halaman yang tersedia: **Masuk** (`/login`), **Ringkasan Operasional** (`/`), **Persetujuan Saya** (`/approvals`), **Data Master › Produk, Packaging & Material, Bundling, Gudang & Lokasi, Pelanggan, Mitra Konsinyasi, Kode Produk Mitra, Pemasok & Maklon, Karyawan**, **SDM › Data Karyawan**, **Logistik › Label Produk**, **Pengaturan › Pengguna & Role, Hak Akses, Matriks Persetujuan, Riwayat Perubahan**, **Tentang Sistem** (`/system/about`), simulasi pihak ketiga di `/_mock/` (pembayaran, pengiriman, kotak email Mailpit di `/_mock/mail/` — tautan undangan & atur ulang password muncul di sini).
+Halaman yang tersedia: **Masuk** (`/login`), **Ringkasan Operasional** (`/`), **Persetujuan Saya** (`/approvals`), **Data Master › Produk, Packaging & Material, Bundling, Gudang & Lokasi, Pelanggan, Mitra Konsinyasi, Kode Produk Mitra, Pemasok & Maklon, Karyawan**, **SDM › Data Karyawan**, **Logistik › Label Produk**, **Integrasi › Import/Export Excel** (impor/ekspor master), **Pengaturan › Pengguna & Role, Hak Akses, Matriks Persetujuan, Riwayat Perubahan**, **Tentang Sistem** (`/system/about`), simulasi pihak ketiga di `/_mock/` (pembayaran, pengiriman, kotak email Mailpit di `/_mock/mail/` — tautan undangan & atur ulang password muncul di sini).
 
 Akun seed lokal: `admin@balans.local`, `purchasing@balans.local`, `staf.gudang@balans.local`, `logistik.leader@balans.local`, `fulfillment.leader@balans.local`, `merchandiser@balans.local`, `head.logistik@balans.local`, `finance@balans.local`, `head.finance@balans.local`, `sales.mt@balans.local`, `sales.ecommerce@balans.local`, `cs@balans.local`, `head.sales@balans.local`, `marketing@balans.local`, `hrga@balans.local`, `head.divisi@balans.local`, `direksi@balans.local`, `dirut@balans.local`. `cmd/devseed` menolak berjalan di luar `APP_ENV=local`. Di local tanpa `JWT_*`/`PII_*` dipakai kunci pengembangan deterministik; staging dan production wajib kunci asli (Runbook 3.1 – 3.2).
 

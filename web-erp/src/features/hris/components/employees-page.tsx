@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { usePermissions } from "@/features/auth/api/auth-api"
+import { DataExchangeButtons } from "@/features/dataexchange/components/data-exchange-buttons"
 import { formatDate } from "@/lib/format/date"
 
 import {
@@ -166,11 +167,14 @@ export function EmployeesPage() {
             Data dasar karyawan untuk akun ERP, harga karyawan, dan HRIS.
           </p>
         </div>
-        {canWrite ? (
-          <Button className="min-h-11 sm:min-h-9" onClick={() => setForm({})}>
-            <PlusIcon /> Tambah Karyawan
-          </Button>
-        ) : null}
+        <div className="flex flex-wrap gap-2">
+          <DataExchangeButtons kind="hris.employee" />
+          {canWrite ? (
+            <Button className="min-h-11 sm:min-h-9" onClick={() => setForm({})}>
+              <PlusIcon /> Tambah Karyawan
+            </Button>
+          ) : null}
+        </div>
       </div>
       <div className="flex flex-wrap gap-2">
         <form

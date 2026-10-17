@@ -41,7 +41,20 @@ const (
 	TypeJPEG = "image/jpeg"
 	TypePNG  = "image/png"
 	TypeWebP = "image/webp"
+	TypeXLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 )
+
+// sniffedAs adalah hasil http.DetectContentType untuk tipe yang tidak dikenali langsung (xlsx = arsip zip).
+var sniffedAs = map[string]string{TypeXLSX: "application/zip"}
+
+// contentMatches memeriksa isi file (hasil deteksi) sesuai tipe yang dideklarasikan.
+func contentMatches(declared, sniffed string) bool {
+	sniffed = NormalizeContentType(sniffed)
+	if want, ok := sniffedAs[declared]; ok {
+		return sniffed == want
+	}
+	return sniffed == declared
+}
 
 // MaxNameLength membatasi nama file asli.
 const MaxNameLength = 200
@@ -142,7 +155,7 @@ func NewUpload(in UploadInput, p OwnerPolicy) (File, error) {
 }
 
 func describeTypes(types []string) string {
-	labels := map[string]string{TypePDF: "PDF", TypeJPEG: "JPG", TypePNG: "PNG", TypeWebP: "WebP"}
+	labels := map[string]string{TypePDF: "PDF", TypeJPEG: "JPG", TypePNG: "PNG", TypeWebP: "WebP", TypeXLSX: "Excel (.xlsx)"}
 	out := make([]string, 0, len(types))
 	for _, t := range types {
 		if l, ok := labels[t]; ok {
@@ -166,7 +179,7 @@ func (f *File) MarkUploaded(written int64, sum []byte, sniffed string, now time.
 	if written != f.SizeBytes {
 		return apperr.WithMessage(apperr.CodeBadRequest, "Ukuran file tidak sesuai. Unggah ulang file.")
 	}
-	if NormalizeContentType(sniffed) != f.ContentType {
+	if !contentMatches(f.ContentType, sniffed) {
 		return apperr.WithMessage(apperr.CodeFileTypeNotAllowed, "Isi file tidak sesuai dengan tipenya.")
 	}
 	f.Status, f.SHA256, f.UploadedAt = StatusUploaded, sum, &now

@@ -75,7 +75,8 @@ Kode: R = read, W = write, S = submit, A = approve, P = post, C = cancel, V = ve
 | `party.supplier` | RWI | RW | — | R | RW | R | — | — | — | — | — | — | — | R |
 | `warehouse.location` | RWI | R | R | RW | R | R | R | R | — | R | — | — | — | R |
 | `hris.employee` | R | — | — | — | R | R | — | — | — | — | — | RWI | — | R |
-| `accounting.account`, `accounting.posting_rule` | R | — | — | — | RW | RWA | — | — | — | — | — | — | — | R |
+| `accounting.account` | R | — | — | — | RWI | RWAI | — | — | — | — | — | — | — | R |
+| `accounting.posting_rule` | R | — | — | — | RW | RWA | — | — | — | — | — | — | — | R |
 | `accounting.dimension` (channel, sub-channel, divisi, kampanye) | RW | — | — | — | RW | RW | R | R | — | R | RW | — | — | R |
 | `accounting.expense_type`, `sales.return_reason` | RW | — | — | R | RW | RW | — | — | R | — | R | — | — | R |
 | `identity.user`, `identity.user_role` ★ | RW | — | — | — | — | — | — | — | — | — | — | — | — | R |

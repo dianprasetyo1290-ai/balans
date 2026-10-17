@@ -5,8 +5,10 @@ package filestore
 
 import (
 	"context"
+	"io"
 	"log/slog"
 	"strings"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
@@ -39,6 +41,7 @@ const (
 	TypeJPEG = domain.TypeJPEG
 	TypePNG  = domain.TypePNG
 	TypeWebP = domain.TypeWebP
+	TypeXLSX = domain.TypeXLSX
 )
 
 // Deps adalah dependensi modul.
@@ -97,6 +100,26 @@ func (m *Module) Attach(ctx context.Context, fileID uuid.UUID, ownerType string,
 // Names mengembalikan nama asli file untuk ditampilkan.
 func (m *Module) Names(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID]string, error) {
 	return m.svc.Names(ctx, ids)
+}
+
+// Info membaca metadata file tanpa cek permission (modul pemanggil memeriksa hak aksesnya sendiri).
+func (m *Module) Info(ctx context.Context, id uuid.UUID) (File, error) { return m.svc.Info(ctx, id) }
+
+// OpenContent membuka isi file yang sudah diunggah tanpa cek permission (dipakai job modul pemilik).
+func (m *Module) OpenContent(ctx context.Context, id uuid.UUID) (io.ReadSeekCloser, error) {
+	return m.svc.OpenContent(ctx, id)
+}
+
+// Save menyimpan file buatan server (hasil ekspor, laporan) dan langsung menautkannya ke pemilik.
+func (m *Module) Save(ctx context.Context, ownerType string, ownerID uuid.UUID, name, contentType string, data []byte) (File, error) {
+	return m.svc.Save(ctx, ownerType, ownerID, name, contentType, data)
+}
+
+// SignedDownloadURL membuat URL unduhan berumur 5 menit tanpa cek permission; pemanggil wajib sudah memeriksa
+// hak akses data pemilik file.
+func (m *Module) SignedDownloadURL(ctx context.Context, id uuid.UUID) (string, time.Time, error) {
+	t, err := m.svc.SignedDownloadURL(ctx, id)
+	return t.URL, t.ExpiresAt, err
 }
 
 // IsContentPath menandai URL isi file bertanda tangan: tidak memakai access token maupun Idempotency-Key.

@@ -28,6 +28,8 @@ tags:
     description: Master produk, packaging, material, bundling (R1.1)
   - name: warehouse
     description: Gudang dan lokasi stok (R1.1)
+  - name: inventory
+    description: Ledger stok, batch, HPP FIFO, saran FEFO (R1.2)
   - name: accounting
     description: COA, dimensi, jenis biaya, periode, posting rule, Jurnal Umum, Buku Besar (R1.1)
   - name: document
@@ -40,6 +42,8 @@ tags:
     description: Purchase Request, Purchase Order (barang, maklon, reprocess), uang muka pembelian (R1.2)
   - name: filestore
     description: Upload dan unduhan file bertanda tangan (R1.1)
+  - name: dataexchange
+    description: Impor/ekspor Excel master data (R1.1)
 paths:
   /healthz:
     $ref: "./paths/system.yaml#/healthz"
@@ -199,6 +203,20 @@ paths:
     $ref: "./paths/warehouse.yaml#/location"
   /api/v1/locations/{id}/restore:
     $ref: "./paths/warehouse.yaml#/locationRestore"
+  /api/v1/stock-balances:
+    $ref: "./paths/inventory.yaml#/stockBalances"
+  /api/v1/stock-card:
+    $ref: "./paths/inventory.yaml#/stockCard"
+  /api/v1/batches:
+    $ref: "./paths/inventory.yaml#/batches"
+  /api/v1/batch-suggestions:
+    $ref: "./paths/inventory.yaml#/batchSuggestions"
+  /api/v1/cost-layers:
+    $ref: "./paths/inventory.yaml#/costLayers"
+  /api/v1/cost-layers/{id}/consumptions:
+    $ref: "./paths/inventory.yaml#/costLayerConsumptions"
+  /api/v1/bundle-availability:
+    $ref: "./paths/inventory.yaml#/bundleAvailability"
   /api/v1/customers:
     $ref: "./paths/party.yaml#/customers"
   /api/v1/customers/{id}:
@@ -237,6 +255,28 @@ paths:
     $ref: "./paths/filestore.yaml#/fileDownloadUrl"
   /api/v1/file-content/{id}:
     $ref: "./paths/filestore.yaml#/fileContent"
+  /api/v1/data-exchange/kinds:
+    $ref: "./paths/dataexchange.yaml#/dataExchangeKinds"
+  /api/v1/data-exchange/kinds/{kind}/template:
+    $ref: "./paths/dataexchange.yaml#/dataExchangeTemplate"
+  /api/v1/import-jobs:
+    $ref: "./paths/dataexchange.yaml#/importJobs"
+  /api/v1/import-jobs/{id}:
+    $ref: "./paths/dataexchange.yaml#/importJob"
+  /api/v1/import-jobs/{id}/rows:
+    $ref: "./paths/dataexchange.yaml#/importJobRows"
+  /api/v1/import-jobs/{id}/commit:
+    $ref: "./paths/dataexchange.yaml#/importJobCommit"
+  /api/v1/import-jobs/{id}/cancel:
+    $ref: "./paths/dataexchange.yaml#/importJobCancel"
+  /api/v1/import-jobs/{id}/error-file:
+    $ref: "./paths/dataexchange.yaml#/importJobErrorFile"
+  /api/v1/export-jobs:
+    $ref: "./paths/dataexchange.yaml#/exportJobs"
+  /api/v1/export-jobs/{id}:
+    $ref: "./paths/dataexchange.yaml#/exportJob"
+  /api/v1/export-jobs/{id}/download-url:
+    $ref: "./paths/dataexchange.yaml#/exportJobDownload"
   /api/v1/procurement/division-options:
     $ref: "./paths/procurement.yaml#/procurementDivisionOptions"
   /api/v1/procurement/cash-bank-accounts:

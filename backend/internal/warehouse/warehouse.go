@@ -16,6 +16,7 @@ import (
 	"balans/internal/platform/clock"
 	"balans/internal/platform/db"
 	"balans/internal/platform/httpx"
+	"balans/internal/platform/tabular"
 	"balans/internal/warehouse/domain"
 	warehousehttp "balans/internal/warehouse/http"
 	"balans/internal/warehouse/postgres"
@@ -138,6 +139,25 @@ func (m *Module) FindLocations(ctx context.Context, q LocationQuery) ([]Location
 // SeedDev membuat Gudang Utama beserta lokasi standarnya untuk demo lokal (APP_ENV=local, BRD U-08).
 // Aman diulang: gudang yang sudah ada dilewati.
 func (m *Module) SeedDev(ctx context.Context) error { return m.svc.SeedDev(ctx) }
+
+// Parties mencari pihak pemilik lokasi eksternal dari modul party (impor/ekspor lokasi).
+type Parties = service.Parties
+
+// SetParties memasang pencari pihak eksternal saat wiring.
+func (m *Module) SetParties(p Parties) { m.svc.Parties = p }
+
+// LocationColumns adalah kolom template impor/ekspor lokasi stok (S-125).
+func LocationColumns() []tabular.Column { return service.LocationColumns }
+
+// ImportLocationRow membuat lokasi atau memperbarui nama/status lokasi (kunci kode lokasi) dari satu baris Excel.
+func (m *Module) ImportLocationRow(ctx context.Context, row tabular.Row) error {
+	return m.svc.ImportLocationRow(ctx, row)
+}
+
+// ExportLocations mengalirkan lokasi sebagai baris Excel.
+func (m *Module) ExportLocations(ctx context.Context, emit func(tabular.Row) error) error {
+	return m.svc.ExportLocations(ctx, emit)
+}
 
 // ExternalLocation mengembalikan lokasi eksternal aktif jenis t milik pihak partyID; ok false jika belum ada.
 func (m *Module) ExternalLocation(ctx context.Context, t LocationType, partyID uuid.UUID) (Location, bool, error) {

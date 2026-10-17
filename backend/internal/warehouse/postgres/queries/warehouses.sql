@@ -50,3 +50,6 @@ SET deleted_at = sqlc.narg('deleted_at'), deleted_by = sqlc.narg('deleted_by'), 
     updated_by = sqlc.arg('actor_id'), version = version + 1
 WHERE id = sqlc.arg('id')
 RETURNING *;
+
+-- name: GetWarehouseIDByCode :one
+SELECT id FROM warehouses WHERE code = $1;

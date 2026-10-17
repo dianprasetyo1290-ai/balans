@@ -24,6 +24,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { usePermissions } from "@/features/auth/api/auth-api"
+import { DataExchangeButtons } from "@/features/dataexchange/components/data-exchange-buttons"
 import { parseProblem } from "@/lib/api/problem"
 import { useIdempotentMutation } from "@/lib/api/use-idempotent-mutation"
 import { cn } from "@/lib/utils"
@@ -92,11 +93,14 @@ export function ChartOfAccountsPage() {
             diposting; akun yang sudah dipakai jurnal tidak bisa dihapus.
           </p>
         </div>
-        {canWrite ? (
-          <Button onClick={() => setForm({})}>
-            <PlusIcon /> Tambah Akun
-          </Button>
-        ) : null}
+        <div className="flex flex-wrap gap-2">
+          <DataExchangeButtons kind="accounting.account" />
+          {canWrite ? (
+            <Button onClick={() => setForm({})}>
+              <PlusIcon /> Tambah Akun
+            </Button>
+          ) : null}
+        </div>
       </div>
       <div className="flex flex-wrap items-center gap-3">
         <form

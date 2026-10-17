@@ -21,6 +21,12 @@ import { Route as AppFinanceAccountsRouteImport } from './routes/_app/finance/ac
 import { Route as AppFinanceFiscalPeriodsRouteImport } from './routes/_app/finance/fiscal-periods'
 import { Route as AppFinanceGeneralLedgerRouteImport } from './routes/_app/finance/general-ledger'
 import { Route as AppHrisEmployeesRouteImport } from './routes/_app/hris/employees'
+import { Route as AppIntegrationsDataExchangeRouteImport } from './routes/_app/integrations/data-exchange'
+import { Route as AppInventoryBatchAllocationRouteImport } from './routes/_app/inventory/batch-allocation'
+import { Route as AppInventoryBatchesRouteImport } from './routes/_app/inventory/batches'
+import { Route as AppInventoryCostLayersRouteImport } from './routes/_app/inventory/cost-layers'
+import { Route as AppInventoryStockRouteImport } from './routes/_app/inventory/stock'
+import { Route as AppInventoryStockCardRouteImport } from './routes/_app/inventory/stock-card'
 import { Route as AppLogisticsProductLabelsRouteImport } from './routes/_app/logistics/product-labels'
 import { Route as AppMasterDataBundlesRouteImport } from './routes/_app/master-data/bundles'
 import { Route as AppMasterDataPackagingMaterialsRouteImport } from './routes/_app/master-data/packaging-materials'
@@ -118,6 +124,38 @@ const AppFinanceGeneralLedgerRoute = AppFinanceGeneralLedgerRouteImport.update({
 const AppHrisEmployeesRoute = AppHrisEmployeesRouteImport.update({
   id: '/hris/employees',
   path: '/hris/employees',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppIntegrationsDataExchangeRoute =
+  AppIntegrationsDataExchangeRouteImport.update({
+    id: '/integrations/data-exchange',
+    path: '/integrations/data-exchange',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppInventoryBatchAllocationRoute =
+  AppInventoryBatchAllocationRouteImport.update({
+    id: '/inventory/batch-allocation',
+    path: '/inventory/batch-allocation',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppInventoryBatchesRoute = AppInventoryBatchesRouteImport.update({
+  id: '/inventory/batches',
+  path: '/inventory/batches',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppInventoryCostLayersRoute = AppInventoryCostLayersRouteImport.update({
+  id: '/inventory/cost-layers',
+  path: '/inventory/cost-layers',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppInventoryStockRoute = AppInventoryStockRouteImport.update({
+  id: '/inventory/stock',
+  path: '/inventory/stock',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppInventoryStockCardRoute = AppInventoryStockCardRouteImport.update({
+  id: '/inventory/stock-card',
+  path: '/inventory/stock-card',
   getParentRoute: () => AppRoute,
 } as any)
 const AppLogisticsProductLabelsRoute =
@@ -351,6 +389,12 @@ export interface FileRoutesByFullPath {
   '/finance/fiscal-periods': typeof AppFinanceFiscalPeriodsRoute
   '/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
   '/hris/employees': typeof AppHrisEmployeesRoute
+  '/integrations/data-exchange': typeof AppIntegrationsDataExchangeRoute
+  '/inventory/batch-allocation': typeof AppInventoryBatchAllocationRoute
+  '/inventory/batches': typeof AppInventoryBatchesRoute
+  '/inventory/cost-layers': typeof AppInventoryCostLayersRoute
+  '/inventory/stock': typeof AppInventoryStockRoute
+  '/inventory/stock-card': typeof AppInventoryStockCardRoute
   '/logistics/product-labels': typeof AppLogisticsProductLabelsRoute
   '/master-data/bundles': typeof AppMasterDataBundlesRoute
   '/master-data/packaging-materials': typeof AppMasterDataPackagingMaterialsRoute
@@ -403,6 +447,12 @@ export interface FileRoutesByTo {
   '/finance/fiscal-periods': typeof AppFinanceFiscalPeriodsRoute
   '/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
   '/hris/employees': typeof AppHrisEmployeesRoute
+  '/integrations/data-exchange': typeof AppIntegrationsDataExchangeRoute
+  '/inventory/batch-allocation': typeof AppInventoryBatchAllocationRoute
+  '/inventory/batches': typeof AppInventoryBatchesRoute
+  '/inventory/cost-layers': typeof AppInventoryCostLayersRoute
+  '/inventory/stock': typeof AppInventoryStockRoute
+  '/inventory/stock-card': typeof AppInventoryStockCardRoute
   '/logistics/product-labels': typeof AppLogisticsProductLabelsRoute
   '/master-data/bundles': typeof AppMasterDataBundlesRoute
   '/master-data/packaging-materials': typeof AppMasterDataPackagingMaterialsRoute
@@ -457,6 +507,12 @@ export interface FileRoutesById {
   '/_app/finance/fiscal-periods': typeof AppFinanceFiscalPeriodsRoute
   '/_app/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
   '/_app/hris/employees': typeof AppHrisEmployeesRoute
+  '/_app/integrations/data-exchange': typeof AppIntegrationsDataExchangeRoute
+  '/_app/inventory/batch-allocation': typeof AppInventoryBatchAllocationRoute
+  '/_app/inventory/batches': typeof AppInventoryBatchesRoute
+  '/_app/inventory/cost-layers': typeof AppInventoryCostLayersRoute
+  '/_app/inventory/stock': typeof AppInventoryStockRoute
+  '/_app/inventory/stock-card': typeof AppInventoryStockCardRoute
   '/_app/logistics/product-labels': typeof AppLogisticsProductLabelsRoute
   '/_app/master-data/bundles': typeof AppMasterDataBundlesRoute
   '/_app/master-data/packaging-materials': typeof AppMasterDataPackagingMaterialsRoute
@@ -511,6 +567,12 @@ export interface FileRouteTypes {
     | '/finance/fiscal-periods'
     | '/finance/general-ledger'
     | '/hris/employees'
+    | '/integrations/data-exchange'
+    | '/inventory/batch-allocation'
+    | '/inventory/batches'
+    | '/inventory/cost-layers'
+    | '/inventory/stock'
+    | '/inventory/stock-card'
     | '/logistics/product-labels'
     | '/master-data/bundles'
     | '/master-data/packaging-materials'
@@ -563,6 +625,12 @@ export interface FileRouteTypes {
     | '/finance/fiscal-periods'
     | '/finance/general-ledger'
     | '/hris/employees'
+    | '/integrations/data-exchange'
+    | '/inventory/batch-allocation'
+    | '/inventory/batches'
+    | '/inventory/cost-layers'
+    | '/inventory/stock'
+    | '/inventory/stock-card'
     | '/logistics/product-labels'
     | '/master-data/bundles'
     | '/master-data/packaging-materials'
@@ -616,6 +684,12 @@ export interface FileRouteTypes {
     | '/_app/finance/fiscal-periods'
     | '/_app/finance/general-ledger'
     | '/_app/hris/employees'
+    | '/_app/integrations/data-exchange'
+    | '/_app/inventory/batch-allocation'
+    | '/_app/inventory/batches'
+    | '/_app/inventory/cost-layers'
+    | '/_app/inventory/stock'
+    | '/_app/inventory/stock-card'
     | '/_app/logistics/product-labels'
     | '/_app/master-data/bundles'
     | '/_app/master-data/packaging-materials'
@@ -750,6 +824,48 @@ declare module '@tanstack/react-router' {
       path: '/hris/employees'
       fullPath: '/hris/employees'
       preLoaderRoute: typeof AppHrisEmployeesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/integrations/data-exchange': {
+      id: '/_app/integrations/data-exchange'
+      path: '/integrations/data-exchange'
+      fullPath: '/integrations/data-exchange'
+      preLoaderRoute: typeof AppIntegrationsDataExchangeRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/inventory/batch-allocation': {
+      id: '/_app/inventory/batch-allocation'
+      path: '/inventory/batch-allocation'
+      fullPath: '/inventory/batch-allocation'
+      preLoaderRoute: typeof AppInventoryBatchAllocationRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/inventory/batches': {
+      id: '/_app/inventory/batches'
+      path: '/inventory/batches'
+      fullPath: '/inventory/batches'
+      preLoaderRoute: typeof AppInventoryBatchesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/inventory/cost-layers': {
+      id: '/_app/inventory/cost-layers'
+      path: '/inventory/cost-layers'
+      fullPath: '/inventory/cost-layers'
+      preLoaderRoute: typeof AppInventoryCostLayersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/inventory/stock': {
+      id: '/_app/inventory/stock'
+      path: '/inventory/stock'
+      fullPath: '/inventory/stock'
+      preLoaderRoute: typeof AppInventoryStockRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/inventory/stock-card': {
+      id: '/_app/inventory/stock-card'
+      path: '/inventory/stock-card'
+      fullPath: '/inventory/stock-card'
+      preLoaderRoute: typeof AppInventoryStockCardRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/logistics/product-labels': {
@@ -1035,6 +1151,12 @@ interface AppRouteChildren {
   AppFinanceFiscalPeriodsRoute: typeof AppFinanceFiscalPeriodsRoute
   AppFinanceGeneralLedgerRoute: typeof AppFinanceGeneralLedgerRoute
   AppHrisEmployeesRoute: typeof AppHrisEmployeesRoute
+  AppIntegrationsDataExchangeRoute: typeof AppIntegrationsDataExchangeRoute
+  AppInventoryBatchAllocationRoute: typeof AppInventoryBatchAllocationRoute
+  AppInventoryBatchesRoute: typeof AppInventoryBatchesRoute
+  AppInventoryCostLayersRoute: typeof AppInventoryCostLayersRoute
+  AppInventoryStockRoute: typeof AppInventoryStockRoute
+  AppInventoryStockCardRoute: typeof AppInventoryStockCardRoute
   AppLogisticsProductLabelsRoute: typeof AppLogisticsProductLabelsRoute
   AppMasterDataBundlesRoute: typeof AppMasterDataBundlesRoute
   AppMasterDataPackagingMaterialsRoute: typeof AppMasterDataPackagingMaterialsRoute
@@ -1083,6 +1205,12 @@ const AppRouteChildren: AppRouteChildren = {
   AppFinanceFiscalPeriodsRoute: AppFinanceFiscalPeriodsRoute,
   AppFinanceGeneralLedgerRoute: AppFinanceGeneralLedgerRoute,
   AppHrisEmployeesRoute: AppHrisEmployeesRoute,
+  AppIntegrationsDataExchangeRoute: AppIntegrationsDataExchangeRoute,
+  AppInventoryBatchAllocationRoute: AppInventoryBatchAllocationRoute,
+  AppInventoryBatchesRoute: AppInventoryBatchesRoute,
+  AppInventoryCostLayersRoute: AppInventoryCostLayersRoute,
+  AppInventoryStockRoute: AppInventoryStockRoute,
+  AppInventoryStockCardRoute: AppInventoryStockCardRoute,
   AppLogisticsProductLabelsRoute: AppLogisticsProductLabelsRoute,
   AppMasterDataBundlesRoute: AppMasterDataBundlesRoute,
   AppMasterDataPackagingMaterialsRoute: AppMasterDataPackagingMaterialsRoute,

@@ -40,6 +40,7 @@ type store interface {
 	ByIDs(ctx context.Context, ids []uuid.UUID) ([]domain.Employee, error)
 	List(ctx context.Context, f postgres.Filter, page paging.Page) (paging.Result[domain.Employee], error)
 	Update(ctx context.Context, e domain.Employee, version int, actorID uuid.UUID) error
+	IDByNumber(ctx context.Context, number string) (uuid.UUID, bool, error)
 }
 
 // Deps adalah dependensi Service.
@@ -49,6 +50,8 @@ type Deps struct {
 	Audit audit.Recorder
 	Clock clock.Clock
 	Log   *slog.Logger
+	// Divisions nil = modul accounting belum aktif; kolom divisi impor tidak bisa diisi.
+	Divisions Divisions
 }
 
 // Service adalah use case modul hris.
