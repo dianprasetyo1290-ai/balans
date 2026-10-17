@@ -221,7 +221,24 @@ export const MENU: MenuGroup[] = [
         ],
         module: "procurement",
       },
-      ...items("Penerimaan Barang", "Reject & Waste", "Tagihan Pemasok"),
+      {
+        label: "Penerimaan Barang",
+        to: "/procurement/goods-receipts",
+        permission: "procurement.goods_receipt.read",
+        module: "procurement",
+      },
+      {
+        label: "Reject & Waste",
+        to: "/procurement/purchase-returns",
+        permission: "procurement.purchase_return.read",
+        module: "procurement",
+      },
+      {
+        label: "Tagihan Pemasok",
+        to: "/procurement/supplier-bills",
+        permission: "procurement.supplier_bill.read",
+        module: "procurement",
+      },
       {
         label: "Uang Muka Pembelian",
         to: "/procurement/purchase-advances",
@@ -471,9 +488,17 @@ export const MENU: MenuGroup[] = [
         permission: "accounting.journal.read",
         module: "accounting",
       },
+      ...items("Piutang Usaha", "Utang Usaha"),
+      {
+        label: "Barang Diterima Belum Ditagih",
+        to: "/finance/goods-received-not-invoiced",
+        permission: [
+          "procurement.supplier_bill.read",
+          "accounting.report.read",
+        ],
+        module: "procurement",
+      },
       ...items(
-        "Piutang Usaha",
-        "Utang Usaha",
         "Kas & Bank",
         "Rekonsiliasi Bank",
         "Kas Kecil",

@@ -141,7 +141,11 @@ export function ApprovalPanel({
   subjectType,
   subjectId,
 }: {
-  subjectType: "purchase_request" | "purchase_order"
+  subjectType:
+    | "purchase_request"
+    | "purchase_order"
+    | "supplier_bill_exception"
+    | "purchase_return"
   subjectId: string
 }) {
   const approvals = useQuery(subjectApprovalsQuery(subjectType, subjectId))

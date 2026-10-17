@@ -20,6 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { EntityHistory } from "@/features/audit/components/entity-history"
+import { usePermissions } from "@/features/auth/api/auth-api"
 import { parseProblem } from "@/lib/api/problem"
 import { useIdempotentMutation } from "@/lib/api/use-idempotent-mutation"
 import { formatDate, formatDateTime } from "@/lib/format/date"
@@ -90,6 +91,7 @@ function OrderDetail({
   const [advancing, setAdvancing] = useState(false)
   const can = (a: PurchaseOrder["allowedActions"][number]) =>
     order.allowedActions.includes(a)
+  const { can: canDo } = usePermissions()
   const toll =
     order.orderType === "toll_manufacturing" || order.orderType === "reprocess"
 
@@ -174,6 +176,21 @@ function OrderDetail({
               }
             >
               <PrinterIcon /> Cetak PO
+            </Button>
+          ) : null}
+          {(order.status === "approved" ||
+            order.status === "partially_received") &&
+          canDo("procurement.goods_receipt.write") ? (
+            <Button
+              variant="outline"
+              render={
+                <Link
+                  to="/procurement/goods-receipts/new"
+                  search={{ purchaseOrderId: order.id }}
+                />
+              }
+            >
+              Terima Barang
             </Button>
           ) : null}
           {can("create_advance") ? (
