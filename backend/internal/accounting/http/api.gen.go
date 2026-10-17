@@ -275,6 +275,54 @@ func (e NormalBalance) Valid() bool {
 	}
 }
 
+// Defines values for ReportRowKind.
+const (
+	ReportRowKindAccount  ReportRowKind = "account"
+	ReportRowKindGroup    ReportRowKind = "group"
+	ReportRowKindSection  ReportRowKind = "section"
+	ReportRowKindSubtotal ReportRowKind = "subtotal"
+	ReportRowKindTotal    ReportRowKind = "total"
+)
+
+// Valid indicates whether the value is a known member of the ReportRowKind enum.
+func (e ReportRowKind) Valid() bool {
+	switch e {
+	case ReportRowKindAccount:
+		return true
+	case ReportRowKindGroup:
+		return true
+	case ReportRowKindSection:
+		return true
+	case ReportRowKindSubtotal:
+		return true
+	case ReportRowKindTotal:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for StatementKind.
+const (
+	BalanceSheet    StatementKind = "balance_sheet"
+	CashFlow        StatementKind = "cash_flow"
+	IncomeStatement StatementKind = "income_statement"
+)
+
+// Valid indicates whether the value is a known member of the StatementKind enum.
+func (e StatementKind) Valid() bool {
+	switch e {
+	case BalanceSheet:
+		return true
+	case CashFlow:
+		return true
+	case IncomeStatement:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for WithholdingType.
 const (
 	None  WithholdingType = "none"
@@ -423,6 +471,47 @@ type CampaignUpdate struct {
 	Version int `json:"version"`
 }
 
+// DashboardChannel defines model for DashboardChannel.
+type DashboardChannel struct {
+	Code string `json:"code"`
+
+	// GrossProfit Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	GrossProfit   Money               `json:"grossProfit"`
+	Id            *openapi_types.UUID `json:"id,omitempty"`
+	MarginPercent string              `json:"marginPercent"`
+	Name          string              `json:"name"`
+
+	// Revenue Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Revenue Money `json:"revenue"`
+}
+
+// DashboardTrendPoint defines model for DashboardTrendPoint.
+type DashboardTrendPoint struct {
+	// GrossProfit Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	GrossProfit Money `json:"grossProfit"`
+
+	// Month Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	Month BusinessDate `json:"month"`
+
+	// NetProfit Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	NetProfit Money `json:"netProfit"`
+
+	// Revenue Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Revenue Money `json:"revenue"`
+}
+
 // Dimension Master dimensi jurnal. Field channel/pihak hanya untuk sub-channel; periode/anggaran hanya kampanye.
 type Dimension struct {
 	BudgetAmount *Money              `json:"budgetAmount,omitempty"`
@@ -441,6 +530,29 @@ type Dimension struct {
 	Version      int                 `json:"version"`
 }
 
+// DimensionAccountRow defines model for DimensionAccountRow.
+type DimensionAccountRow struct {
+	AccountCode string  `json:"accountCode"`
+	AccountName string  `json:"accountName"`
+	Amounts     []Money `json:"amounts"`
+	Group       int     `json:"group"`
+
+	// Total Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Total Money `json:"total"`
+}
+
+// DimensionColumn defines model for DimensionColumn.
+type DimensionColumn struct {
+	Code string `json:"code"`
+
+	// Id Kosong = jurnal tanpa dimensi ini.
+	Id      *openapi_types.UUID `json:"id,omitempty"`
+	Name    string              `json:"name"`
+	Summary ProfitLossSummary   `json:"summary"`
+}
+
 // DimensionInput defines model for DimensionInput.
 type DimensionInput struct {
 	Code     string `json:"code"`
@@ -450,6 +562,25 @@ type DimensionInput struct {
 
 // DimensionKind defines model for DimensionKind.
 type DimensionKind string
+
+// DimensionProfitLoss defines model for DimensionProfitLoss.
+type DimensionProfitLoss struct {
+	Accounts []DimensionAccountRow `json:"accounts"`
+	Columns  []DimensionColumn     `json:"columns"`
+
+	// DateFrom Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	DateFrom BusinessDate `json:"dateFrom"`
+
+	// DateTo Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	DateTo      BusinessDate      `json:"dateTo"`
+	Dimension   DimensionKind     `json:"dimension"`
+	RefreshedAt *time.Time        `json:"refreshedAt,omitempty"`
+	Total       ProfitLossSummary `json:"total"`
+}
 
 // DimensionRef defines model for DimensionRef.
 type DimensionRef struct {
@@ -467,6 +598,44 @@ type DimensionUpdate struct {
 
 // ErrorCode Katalog kode error (Technical Guideline Lampiran A).
 type ErrorCode string
+
+// ExecutiveDashboard defines model for ExecutiveDashboard.
+type ExecutiveDashboard struct {
+	// Cash Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Cash     Money              `json:"cash"`
+	Channels []DashboardChannel `json:"channels"`
+
+	// DateFrom Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	DateFrom BusinessDate `json:"dateFrom"`
+
+	// DateTo Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	DateTo BusinessDate `json:"dateTo"`
+
+	// Inventory Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Inventory Money `json:"inventory"`
+
+	// Payables Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Payables Money             `json:"payables"`
+	Period   ProfitLossSummary `json:"period"`
+	Previous ProfitLossSummary `json:"previous"`
+
+	// Receivables Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Receivables Money                 `json:"receivables"`
+	RefreshedAt *time.Time            `json:"refreshedAt,omitempty"`
+	Trend       []DashboardTrendPoint `json:"trend"`
+}
 
 // ExpenseApprovalSubject Jenis dokumen approval (subject_type) yang dipakai dokumen biaya dengan jenis ini.
 type ExpenseApprovalSubject string
@@ -547,6 +716,27 @@ type ExpenseTypeUpdate struct {
 
 	// WithholdingType Jenis PPh yang dipotong (pemasok, jenis biaya); tarif di master tarif PPh.
 	WithholdingType WithholdingType `json:"withholdingType"`
+}
+
+// FinancialStatement defines model for FinancialStatement.
+type FinancialStatement struct {
+	// Balanced Neraca seimbang / kenaikan kas = mutasi akun Kas & Bank.
+	Balanced bool `json:"balanced"`
+
+	// DateFrom Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	DateFrom BusinessDate `json:"dateFrom"`
+
+	// DateTo Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	DateTo      BusinessDate      `json:"dateTo"`
+	Kind        StatementKind     `json:"kind"`
+	RefreshedAt *time.Time        `json:"refreshedAt,omitempty"`
+	Rows        []StatementRow    `json:"rows"`
+	Summary     ProfitLossSummary `json:"summary"`
+	Title       string            `json:"title"`
 }
 
 // FiscalPeriod defines model for FiscalPeriod.
@@ -879,6 +1069,80 @@ type Problem struct {
 	Type      string             `json:"type"`
 }
 
+// ProfitLossSummary defines model for ProfitLossSummary.
+type ProfitLossSummary struct {
+	// Cogs Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Cogs               Money  `json:"cogs"`
+	GrossMarginPercent string `json:"grossMarginPercent"`
+
+	// GrossProfit Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	GrossProfit      Money  `json:"grossProfit"`
+	NetMarginPercent string `json:"netMarginPercent"`
+
+	// NetProfit Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	NetProfit Money `json:"netProfit"`
+
+	// OperatingExpense Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	OperatingExpense Money `json:"operatingExpense"`
+
+	// OperatingProfit Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	OperatingProfit Money `json:"operatingProfit"`
+
+	// OtherNet Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	OtherNet Money `json:"otherNet"`
+
+	// Revenue Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Revenue Money `json:"revenue"`
+}
+
+// ReadModelRefresh defines model for ReadModelRefresh.
+type ReadModelRefresh struct {
+	DurationMs  int       `json:"durationMs"`
+	Name        string    `json:"name"`
+	RefreshedAt time.Time `json:"refreshedAt"`
+}
+
+// ReadModelStatus defines model for ReadModelStatus.
+type ReadModelStatus struct {
+	Items []ReadModelRefresh `json:"items"`
+}
+
+// ReportRowKind Jenis baris laporan (judul bagian, subjudul akun induk, akun, subtotal, total).
+type ReportRowKind string
+
+// StatementKind defines model for StatementKind.
+type StatementKind string
+
+// StatementRow defines model for StatementRow.
+type StatementRow struct {
+	// Amount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Amount Money `json:"amount"`
+
+	// Code Kode akun (baris akun) untuk drill-down Buku Besar.
+	Code *string `json:"code,omitempty"`
+
+	// Kind Jenis baris laporan (judul bagian, subjudul akun induk, akun, subtotal, total).
+	Kind  ReportRowKind `json:"kind"`
+	Label string        `json:"label"`
+	Level int           `json:"level"`
+}
+
 // SubChannelFields defines model for SubChannelFields.
 type SubChannelFields struct {
 	IsActive  bool                `json:"isActive"`
@@ -908,6 +1172,102 @@ type SubChannelUpdate struct {
 	Version int `json:"version"`
 }
 
+// TaxJournalLine defines model for TaxJournalLine.
+type TaxJournalLine struct {
+	AccountCode string `json:"accountCode"`
+	AccountName string `json:"accountName"`
+
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate `json:"businessDate"`
+
+	// Credit Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Credit Money `json:"credit"`
+
+	// Debit Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Debit       Money              `json:"debit"`
+	Description string             `json:"description"`
+	EntryId     openapi_types.UUID `json:"entryId"`
+	Number      string             `json:"number"`
+	SourceLabel string             `json:"sourceLabel"`
+	SourceType  string             `json:"sourceType"`
+}
+
+// TaxMonth defines model for TaxMonth.
+type TaxMonth struct {
+	// CumulativeTurnover Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	CumulativeTurnover Money `json:"cumulativeTurnover"`
+
+	// FinalTax Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	FinalTax Money `json:"finalTax"`
+
+	// FinalTaxPaid Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	FinalTaxPaid Money `json:"finalTaxPaid"`
+
+	// Month Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	Month BusinessDate `json:"month"`
+
+	// Pph21Withheld Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Pph21Withheld Money `json:"pph21Withheld"`
+
+	// Pph23Withheld Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Pph23Withheld Money `json:"pph23Withheld"`
+
+	// Pph42Withheld Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Pph42Withheld Money `json:"pph42Withheld"`
+
+	// Turnover Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Turnover Money `json:"turnover"`
+
+	// WithholdingPaid Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	WithholdingPaid Money `json:"withholdingPaid"`
+}
+
+// TaxSummary defines model for TaxSummary.
+type TaxSummary struct {
+	// Limit Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Limit         Money            `json:"limit"`
+	LimitExceeded bool             `json:"limitExceeded"`
+	Lines         []TaxJournalLine `json:"lines"`
+	Months        []TaxMonth       `json:"months"`
+	RefreshedAt   *time.Time       `json:"refreshedAt,omitempty"`
+
+	// Turnover Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Turnover    Money  `json:"turnover"`
+	UsedPercent string `json:"usedPercent"`
+
+	// Warning Omzet kumulatif ≥ 80% batas.
+	Warning bool `json:"warning"`
+	Year    int  `json:"year"`
+}
+
 // VersionInput defines model for VersionInput.
 type VersionInput struct {
 	// Version Versi terakhir yang dilihat user (optimistic locking).
@@ -931,6 +1291,18 @@ type Page = int
 
 // PageSize defines model for PageSize.
 type PageSize = int
+
+// ReportCampaignId defines model for ReportCampaignId.
+type ReportCampaignId = openapi_types.UUID
+
+// ReportChannelId defines model for ReportChannelId.
+type ReportChannelId = openapi_types.UUID
+
+// ReportDivisionId defines model for ReportDivisionId.
+type ReportDivisionId = openapi_types.UUID
+
+// ReportSubChannelId defines model for ReportSubChannelId.
+type ReportSubChannelId = openapi_types.UUID
 
 // Search defines model for Search.
 type Search = string
@@ -1138,6 +1510,45 @@ type ReverseJournalEntryParams struct {
 	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
 }
 
+// GetExecutiveDashboardParams defines parameters for GetExecutiveDashboard.
+type GetExecutiveDashboardParams struct {
+	DateFrom BusinessDate `form:"dateFrom" json:"dateFrom"`
+	DateTo   BusinessDate `form:"dateTo" json:"dateTo"`
+}
+
+// GetFinancialStatementParams defines parameters for GetFinancialStatement.
+type GetFinancialStatementParams struct {
+	Kind         StatementKind       `form:"kind" json:"kind"`
+	DateFrom     *BusinessDate       `form:"dateFrom,omitempty" json:"dateFrom,omitempty"`
+	DateTo       BusinessDate        `form:"dateTo" json:"dateTo"`
+	ChannelId    *ReportChannelId    `form:"channelId,omitempty" json:"channelId,omitempty"`
+	SubChannelId *ReportSubChannelId `form:"subChannelId,omitempty" json:"subChannelId,omitempty"`
+	DivisionId   *ReportDivisionId   `form:"divisionId,omitempty" json:"divisionId,omitempty"`
+	CampaignId   *ReportCampaignId   `form:"campaignId,omitempty" json:"campaignId,omitempty"`
+}
+
+// GetProfitLossByDimensionParams defines parameters for GetProfitLossByDimension.
+type GetProfitLossByDimensionParams struct {
+	Dimension DimensionKind    `form:"dimension" json:"dimension"`
+	DateFrom  BusinessDate     `form:"dateFrom" json:"dateFrom"`
+	DateTo    BusinessDate     `form:"dateTo" json:"dateTo"`
+	ChannelId *ReportChannelId `form:"channelId,omitempty" json:"channelId,omitempty"`
+}
+
+// RefreshReadModelsParams defines parameters for RefreshReadModels.
+type RefreshReadModelsParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// GetTaxSummaryParams defines parameters for GetTaxSummary.
+type GetTaxSummaryParams struct {
+	Year int `form:"year" json:"year"`
+
+	// Month Masa (1–12) untuk rincian jurnal; kosong = tanpa rincian.
+	Month *int `form:"month,omitempty" json:"month,omitempty"`
+}
+
 // ListSubChannelsParams defines parameters for ListSubChannels.
 type ListSubChannelsParams struct {
 	IncludeInactive *IncludeInactive    `form:"includeInactive,omitempty" json:"includeInactive,omitempty"`
@@ -1311,6 +1722,24 @@ type ServerInterface interface {
 	// ListPostingRules Posting rule jurnal otomatis dan pemetaan akun yang berlaku hari ini (S-130)
 	// (GET /api/v1/posting-rules)
 	ListPostingRules(w http.ResponseWriter, r *http.Request)
+	// GetExecutiveDashboard Dashboard eksekutif dasar — penjualan, margin, stok, kas (S-418, RPT-14)
+	// (GET /api/v1/reports/executive-dashboard)
+	GetExecutiveDashboard(w http.ResponseWriter, r *http.Request, params GetExecutiveDashboardParams)
+	// GetFinancialStatement Neraca, Laba Rugi, atau Arus Kas (S-409, RPT-12)
+	// (GET /api/v1/reports/financial-statements)
+	GetFinancialStatement(w http.ResponseWriter, r *http.Request, params GetFinancialStatementParams)
+	// GetProfitLossByDimension Laba rugi per channel, sub-channel, divisi, atau kampanye (S-417, RPT-15)
+	// (GET /api/v1/reports/profit-loss-by-dimension)
+	GetProfitLossByDimension(w http.ResponseWriter, r *http.Request, params GetProfitLossByDimensionParams)
+	// ListReadModels Waktu refresh terakhir read model laporan
+	// (GET /api/v1/reports/read-models)
+	ListReadModels(w http.ResponseWriter, r *http.Request)
+	// RefreshReadModels Perbarui data laporan sekarang (tanpa menunggu job 15 menit)
+	// (POST /api/v1/reports/read-models/refresh)
+	RefreshReadModels(w http.ResponseWriter, r *http.Request, params RefreshReadModelsParams)
+	// GetTaxSummary Rekap PPh dipotong, PPh Final, dan pemantauan omzet terhadap Rp4,8 M (S-416, RPT-18)
+	// (GET /api/v1/reports/tax-summary)
+	GetTaxSummary(w http.ResponseWriter, r *http.Request, params GetTaxSummaryParams)
 	// ListSubChannels Master sub-channel (dimensi S)
 	// (GET /api/v1/sub-channels)
 	ListSubChannels(w http.ResponseWriter, r *http.Request, params ListSubChannelsParams)
@@ -1518,6 +1947,42 @@ func (_ Unimplemented) ReverseJournalEntry(w http.ResponseWriter, r *http.Reques
 // ListPostingRules Posting rule jurnal otomatis dan pemetaan akun yang berlaku hari ini (S-130)
 // (GET /api/v1/posting-rules)
 func (_ Unimplemented) ListPostingRules(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetExecutiveDashboard Dashboard eksekutif dasar — penjualan, margin, stok, kas (S-418, RPT-14)
+// (GET /api/v1/reports/executive-dashboard)
+func (_ Unimplemented) GetExecutiveDashboard(w http.ResponseWriter, r *http.Request, params GetExecutiveDashboardParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetFinancialStatement Neraca, Laba Rugi, atau Arus Kas (S-409, RPT-12)
+// (GET /api/v1/reports/financial-statements)
+func (_ Unimplemented) GetFinancialStatement(w http.ResponseWriter, r *http.Request, params GetFinancialStatementParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetProfitLossByDimension Laba rugi per channel, sub-channel, divisi, atau kampanye (S-417, RPT-15)
+// (GET /api/v1/reports/profit-loss-by-dimension)
+func (_ Unimplemented) GetProfitLossByDimension(w http.ResponseWriter, r *http.Request, params GetProfitLossByDimensionParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListReadModels Waktu refresh terakhir read model laporan
+// (GET /api/v1/reports/read-models)
+func (_ Unimplemented) ListReadModels(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// RefreshReadModels Perbarui data laporan sekarang (tanpa menunggu job 15 menit)
+// (POST /api/v1/reports/read-models/refresh)
+func (_ Unimplemented) RefreshReadModels(w http.ResponseWriter, r *http.Request, params RefreshReadModelsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetTaxSummary Rekap PPh dipotong, PPh Final, dan pemantauan omzet terhadap Rp4,8 M (S-416, RPT-18)
+// (GET /api/v1/reports/tax-summary)
+func (_ Unimplemented) GetTaxSummary(w http.ResponseWriter, r *http.Request, params GetTaxSummaryParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -3241,6 +3706,340 @@ func (siw *ServerInterfaceWrapper) ListPostingRules(w http.ResponseWriter, r *ht
 	handler.ServeHTTP(w, r)
 }
 
+// GetExecutiveDashboard operation middleware
+func (siw *ServerInterfaceWrapper) GetExecutiveDashboard(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetExecutiveDashboardParams
+
+	// ------------- Required query parameter "dateFrom" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "dateFrom", r.URL.Query(), &params.DateFrom, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dateFrom"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dateFrom", Err: err})
+		}
+		return
+	}
+
+	// ------------- Required query parameter "dateTo" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "dateTo", r.URL.Query(), &params.DateTo, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dateTo"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dateTo", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetExecutiveDashboard(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetFinancialStatement operation middleware
+func (siw *ServerInterfaceWrapper) GetFinancialStatement(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetFinancialStatementParams
+
+	// ------------- Required query parameter "kind" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "kind", r.URL.Query(), &params.Kind, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "kind"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "kind", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "dateFrom" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "dateFrom", r.URL.Query(), &params.DateFrom, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dateFrom"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dateFrom", Err: err})
+		}
+		return
+	}
+
+	// ------------- Required query parameter "dateTo" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "dateTo", r.URL.Query(), &params.DateTo, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dateTo"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dateTo", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "channelId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "channelId", r.URL.Query(), &params.ChannelId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "channelId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "channelId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "subChannelId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "subChannelId", r.URL.Query(), &params.SubChannelId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "subChannelId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "subChannelId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "divisionId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "divisionId", r.URL.Query(), &params.DivisionId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "divisionId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "divisionId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "campaignId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "campaignId", r.URL.Query(), &params.CampaignId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "campaignId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "campaignId", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetFinancialStatement(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetProfitLossByDimension operation middleware
+func (siw *ServerInterfaceWrapper) GetProfitLossByDimension(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetProfitLossByDimensionParams
+
+	// ------------- Required query parameter "dimension" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "dimension", r.URL.Query(), &params.Dimension, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dimension"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dimension", Err: err})
+		}
+		return
+	}
+
+	// ------------- Required query parameter "dateFrom" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "dateFrom", r.URL.Query(), &params.DateFrom, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dateFrom"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dateFrom", Err: err})
+		}
+		return
+	}
+
+	// ------------- Required query parameter "dateTo" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "dateTo", r.URL.Query(), &params.DateTo, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dateTo"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dateTo", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "channelId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "channelId", r.URL.Query(), &params.ChannelId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "channelId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "channelId", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetProfitLossByDimension(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListReadModels operation middleware
+func (siw *ServerInterfaceWrapper) ListReadModels(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListReadModels(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// RefreshReadModels operation middleware
+func (siw *ServerInterfaceWrapper) RefreshReadModels(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params RefreshReadModelsParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.RefreshReadModels(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetTaxSummary operation middleware
+func (siw *ServerInterfaceWrapper) GetTaxSummary(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetTaxSummaryParams
+
+	// ------------- Required query parameter "year" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "year", r.URL.Query(), &params.Year, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "year"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "year", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "month" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "month", r.URL.Query(), &params.Month, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "month"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "month", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetTaxSummary(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // ListSubChannels operation middleware
 func (siw *ServerInterfaceWrapper) ListSubChannels(w http.ResponseWriter, r *http.Request) {
 
@@ -3673,6 +4472,24 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/api/v1/general-ledger", wrapper.GetGeneralLedger)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/reports/financial-statements", wrapper.GetFinancialStatement)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/reports/profit-loss-by-dimension", wrapper.GetProfitLossByDimension)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/reports/tax-summary", wrapper.GetTaxSummary)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/reports/executive-dashboard", wrapper.GetExecutiveDashboard)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/reports/read-models", wrapper.ListReadModels)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/reports/read-models/refresh", wrapper.RefreshReadModels)
 	})
 
 	return r
@@ -4921,6 +5738,239 @@ func (response ListPostingRulesdefaultApplicationProblemPlusJSONResponse) VisitL
 	return err
 }
 
+type GetExecutiveDashboardRequestObject struct {
+	Params GetExecutiveDashboardParams
+}
+
+type GetExecutiveDashboardResponseObject interface {
+	VisitGetExecutiveDashboardResponse(w http.ResponseWriter) error
+}
+
+type GetExecutiveDashboard200JSONResponse ExecutiveDashboard
+
+func (response GetExecutiveDashboard200JSONResponse) VisitGetExecutiveDashboardResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetExecutiveDashboarddefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetExecutiveDashboarddefaultApplicationProblemPlusJSONResponse) VisitGetExecutiveDashboardResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetFinancialStatementRequestObject struct {
+	Params GetFinancialStatementParams
+}
+
+type GetFinancialStatementResponseObject interface {
+	VisitGetFinancialStatementResponse(w http.ResponseWriter) error
+}
+
+type GetFinancialStatement200JSONResponse FinancialStatement
+
+func (response GetFinancialStatement200JSONResponse) VisitGetFinancialStatementResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetFinancialStatementdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetFinancialStatementdefaultApplicationProblemPlusJSONResponse) VisitGetFinancialStatementResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetProfitLossByDimensionRequestObject struct {
+	Params GetProfitLossByDimensionParams
+}
+
+type GetProfitLossByDimensionResponseObject interface {
+	VisitGetProfitLossByDimensionResponse(w http.ResponseWriter) error
+}
+
+type GetProfitLossByDimension200JSONResponse DimensionProfitLoss
+
+func (response GetProfitLossByDimension200JSONResponse) VisitGetProfitLossByDimensionResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetProfitLossByDimensiondefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetProfitLossByDimensiondefaultApplicationProblemPlusJSONResponse) VisitGetProfitLossByDimensionResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListReadModelsRequestObject struct {
+}
+
+type ListReadModelsResponseObject interface {
+	VisitListReadModelsResponse(w http.ResponseWriter) error
+}
+
+type ListReadModels200JSONResponse ReadModelStatus
+
+func (response ListReadModels200JSONResponse) VisitListReadModelsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListReadModelsdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListReadModelsdefaultApplicationProblemPlusJSONResponse) VisitListReadModelsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RefreshReadModelsRequestObject struct {
+	Params RefreshReadModelsParams
+}
+
+type RefreshReadModelsResponseObject interface {
+	VisitRefreshReadModelsResponse(w http.ResponseWriter) error
+}
+
+type RefreshReadModels200JSONResponse ReadModelStatus
+
+func (response RefreshReadModels200JSONResponse) VisitRefreshReadModelsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RefreshReadModelsdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response RefreshReadModelsdefaultApplicationProblemPlusJSONResponse) VisitRefreshReadModelsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetTaxSummaryRequestObject struct {
+	Params GetTaxSummaryParams
+}
+
+type GetTaxSummaryResponseObject interface {
+	VisitGetTaxSummaryResponse(w http.ResponseWriter) error
+}
+
+type GetTaxSummary200JSONResponse TaxSummary
+
+func (response GetTaxSummary200JSONResponse) VisitGetTaxSummaryResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetTaxSummarydefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetTaxSummarydefaultApplicationProblemPlusJSONResponse) VisitGetTaxSummaryResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type ListSubChannelsRequestObject struct {
 	Params ListSubChannelsParams
 }
@@ -5173,6 +6223,24 @@ type StrictServerInterface interface {
 	// ListPostingRules Posting rule jurnal otomatis dan pemetaan akun yang berlaku hari ini (S-130)
 	// (GET /api/v1/posting-rules)
 	ListPostingRules(ctx context.Context, request ListPostingRulesRequestObject) (ListPostingRulesResponseObject, error)
+	// GetExecutiveDashboard Dashboard eksekutif dasar — penjualan, margin, stok, kas (S-418, RPT-14)
+	// (GET /api/v1/reports/executive-dashboard)
+	GetExecutiveDashboard(ctx context.Context, request GetExecutiveDashboardRequestObject) (GetExecutiveDashboardResponseObject, error)
+	// GetFinancialStatement Neraca, Laba Rugi, atau Arus Kas (S-409, RPT-12)
+	// (GET /api/v1/reports/financial-statements)
+	GetFinancialStatement(ctx context.Context, request GetFinancialStatementRequestObject) (GetFinancialStatementResponseObject, error)
+	// GetProfitLossByDimension Laba rugi per channel, sub-channel, divisi, atau kampanye (S-417, RPT-15)
+	// (GET /api/v1/reports/profit-loss-by-dimension)
+	GetProfitLossByDimension(ctx context.Context, request GetProfitLossByDimensionRequestObject) (GetProfitLossByDimensionResponseObject, error)
+	// ListReadModels Waktu refresh terakhir read model laporan
+	// (GET /api/v1/reports/read-models)
+	ListReadModels(ctx context.Context, request ListReadModelsRequestObject) (ListReadModelsResponseObject, error)
+	// RefreshReadModels Perbarui data laporan sekarang (tanpa menunggu job 15 menit)
+	// (POST /api/v1/reports/read-models/refresh)
+	RefreshReadModels(ctx context.Context, request RefreshReadModelsRequestObject) (RefreshReadModelsResponseObject, error)
+	// GetTaxSummary Rekap PPh dipotong, PPh Final, dan pemantauan omzet terhadap Rp4,8 M (S-416, RPT-18)
+	// (GET /api/v1/reports/tax-summary)
+	GetTaxSummary(ctx context.Context, request GetTaxSummaryRequestObject) (GetTaxSummaryResponseObject, error)
 	// ListSubChannels Master sub-channel (dimensi S)
 	// (GET /api/v1/sub-channels)
 	ListSubChannels(ctx context.Context, request ListSubChannelsRequestObject) (ListSubChannelsResponseObject, error)
@@ -6161,6 +7229,160 @@ func (sh *strictHandler) ListPostingRules(w http.ResponseWriter, r *http.Request
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(ListPostingRulesResponseObject); ok {
 		if err := validResponse.VisitListPostingRulesResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetExecutiveDashboard operation middleware
+func (sh *strictHandler) GetExecutiveDashboard(w http.ResponseWriter, r *http.Request, params GetExecutiveDashboardParams) {
+	var request GetExecutiveDashboardRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetExecutiveDashboard(ctx, request.(GetExecutiveDashboardRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetExecutiveDashboard")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetExecutiveDashboardResponseObject); ok {
+		if err := validResponse.VisitGetExecutiveDashboardResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetFinancialStatement operation middleware
+func (sh *strictHandler) GetFinancialStatement(w http.ResponseWriter, r *http.Request, params GetFinancialStatementParams) {
+	var request GetFinancialStatementRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetFinancialStatement(ctx, request.(GetFinancialStatementRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetFinancialStatement")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetFinancialStatementResponseObject); ok {
+		if err := validResponse.VisitGetFinancialStatementResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetProfitLossByDimension operation middleware
+func (sh *strictHandler) GetProfitLossByDimension(w http.ResponseWriter, r *http.Request, params GetProfitLossByDimensionParams) {
+	var request GetProfitLossByDimensionRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetProfitLossByDimension(ctx, request.(GetProfitLossByDimensionRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetProfitLossByDimension")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetProfitLossByDimensionResponseObject); ok {
+		if err := validResponse.VisitGetProfitLossByDimensionResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListReadModels operation middleware
+func (sh *strictHandler) ListReadModels(w http.ResponseWriter, r *http.Request) {
+	var request ListReadModelsRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListReadModels(ctx, request.(ListReadModelsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListReadModels")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListReadModelsResponseObject); ok {
+		if err := validResponse.VisitListReadModelsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// RefreshReadModels operation middleware
+func (sh *strictHandler) RefreshReadModels(w http.ResponseWriter, r *http.Request, params RefreshReadModelsParams) {
+	var request RefreshReadModelsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.RefreshReadModels(ctx, request.(RefreshReadModelsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RefreshReadModels")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(RefreshReadModelsResponseObject); ok {
+		if err := validResponse.VisitRefreshReadModelsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetTaxSummary operation middleware
+func (sh *strictHandler) GetTaxSummary(w http.ResponseWriter, r *http.Request, params GetTaxSummaryParams) {
+	var request GetTaxSummaryRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetTaxSummary(ctx, request.(GetTaxSummaryRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetTaxSummary")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetTaxSummaryResponseObject); ok {
+		if err := validResponse.VisitGetTaxSummaryResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

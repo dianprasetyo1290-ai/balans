@@ -64,8 +64,8 @@ UPDATE import_job_rows SET is_valid = false, errors = sqlc.arg('errors')
 WHERE job_id = sqlc.arg('job_id') AND row_number = sqlc.arg('row_number');
 
 -- name: InsertExportJob :one
-INSERT INTO export_jobs (kind, created_by, updated_by)
-VALUES (sqlc.arg('kind'), sqlc.arg('actor_id'), sqlc.arg('actor_id'))
+INSERT INTO export_jobs (kind, params, created_by, updated_by)
+VALUES (sqlc.arg('kind'), sqlc.arg('params'), sqlc.arg('actor_id'), sqlc.arg('actor_id'))
 RETURNING *;
 
 -- name: GetExportJob :one

@@ -77,7 +77,7 @@ func (q *Queries) DeleteImportRows(ctx context.Context, jobID uuid.UUID) error {
 }
 
 const getExportJob = `-- name: GetExportJob :one
-SELECT id, kind, status, total_rows, file_id, file_name, message, completed_at, created_at, created_by, updated_at, updated_by, version FROM export_jobs WHERE id = $1
+SELECT id, kind, status, total_rows, file_id, file_name, message, completed_at, created_at, created_by, updated_at, updated_by, version, params FROM export_jobs WHERE id = $1
 `
 
 func (q *Queries) GetExportJob(ctx context.Context, id uuid.UUID) (ExportJob, error) {
@@ -97,12 +97,13 @@ func (q *Queries) GetExportJob(ctx context.Context, id uuid.UUID) (ExportJob, er
 		&i.UpdatedAt,
 		&i.UpdatedBy,
 		&i.Version,
+		&i.Params,
 	)
 	return i, err
 }
 
 const getExportJobForUpdate = `-- name: GetExportJobForUpdate :one
-SELECT id, kind, status, total_rows, file_id, file_name, message, completed_at, created_at, created_by, updated_at, updated_by, version FROM export_jobs WHERE id = $1 FOR UPDATE
+SELECT id, kind, status, total_rows, file_id, file_name, message, completed_at, created_at, created_by, updated_at, updated_by, version, params FROM export_jobs WHERE id = $1 FOR UPDATE
 `
 
 func (q *Queries) GetExportJobForUpdate(ctx context.Context, id uuid.UUID) (ExportJob, error) {
@@ -122,6 +123,7 @@ func (q *Queries) GetExportJobForUpdate(ctx context.Context, id uuid.UUID) (Expo
 		&i.UpdatedAt,
 		&i.UpdatedBy,
 		&i.Version,
+		&i.Params,
 	)
 	return i, err
 }
@@ -191,18 +193,19 @@ func (q *Queries) GetImportJobForUpdate(ctx context.Context, id uuid.UUID) (Impo
 }
 
 const insertExportJob = `-- name: InsertExportJob :one
-INSERT INTO export_jobs (kind, created_by, updated_by)
-VALUES ($1, $2, $2)
-RETURNING id, kind, status, total_rows, file_id, file_name, message, completed_at, created_at, created_by, updated_at, updated_by, version
+INSERT INTO export_jobs (kind, params, created_by, updated_by)
+VALUES ($1, $2, $3, $3)
+RETURNING id, kind, status, total_rows, file_id, file_name, message, completed_at, created_at, created_by, updated_at, updated_by, version, params
 `
 
 type InsertExportJobParams struct {
 	Kind    string
+	Params  []byte
 	ActorID uuid.UUID
 }
 
 func (q *Queries) InsertExportJob(ctx context.Context, arg InsertExportJobParams) (ExportJob, error) {
-	row := q.db.QueryRow(ctx, insertExportJob, arg.Kind, arg.ActorID)
+	row := q.db.QueryRow(ctx, insertExportJob, arg.Kind, arg.Params, arg.ActorID)
 	var i ExportJob
 	err := row.Scan(
 		&i.ID,
@@ -218,6 +221,7 @@ func (q *Queries) InsertExportJob(ctx context.Context, arg InsertExportJobParams
 		&i.UpdatedAt,
 		&i.UpdatedBy,
 		&i.Version,
+		&i.Params,
 	)
 	return i, err
 }
@@ -280,7 +284,7 @@ type InsertImportRowsParams struct {
 }
 
 const listExportJobs = `-- name: ListExportJobs :many
-SELECT id, kind, status, total_rows, file_id, file_name, message, completed_at, created_at, created_by, updated_at, updated_by, version FROM export_jobs
+SELECT id, kind, status, total_rows, file_id, file_name, message, completed_at, created_at, created_by, updated_at, updated_by, version, params FROM export_jobs
 WHERE kind = ANY($1::text[])
   AND ($2::text IS NULL OR kind = $2)
 ORDER BY created_at DESC, id DESC
@@ -322,6 +326,7 @@ func (q *Queries) ListExportJobs(ctx context.Context, arg ListExportJobsParams) 
 			&i.UpdatedAt,
 			&i.UpdatedBy,
 			&i.Version,
+			&i.Params,
 		); err != nil {
 			return nil, err
 		}

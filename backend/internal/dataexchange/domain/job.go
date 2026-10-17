@@ -135,10 +135,12 @@ type ExportJob struct {
 	FileName    string
 	Message     string
 	CompletedAt *time.Time
-	CreatedBy   uuid.UUID
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	Version     int
+	// Params adalah parameter ekspor laporan (periode, filter); kosong untuk ekspor master.
+	Params    map[string]string
+	CreatedBy uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Version   int
 }
 
 // Spec adalah definisi satu jenis data impor/ekspor.
@@ -149,13 +151,31 @@ type Spec struct {
 	// Sheet adalah nama sheet data di template (mis. `Produk`).
 	Sheet   string
 	Columns []tabular.Column
+	// Resource opsional: resource permission bila berbeda dari Kind (mis. impor settlement per marketplace
+	// `settlement.shopee` memakai `accounting.settlement`).
+	Resource string
+	// ExportPerm opsional: permission ekspor penuh (mis. laporan `accounting.report.read`) menggantikan
+	// `<resource>.export`.
+	ExportPerm string
 }
 
-// ImportPermission adalah `<kind>.import`.
-func (s Spec) ImportPermission() string { return s.Kind + ".import" }
+func (s Spec) resource() string {
+	if s.Resource != "" {
+		return s.Resource
+	}
+	return s.Kind
+}
 
-// ExportPermission adalah `<kind>.export`.
-func (s Spec) ExportPermission() string { return s.Kind + ".export" }
+// ImportPermission adalah `<resource>.import`.
+func (s Spec) ImportPermission() string { return s.resource() + ".import" }
+
+// ExportPermission adalah `<resource>.export` atau ExportPerm.
+func (s Spec) ExportPermission() string {
+	if s.ExportPerm != "" {
+		return s.ExportPerm
+	}
+	return s.resource() + ".export"
+}
 
 // FileName adalah nama file template/ekspor, mis. `Produk.xlsx`.
 func (s Spec) FileName(prefix string) string { return prefix + " " + s.Label + ".xlsx" }

@@ -439,6 +439,11 @@ components:
       properties:
         kind:
           type: string
+        params:
+          type: object
+          description: Parameter ekspor laporan (mis. dateFrom, dateTo, locationId); diabaikan untuk ekspor master.
+          additionalProperties:
+            type: string
     ExportJob:
       type: object
       required: [id, kind, kindLabel, status, totalRows, fileName, message, createdBy, createdAt, updatedAt]

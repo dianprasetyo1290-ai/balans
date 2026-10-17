@@ -17,6 +17,24 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
+// Defines values for BatchCostRowRejectDisposition.
+const (
+	BatchCostRowRejectDispositionAbsorbed         BatchCostRowRejectDisposition = "absorbed"
+	BatchCostRowRejectDispositionReturnToSupplier BatchCostRowRejectDisposition = "return_to_supplier"
+)
+
+// Valid indicates whether the value is a known member of the BatchCostRowRejectDisposition enum.
+func (e BatchCostRowRejectDisposition) Valid() bool {
+	switch e {
+	case BatchCostRowRejectDispositionAbsorbed:
+		return true
+	case BatchCostRowRejectDispositionReturnToSupplier:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for ErrorCode.
 const (
 	APPROVALPOLICYMISSING     ErrorCode = "APPROVAL_POLICY_MISSING"
@@ -170,6 +188,24 @@ func (e GoodsReceiptStatus) Valid() bool {
 	case GoodsReceiptStatusDraft:
 		return true
 	case GoodsReceiptStatusPosted:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PayableAgingDocumentDocumentType.
+const (
+	PayableAgingDocumentDocumentTypeDebitNote    PayableAgingDocumentDocumentType = "debit_note"
+	PayableAgingDocumentDocumentTypeSupplierBill PayableAgingDocumentDocumentType = "supplier_bill"
+)
+
+// Valid indicates whether the value is a known member of the PayableAgingDocumentDocumentType enum.
+func (e PayableAgingDocumentDocumentType) Valid() bool {
+	switch e {
+	case PayableAgingDocumentDocumentTypeDebitNote:
+		return true
+	case PayableAgingDocumentDocumentTypeSupplierBill:
 		return true
 	default:
 		return false
@@ -478,16 +514,16 @@ func (e PurchaseStockStatus) Valid() bool {
 
 // Defines values for RejectDisposition.
 const (
-	Absorbed         RejectDisposition = "absorbed"
-	ReturnToSupplier RejectDisposition = "return_to_supplier"
+	RejectDispositionAbsorbed         RejectDisposition = "absorbed"
+	RejectDispositionReturnToSupplier RejectDisposition = "return_to_supplier"
 )
 
 // Valid indicates whether the value is a known member of the RejectDisposition enum.
 func (e RejectDisposition) Valid() bool {
 	switch e {
-	case Absorbed:
+	case RejectDispositionAbsorbed:
 		return true
-	case ReturnToSupplier:
+	case RejectDispositionReturnToSupplier:
 		return true
 	default:
 		return false
@@ -595,6 +631,57 @@ func (e WithholdingType) Valid() bool {
 		return false
 	}
 }
+
+// BatchCostReport defines model for BatchCostReport.
+type BatchCostReport struct {
+	Items []BatchCostRow `json:"items"`
+}
+
+// BatchCostRow defines model for BatchCostRow.
+type BatchCostRow struct {
+	BatchNumber string `json:"batchNumber"`
+
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate `json:"businessDate"`
+	GoodQty      string       `json:"goodQty"`
+
+	// InventoryAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	InventoryAmount Money `json:"inventoryAmount"`
+
+	// MaterialCost Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	MaterialCost Money `json:"materialCost"`
+
+	// OrderType Jenis PO: `goods` barang, `packaging` packaging (RM), `toll_manufacturing` jasa maklon per batch,
+	// `reprocess` reprocess bahan GM di maklon, `other` lainnya (baris boleh berupa uraian).
+	OrderType         PurchaseOrderType             `json:"orderType"`
+	ProductName       string                        `json:"productName"`
+	ReceiptId         openapi_types.UUID            `json:"receiptId"`
+	ReceiptNumber     string                        `json:"receiptNumber"`
+	RejectDisposition BatchCostRowRejectDisposition `json:"rejectDisposition"`
+	RejectQty         string                        `json:"rejectQty"`
+
+	// ServiceAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	ServiceAmount Money  `json:"serviceAmount"`
+	Sku           string `json:"sku"`
+	SupplierName  string `json:"supplierName"`
+	UnitCost      string `json:"unitCost"`
+
+	// UnitPrice Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	UnitPrice Money `json:"unitPrice"`
+}
+
+// BatchCostRowRejectDisposition defines model for BatchCostRow.RejectDisposition.
+type BatchCostRowRejectDisposition string
 
 // BillableReceiptLine defines model for BillableReceiptLine.
 type BillableReceiptLine struct {
@@ -1066,12 +1153,155 @@ type GoodsReceivedNotInvoicedReport struct {
 // Example: 1250000.00
 type Money = string
 
+// OutstandingPurchaseOrderLine defines model for OutstandingPurchaseOrderLine.
+type OutstandingPurchaseOrderLine struct {
+	BilledQty string `json:"billedQty"`
+
+	// ExpectedDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	ExpectedDate BusinessDate `json:"expectedDate"`
+	Item         string       `json:"item"`
+	LineNo       int          `json:"lineNo"`
+	Number       string       `json:"number"`
+	OpenQty      string       `json:"openQty"`
+
+	// OpenValue Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	OpenValue Money `json:"openValue"`
+
+	// OrderDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	OrderDate BusinessDate `json:"orderDate"`
+
+	// OrderType Jenis PO: `goods` barang, `packaging` packaging (RM), `toll_manufacturing` jasa maklon per batch,
+	// `reprocess` reprocess bahan GM di maklon, `other` lainnya (baris boleh berupa uraian).
+	OrderType       PurchaseOrderType  `json:"orderType"`
+	OrderedQty      string             `json:"orderedQty"`
+	PurchaseOrderId openapi_types.UUID `json:"purchaseOrderId"`
+	ReceivedQty     string             `json:"receivedQty"`
+	Status          string             `json:"status"`
+	SupplierName    string             `json:"supplierName"`
+	UnbilledQty     string             `json:"unbilledQty"`
+
+	// UnitPrice Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	UnitPrice Money `json:"unitPrice"`
+}
+
+// OutstandingPurchaseOrderReport defines model for OutstandingPurchaseOrderReport.
+type OutstandingPurchaseOrderReport struct {
+	// AsOf Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	AsOf  BusinessDate                   `json:"asOf"`
+	Items []OutstandingPurchaseOrderLine `json:"items"`
+
+	// TotalOpenValue Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	TotalOpenValue Money `json:"totalOpenValue"`
+}
+
 // Pagination Metadata pagination standar (Technical Guideline 8.2).
 type Pagination struct {
 	Page       int   `json:"page"`
 	PageSize   int   `json:"pageSize"`
 	TotalItems int64 `json:"totalItems"`
 	TotalPages int   `json:"totalPages"`
+}
+
+// PayableAgingAmounts defines model for PayableAgingAmounts.
+type PayableAgingAmounts struct {
+	// Current Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Current Money `json:"current"`
+
+	// D1To30 Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	D1To30 Money `json:"d1To30"`
+
+	// D31To60 Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	D31To60 Money `json:"d31To60"`
+
+	// D61To90 Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	D61To90 Money `json:"d61To90"`
+
+	// Over90 Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Over90 Money `json:"over90"`
+
+	// Total Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Total Money `json:"total"`
+}
+
+// PayableAgingDocument defines model for PayableAgingDocument.
+type PayableAgingDocument struct {
+	// Amount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Amount Money `json:"amount"`
+
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate   BusinessDate                     `json:"businessDate"`
+	DocumentNumber string                           `json:"documentNumber"`
+	DocumentType   PayableAgingDocumentDocumentType `json:"documentType"`
+
+	// DueDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	DueDate BusinessDate `json:"dueDate"`
+
+	// Open Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Open Money `json:"open"`
+}
+
+// PayableAgingDocumentDocumentType defines model for PayableAgingDocument.DocumentType.
+type PayableAgingDocumentDocumentType string
+
+// PayableAgingReport defines model for PayableAgingReport.
+type PayableAgingReport struct {
+	// AsOf Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	AsOf BusinessDate `json:"asOf"`
+
+	// Difference Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Difference Money                  `json:"difference"`
+	Items      []PayableAgingSupplier `json:"items"`
+
+	// LedgerBalance Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	LedgerBalance Money               `json:"ledgerBalance"`
+	Totals        PayableAgingAmounts `json:"totals"`
+}
+
+// PayableAgingSupplier defines model for PayableAgingSupplier.
+type PayableAgingSupplier struct {
+	Amounts      PayableAgingAmounts    `json:"amounts"`
+	Documents    []PayableAgingDocument `json:"documents"`
+	SupplierCode string                 `json:"supplierCode"`
+	SupplierId   openapi_types.UUID     `json:"supplierId"`
+	SupplierName string                 `json:"supplierName"`
 }
 
 // Problem Format error RFC 7807 (Technical Guideline 8.3). Field code adalah kontrak stabil untuk FE.
@@ -2355,11 +2585,28 @@ type ListBillableReceiptsParams struct {
 	PurchaseOrderId openapi_types.UUID `form:"purchaseOrderId" json:"purchaseOrderId"`
 }
 
+// GetBatchCostReportParams defines parameters for GetBatchCostReport.
+type GetBatchCostReportParams struct {
+	DateFrom  BusinessDate        `form:"dateFrom" json:"dateFrom"`
+	DateTo    BusinessDate        `form:"dateTo" json:"dateTo"`
+	ProductId *openapi_types.UUID `form:"productId,omitempty" json:"productId,omitempty"`
+}
+
 // GetGoodsReceivedNotInvoicedParams defines parameters for GetGoodsReceivedNotInvoiced.
 type GetGoodsReceivedNotInvoicedParams struct {
 	Q               *Search             `form:"q,omitempty" json:"q,omitempty"`
 	SupplierId      *openapi_types.UUID `form:"supplierId,omitempty" json:"supplierId,omitempty"`
 	PurchaseOrderId *openapi_types.UUID `form:"purchaseOrderId,omitempty" json:"purchaseOrderId,omitempty"`
+}
+
+// GetOutstandingPurchaseOrdersParams defines parameters for GetOutstandingPurchaseOrders.
+type GetOutstandingPurchaseOrdersParams struct {
+	SupplierId *openapi_types.UUID `form:"supplierId,omitempty" json:"supplierId,omitempty"`
+}
+
+// GetPayableAgingParams defines parameters for GetPayableAging.
+type GetPayableAgingParams struct {
+	AsOf *BusinessDate `form:"asOf,omitempty" json:"asOf,omitempty"`
 }
 
 // ListReturnableReceiptsParams defines parameters for ListReturnableReceipts.
@@ -2727,9 +2974,18 @@ type ServerInterface interface {
 	// ListProcurementInboundLocations Lokasi Inbound aktif untuk form Penerimaan Barang
 	// (GET /api/v1/procurement/inbound-locations)
 	ListProcurementInboundLocations(w http.ResponseWriter, r *http.Request)
+	// GetBatchCostReport Laporan HPP — komposisi HPP per SKU per batch dengan rincian reject (RPT-04)
+	// (GET /api/v1/procurement/reports/batch-costs)
+	GetBatchCostReport(w http.ResponseWriter, r *http.Request, params GetBatchCostReportParams)
 	// GetGoodsReceivedNotInvoiced Laporan Barang Diterima Belum Ditagih per PO/GR (S-209)
 	// (GET /api/v1/procurement/reports/goods-received-not-invoiced)
 	GetGoodsReceivedNotInvoiced(w http.ResponseWriter, r *http.Request, params GetGoodsReceivedNotInvoicedParams)
+	// GetOutstandingPurchaseOrders Outstanding PO — qty belum diterima & diterima belum ditagih per baris (RPT-10)
+	// (GET /api/v1/procurement/reports/outstanding-purchase-orders)
+	GetOutstandingPurchaseOrders(w http.ResponseWriter, r *http.Request, params GetOutstandingPurchaseOrdersParams)
+	// GetPayableAging Laporan Utang — umur utang per pemasok (RPT-11), direkonsiliasi ke akun 2101
+	// (GET /api/v1/procurement/reports/payable-aging)
+	GetPayableAging(w http.ResponseWriter, r *http.Request, params GetPayableAgingParams)
 	// ListReturnableReceipts Baris Penerimaan Barang PO yang masih bisa diretur (form Retur Pembelian)
 	// (GET /api/v1/procurement/returnable-receipts)
 	ListReturnableReceipts(w http.ResponseWriter, r *http.Request, params ListReturnableReceiptsParams)
@@ -2910,9 +3166,27 @@ func (_ Unimplemented) ListProcurementInboundLocations(w http.ResponseWriter, r 
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GetBatchCostReport Laporan HPP — komposisi HPP per SKU per batch dengan rincian reject (RPT-04)
+// (GET /api/v1/procurement/reports/batch-costs)
+func (_ Unimplemented) GetBatchCostReport(w http.ResponseWriter, r *http.Request, params GetBatchCostReportParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
 // GetGoodsReceivedNotInvoiced Laporan Barang Diterima Belum Ditagih per PO/GR (S-209)
 // (GET /api/v1/procurement/reports/goods-received-not-invoiced)
 func (_ Unimplemented) GetGoodsReceivedNotInvoiced(w http.ResponseWriter, r *http.Request, params GetGoodsReceivedNotInvoicedParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetOutstandingPurchaseOrders Outstanding PO — qty belum diterima & diterima belum ditagih per baris (RPT-10)
+// (GET /api/v1/procurement/reports/outstanding-purchase-orders)
+func (_ Unimplemented) GetOutstandingPurchaseOrders(w http.ResponseWriter, r *http.Request, params GetOutstandingPurchaseOrdersParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetPayableAging Laporan Utang — umur utang per pemasok (RPT-11), direkonsiliasi ke akun 2101
+// (GET /api/v1/procurement/reports/payable-aging)
+func (_ Unimplemented) GetPayableAging(w http.ResponseWriter, r *http.Request, params GetPayableAgingParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -3598,6 +3872,65 @@ func (siw *ServerInterfaceWrapper) ListProcurementInboundLocations(w http.Respon
 	handler.ServeHTTP(w, r)
 }
 
+// GetBatchCostReport operation middleware
+func (siw *ServerInterfaceWrapper) GetBatchCostReport(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetBatchCostReportParams
+
+	// ------------- Required query parameter "dateFrom" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "dateFrom", r.URL.Query(), &params.DateFrom, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dateFrom"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dateFrom", Err: err})
+		}
+		return
+	}
+
+	// ------------- Required query parameter "dateTo" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "dateTo", r.URL.Query(), &params.DateTo, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dateTo"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dateTo", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "productId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "productId", r.URL.Query(), &params.ProductId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "productId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "productId", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetBatchCostReport(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // GetGoodsReceivedNotInvoiced operation middleware
 func (siw *ServerInterfaceWrapper) GetGoodsReceivedNotInvoiced(w http.ResponseWriter, r *http.Request) {
 
@@ -3648,6 +3981,72 @@ func (siw *ServerInterfaceWrapper) GetGoodsReceivedNotInvoiced(w http.ResponseWr
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetGoodsReceivedNotInvoiced(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetOutstandingPurchaseOrders operation middleware
+func (siw *ServerInterfaceWrapper) GetOutstandingPurchaseOrders(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetOutstandingPurchaseOrdersParams
+
+	// ------------- Optional query parameter "supplierId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "supplierId", r.URL.Query(), &params.SupplierId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "supplierId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "supplierId", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetOutstandingPurchaseOrders(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetPayableAging operation middleware
+func (siw *ServerInterfaceWrapper) GetPayableAging(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetPayableAgingParams
+
+	// ------------- Optional query parameter "asOf" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "asOf", r.URL.Query(), &params.AsOf, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "asOf"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "asOf", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetPayableAging(w, r, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -6178,6 +6577,15 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/api/v1/procurement/reports/goods-received-not-invoiced", wrapper.GetGoodsReceivedNotInvoiced)
 	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/procurement/reports/outstanding-purchase-orders", wrapper.GetOutstandingPurchaseOrders)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/procurement/reports/payable-aging", wrapper.GetPayableAging)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/procurement/reports/batch-costs", wrapper.GetBatchCostReport)
+	})
 
 	return r
 }
@@ -6578,6 +6986,45 @@ func (response ListProcurementInboundLocationsdefaultApplicationProblemPlusJSONR
 	return err
 }
 
+type GetBatchCostReportRequestObject struct {
+	Params GetBatchCostReportParams
+}
+
+type GetBatchCostReportResponseObject interface {
+	VisitGetBatchCostReportResponse(w http.ResponseWriter) error
+}
+
+type GetBatchCostReport200JSONResponse BatchCostReport
+
+func (response GetBatchCostReport200JSONResponse) VisitGetBatchCostReportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetBatchCostReportdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetBatchCostReportdefaultApplicationProblemPlusJSONResponse) VisitGetBatchCostReportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type GetGoodsReceivedNotInvoicedRequestObject struct {
 	Params GetGoodsReceivedNotInvoicedParams
 }
@@ -6606,6 +7053,84 @@ type GetGoodsReceivedNotInvoiceddefaultApplicationProblemPlusJSONResponse struct
 }
 
 func (response GetGoodsReceivedNotInvoiceddefaultApplicationProblemPlusJSONResponse) VisitGetGoodsReceivedNotInvoicedResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetOutstandingPurchaseOrdersRequestObject struct {
+	Params GetOutstandingPurchaseOrdersParams
+}
+
+type GetOutstandingPurchaseOrdersResponseObject interface {
+	VisitGetOutstandingPurchaseOrdersResponse(w http.ResponseWriter) error
+}
+
+type GetOutstandingPurchaseOrders200JSONResponse OutstandingPurchaseOrderReport
+
+func (response GetOutstandingPurchaseOrders200JSONResponse) VisitGetOutstandingPurchaseOrdersResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetOutstandingPurchaseOrdersdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetOutstandingPurchaseOrdersdefaultApplicationProblemPlusJSONResponse) VisitGetOutstandingPurchaseOrdersResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetPayableAgingRequestObject struct {
+	Params GetPayableAgingParams
+}
+
+type GetPayableAgingResponseObject interface {
+	VisitGetPayableAgingResponse(w http.ResponseWriter) error
+}
+
+type GetPayableAging200JSONResponse PayableAgingReport
+
+func (response GetPayableAging200JSONResponse) VisitGetPayableAgingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetPayableAgingdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetPayableAgingdefaultApplicationProblemPlusJSONResponse) VisitGetPayableAgingResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
@@ -8180,9 +8705,18 @@ type StrictServerInterface interface {
 	// ListProcurementInboundLocations Lokasi Inbound aktif untuk form Penerimaan Barang
 	// (GET /api/v1/procurement/inbound-locations)
 	ListProcurementInboundLocations(ctx context.Context, request ListProcurementInboundLocationsRequestObject) (ListProcurementInboundLocationsResponseObject, error)
+	// GetBatchCostReport Laporan HPP — komposisi HPP per SKU per batch dengan rincian reject (RPT-04)
+	// (GET /api/v1/procurement/reports/batch-costs)
+	GetBatchCostReport(ctx context.Context, request GetBatchCostReportRequestObject) (GetBatchCostReportResponseObject, error)
 	// GetGoodsReceivedNotInvoiced Laporan Barang Diterima Belum Ditagih per PO/GR (S-209)
 	// (GET /api/v1/procurement/reports/goods-received-not-invoiced)
 	GetGoodsReceivedNotInvoiced(ctx context.Context, request GetGoodsReceivedNotInvoicedRequestObject) (GetGoodsReceivedNotInvoicedResponseObject, error)
+	// GetOutstandingPurchaseOrders Outstanding PO — qty belum diterima & diterima belum ditagih per baris (RPT-10)
+	// (GET /api/v1/procurement/reports/outstanding-purchase-orders)
+	GetOutstandingPurchaseOrders(ctx context.Context, request GetOutstandingPurchaseOrdersRequestObject) (GetOutstandingPurchaseOrdersResponseObject, error)
+	// GetPayableAging Laporan Utang — umur utang per pemasok (RPT-11), direkonsiliasi ke akun 2101
+	// (GET /api/v1/procurement/reports/payable-aging)
+	GetPayableAging(ctx context.Context, request GetPayableAgingRequestObject) (GetPayableAgingResponseObject, error)
 	// ListReturnableReceipts Baris Penerimaan Barang PO yang masih bisa diretur (form Retur Pembelian)
 	// (GET /api/v1/procurement/returnable-receipts)
 	ListReturnableReceipts(ctx context.Context, request ListReturnableReceiptsRequestObject) (ListReturnableReceiptsResponseObject, error)
@@ -8623,6 +9157,32 @@ func (sh *strictHandler) ListProcurementInboundLocations(w http.ResponseWriter, 
 	}
 }
 
+// GetBatchCostReport operation middleware
+func (sh *strictHandler) GetBatchCostReport(w http.ResponseWriter, r *http.Request, params GetBatchCostReportParams) {
+	var request GetBatchCostReportRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetBatchCostReport(ctx, request.(GetBatchCostReportRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetBatchCostReport")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetBatchCostReportResponseObject); ok {
+		if err := validResponse.VisitGetBatchCostReportResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // GetGoodsReceivedNotInvoiced operation middleware
 func (sh *strictHandler) GetGoodsReceivedNotInvoiced(w http.ResponseWriter, r *http.Request, params GetGoodsReceivedNotInvoicedParams) {
 	var request GetGoodsReceivedNotInvoicedRequestObject
@@ -8642,6 +9202,58 @@ func (sh *strictHandler) GetGoodsReceivedNotInvoiced(w http.ResponseWriter, r *h
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(GetGoodsReceivedNotInvoicedResponseObject); ok {
 		if err := validResponse.VisitGetGoodsReceivedNotInvoicedResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetOutstandingPurchaseOrders operation middleware
+func (sh *strictHandler) GetOutstandingPurchaseOrders(w http.ResponseWriter, r *http.Request, params GetOutstandingPurchaseOrdersParams) {
+	var request GetOutstandingPurchaseOrdersRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetOutstandingPurchaseOrders(ctx, request.(GetOutstandingPurchaseOrdersRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetOutstandingPurchaseOrders")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetOutstandingPurchaseOrdersResponseObject); ok {
+		if err := validResponse.VisitGetOutstandingPurchaseOrdersResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetPayableAging operation middleware
+func (sh *strictHandler) GetPayableAging(w http.ResponseWriter, r *http.Request, params GetPayableAgingParams) {
+	var request GetPayableAgingRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetPayableAging(ctx, request.(GetPayableAgingRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetPayableAging")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetPayableAgingResponseObject); ok {
+		if err := validResponse.VisitGetPayableAgingResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

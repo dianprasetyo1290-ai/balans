@@ -1,0 +1,92 @@
+stockCountVariances:
+  get:
+    operationId: getStockCountVarianceReport
+    tags: [warehouse]
+    summary: Laporan Stock Count — hasil hitung & selisih (RPT-03)
+    description: Butuh `warehouse.stock_count.read` atau `accounting.report.read`.
+    parameters:
+      - name: dateFrom
+        in: query
+        required: true
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+      - name: dateTo
+        in: query
+        required: true
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+      - name: locationId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: productId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: varianceOnly
+        in: query
+        schema:
+          type: boolean
+          default: false
+    responses:
+      "200":
+        description: Hasil stock count
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StockCountVarianceReport"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+components:
+  schemas:
+    StockCountVarianceRow:
+      type: object
+      required: [stockCountId, number, countType, businessDate, status, locationCode, locationName, sku, productName, batchNumber, systemQty, varianceQty, varianceAmount, isExtra]
+      properties:
+        stockCountId:
+          type: string
+          format: uuid
+        number:
+          type: string
+        countType:
+          type: string
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        status:
+          type: string
+        locationCode:
+          type: string
+        locationName:
+          type: string
+        sku:
+          type: string
+        productName:
+          type: string
+        batchNumber:
+          type: string
+        systemQty:
+          type: string
+        countedQty:
+          type: string
+        varianceQty:
+          type: string
+        varianceAmount:
+          $ref: "../components/common.yaml#/Money"
+        isExtra:
+          type: boolean
+    StockCountVarianceReport:
+      type: object
+      required: [items, totalVarianceAmount, totalShortageAmount, totalOverageAmount]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/StockCountVarianceRow"
+        totalVarianceAmount:
+          $ref: "../components/common.yaml#/Money"
+        totalShortageAmount:
+          $ref: "../components/common.yaml#/Money"
+        totalOverageAmount:
+          $ref: "../components/common.yaml#/Money"

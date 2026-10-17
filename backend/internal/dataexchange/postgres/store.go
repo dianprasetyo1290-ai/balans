@@ -76,10 +76,14 @@ func toImportJob(r sqlcgen.ImportJob) domain.ImportJob {
 }
 
 func toExportJob(r sqlcgen.ExportJob) domain.ExportJob {
+	params := map[string]string{}
+	if len(r.Params) > 0 {
+		_ = json.Unmarshal(r.Params, &params) // kolom jsonb selalu objek string (ditulis InsertExportJob)
+	}
 	return domain.ExportJob{
 		ID: r.ID, Kind: r.Kind, Status: domain.ExportStatus(r.Status), TotalRows: int(r.TotalRows),
 		FileID: ptrUUID(r.FileID), FileName: r.FileName, Message: r.Message, CompletedAt: r.CompletedAt,
-		CreatedBy: r.CreatedBy, CreatedAt: r.CreatedAt, UpdatedAt: r.UpdatedAt, Version: int(r.Version),
+		Params: params, CreatedBy: r.CreatedBy, CreatedAt: r.CreatedAt, UpdatedAt: r.UpdatedAt, Version: int(r.Version),
 	}
 }
 
@@ -264,8 +268,15 @@ func (s *Store) SetRowErrors(ctx context.Context, jobID uuid.UUID, row int, errs
 }
 
 // InsertExportJob mencatat permintaan ekspor.
-func (s *Store) InsertExportJob(ctx context.Context, kind string, actorID uuid.UUID) (domain.ExportJob, error) {
-	r, err := s.q(ctx).InsertExportJob(ctx, sqlcgen.InsertExportJobParams{Kind: kind, ActorID: actorID})
+func (s *Store) InsertExportJob(ctx context.Context, kind string, params map[string]string, actorID uuid.UUID) (domain.ExportJob, error) {
+	if params == nil {
+		params = map[string]string{}
+	}
+	raw, err := json.Marshal(params)
+	if err != nil {
+		return domain.ExportJob{}, fmt.Errorf("marshal export params: %w", err)
+	}
+	r, err := s.q(ctx).InsertExportJob(ctx, sqlcgen.InsertExportJobParams{Kind: kind, Params: raw, ActorID: actorID})
 	if err != nil {
 		return domain.ExportJob{}, fmt.Errorf("insert export job: %w", err)
 	}

@@ -200,7 +200,7 @@ func (h *DataExchangeHandler) ListExportJobs(ctx context.Context, req ListExport
 
 // CreateExportJob memulai ekspor.
 func (h *DataExchangeHandler) CreateExportJob(ctx context.Context, req CreateExportJobRequestObject) (CreateExportJobResponseObject, error) {
-	j, err := h.svc.CreateExport(ctx, req.Body.Kind)
+	j, err := h.svc.CreateExport(ctx, req.Body.Kind, derefParams(req.Body.Params))
 	if err != nil {
 		return nil, err
 	}
@@ -223,4 +223,11 @@ func (h *DataExchangeHandler) GetExportJobDownloadUrl(ctx context.Context, req G
 		return nil, err
 	}
 	return GetExportJobDownloadUrl200JSONResponse{Url: url, ExpiresAt: exp}, nil
+}
+
+func derefParams(p *map[string]string) map[string]string {
+	if p == nil {
+		return nil
+	}
+	return *p
 }

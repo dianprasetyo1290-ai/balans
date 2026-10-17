@@ -36,6 +36,7 @@ import (
 	"balans/internal/platform/pii"
 	"balans/internal/platform/webhook"
 	"balans/internal/pricing"
+	"balans/internal/procurement"
 	"balans/internal/sales"
 	"balans/internal/system"
 	"balans/internal/warehouse"
@@ -69,6 +70,7 @@ type App struct {
 	notification *notification.Module
 	dataexchange *dataexchange.Module
 	sales        *sales.Module
+	procurement  *procurement.Module
 	cipher       *pii.Cipher
 	modules      []module
 	console      *mockconsole.Console
@@ -241,6 +243,7 @@ func (a *App) buildModules() error {
 	if gateway != nil {
 		console.Payments = gateway
 	}
+	a.connectReports()
 	if cfg.IsEnabled(logistics.Name) {
 		if cfg.ShipmentProvider != config.ProviderMock {
 			return providerNotAvailable("SHIPMENT_PROVIDER", cfg.ShipmentProvider)

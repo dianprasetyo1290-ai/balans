@@ -1,0 +1,234 @@
+outstandingPurchaseOrders:
+  get:
+    operationId: getOutstandingPurchaseOrders
+    tags: [procurement]
+    summary: Outstanding PO — qty belum diterima & diterima belum ditagih per baris (RPT-10)
+    description: Butuh `procurement.purchase_order.read`, `procurement.supplier_bill.read`, atau `accounting.report.read`.
+    parameters:
+      - name: supplierId
+        in: query
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Outstanding PO
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OutstandingPurchaseOrderReport"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+payableAging:
+  get:
+    operationId: getPayableAging
+    tags: [procurement]
+    summary: Laporan Utang — umur utang per pemasok (RPT-11), direkonsiliasi ke akun 2101
+    parameters:
+      - name: asOf
+        in: query
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+    responses:
+      "200":
+        description: Umur utang
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PayableAgingReport"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+batchCosts:
+  get:
+    operationId: getBatchCostReport
+    tags: [procurement]
+    summary: Laporan HPP — komposisi HPP per SKU per batch dengan rincian reject (RPT-04)
+    parameters:
+      - name: dateFrom
+        in: query
+        required: true
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+      - name: dateTo
+        in: query
+        required: true
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+      - name: productId
+        in: query
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Komposisi HPP batch
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BatchCostReport"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+components:
+  schemas:
+    OutstandingPurchaseOrderLine:
+      type: object
+      required: [purchaseOrderId, number, orderType, supplierName, orderDate, expectedDate, status, lineNo, item, orderedQty, receivedQty, billedQty, openQty, unbilledQty, unitPrice, openValue]
+      properties:
+        purchaseOrderId:
+          type: string
+          format: uuid
+        number:
+          type: string
+        orderType:
+          $ref: "../components/common.yaml#/PurchaseOrderType"
+        supplierName:
+          type: string
+        orderDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        expectedDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        status:
+          type: string
+        lineNo:
+          type: integer
+        item:
+          type: string
+        orderedQty:
+          type: string
+        receivedQty:
+          type: string
+        billedQty:
+          type: string
+        openQty:
+          type: string
+        unbilledQty:
+          type: string
+        unitPrice:
+          $ref: "../components/common.yaml#/Money"
+        openValue:
+          $ref: "../components/common.yaml#/Money"
+    OutstandingPurchaseOrderReport:
+      type: object
+      required: [asOf, items, totalOpenValue]
+      properties:
+        asOf:
+          $ref: "../components/common.yaml#/BusinessDate"
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OutstandingPurchaseOrderLine"
+        totalOpenValue:
+          $ref: "../components/common.yaml#/Money"
+    PayableAgingAmounts:
+      type: object
+      required: [current, d1To30, d31To60, d61To90, over90, total]
+      properties:
+        current:
+          $ref: "../components/common.yaml#/Money"
+        d1To30:
+          $ref: "../components/common.yaml#/Money"
+        d31To60:
+          $ref: "../components/common.yaml#/Money"
+        d61To90:
+          $ref: "../components/common.yaml#/Money"
+        over90:
+          $ref: "../components/common.yaml#/Money"
+        total:
+          $ref: "../components/common.yaml#/Money"
+    PayableAgingDocument:
+      type: object
+      required: [documentType, documentNumber, businessDate, dueDate, amount, open]
+      properties:
+        documentType:
+          type: string
+          enum: [supplier_bill, debit_note]
+        documentNumber:
+          type: string
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        dueDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        amount:
+          $ref: "../components/common.yaml#/Money"
+        open:
+          $ref: "../components/common.yaml#/Money"
+    PayableAgingSupplier:
+      type: object
+      required: [supplierId, supplierCode, supplierName, amounts, documents]
+      properties:
+        supplierId:
+          type: string
+          format: uuid
+        supplierCode:
+          type: string
+        supplierName:
+          type: string
+        amounts:
+          $ref: "#/components/schemas/PayableAgingAmounts"
+        documents:
+          type: array
+          items:
+            $ref: "#/components/schemas/PayableAgingDocument"
+    PayableAgingReport:
+      type: object
+      required: [asOf, items, totals, ledgerBalance, difference]
+      properties:
+        asOf:
+          $ref: "../components/common.yaml#/BusinessDate"
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/PayableAgingSupplier"
+        totals:
+          $ref: "#/components/schemas/PayableAgingAmounts"
+        ledgerBalance:
+          $ref: "../components/common.yaml#/Money"
+        difference:
+          $ref: "../components/common.yaml#/Money"
+          description: Saldo akun 2101 dikurangi total utang terbuka (harus nol).
+    BatchCostRow:
+      type: object
+      required: [receiptId, receiptNumber, businessDate, supplierName, orderType, sku, productName, batchNumber, goodQty, rejectQty, rejectDisposition, unitPrice, serviceAmount, materialCost, inventoryAmount, unitCost]
+      properties:
+        receiptId:
+          type: string
+          format: uuid
+        receiptNumber:
+          type: string
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        supplierName:
+          type: string
+        orderType:
+          $ref: "../components/common.yaml#/PurchaseOrderType"
+        sku:
+          type: string
+        productName:
+          type: string
+        batchNumber:
+          type: string
+        goodQty:
+          type: string
+        rejectQty:
+          type: string
+        rejectDisposition:
+          type: string
+          enum: [return_to_supplier, absorbed]
+        unitPrice:
+          $ref: "../components/common.yaml#/Money"
+        serviceAmount:
+          $ref: "../components/common.yaml#/Money"
+        materialCost:
+          $ref: "../components/common.yaml#/Money"
+        inventoryAmount:
+          $ref: "../components/common.yaml#/Money"
+        unitCost:
+          type: string
+    BatchCostReport:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/BatchCostRow"

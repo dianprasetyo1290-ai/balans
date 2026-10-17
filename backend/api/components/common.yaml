@@ -72,6 +72,14 @@ SalesDocumentStatus:
   type: string
   description: Status Sales Order, Proforma Invoice, Invoice, dan pembayaran pelanggan (Desain Status Dokumen 1).
   enum: [draft, pending_approval, awaiting_payment, partially_paid, paid, in_progress, in_transit, completed, cancelled, expired, posted]
+ReportRowKind:
+  type: string
+  description: Jenis baris laporan (judul bagian, subjudul akun induk, akun, subtotal, total).
+  enum: [section, group, account, subtotal, total]
+ReportGroupBy:
+  type: string
+  description: Pengelompokan laporan penjualan & margin (RPT-05, RPT-15).
+  enum: [channel, sub_channel, product, category, month, day]
 VersionInput:
   type: object
   required: [version]

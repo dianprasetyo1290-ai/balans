@@ -53,6 +53,13 @@ type Exporter interface {
 	Export(ctx context.Context, emit func(tabular.Row) error) error
 }
 
+// ParamExporter opsional: ekspor laporan dengan parameter (periode, filter) yang disimpan di job.
+// ValidateParams dipanggil saat job dibuat sehingga parameter salah langsung ditolak (VALIDATION_FAILED).
+type ParamExporter interface {
+	ValidateParams(params map[string]string) error
+	ExportWith(ctx context.Context, params map[string]string, emit func(tabular.Row) error) error
+}
+
 type rowKeyCtx struct{}
 
 // RowKey adalah kunci idempotensi baris: ID job + nomor baris. Kosong di luar job impor.
@@ -112,7 +119,7 @@ type store interface {
 	ValidRowNumbers(ctx context.Context, jobID uuid.UUID) (map[int]bool, error)
 	SetRowErrors(ctx context.Context, jobID uuid.UUID, row int, errs []domain.RowError) error
 
-	InsertExportJob(ctx context.Context, kind string, actorID uuid.UUID) (domain.ExportJob, error)
+	InsertExportJob(ctx context.Context, kind string, params map[string]string, actorID uuid.UUID) (domain.ExportJob, error)
 	GetExportJob(ctx context.Context, id uuid.UUID, forUpdate bool) (domain.ExportJob, error)
 	ListExportJobs(ctx context.Context, kinds []string, kind *string, page paging.Page) (paging.Result[domain.ExportJob], error)
 	SaveExportJob(ctx context.Context, j domain.ExportJob, now time.Time, actorID uuid.UUID) (domain.ExportJob, error)

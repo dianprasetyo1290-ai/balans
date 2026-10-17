@@ -235,22 +235,22 @@ func (e InternalUsageAction) Valid() bool {
 
 // Defines values for InternalUsagePurpose.
 const (
-	EmployeeSample InternalUsagePurpose = "employee_sample"
-	Event          InternalUsagePurpose = "event"
-	Marketing      InternalUsagePurpose = "marketing"
-	SalesSampling  InternalUsagePurpose = "sales_sampling"
+	InternalUsagePurposeEmployeeSample InternalUsagePurpose = "employee_sample"
+	InternalUsagePurposeEvent          InternalUsagePurpose = "event"
+	InternalUsagePurposeMarketing      InternalUsagePurpose = "marketing"
+	InternalUsagePurposeSalesSampling  InternalUsagePurpose = "sales_sampling"
 )
 
 // Valid indicates whether the value is a known member of the InternalUsagePurpose enum.
 func (e InternalUsagePurpose) Valid() bool {
 	switch e {
-	case EmployeeSample:
+	case InternalUsagePurposeEmployeeSample:
 		return true
-	case Event:
+	case InternalUsagePurposeEvent:
 		return true
-	case Marketing:
+	case InternalUsagePurposeMarketing:
 		return true
-	case SalesSampling:
+	case InternalUsagePurposeSalesSampling:
 		return true
 	default:
 		return false
@@ -464,6 +464,36 @@ func (e ReturnDispositionAction) Valid() bool {
 	}
 }
 
+// Defines values for StockExpiryRowBucket.
+const (
+	StockExpiryRowBucketD3190    StockExpiryRowBucket = "d31_90"
+	StockExpiryRowBucketD91180   StockExpiryRowBucket = "d91_180"
+	StockExpiryRowBucketExpired  StockExpiryRowBucket = "expired"
+	StockExpiryRowBucketNear     StockExpiryRowBucket = "near"
+	StockExpiryRowBucketNoExpiry StockExpiryRowBucket = "no_expiry"
+	StockExpiryRowBucketOver180  StockExpiryRowBucket = "over_180"
+)
+
+// Valid indicates whether the value is a known member of the StockExpiryRowBucket enum.
+func (e StockExpiryRowBucket) Valid() bool {
+	switch e {
+	case StockExpiryRowBucketD3190:
+		return true
+	case StockExpiryRowBucketD91180:
+		return true
+	case StockExpiryRowBucketExpired:
+		return true
+	case StockExpiryRowBucketNear:
+		return true
+	case StockExpiryRowBucketNoExpiry:
+		return true
+	case StockExpiryRowBucketOver180:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for StockMovementType.
 const (
 	Issue   StockMovementType = "issue"
@@ -524,6 +554,30 @@ func (e ListInternalUsageDimensionOptionsParamsKind) Valid() bool {
 	case Campaign:
 		return true
 	case Division:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for GetInternalUsageReportParamsPurpose.
+const (
+	GetInternalUsageReportParamsPurposeEmployeeSample GetInternalUsageReportParamsPurpose = "employee_sample"
+	GetInternalUsageReportParamsPurposeEvent          GetInternalUsageReportParamsPurpose = "event"
+	GetInternalUsageReportParamsPurposeMarketing      GetInternalUsageReportParamsPurpose = "marketing"
+	GetInternalUsageReportParamsPurposeSalesSampling  GetInternalUsageReportParamsPurpose = "sales_sampling"
+)
+
+// Valid indicates whether the value is a known member of the GetInternalUsageReportParamsPurpose enum.
+func (e GetInternalUsageReportParamsPurpose) Valid() bool {
+	switch e {
+	case GetInternalUsageReportParamsPurposeEmployeeSample:
+		return true
+	case GetInternalUsageReportParamsPurposeEvent:
+		return true
+	case GetInternalUsageReportParamsPurposeMarketing:
+		return true
+	case GetInternalUsageReportParamsPurposeSalesSampling:
 		return true
 	default:
 		return false
@@ -1055,6 +1109,39 @@ type InternalUsageList struct {
 // InternalUsagePurpose `marketing` Marketing, `event` Event, `employee_sample` Sampel Karyawan, `sales_sampling` Sampling Sales.
 type InternalUsagePurpose string
 
+// InternalUsageReport defines model for InternalUsageReport.
+type InternalUsageReport struct {
+	Items []InternalUsageReportRow `json:"items"`
+
+	// TotalCost Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	TotalCost Money `json:"totalCost"`
+}
+
+// InternalUsageReportRow defines model for InternalUsageReportRow.
+type InternalUsageReportRow struct {
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate `json:"businessDate"`
+	CampaignCode string       `json:"campaignCode"`
+	CampaignName string       `json:"campaignName"`
+	ConsumedQty  string       `json:"consumedQty"`
+
+	// Cost Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Cost         Money              `json:"cost"`
+	DivisionName string             `json:"divisionName"`
+	Number       string             `json:"number"`
+	Product      ReportProductRef   `json:"product"`
+	Purpose      string             `json:"purpose"`
+	Qty          string             `json:"qty"`
+	ReturnedQty  string             `json:"returnedQty"`
+	UsageId      openapi_types.UUID `json:"usageId"`
+}
+
 // InternalUsageSettleInput defines model for InternalUsageSettleInput.
 type InternalUsageSettleInput struct {
 	// Lines Qty sisa per baris; baris yang tidak dikirim berarti tanpa sisa.
@@ -1407,6 +1494,23 @@ type RepackingUpdate struct {
 	Version int `json:"version"`
 }
 
+// ReportLocationRef defines model for ReportLocationRef.
+type ReportLocationRef struct {
+	Code          string             `json:"code"`
+	Id            openapi_types.UUID `json:"id"`
+	Name          string             `json:"name"`
+	Type          string             `json:"type"`
+	WarehouseName string             `json:"warehouseName"`
+}
+
+// ReportProductRef defines model for ReportProductRef.
+type ReportProductRef struct {
+	Id   openapi_types.UUID `json:"id"`
+	Name string             `json:"name"`
+	Sku  string             `json:"sku"`
+	Uom  string             `json:"uom"`
+}
+
 // ReturnDisposition Disposisi barang retur (Disposisi Retur, WMS-07); dipakai master Alasan Retur dan dokumen Disposisi Retur.
 type ReturnDisposition string
 
@@ -1550,6 +1654,35 @@ type ReturnDispositionDocumentUpdate struct {
 
 	// Version Versi terakhir yang dilihat user (optimistic locking).
 	Version int `json:"version"`
+}
+
+// ReturnReport defines model for ReturnReport.
+type ReturnReport struct {
+	Items []ReturnReportRow `json:"items"`
+}
+
+// ReturnReportRow defines model for ReturnReportRow.
+type ReturnReportRow struct {
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate `json:"businessDate"`
+
+	// Cost Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Cost Money `json:"cost"`
+
+	// Disposition Disposisi barang retur (Disposisi Retur, WMS-07); dipakai master Alasan Retur dan dokumen Disposisi Retur.
+	Disposition   ReturnDisposition  `json:"disposition"`
+	DispositionId openapi_types.UUID `json:"dispositionId"`
+	Location      ReportLocationRef  `json:"location"`
+	Number        string             `json:"number"`
+	Product       ReportProductRef   `json:"product"`
+	QcNote        string             `json:"qcNote"`
+	Qty           string             `json:"qty"`
+	ReasonCode    string             `json:"reasonCode"`
+	ReasonName    string             `json:"reasonName"`
 }
 
 // StockBalance defines model for StockBalance.
@@ -1701,6 +1834,41 @@ type StockCardLine struct {
 	UnitCost UnitCost `json:"unitCost"`
 }
 
+// StockExpiryReport defines model for StockExpiryReport.
+type StockExpiryReport struct {
+	Items    []StockExpiryRow `json:"items"`
+	NearDays int              `json:"nearDays"`
+
+	// Today Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	Today BusinessDate `json:"today"`
+}
+
+// StockExpiryRow defines model for StockExpiryRow.
+type StockExpiryRow struct {
+	AgeDays      *int                 `json:"ageDays,omitempty"`
+	BatchNumber  string               `json:"batchNumber"`
+	Bucket       StockExpiryRowBucket `json:"bucket"`
+	DaysToExpiry *int                 `json:"daysToExpiry,omitempty"`
+
+	// ExpiryDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	ExpiryDate *BusinessDate     `json:"expiryDate,omitempty"`
+	Location   ReportLocationRef `json:"location"`
+	Product    ReportProductRef  `json:"product"`
+	Qty        string            `json:"qty"`
+
+	// Value Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Value Money `json:"value"`
+}
+
+// StockExpiryRowBucket defines model for StockExpiryRow.Bucket.
+type StockExpiryRowBucket string
+
 // StockLocationRef defines model for StockLocationRef.
 type StockLocationRef struct {
 	Code          string             `json:"code"`
@@ -1709,8 +1877,90 @@ type StockLocationRef struct {
 	WarehouseName *string            `json:"warehouseName,omitempty"`
 }
 
+// StockMovementReport defines model for StockMovementReport.
+type StockMovementReport struct {
+	// DateFrom Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	DateFrom BusinessDate `json:"dateFrom"`
+
+	// DateTo Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	DateTo BusinessDate       `json:"dateTo"`
+	Items  []StockMovementRow `json:"items"`
+}
+
+// StockMovementRow defines model for StockMovementRow.
+type StockMovementRow struct {
+	ClosingQty string `json:"closingQty"`
+
+	// ClosingValue Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	ClosingValue Money `json:"closingValue"`
+
+	// InValue Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	InValue    Money             `json:"inValue"`
+	IssueQty   string            `json:"issueQty"`
+	Location   ReportLocationRef `json:"location"`
+	MoveInQty  string            `json:"moveInQty"`
+	MoveOutQty string            `json:"moveOutQty"`
+	OpeningQty string            `json:"openingQty"`
+
+	// OpeningValue Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	OpeningValue Money `json:"openingValue"`
+
+	// OutValue Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	OutValue   Money            `json:"outValue"`
+	Product    ReportProductRef `json:"product"`
+	ReceiveQty string           `json:"receiveQty"`
+}
+
 // StockMovementType defines model for StockMovementType.
 type StockMovementType string
+
+// StockPositionReport defines model for StockPositionReport.
+type StockPositionReport struct {
+	ByLocationType []StockTypeTotal   `json:"byLocationType"`
+	Items          []StockPositionRow `json:"items"`
+	TotalQty       string             `json:"totalQty"`
+
+	// TotalValue Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	TotalValue Money `json:"totalValue"`
+}
+
+// StockPositionRow defines model for StockPositionRow.
+type StockPositionRow struct {
+	BatchId     *openapi_types.UUID `json:"batchId,omitempty"`
+	BatchNumber string              `json:"batchNumber"`
+
+	// ExpiryDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	ExpiryDate *BusinessDate `json:"expiryDate,omitempty"`
+
+	// FirstInDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	FirstInDate *BusinessDate     `json:"firstInDate,omitempty"`
+	Location    ReportLocationRef `json:"location"`
+	Product     ReportProductRef  `json:"product"`
+	Qty         string            `json:"qty"`
+
+	// Value Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Value Money `json:"value"`
+}
 
 // StockProductRef defines model for StockProductRef.
 type StockProductRef struct {
@@ -1727,6 +1977,17 @@ type StockQuantity = string
 
 // StockStatus `available` Tersedia, `quarantine` Karantina, `in_transit` Dalam Pengiriman, `reserved` Dialokasikan.
 type StockStatus string
+
+// StockTypeTotal defines model for StockTypeTotal.
+type StockTypeTotal struct {
+	LocationType string `json:"locationType"`
+	Qty          string `json:"qty"`
+
+	// Value Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Value Money `json:"value"`
+}
 
 // SuggestedBatch defines model for SuggestedBatch.
 type SuggestedBatch struct {
@@ -1775,6 +2036,25 @@ type Page = int
 
 // PageSize defines model for PageSize.
 type PageSize = int
+
+// ReportDateFrom Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+//
+// Example: 2026-10-19
+type ReportDateFrom = BusinessDate
+
+// ReportDateTo Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+//
+// Example: 2026-10-19
+type ReportDateTo = BusinessDate
+
+// ReportLocationId defines model for ReportLocationId.
+type ReportLocationId = openapi_types.UUID
+
+// ReportLocationType defines model for ReportLocationType.
+type ReportLocationType = string
+
+// ReportProductId defines model for ReportProductId.
+type ReportProductId = openapi_types.UUID
 
 // Search defines model for Search.
 type Search = string
@@ -1886,6 +2166,57 @@ type RunInternalUsageActionParams struct {
 type SettleInternalUsageParams struct {
 	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
 	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// GetInternalUsageReportParams defines parameters for GetInternalUsageReport.
+type GetInternalUsageReportParams struct {
+	DateFrom   ReportDateFrom                       `form:"dateFrom" json:"dateFrom"`
+	DateTo     ReportDateTo                         `form:"dateTo" json:"dateTo"`
+	Purpose    *GetInternalUsageReportParamsPurpose `form:"purpose,omitempty" json:"purpose,omitempty"`
+	CampaignId *openapi_types.UUID                  `form:"campaignId,omitempty" json:"campaignId,omitempty"`
+	DivisionId *openapi_types.UUID                  `form:"divisionId,omitempty" json:"divisionId,omitempty"`
+}
+
+// GetInternalUsageReportParamsPurpose defines parameters for GetInternalUsageReport.
+type GetInternalUsageReportParamsPurpose string
+
+// GetReturnReportParams defines parameters for GetReturnReport.
+type GetReturnReportParams struct {
+	DateFrom ReportDateFrom `form:"dateFrom" json:"dateFrom"`
+	DateTo   ReportDateTo   `form:"dateTo" json:"dateTo"`
+}
+
+// GetStockExpiryReportParams defines parameters for GetStockExpiryReport.
+type GetStockExpiryReportParams struct {
+	LocationId *ReportLocationId `form:"locationId,omitempty" json:"locationId,omitempty"`
+
+	// LocationType Jenis lokasi (mis. consignment, vending_buffer, toll_manufacturer).
+	LocationType *ReportLocationType `form:"locationType,omitempty" json:"locationType,omitempty"`
+	ProductId    *ReportProductId    `form:"productId,omitempty" json:"productId,omitempty"`
+
+	// WithinDays Hanya batch yang kedaluwarsa dalam N hari (termasuk yang sudah lewat); kosong = semua.
+	WithinDays *int `form:"withinDays,omitempty" json:"withinDays,omitempty"`
+}
+
+// GetStockMovementReportParams defines parameters for GetStockMovementReport.
+type GetStockMovementReportParams struct {
+	DateFrom   ReportDateFrom    `form:"dateFrom" json:"dateFrom"`
+	DateTo     ReportDateTo      `form:"dateTo" json:"dateTo"`
+	LocationId *ReportLocationId `form:"locationId,omitempty" json:"locationId,omitempty"`
+
+	// LocationType Jenis lokasi (mis. consignment, vending_buffer, toll_manufacturer).
+	LocationType *ReportLocationType `form:"locationType,omitempty" json:"locationType,omitempty"`
+	ProductId    *ReportProductId    `form:"productId,omitempty" json:"productId,omitempty"`
+}
+
+// GetStockPositionReportParams defines parameters for GetStockPositionReport.
+type GetStockPositionReportParams struct {
+	LocationId *ReportLocationId `form:"locationId,omitempty" json:"locationId,omitempty"`
+
+	// LocationType Jenis lokasi (mis. consignment, vending_buffer, toll_manufacturer).
+	LocationType *ReportLocationType `form:"locationType,omitempty" json:"locationType,omitempty"`
+	ProductId    *ReportProductId    `form:"productId,omitempty" json:"productId,omitempty"`
+	BatchId      *openapi_types.UUID `form:"batchId,omitempty" json:"batchId,omitempty"`
 }
 
 // ListRecostRunsParams defines parameters for ListRecostRuns.
@@ -2071,6 +2402,21 @@ type ServerInterface interface {
 	// SettleInternalUsage Mencatat sisa barang event (maks. H+1); sisa kembali ke Inbound berstatus Karantina
 	// (POST /api/v1/internal-usages/{id}/settle)
 	SettleInternalUsage(w http.ResponseWriter, r *http.Request, id Id, params SettleInternalUsageParams)
+	// GetInternalUsageReport Laporan Pemakaian Internal per kampanye, tujuan, divisi (RPT-08)
+	// (GET /api/v1/inventory/reports/internal-usage)
+	GetInternalUsageReport(w http.ResponseWriter, r *http.Request, params GetInternalUsageReportParams)
+	// GetReturnReport Laporan Retur — barang retur, alasan, dan tindak lanjut (disposisi) (RPT-09)
+	// (GET /api/v1/inventory/reports/returns)
+	GetReturnReport(w http.ResponseWriter, r *http.Request, params GetReturnReportParams)
+	// GetStockExpiryReport Laporan Kedaluwarsa — sisa umur simpan & umur stok per batch per lokasi (RPT-19)
+	// (GET /api/v1/inventory/reports/stock-expiry)
+	GetStockExpiryReport(w http.ResponseWriter, r *http.Request, params GetStockExpiryReportParams)
+	// GetStockMovementReport Laporan Mutasi Stok — saldo awal, masuk, keluar, pindah, saldo akhir per SKU × lokasi (RPT-02)
+	// (GET /api/v1/inventory/reports/stock-movements)
+	GetStockMovementReport(w http.ResponseWriter, r *http.Request, params GetStockMovementReportParams)
+	// GetStockPositionReport Laporan Stok — posisi & nilai per SKU, lokasi, batch (RPT-01)
+	// (GET /api/v1/inventory/reports/stock-position)
+	GetStockPositionReport(w http.ResponseWriter, r *http.Request, params GetStockPositionReportParams)
 	// ListRecostRuns Riwayat recost HPP akibat penerimaan bertanggal mundur (S-224)
 	// (GET /api/v1/recost-runs)
 	ListRecostRuns(w http.ResponseWriter, r *http.Request, params ListRecostRunsParams)
@@ -2221,6 +2567,36 @@ func (_ Unimplemented) RunInternalUsageAction(w http.ResponseWriter, r *http.Req
 // SettleInternalUsage Mencatat sisa barang event (maks. H+1); sisa kembali ke Inbound berstatus Karantina
 // (POST /api/v1/internal-usages/{id}/settle)
 func (_ Unimplemented) SettleInternalUsage(w http.ResponseWriter, r *http.Request, id Id, params SettleInternalUsageParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetInternalUsageReport Laporan Pemakaian Internal per kampanye, tujuan, divisi (RPT-08)
+// (GET /api/v1/inventory/reports/internal-usage)
+func (_ Unimplemented) GetInternalUsageReport(w http.ResponseWriter, r *http.Request, params GetInternalUsageReportParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetReturnReport Laporan Retur — barang retur, alasan, dan tindak lanjut (disposisi) (RPT-09)
+// (GET /api/v1/inventory/reports/returns)
+func (_ Unimplemented) GetReturnReport(w http.ResponseWriter, r *http.Request, params GetReturnReportParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetStockExpiryReport Laporan Kedaluwarsa — sisa umur simpan & umur stok per batch per lokasi (RPT-19)
+// (GET /api/v1/inventory/reports/stock-expiry)
+func (_ Unimplemented) GetStockExpiryReport(w http.ResponseWriter, r *http.Request, params GetStockExpiryReportParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetStockMovementReport Laporan Mutasi Stok — saldo awal, masuk, keluar, pindah, saldo akhir per SKU × lokasi (RPT-02)
+// (GET /api/v1/inventory/reports/stock-movements)
+func (_ Unimplemented) GetStockMovementReport(w http.ResponseWriter, r *http.Request, params GetStockMovementReportParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetStockPositionReport Laporan Stok — posisi & nilai per SKU, lokasi, batch (RPT-01)
+// (GET /api/v1/inventory/reports/stock-position)
+func (_ Unimplemented) GetStockPositionReport(w http.ResponseWriter, r *http.Request, params GetStockPositionReportParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -3318,6 +3694,366 @@ func (siw *ServerInterfaceWrapper) SettleInternalUsage(w http.ResponseWriter, r 
 	handler.ServeHTTP(w, r)
 }
 
+// GetInternalUsageReport operation middleware
+func (siw *ServerInterfaceWrapper) GetInternalUsageReport(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetInternalUsageReportParams
+
+	// ------------- Required query parameter "dateFrom" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "dateFrom", r.URL.Query(), &params.DateFrom, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dateFrom"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dateFrom", Err: err})
+		}
+		return
+	}
+
+	// ------------- Required query parameter "dateTo" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "dateTo", r.URL.Query(), &params.DateTo, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dateTo"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dateTo", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "purpose" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "purpose", r.URL.Query(), &params.Purpose, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "purpose"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "purpose", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "campaignId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "campaignId", r.URL.Query(), &params.CampaignId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "campaignId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "campaignId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "divisionId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "divisionId", r.URL.Query(), &params.DivisionId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "divisionId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "divisionId", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetInternalUsageReport(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetReturnReport operation middleware
+func (siw *ServerInterfaceWrapper) GetReturnReport(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetReturnReportParams
+
+	// ------------- Required query parameter "dateFrom" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "dateFrom", r.URL.Query(), &params.DateFrom, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dateFrom"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dateFrom", Err: err})
+		}
+		return
+	}
+
+	// ------------- Required query parameter "dateTo" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "dateTo", r.URL.Query(), &params.DateTo, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dateTo"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dateTo", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetReturnReport(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetStockExpiryReport operation middleware
+func (siw *ServerInterfaceWrapper) GetStockExpiryReport(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetStockExpiryReportParams
+
+	// ------------- Optional query parameter "locationId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "locationId", r.URL.Query(), &params.LocationId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "locationId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "locationId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "locationType" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "locationType", r.URL.Query(), &params.LocationType, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "locationType"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "locationType", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "productId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "productId", r.URL.Query(), &params.ProductId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "productId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "productId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "withinDays" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "withinDays", r.URL.Query(), &params.WithinDays, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "withinDays"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "withinDays", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetStockExpiryReport(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetStockMovementReport operation middleware
+func (siw *ServerInterfaceWrapper) GetStockMovementReport(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetStockMovementReportParams
+
+	// ------------- Required query parameter "dateFrom" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "dateFrom", r.URL.Query(), &params.DateFrom, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dateFrom"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dateFrom", Err: err})
+		}
+		return
+	}
+
+	// ------------- Required query parameter "dateTo" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "dateTo", r.URL.Query(), &params.DateTo, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dateTo"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dateTo", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "locationId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "locationId", r.URL.Query(), &params.LocationId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "locationId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "locationId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "locationType" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "locationType", r.URL.Query(), &params.LocationType, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "locationType"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "locationType", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "productId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "productId", r.URL.Query(), &params.ProductId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "productId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "productId", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetStockMovementReport(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetStockPositionReport operation middleware
+func (siw *ServerInterfaceWrapper) GetStockPositionReport(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetStockPositionReportParams
+
+	// ------------- Optional query parameter "locationId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "locationId", r.URL.Query(), &params.LocationId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "locationId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "locationId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "locationType" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "locationType", r.URL.Query(), &params.LocationType, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "locationType"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "locationType", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "productId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "productId", r.URL.Query(), &params.ProductId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "productId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "productId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "batchId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "batchId", r.URL.Query(), &params.BatchId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "batchId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "batchId", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetStockPositionReport(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // ListRecostRuns operation middleware
 func (siw *ServerInterfaceWrapper) ListRecostRuns(w http.ResponseWriter, r *http.Request) {
 
@@ -4239,6 +4975,21 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		r.Get(options.BaseURL+"/api/v1/stock-card", wrapper.GetStockCard)
 	})
 	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/inventory/reports/stock-position", wrapper.GetStockPositionReport)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/inventory/reports/stock-movements", wrapper.GetStockMovementReport)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/inventory/reports/stock-expiry", wrapper.GetStockExpiryReport)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/inventory/reports/internal-usage", wrapper.GetInternalUsageReport)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/inventory/reports/returns", wrapper.GetReturnReport)
+	})
+	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/api/v1/batches", wrapper.ListBatches)
 	})
 	r.Group(func(r chi.Router) {
@@ -5049,6 +5800,201 @@ func (response SettleInternalUsagedefaultApplicationProblemPlusJSONResponse) Vis
 	return err
 }
 
+type GetInternalUsageReportRequestObject struct {
+	Params GetInternalUsageReportParams
+}
+
+type GetInternalUsageReportResponseObject interface {
+	VisitGetInternalUsageReportResponse(w http.ResponseWriter) error
+}
+
+type GetInternalUsageReport200JSONResponse InternalUsageReport
+
+func (response GetInternalUsageReport200JSONResponse) VisitGetInternalUsageReportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetInternalUsageReportdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetInternalUsageReportdefaultApplicationProblemPlusJSONResponse) VisitGetInternalUsageReportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetReturnReportRequestObject struct {
+	Params GetReturnReportParams
+}
+
+type GetReturnReportResponseObject interface {
+	VisitGetReturnReportResponse(w http.ResponseWriter) error
+}
+
+type GetReturnReport200JSONResponse ReturnReport
+
+func (response GetReturnReport200JSONResponse) VisitGetReturnReportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetReturnReportdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetReturnReportdefaultApplicationProblemPlusJSONResponse) VisitGetReturnReportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetStockExpiryReportRequestObject struct {
+	Params GetStockExpiryReportParams
+}
+
+type GetStockExpiryReportResponseObject interface {
+	VisitGetStockExpiryReportResponse(w http.ResponseWriter) error
+}
+
+type GetStockExpiryReport200JSONResponse StockExpiryReport
+
+func (response GetStockExpiryReport200JSONResponse) VisitGetStockExpiryReportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetStockExpiryReportdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetStockExpiryReportdefaultApplicationProblemPlusJSONResponse) VisitGetStockExpiryReportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetStockMovementReportRequestObject struct {
+	Params GetStockMovementReportParams
+}
+
+type GetStockMovementReportResponseObject interface {
+	VisitGetStockMovementReportResponse(w http.ResponseWriter) error
+}
+
+type GetStockMovementReport200JSONResponse StockMovementReport
+
+func (response GetStockMovementReport200JSONResponse) VisitGetStockMovementReportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetStockMovementReportdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetStockMovementReportdefaultApplicationProblemPlusJSONResponse) VisitGetStockMovementReportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetStockPositionReportRequestObject struct {
+	Params GetStockPositionReportParams
+}
+
+type GetStockPositionReportResponseObject interface {
+	VisitGetStockPositionReportResponse(w http.ResponseWriter) error
+}
+
+type GetStockPositionReport200JSONResponse StockPositionReport
+
+func (response GetStockPositionReport200JSONResponse) VisitGetStockPositionReportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetStockPositionReportdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetStockPositionReportdefaultApplicationProblemPlusJSONResponse) VisitGetStockPositionReportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type ListRecostRunsRequestObject struct {
 	Params ListRecostRunsParams
 }
@@ -5624,6 +6570,21 @@ type StrictServerInterface interface {
 	// SettleInternalUsage Mencatat sisa barang event (maks. H+1); sisa kembali ke Inbound berstatus Karantina
 	// (POST /api/v1/internal-usages/{id}/settle)
 	SettleInternalUsage(ctx context.Context, request SettleInternalUsageRequestObject) (SettleInternalUsageResponseObject, error)
+	// GetInternalUsageReport Laporan Pemakaian Internal per kampanye, tujuan, divisi (RPT-08)
+	// (GET /api/v1/inventory/reports/internal-usage)
+	GetInternalUsageReport(ctx context.Context, request GetInternalUsageReportRequestObject) (GetInternalUsageReportResponseObject, error)
+	// GetReturnReport Laporan Retur — barang retur, alasan, dan tindak lanjut (disposisi) (RPT-09)
+	// (GET /api/v1/inventory/reports/returns)
+	GetReturnReport(ctx context.Context, request GetReturnReportRequestObject) (GetReturnReportResponseObject, error)
+	// GetStockExpiryReport Laporan Kedaluwarsa — sisa umur simpan & umur stok per batch per lokasi (RPT-19)
+	// (GET /api/v1/inventory/reports/stock-expiry)
+	GetStockExpiryReport(ctx context.Context, request GetStockExpiryReportRequestObject) (GetStockExpiryReportResponseObject, error)
+	// GetStockMovementReport Laporan Mutasi Stok — saldo awal, masuk, keluar, pindah, saldo akhir per SKU × lokasi (RPT-02)
+	// (GET /api/v1/inventory/reports/stock-movements)
+	GetStockMovementReport(ctx context.Context, request GetStockMovementReportRequestObject) (GetStockMovementReportResponseObject, error)
+	// GetStockPositionReport Laporan Stok — posisi & nilai per SKU, lokasi, batch (RPT-01)
+	// (GET /api/v1/inventory/reports/stock-position)
+	GetStockPositionReport(ctx context.Context, request GetStockPositionReportRequestObject) (GetStockPositionReportResponseObject, error)
 	// ListRecostRuns Riwayat recost HPP akibat penerimaan bertanggal mundur (S-224)
 	// (GET /api/v1/recost-runs)
 	ListRecostRuns(ctx context.Context, request ListRecostRunsRequestObject) (ListRecostRunsResponseObject, error)
@@ -6229,6 +7190,136 @@ func (sh *strictHandler) SettleInternalUsage(w http.ResponseWriter, r *http.Requ
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(SettleInternalUsageResponseObject); ok {
 		if err := validResponse.VisitSettleInternalUsageResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetInternalUsageReport operation middleware
+func (sh *strictHandler) GetInternalUsageReport(w http.ResponseWriter, r *http.Request, params GetInternalUsageReportParams) {
+	var request GetInternalUsageReportRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetInternalUsageReport(ctx, request.(GetInternalUsageReportRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetInternalUsageReport")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetInternalUsageReportResponseObject); ok {
+		if err := validResponse.VisitGetInternalUsageReportResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetReturnReport operation middleware
+func (sh *strictHandler) GetReturnReport(w http.ResponseWriter, r *http.Request, params GetReturnReportParams) {
+	var request GetReturnReportRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetReturnReport(ctx, request.(GetReturnReportRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetReturnReport")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetReturnReportResponseObject); ok {
+		if err := validResponse.VisitGetReturnReportResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetStockExpiryReport operation middleware
+func (sh *strictHandler) GetStockExpiryReport(w http.ResponseWriter, r *http.Request, params GetStockExpiryReportParams) {
+	var request GetStockExpiryReportRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetStockExpiryReport(ctx, request.(GetStockExpiryReportRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetStockExpiryReport")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetStockExpiryReportResponseObject); ok {
+		if err := validResponse.VisitGetStockExpiryReportResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetStockMovementReport operation middleware
+func (sh *strictHandler) GetStockMovementReport(w http.ResponseWriter, r *http.Request, params GetStockMovementReportParams) {
+	var request GetStockMovementReportRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetStockMovementReport(ctx, request.(GetStockMovementReportRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetStockMovementReport")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetStockMovementReportResponseObject); ok {
+		if err := validResponse.VisitGetStockMovementReportResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetStockPositionReport operation middleware
+func (sh *strictHandler) GetStockPositionReport(w http.ResponseWriter, r *http.Request, params GetStockPositionReportParams) {
+	var request GetStockPositionReportRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetStockPositionReport(ctx, request.(GetStockPositionReportRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetStockPositionReport")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetStockPositionReportResponseObject); ok {
+		if err := validResponse.VisitGetStockPositionReportResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

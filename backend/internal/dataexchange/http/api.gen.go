@@ -310,6 +310,9 @@ type ExportJobStatus string
 // ExportJobInput defines model for ExportJobInput.
 type ExportJobInput struct {
 	Kind string `json:"kind"`
+
+	// Params Parameter ekspor laporan (mis. dateFrom, dateTo, locationId); diabaikan untuk ekspor master.
+	Params *map[string]string `json:"params,omitempty"`
 }
 
 // ExportJobList defines model for ExportJobList.

@@ -42,6 +42,7 @@ func (a *App) buildProcurement(mailer *notification.Module) error {
 	// tanpa approval (D-24, PRC-05).
 	a.warehouse.RegisterInboundHandler(warehouse.SourceGoodsReceipt, receiptQCHandler(m, a.Clock))
 	registerAuditEntities(a.audit, procurement.AuditEntities())
+	a.procurement = m
 	a.modules = append(a.modules, m)
 	return nil
 }

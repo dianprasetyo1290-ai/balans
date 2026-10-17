@@ -97,6 +97,9 @@ type ProductRef struct {
 	IsActive   bool
 	Deleted    bool
 	Components []domain.ComponentQty
+	// CategoryID/CategoryName: kategori katalog untuk laporan margin per kategori (RPT-15).
+	CategoryID   *uuid.UUID
+	CategoryName string
 }
 
 // Label mengembalikan "SKU – nama".

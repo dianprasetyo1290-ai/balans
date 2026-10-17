@@ -6,6 +6,7 @@ package accounting
 import (
 	"context"
 	"log/slog"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
@@ -115,19 +116,22 @@ type Deps struct {
 
 // Module adalah modul accounting.
 type Module struct {
-	svc *service.Service
-	rs  *httpx.Responder
-	h   *accountinghttp.AccountingHandler
+	svc     *service.Service
+	reports *service.ReportService
+	rs      *httpx.Responder
+	h       *accountinghttp.AccountingHandler
 }
 
 var _ Poster = (*Module)(nil)
 
 // New menyusun modul.
 func New(d Deps) *Module {
+	store := postgres.NewStore(d.Pool)
 	svc := service.New(service.Deps{
-		Store: postgres.NewStore(d.Pool), Tx: d.Tx, Numberer: d.Numberer, Audit: d.Audit, Clock: d.Clock, Log: d.Log,
+		Store: store, Tx: d.Tx, Numberer: d.Numberer, Audit: d.Audit, Clock: d.Clock, Log: d.Log,
 	})
-	return &Module{svc: svc, rs: d.Responder, h: accountinghttp.NewHandler(svc)}
+	reports := service.NewReportService(store, d.Tx, d.Clock, svc.DimensionLabels)
+	return &Module{svc: svc, reports: reports, rs: d.Responder, h: accountinghttp.NewHandler(svc).WithReports(reports)}
 }
 
 // Name mengembalikan nama modul.
@@ -139,6 +143,7 @@ func (m *Module) RegisterRoutes(r chi.Router) { accountinghttp.Register(r, m.h, 
 // RegisterWorkers mendaftarkan worker pembuatan periode.
 func (m *Module) RegisterWorkers(w *river.Workers) {
 	river.AddWorker(w, service.NewEnsurePeriodsWorker(m.svc))
+	river.AddWorker(w, service.NewRefreshReadModelsWorker(m.reports))
 }
 
 // PeriodicJobs menjadwalkan accounting.ensure_fiscal_periods harian 00.05 WIB, juga saat worker mulai.
@@ -147,6 +152,9 @@ func (m *Module) PeriodicJobs() []*river.PeriodicJob {
 		river.NewPeriodicJob(jobqueue.DailyAt{Hour: 0, Minute: 5},
 			func() (river.JobArgs, *river.InsertOpts) { return service.EnsurePeriodsArgs{}, nil },
 			&river.PeriodicJobOpts{ID: service.EnsurePeriodsArgs{}.Kind(), RunOnStart: true}),
+		river.NewPeriodicJob(river.PeriodicInterval(readModelInterval),
+			func() (river.JobArgs, *river.InsertOpts) { return service.RefreshReadModelsArgs{}, nil },
+			&river.PeriodicJobOpts{ID: service.RefreshReadModelsArgs{}.Kind(), RunOnStart: true}),
 	}
 }
 
@@ -250,4 +258,57 @@ func (m *Module) ExportAccounts(ctx context.Context, emit func(tabular.Row) erro
 // Divisions mengembalikan seluruh divisi (termasuk nonaktif) tanpa cek permission (impor karyawan).
 func (m *Module) Divisions(ctx context.Context) ([]DimensionValue, error) {
 	return m.svc.Divisions(ctx)
+}
+
+// --- Read model & laporan (S-409, S-416 – S-418) ----------------------------------------------------
+
+// readModelInterval adalah jadwal job accounting.refresh_read_models (Lampiran B: tiap 15 menit).
+const readModelInterval = 15 * time.Minute
+
+// ReadModelRefresher me-refresh read model laporan milik modul lain.
+type ReadModelRefresher = service.ReadModelRefresher
+
+// RegisterReadModel mendaftarkan refresher read model modul lain (mis. `sales.sales_lines`) ke job
+// accounting.refresh_read_models. Dipanggil saat wiring.
+func (m *Module) RegisterReadModel(name string, fn ReadModelRefresher) { m.reports.RegisterReadModel(name, fn) }
+
+// RefreshReadModels me-refresh seluruh read model sekarang (job dan test); false = refresh lain sedang berjalan.
+func (m *Module) RefreshReadModels(ctx context.Context) (bool, error) { return m.reports.RefreshReadModels(ctx) }
+
+// ReadModelRefreshedAt mengembalikan waktu refresh terakhir read model (nil = belum pernah).
+func (m *Module) ReadModelRefreshedAt(ctx context.Context, name string) (*time.Time, error) {
+	return m.reports.RefreshedAt(ctx, name)
+}
+
+// StatementColumns, DimensionReportColumns, TaxReportColumns adalah kolom ekspor laporan.
+func StatementColumns() []tabular.Column       { return service.StatementColumns }
+func DimensionReportColumns() []tabular.Column { return service.DimensionColumns }
+func TaxReportColumns() []tabular.Column       { return service.TaxColumns }
+
+// ValidateStatementParams dan ExportStatement: ekspor Neraca/Laba Rugi/Arus Kas (params kind, dateFrom, dateTo).
+func (m *Module) ValidateStatementParams(p map[string]string) error {
+	return m.reports.ValidateStatementParams(p)
+}
+
+// ExportStatement mengalirkan baris laporan keuangan.
+func (m *Module) ExportStatement(ctx context.Context, p map[string]string, emit func(tabular.Row) error) error {
+	return m.reports.ExportStatement(ctx, p, emit)
+}
+
+// ValidateDimensionReportParams memeriksa parameter ekspor laba rugi per dimensi.
+func (m *Module) ValidateDimensionReportParams(p map[string]string) error {
+	return m.reports.ValidateDimensionParams(p)
+}
+
+// ExportDimensionReport mengalirkan laba rugi per dimensi (params dimension, dateFrom, dateTo).
+func (m *Module) ExportDimensionReport(ctx context.Context, p map[string]string, emit func(tabular.Row) error) error {
+	return m.reports.ExportDimensionProfitLoss(ctx, p, emit)
+}
+
+// ValidateTaxReportParams memeriksa parameter ekspor rekap pajak.
+func (m *Module) ValidateTaxReportParams(p map[string]string) error { return m.reports.ValidateTaxParams(p) }
+
+// ExportTaxReport mengalirkan rekap pajak per masa (params year).
+func (m *Module) ExportTaxReport(ctx context.Context, p map[string]string, emit func(tabular.Row) error) error {
+	return m.reports.ExportTax(ctx, p, emit)
 }

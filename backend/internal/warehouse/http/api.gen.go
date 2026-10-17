@@ -992,6 +992,53 @@ type StockCountSummary struct {
 // StockCountType `full` Penuh, `cycle` Cycle count, `consignment` Konsinyasi, `vending` Vending.
 type StockCountType string
 
+// StockCountVarianceReport defines model for StockCountVarianceReport.
+type StockCountVarianceReport struct {
+	Items []StockCountVarianceRow `json:"items"`
+
+	// TotalOverageAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	TotalOverageAmount Money `json:"totalOverageAmount"`
+
+	// TotalShortageAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	TotalShortageAmount Money `json:"totalShortageAmount"`
+
+	// TotalVarianceAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	TotalVarianceAmount Money `json:"totalVarianceAmount"`
+}
+
+// StockCountVarianceRow defines model for StockCountVarianceRow.
+type StockCountVarianceRow struct {
+	BatchNumber string `json:"batchNumber"`
+
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate       `json:"businessDate"`
+	CountType    string             `json:"countType"`
+	CountedQty   *string            `json:"countedQty,omitempty"`
+	IsExtra      bool               `json:"isExtra"`
+	LocationCode string             `json:"locationCode"`
+	LocationName string             `json:"locationName"`
+	Number       string             `json:"number"`
+	ProductName  string             `json:"productName"`
+	Sku          string             `json:"sku"`
+	Status       string             `json:"status"`
+	StockCountId openapi_types.UUID `json:"stockCountId"`
+	SystemQty    string             `json:"systemQty"`
+
+	// VarianceAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	VarianceAmount Money  `json:"varianceAmount"`
+	VarianceQty    string `json:"varianceQty"`
+}
+
 // StockInTransitLine defines model for StockInTransitLine.
 type StockInTransitLine struct {
 	Batch *WhBatchRef `json:"batch,omitempty"`
@@ -1489,6 +1536,15 @@ type ActOnStockTransferParams struct {
 	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
 }
 
+// GetStockCountVarianceReportParams defines parameters for GetStockCountVarianceReport.
+type GetStockCountVarianceReportParams struct {
+	DateFrom     BusinessDate        `form:"dateFrom" json:"dateFrom"`
+	DateTo       BusinessDate        `form:"dateTo" json:"dateTo"`
+	LocationId   *openapi_types.UUID `form:"locationId,omitempty" json:"locationId,omitempty"`
+	ProductId    *openapi_types.UUID `form:"productId,omitempty" json:"productId,omitempty"`
+	VarianceOnly *bool               `form:"varianceOnly,omitempty" json:"varianceOnly,omitempty"`
+}
+
 // ListWarehousesParams defines parameters for ListWarehouses.
 type ListWarehousesParams struct {
 	Page     *Page     `form:"page,omitempty" json:"page,omitempty"`
@@ -1635,6 +1691,9 @@ type ServerInterface interface {
 	// ActOnStockTransfer Aksi status transfer (submit, release, prepare, post, ship, receive, complete, cancel)
 	// (POST /api/v1/stock-transfers/{id}/actions)
 	ActOnStockTransfer(w http.ResponseWriter, r *http.Request, id Id, params ActOnStockTransferParams)
+	// GetStockCountVarianceReport Laporan Stock Count — hasil hitung & selisih (RPT-03)
+	// (GET /api/v1/warehouse/reports/stock-count-variances)
+	GetStockCountVarianceReport(w http.ResponseWriter, r *http.Request, params GetStockCountVarianceReportParams)
 	// ListWarehouses Daftar gudang fisik
 	// (GET /api/v1/warehouses)
 	ListWarehouses(w http.ResponseWriter, r *http.Request, params ListWarehousesParams)
@@ -1794,6 +1853,12 @@ func (_ Unimplemented) UpdateStockTransfer(w http.ResponseWriter, r *http.Reques
 // ActOnStockTransfer Aksi status transfer (submit, release, prepare, post, ship, receive, complete, cancel)
 // (POST /api/v1/stock-transfers/{id}/actions)
 func (_ Unimplemented) ActOnStockTransfer(w http.ResponseWriter, r *http.Request, id Id, params ActOnStockTransferParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetStockCountVarianceReport Laporan Stock Count — hasil hitung & selisih (RPT-03)
+// (GET /api/v1/warehouse/reports/stock-count-variances)
+func (_ Unimplemented) GetStockCountVarianceReport(w http.ResponseWriter, r *http.Request, params GetStockCountVarianceReportParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -3151,6 +3216,91 @@ func (siw *ServerInterfaceWrapper) ActOnStockTransfer(w http.ResponseWriter, r *
 	handler.ServeHTTP(w, r)
 }
 
+// GetStockCountVarianceReport operation middleware
+func (siw *ServerInterfaceWrapper) GetStockCountVarianceReport(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetStockCountVarianceReportParams
+
+	// ------------- Required query parameter "dateFrom" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "dateFrom", r.URL.Query(), &params.DateFrom, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dateFrom"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dateFrom", Err: err})
+		}
+		return
+	}
+
+	// ------------- Required query parameter "dateTo" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "dateTo", r.URL.Query(), &params.DateTo, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dateTo"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dateTo", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "locationId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "locationId", r.URL.Query(), &params.LocationId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "locationId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "locationId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "productId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "productId", r.URL.Query(), &params.ProductId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "productId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "productId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "varianceOnly" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "varianceOnly", r.URL.Query(), &params.VarianceOnly, runtime.BindQueryParameterOptions{Type: "boolean", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "varianceOnly"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "varianceOnly", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetStockCountVarianceReport(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // ListWarehouses operation middleware
 func (siw *ServerInterfaceWrapper) ListWarehouses(w http.ResponseWriter, r *http.Request) {
 
@@ -3678,6 +3828,9 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/api/v1/stock-count-schedules", wrapper.CreateStockCountSchedule)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/warehouse/reports/stock-count-variances", wrapper.GetStockCountVarianceReport)
 	})
 	r.Group(func(r chi.Router) {
 		r.Put(options.BaseURL+"/api/v1/stock-count-schedules/{id}", wrapper.UpdateStockCountSchedule)
@@ -4603,6 +4756,45 @@ func (response ActOnStockTransferdefaultApplicationProblemPlusJSONResponse) Visi
 	return err
 }
 
+type GetStockCountVarianceReportRequestObject struct {
+	Params GetStockCountVarianceReportParams
+}
+
+type GetStockCountVarianceReportResponseObject interface {
+	VisitGetStockCountVarianceReportResponse(w http.ResponseWriter) error
+}
+
+type GetStockCountVarianceReport200JSONResponse StockCountVarianceReport
+
+func (response GetStockCountVarianceReport200JSONResponse) VisitGetStockCountVarianceReportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetStockCountVarianceReportdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetStockCountVarianceReportdefaultApplicationProblemPlusJSONResponse) VisitGetStockCountVarianceReportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type ListWarehousesRequestObject struct {
 	Params ListWarehousesParams
 }
@@ -4907,6 +5099,9 @@ type StrictServerInterface interface {
 	// ActOnStockTransfer Aksi status transfer (submit, release, prepare, post, ship, receive, complete, cancel)
 	// (POST /api/v1/stock-transfers/{id}/actions)
 	ActOnStockTransfer(ctx context.Context, request ActOnStockTransferRequestObject) (ActOnStockTransferResponseObject, error)
+	// GetStockCountVarianceReport Laporan Stock Count — hasil hitung & selisih (RPT-03)
+	// (GET /api/v1/warehouse/reports/stock-count-variances)
+	GetStockCountVarianceReport(ctx context.Context, request GetStockCountVarianceReportRequestObject) (GetStockCountVarianceReportResponseObject, error)
 	// ListWarehouses Daftar gudang fisik
 	// (GET /api/v1/warehouses)
 	ListWarehouses(ctx context.Context, request ListWarehousesRequestObject) (ListWarehousesResponseObject, error)
@@ -5642,6 +5837,32 @@ func (sh *strictHandler) ActOnStockTransfer(w http.ResponseWriter, r *http.Reque
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(ActOnStockTransferResponseObject); ok {
 		if err := validResponse.VisitActOnStockTransferResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetStockCountVarianceReport operation middleware
+func (sh *strictHandler) GetStockCountVarianceReport(w http.ResponseWriter, r *http.Request, params GetStockCountVarianceReportParams) {
+	var request GetStockCountVarianceReportRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetStockCountVarianceReport(ctx, request.(GetStockCountVarianceReportRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetStockCountVarianceReport")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetStockCountVarianceReportResponseObject); ok {
+		if err := validResponse.VisitGetStockCountVarianceReportResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

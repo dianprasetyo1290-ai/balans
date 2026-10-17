@@ -1,0 +1,452 @@
+financialStatement:
+  get:
+    operationId: getFinancialStatement
+    tags: [accounting]
+    summary: Neraca, Laba Rugi, atau Arus Kas (S-409, RPT-12)
+    description: |
+      Disusun dari read model `rm_gl_daily` yang di-refresh job `accounting.refresh_read_models` tiap 15 menit
+      (lihat `refreshedAt`). Neraca memakai `dateTo` sebagai tanggal posisi (laba tahun berjalan sejak 1 Januari).
+      Laba Rugi boleh difilter per dimensi. Arus Kas metode tidak langsung. Butuh `accounting.report.read`.
+    parameters:
+      - name: kind
+        in: query
+        required: true
+        schema:
+          $ref: "#/components/schemas/StatementKind"
+      - name: dateFrom
+        in: query
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+      - name: dateTo
+        in: query
+        required: true
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+      - $ref: "#/components/parameters/ReportChannelId"
+      - $ref: "#/components/parameters/ReportSubChannelId"
+      - $ref: "#/components/parameters/ReportDivisionId"
+      - $ref: "#/components/parameters/ReportCampaignId"
+    responses:
+      "200":
+        description: Laporan keuangan
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FinancialStatement"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+profitLossByDimension:
+  get:
+    operationId: getProfitLossByDimension
+    tags: [accounting]
+    summary: Laba rugi per channel, sub-channel, divisi, atau kampanye (S-417, RPT-15)
+    description: |
+      Kolom per nilai dimensi; jurnal tanpa dimensi tersebut masuk kolom "Tanpa …" sehingga jumlah kolom sama dengan
+      Laba Rugi total. Butuh `accounting.report.read`.
+    parameters:
+      - name: dimension
+        in: query
+        required: true
+        schema:
+          $ref: "./accounting.yaml#/components/schemas/DimensionKind"
+      - name: dateFrom
+        in: query
+        required: true
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+      - name: dateTo
+        in: query
+        required: true
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+      - $ref: "#/components/parameters/ReportChannelId"
+    responses:
+      "200":
+        description: Laba rugi per dimensi
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DimensionProfitLoss"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+taxSummary:
+  get:
+    operationId: getTaxSummary
+    tags: [accounting]
+    summary: Rekap PPh dipotong, PPh Final, dan pemantauan omzet terhadap Rp4,8 M (S-416, RPT-18)
+    description: Butuh `accounting.report.read` atau `accounting.withholding.read`.
+    parameters:
+      - name: year
+        in: query
+        required: true
+        schema:
+          type: integer
+      - name: month
+        in: query
+        description: Masa (1–12) untuk rincian jurnal; kosong = tanpa rincian.
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Rekap pajak
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaxSummary"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+executiveDashboard:
+  get:
+    operationId: getExecutiveDashboard
+    tags: [accounting]
+    summary: Dashboard eksekutif dasar — penjualan, margin, stok, kas (S-418, RPT-14)
+    description: Dari materialized view yang di-refresh job. Butuh `accounting.report.read`.
+    parameters:
+      - name: dateFrom
+        in: query
+        required: true
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+      - name: dateTo
+        in: query
+        required: true
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+    responses:
+      "200":
+        description: Dashboard
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExecutiveDashboard"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+readModels:
+  get:
+    operationId: listReadModels
+    tags: [accounting]
+    summary: Waktu refresh terakhir read model laporan
+    responses:
+      "200":
+        description: Status read model
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReadModelStatus"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+readModelsRefresh:
+  post:
+    operationId: refreshReadModels
+    tags: [accounting]
+    summary: Perbarui data laporan sekarang (tanpa menunggu job 15 menit)
+    description: Butuh `accounting.report.read`, `inventory.stock.read`, `sales.sales_order.read`, atau `sales.invoice.read`.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    responses:
+      "200":
+        description: Status read model setelah refresh
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReadModelStatus"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+components:
+  parameters:
+    ReportChannelId:
+      name: channelId
+      in: query
+      schema:
+        type: string
+        format: uuid
+    ReportSubChannelId:
+      name: subChannelId
+      in: query
+      schema:
+        type: string
+        format: uuid
+    ReportDivisionId:
+      name: divisionId
+      in: query
+      schema:
+        type: string
+        format: uuid
+    ReportCampaignId:
+      name: campaignId
+      in: query
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    StatementKind:
+      type: string
+      enum: [balance_sheet, income_statement, cash_flow]
+    StatementRow:
+      type: object
+      required: [kind, label, level, amount]
+      properties:
+        kind:
+          $ref: "../components/common.yaml#/ReportRowKind"
+        code:
+          type: string
+          description: Kode akun (baris akun) untuk drill-down Buku Besar.
+        label:
+          type: string
+        level:
+          type: integer
+        amount:
+          $ref: "../components/common.yaml#/Money"
+    ProfitLossSummary:
+      type: object
+      required: [revenue, cogs, grossProfit, operatingExpense, operatingProfit, otherNet, netProfit, grossMarginPercent, netMarginPercent]
+      properties:
+        revenue:
+          $ref: "../components/common.yaml#/Money"
+        cogs:
+          $ref: "../components/common.yaml#/Money"
+        grossProfit:
+          $ref: "../components/common.yaml#/Money"
+        operatingExpense:
+          $ref: "../components/common.yaml#/Money"
+        operatingProfit:
+          $ref: "../components/common.yaml#/Money"
+        otherNet:
+          $ref: "../components/common.yaml#/Money"
+        netProfit:
+          $ref: "../components/common.yaml#/Money"
+        grossMarginPercent:
+          type: string
+        netMarginPercent:
+          type: string
+    FinancialStatement:
+      type: object
+      required: [kind, title, dateFrom, dateTo, rows, balanced, summary]
+      properties:
+        kind:
+          $ref: "#/components/schemas/StatementKind"
+        title:
+          type: string
+        dateFrom:
+          $ref: "../components/common.yaml#/BusinessDate"
+        dateTo:
+          $ref: "../components/common.yaml#/BusinessDate"
+        rows:
+          type: array
+          items:
+            $ref: "#/components/schemas/StatementRow"
+        balanced:
+          type: boolean
+          description: Neraca seimbang / kenaikan kas = mutasi akun Kas & Bank.
+        summary:
+          $ref: "#/components/schemas/ProfitLossSummary"
+        refreshedAt:
+          type: string
+          format: date-time
+    DimensionColumn:
+      type: object
+      required: [code, name, summary]
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Kosong = jurnal tanpa dimensi ini.
+        code:
+          type: string
+        name:
+          type: string
+        summary:
+          $ref: "#/components/schemas/ProfitLossSummary"
+    DimensionAccountRow:
+      type: object
+      required: [accountCode, accountName, group, amounts, total]
+      properties:
+        accountCode:
+          type: string
+        accountName:
+          type: string
+        group:
+          type: integer
+        amounts:
+          type: array
+          items:
+            $ref: "../components/common.yaml#/Money"
+        total:
+          $ref: "../components/common.yaml#/Money"
+    DimensionProfitLoss:
+      type: object
+      required: [dimension, dateFrom, dateTo, columns, accounts, total]
+      properties:
+        dimension:
+          $ref: "./accounting.yaml#/components/schemas/DimensionKind"
+        dateFrom:
+          $ref: "../components/common.yaml#/BusinessDate"
+        dateTo:
+          $ref: "../components/common.yaml#/BusinessDate"
+        columns:
+          type: array
+          items:
+            $ref: "#/components/schemas/DimensionColumn"
+        accounts:
+          type: array
+          items:
+            $ref: "#/components/schemas/DimensionAccountRow"
+        total:
+          $ref: "#/components/schemas/ProfitLossSummary"
+        refreshedAt:
+          type: string
+          format: date-time
+    TaxMonth:
+      type: object
+      required: [month, pph21Withheld, pph23Withheld, pph42Withheld, withholdingPaid, finalTax, finalTaxPaid, turnover, cumulativeTurnover]
+      properties:
+        month:
+          $ref: "../components/common.yaml#/BusinessDate"
+        pph21Withheld:
+          $ref: "../components/common.yaml#/Money"
+        pph23Withheld:
+          $ref: "../components/common.yaml#/Money"
+        pph42Withheld:
+          $ref: "../components/common.yaml#/Money"
+        withholdingPaid:
+          $ref: "../components/common.yaml#/Money"
+        finalTax:
+          $ref: "../components/common.yaml#/Money"
+        finalTaxPaid:
+          $ref: "../components/common.yaml#/Money"
+        turnover:
+          $ref: "../components/common.yaml#/Money"
+        cumulativeTurnover:
+          $ref: "../components/common.yaml#/Money"
+    TaxJournalLine:
+      type: object
+      required: [entryId, businessDate, number, sourceType, sourceLabel, description, accountCode, accountName, debit, credit]
+      properties:
+        entryId:
+          type: string
+          format: uuid
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        number:
+          type: string
+        sourceType:
+          type: string
+        sourceLabel:
+          type: string
+        description:
+          type: string
+        accountCode:
+          type: string
+        accountName:
+          type: string
+        debit:
+          $ref: "../components/common.yaml#/Money"
+        credit:
+          $ref: "../components/common.yaml#/Money"
+    TaxSummary:
+      type: object
+      required: [year, months, turnover, limit, usedPercent, warning, limitExceeded, lines]
+      properties:
+        year:
+          type: integer
+        months:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaxMonth"
+        turnover:
+          $ref: "../components/common.yaml#/Money"
+        limit:
+          $ref: "../components/common.yaml#/Money"
+        usedPercent:
+          type: string
+        warning:
+          type: boolean
+          description: Omzet kumulatif ≥ 80% batas.
+        limitExceeded:
+          type: boolean
+        lines:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaxJournalLine"
+        refreshedAt:
+          type: string
+          format: date-time
+    DashboardTrendPoint:
+      type: object
+      required: [month, revenue, grossProfit, netProfit]
+      properties:
+        month:
+          $ref: "../components/common.yaml#/BusinessDate"
+        revenue:
+          $ref: "../components/common.yaml#/Money"
+        grossProfit:
+          $ref: "../components/common.yaml#/Money"
+        netProfit:
+          $ref: "../components/common.yaml#/Money"
+    DashboardChannel:
+      type: object
+      required: [code, name, revenue, grossProfit, marginPercent]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        revenue:
+          $ref: "../components/common.yaml#/Money"
+        grossProfit:
+          $ref: "../components/common.yaml#/Money"
+        marginPercent:
+          type: string
+    ExecutiveDashboard:
+      type: object
+      required: [dateFrom, dateTo, period, previous, cash, receivables, inventory, payables, trend, channels]
+      properties:
+        dateFrom:
+          $ref: "../components/common.yaml#/BusinessDate"
+        dateTo:
+          $ref: "../components/common.yaml#/BusinessDate"
+        period:
+          $ref: "#/components/schemas/ProfitLossSummary"
+        previous:
+          $ref: "#/components/schemas/ProfitLossSummary"
+        cash:
+          $ref: "../components/common.yaml#/Money"
+        receivables:
+          $ref: "../components/common.yaml#/Money"
+        inventory:
+          $ref: "../components/common.yaml#/Money"
+        payables:
+          $ref: "../components/common.yaml#/Money"
+        trend:
+          type: array
+          items:
+            $ref: "#/components/schemas/DashboardTrendPoint"
+        channels:
+          type: array
+          items:
+            $ref: "#/components/schemas/DashboardChannel"
+        refreshedAt:
+          type: string
+          format: date-time
+    ReadModelRefresh:
+      type: object
+      required: [name, refreshedAt, durationMs]
+      properties:
+        name:
+          type: string
+        refreshedAt:
+          type: string
+          format: date-time
+        durationMs:
+          type: integer
+    ReadModelStatus:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReadModelRefresh"

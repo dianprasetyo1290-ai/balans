@@ -780,6 +780,232 @@ paths:
                 $ref: '#/components/schemas/ReceivableAgingReport'
         default:
           $ref: '#/components/responses/Problem'
+  /api/v1/sales/reports/sales:
+    get:
+      operationId: getSalesReport
+      tags:
+        - sales
+      summary: Laporan Penjualan & margin kotor per channel/sub-channel/produk/kategori/periode (RPT-05, RPT-15)
+      description: |
+        Dari read model `rm_sales_lines` (di-refresh job `accounting.refresh_read_models`). Neto = jurnal 4101 − 4102,
+        HPP = HPP pengiriman (A-06/A-10). Butuh `sales.sales_order.read`, `sales.marketplace_order.read`,
+        `sales.invoice.read`, atau `accounting.report.read`.
+      parameters:
+        - name: groupBy
+          in: query
+          schema:
+            $ref: '#/components/schemas/ReportGroupBy'
+        - name: dateFrom
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+        - name: dateTo
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+        - name: channelId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: subChannelId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: productId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: orderType
+          in: query
+          description: Jenis pesanan (modern_trade, b2b, social_commerce, marketplace, employee, consignment).
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Laporan penjualan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReport'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/reports/consignment:
+    get:
+      operationId: getConsignmentReport
+      tags:
+        - sales
+      summary: Laporan Konsinyasi — invoice konsinyasi & selisih per mitra (RPT-06)
+      parameters:
+        - name: dateFrom
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+        - name: dateTo
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+      responses:
+        '200':
+          description: Rekap konsinyasi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentReport'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/settlement-formats:
+    get:
+      operationId: listSettlementFormats
+      tags:
+        - sales
+      summary: Format laporan settlement per marketplace (jenis data impor dan kolom)
+      responses:
+        '200':
+          description: Format settlement
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SettlementFormat'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/marketplace-settlements:
+    get:
+      operationId: listMarketplaceSettlements
+      tags:
+        - sales
+      summary: Daftar settlement marketplace (S-403)
+      description: Settlement dibuat lewat impor laporan settlement (Import/Export Excel). Butuh `accounting.settlement.read`.
+      parameters:
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/SettlementStatus'
+        - name: subChannelId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Daftar settlement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketplaceSettlementList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/marketplace-settlements/{id}:
+    get:
+      operationId: getMarketplaceSettlement
+      tags:
+        - sales
+      summary: Detail settlement marketplace beserta order yang dicocokkan
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Settlement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketplaceSettlement'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/marketplace-settlements/{id}/post:
+    post:
+      operationId: postMarketplaceSettlement
+      tags:
+        - sales
+      summary: Posting settlement — jurnal A-10s (Dr Bank + Fee 6105 + Promo 6107, Cr Piutang Marketplace 121x)
+      description: Butuh `accounting.settlement.post`.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Settlement diposting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketplaceSettlement'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/marketplace-settlements/{id}/cancel:
+    post:
+      operationId: cancelMarketplaceSettlement
+      tags:
+        - sales
+      summary: Batalkan settlement draft (order bisa diimpor ulang)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SettlementCancelInput'
+      responses:
+        '200':
+          description: Settlement dibatalkan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketplaceSettlement'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/marketplace-receivables:
+    get:
+      operationId: listMarketplaceReceivables
+      tags:
+        - sales
+      summary: Sisa piutang marketplace per order (F1-402)
+      description: Butuh `accounting.settlement.read` atau `sales.marketplace_order.read`.
+      parameters:
+        - name: subChannelId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: openOnly
+          in: query
+          schema:
+            type: boolean
+            default: true
+        - $ref: '#/components/parameters/Search'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Sisa piutang marketplace
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketplaceReceivableList'
+        default:
+          $ref: '#/components/responses/Problem'
   /api/v1/webhooks/biteship:
     post:
       operationId: receiveBiteshipWebhook
@@ -3027,6 +3253,166 @@ paths:
                 $ref: '#/components/schemas/GeneralLedger'
         default:
           $ref: '#/components/responses/Problem'
+  /api/v1/reports/financial-statements:
+    get:
+      operationId: getFinancialStatement
+      tags:
+        - accounting
+      summary: Neraca, Laba Rugi, atau Arus Kas (S-409, RPT-12)
+      description: |
+        Disusun dari read model `rm_gl_daily` yang di-refresh job `accounting.refresh_read_models` tiap 15 menit
+        (lihat `refreshedAt`). Neraca memakai `dateTo` sebagai tanggal posisi (laba tahun berjalan sejak 1 Januari).
+        Laba Rugi boleh difilter per dimensi. Arus Kas metode tidak langsung. Butuh `accounting.report.read`.
+      parameters:
+        - name: kind
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/StatementKind'
+        - name: dateFrom
+          in: query
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+        - name: dateTo
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+        - $ref: '#/components/parameters/ReportChannelId'
+        - $ref: '#/components/parameters/ReportSubChannelId'
+        - $ref: '#/components/parameters/ReportDivisionId'
+        - $ref: '#/components/parameters/ReportCampaignId'
+      responses:
+        '200':
+          description: Laporan keuangan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialStatement'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/reports/profit-loss-by-dimension:
+    get:
+      operationId: getProfitLossByDimension
+      tags:
+        - accounting
+      summary: Laba rugi per channel, sub-channel, divisi, atau kampanye (S-417, RPT-15)
+      description: |
+        Kolom per nilai dimensi; jurnal tanpa dimensi tersebut masuk kolom "Tanpa …" sehingga jumlah kolom sama dengan
+        Laba Rugi total. Butuh `accounting.report.read`.
+      parameters:
+        - name: dimension
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/DimensionKind'
+        - name: dateFrom
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+        - name: dateTo
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+        - $ref: '#/components/parameters/ReportChannelId'
+      responses:
+        '200':
+          description: Laba rugi per dimensi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DimensionProfitLoss'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/reports/tax-summary:
+    get:
+      operationId: getTaxSummary
+      tags:
+        - accounting
+      summary: Rekap PPh dipotong, PPh Final, dan pemantauan omzet terhadap Rp4,8 M (S-416, RPT-18)
+      description: Butuh `accounting.report.read` atau `accounting.withholding.read`.
+      parameters:
+        - name: year
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: month
+          in: query
+          description: Masa (1–12) untuk rincian jurnal; kosong = tanpa rincian.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Rekap pajak
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxSummary'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/reports/executive-dashboard:
+    get:
+      operationId: getExecutiveDashboard
+      tags:
+        - accounting
+      summary: Dashboard eksekutif dasar — penjualan, margin, stok, kas (S-418, RPT-14)
+      description: Dari materialized view yang di-refresh job. Butuh `accounting.report.read`.
+      parameters:
+        - name: dateFrom
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+        - name: dateTo
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+      responses:
+        '200':
+          description: Dashboard
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutiveDashboard'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/reports/read-models:
+    get:
+      operationId: listReadModels
+      tags:
+        - accounting
+      summary: Waktu refresh terakhir read model laporan
+      responses:
+        '200':
+          description: Status read model
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadModelStatus'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/reports/read-models/refresh:
+    post:
+      operationId: refreshReadModels
+      tags:
+        - accounting
+      summary: Perbarui data laporan sekarang (tanpa menunggu job 15 menit)
+      description: Butuh `accounting.report.read`, `inventory.stock.read`, `sales.sales_order.read`, atau `sales.invoice.read`.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Status read model setelah refresh
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadModelStatus'
+        default:
+          $ref: '#/components/responses/Problem'
   /api/v1/document-sequences:
     get:
       operationId: listDocumentSequences
@@ -3539,6 +3925,48 @@ paths:
                 $ref: '#/components/schemas/StockCountSchedule'
         default:
           $ref: '#/components/responses/Problem'
+  /api/v1/warehouse/reports/stock-count-variances:
+    get:
+      operationId: getStockCountVarianceReport
+      tags:
+        - warehouse
+      summary: Laporan Stock Count — hasil hitung & selisih (RPT-03)
+      description: Butuh `warehouse.stock_count.read` atau `accounting.report.read`.
+      parameters:
+        - name: dateFrom
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+        - name: dateTo
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+        - name: locationId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: productId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: varianceOnly
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Hasil stock count
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockCountVarianceReport'
+        default:
+          $ref: '#/components/responses/Problem'
   /api/v1/stock-count-schedules/{id}:
     parameters:
       - $ref: '#/components/parameters/Id'
@@ -3660,6 +4088,135 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StockCard'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/inventory/reports/stock-position:
+    get:
+      operationId: getStockPositionReport
+      tags:
+        - inventory
+      summary: Laporan Stok — posisi & nilai per SKU, lokasi, batch (RPT-01)
+      description: |
+        Dari read model `rm_stock_values` (di-refresh job `accounting.refresh_read_models`). Nilai = HPP FIFO
+        mutasi per lokasi; total per jenis lokasi sama dengan saldo akun persediaan 13xx. Butuh `inventory.stock.read`
+        atau `accounting.report.read`.
+      parameters:
+        - $ref: '#/components/parameters/ReportLocationId'
+        - $ref: '#/components/parameters/ReportLocationType'
+        - $ref: '#/components/parameters/ReportProductId'
+        - name: batchId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Posisi stok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockPositionReport'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/inventory/reports/stock-movements:
+    get:
+      operationId: getStockMovementReport
+      tags:
+        - inventory
+      summary: Laporan Mutasi Stok — saldo awal, masuk, keluar, pindah, saldo akhir per SKU × lokasi (RPT-02)
+      parameters:
+        - $ref: '#/components/parameters/ReportDateFrom'
+        - $ref: '#/components/parameters/ReportDateTo'
+        - $ref: '#/components/parameters/ReportLocationId'
+        - $ref: '#/components/parameters/ReportLocationType'
+        - $ref: '#/components/parameters/ReportProductId'
+      responses:
+        '200':
+          description: Mutasi stok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockMovementReport'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/inventory/reports/stock-expiry:
+    get:
+      operationId: getStockExpiryReport
+      tags:
+        - inventory
+      summary: Laporan Kedaluwarsa — sisa umur simpan & umur stok per batch per lokasi (RPT-19)
+      parameters:
+        - $ref: '#/components/parameters/ReportLocationId'
+        - $ref: '#/components/parameters/ReportLocationType'
+        - $ref: '#/components/parameters/ReportProductId'
+        - name: withinDays
+          in: query
+          description: Hanya batch yang kedaluwarsa dalam N hari (termasuk yang sudah lewat); kosong = semua.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Kedaluwarsa & umur stok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockExpiryReport'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/inventory/reports/internal-usage:
+    get:
+      operationId: getInternalUsageReport
+      tags:
+        - inventory
+      summary: Laporan Pemakaian Internal per kampanye, tujuan, divisi (RPT-08)
+      description: Pemakaian Internal diposting. Butuh `inventory.internal_usage.read` atau `accounting.report.read`.
+      parameters:
+        - $ref: '#/components/parameters/ReportDateFrom'
+        - $ref: '#/components/parameters/ReportDateTo'
+        - name: purpose
+          in: query
+          schema:
+            type: string
+            enum:
+              - marketing
+              - event
+              - employee_sample
+              - sales_sampling
+        - name: campaignId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: divisionId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Pemakaian internal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalUsageReport'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/inventory/reports/returns:
+    get:
+      operationId: getReturnReport
+      tags:
+        - inventory
+      summary: Laporan Retur — barang retur, alasan, dan tindak lanjut (disposisi) (RPT-09)
+      parameters:
+        - $ref: '#/components/parameters/ReportDateFrom'
+        - $ref: '#/components/parameters/ReportDateTo'
+      responses:
+        '200':
+          description: Retur & tindak lanjut
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReturnReport'
         default:
           $ref: '#/components/responses/Problem'
   /api/v1/batches:
@@ -7449,6 +8006,79 @@ paths:
                 $ref: '#/components/schemas/GoodsReceivedNotInvoicedReport'
         default:
           $ref: '#/components/responses/Problem'
+  /api/v1/procurement/reports/outstanding-purchase-orders:
+    get:
+      operationId: getOutstandingPurchaseOrders
+      tags:
+        - procurement
+      summary: Outstanding PO — qty belum diterima & diterima belum ditagih per baris (RPT-10)
+      description: Butuh `procurement.purchase_order.read`, `procurement.supplier_bill.read`, atau `accounting.report.read`.
+      parameters:
+        - name: supplierId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Outstanding PO
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutstandingPurchaseOrderReport'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/procurement/reports/payable-aging:
+    get:
+      operationId: getPayableAging
+      tags:
+        - procurement
+      summary: Laporan Utang — umur utang per pemasok (RPT-11), direkonsiliasi ke akun 2101
+      parameters:
+        - name: asOf
+          in: query
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+      responses:
+        '200':
+          description: Umur utang
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayableAgingReport'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/procurement/reports/batch-costs:
+    get:
+      operationId: getBatchCostReport
+      tags:
+        - procurement
+      summary: Laporan HPP — komposisi HPP per SKU per batch dengan rincian reject (RPT-04)
+      parameters:
+        - name: dateFrom
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+        - name: dateTo
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+        - name: productId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Komposisi HPP batch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchCostReport'
+        default:
+          $ref: '#/components/responses/Problem'
 components:
   securitySchemes:
     bearerAuth:
@@ -8861,6 +9491,351 @@ components:
             $ref: '#/components/schemas/ReceivableAgingRow'
         totals:
           $ref: '#/components/schemas/ReceivableAgingRow'
+    ReportGroupBy:
+      type: string
+      description: Pengelompokan laporan penjualan & margin (RPT-05, RPT-15).
+      enum:
+        - channel
+        - sub_channel
+        - product
+        - category
+        - month
+        - day
+    SalesReportLine:
+      type: object
+      required:
+        - key
+        - code
+        - name
+        - qty
+        - gross
+        - discount
+        - net
+        - cogs
+        - grossProfit
+        - marginPercent
+      properties:
+        key:
+          type: string
+        code:
+          type: string
+        name:
+          type: string
+        qty:
+          type: string
+        gross:
+          $ref: '#/components/schemas/Money'
+        discount:
+          $ref: '#/components/schemas/Money'
+        net:
+          $ref: '#/components/schemas/Money'
+        cogs:
+          $ref: '#/components/schemas/Money'
+        grossProfit:
+          $ref: '#/components/schemas/Money'
+        marginPercent:
+          type: string
+    SalesReport:
+      type: object
+      required:
+        - groupBy
+        - dateFrom
+        - dateTo
+        - lines
+        - total
+      properties:
+        groupBy:
+          $ref: '#/components/schemas/ReportGroupBy'
+        dateFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        dateTo:
+          $ref: '#/components/schemas/BusinessDate'
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesReportLine'
+        total:
+          $ref: '#/components/schemas/SalesReportLine'
+    ConsignmentReportRow:
+      type: object
+      required:
+        - partnerId
+        - partnerCode
+        - partnerName
+        - invoiceType
+        - invoiceCount
+        - gross
+        - discount
+        - total
+        - paid
+        - outstanding
+      properties:
+        partnerId:
+          type: string
+          format: uuid
+        partnerCode:
+          type: string
+        partnerName:
+          type: string
+        invoiceType:
+          type: string
+          enum:
+            - consignment
+            - variance
+        invoiceCount:
+          type: integer
+        gross:
+          $ref: '#/components/schemas/Money'
+        discount:
+          $ref: '#/components/schemas/Money'
+        total:
+          $ref: '#/components/schemas/Money'
+        paid:
+          $ref: '#/components/schemas/Money'
+        outstanding:
+          $ref: '#/components/schemas/Money'
+    ConsignmentReport:
+      type: object
+      required:
+        - dateFrom
+        - dateTo
+        - items
+      properties:
+        dateFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        dateTo:
+          $ref: '#/components/schemas/BusinessDate'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsignmentReportRow'
+    SettlementFormatColumn:
+      type: object
+      required:
+        - key
+        - header
+        - required
+      properties:
+        key:
+          type: string
+        header:
+          type: string
+        required:
+          type: boolean
+    SettlementFormat:
+      type: object
+      required:
+        - marketplace
+        - label
+        - kind
+        - columns
+      properties:
+        marketplace:
+          type: string
+        label:
+          type: string
+        kind:
+          type: string
+          description: Jenis data impor dataexchange.
+        columns:
+          type: array
+          items:
+            $ref: '#/components/schemas/SettlementFormatColumn'
+    SettlementStatus:
+      type: string
+      enum:
+        - draft
+        - posted
+        - cancelled
+    MarketplaceSettlementSummary:
+      type: object
+      required:
+        - id
+        - marketplaceCode
+        - marketplaceName
+        - payoutReference
+        - settlementDate
+        - bankAccountCode
+        - status
+        - statusLabel
+        - lineCount
+        - settled
+        - fee
+        - promo
+        - net
+        - version
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        marketplaceCode:
+          type: string
+        marketplaceName:
+          type: string
+        payoutReference:
+          type: string
+        settlementDate:
+          $ref: '#/components/schemas/BusinessDate'
+        bankAccountCode:
+          type: string
+        status:
+          $ref: '#/components/schemas/SettlementStatus'
+        statusLabel:
+          type: string
+        lineCount:
+          type: integer
+        settled:
+          $ref: '#/components/schemas/Money'
+        fee:
+          $ref: '#/components/schemas/Money'
+        promo:
+          $ref: '#/components/schemas/Money'
+        net:
+          $ref: '#/components/schemas/Money'
+        journalEntryId:
+          type: string
+          format: uuid
+        postedAt:
+          type: string
+          format: date-time
+        cancelReason:
+          type: string
+        version:
+          type: integer
+        updatedAt:
+          type: string
+          format: date-time
+    MarketplaceSettlementList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/MarketplaceSettlementSummary'
+    MarketplaceSettlementLine:
+      type: object
+      required:
+        - lineNo
+        - salesOrderId
+        - externalOrderId
+        - orderNumber
+        - receivable
+        - fee
+        - promo
+        - net
+        - settled
+        - outstanding
+      properties:
+        lineNo:
+          type: integer
+        salesOrderId:
+          type: string
+          format: uuid
+        externalOrderId:
+          type: string
+        orderNumber:
+          type: string
+        receivable:
+          $ref: '#/components/schemas/Money'
+        fee:
+          $ref: '#/components/schemas/Money'
+        promo:
+          $ref: '#/components/schemas/Money'
+        net:
+          $ref: '#/components/schemas/Money'
+        settled:
+          $ref: '#/components/schemas/Money'
+        outstanding:
+          $ref: '#/components/schemas/Money'
+    MarketplaceSettlement:
+      allOf:
+        - $ref: '#/components/schemas/MarketplaceSettlementSummary'
+        - type: object
+          required:
+            - lines
+            - allowedActions
+          properties:
+            lines:
+              type: array
+              items:
+                $ref: '#/components/schemas/MarketplaceSettlementLine'
+            allowedActions:
+              type: array
+              items:
+                type: string
+    SettlementCancelInput:
+      type: object
+      required:
+        - version
+        - reason
+      properties:
+        version:
+          type: integer
+        reason:
+          type: string
+    MarketplaceReceivable:
+      type: object
+      required:
+        - salesOrderId
+        - number
+        - externalOrderId
+        - marketplaceName
+        - orderDate
+        - handedOverDate
+        - buyerName
+        - receivable
+        - settled
+        - draft
+        - outstanding
+      properties:
+        salesOrderId:
+          type: string
+          format: uuid
+        number:
+          type: string
+        externalOrderId:
+          type: string
+        marketplaceName:
+          type: string
+        orderDate:
+          $ref: '#/components/schemas/BusinessDate'
+        handedOverDate:
+          $ref: '#/components/schemas/BusinessDate'
+        buyerName:
+          type: string
+        receivable:
+          $ref: '#/components/schemas/Money'
+        settled:
+          $ref: '#/components/schemas/Money'
+        draft:
+          $ref: '#/components/schemas/Money'
+        outstanding:
+          $ref: '#/components/schemas/Money'
+    MarketplaceReceivableList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+            - totalReceivable
+            - totalSettled
+            - totalOutstanding
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/MarketplaceReceivable'
+            totalReceivable:
+              $ref: '#/components/schemas/Money'
+            totalSettled:
+              $ref: '#/components/schemas/Money'
+            totalOutstanding:
+              $ref: '#/components/schemas/Money'
     BiteshipNotification:
       type: object
       description: Payload webhook status order Biteship (nama field milik Biteship).
@@ -11140,6 +12115,373 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/GeneralLedgerLine'
+    StatementKind:
+      type: string
+      enum:
+        - balance_sheet
+        - income_statement
+        - cash_flow
+    ReportRowKind:
+      type: string
+      description: Jenis baris laporan (judul bagian, subjudul akun induk, akun, subtotal, total).
+      enum:
+        - section
+        - group
+        - account
+        - subtotal
+        - total
+    StatementRow:
+      type: object
+      required:
+        - kind
+        - label
+        - level
+        - amount
+      properties:
+        kind:
+          $ref: '#/components/schemas/ReportRowKind'
+        code:
+          type: string
+          description: Kode akun (baris akun) untuk drill-down Buku Besar.
+        label:
+          type: string
+        level:
+          type: integer
+        amount:
+          $ref: '#/components/schemas/Money'
+    ProfitLossSummary:
+      type: object
+      required:
+        - revenue
+        - cogs
+        - grossProfit
+        - operatingExpense
+        - operatingProfit
+        - otherNet
+        - netProfit
+        - grossMarginPercent
+        - netMarginPercent
+      properties:
+        revenue:
+          $ref: '#/components/schemas/Money'
+        cogs:
+          $ref: '#/components/schemas/Money'
+        grossProfit:
+          $ref: '#/components/schemas/Money'
+        operatingExpense:
+          $ref: '#/components/schemas/Money'
+        operatingProfit:
+          $ref: '#/components/schemas/Money'
+        otherNet:
+          $ref: '#/components/schemas/Money'
+        netProfit:
+          $ref: '#/components/schemas/Money'
+        grossMarginPercent:
+          type: string
+        netMarginPercent:
+          type: string
+    FinancialStatement:
+      type: object
+      required:
+        - kind
+        - title
+        - dateFrom
+        - dateTo
+        - rows
+        - balanced
+        - summary
+      properties:
+        kind:
+          $ref: '#/components/schemas/StatementKind'
+        title:
+          type: string
+        dateFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        dateTo:
+          $ref: '#/components/schemas/BusinessDate'
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/StatementRow'
+        balanced:
+          type: boolean
+          description: Neraca seimbang / kenaikan kas = mutasi akun Kas & Bank.
+        summary:
+          $ref: '#/components/schemas/ProfitLossSummary'
+        refreshedAt:
+          type: string
+          format: date-time
+    DimensionColumn:
+      type: object
+      required:
+        - code
+        - name
+        - summary
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Kosong = jurnal tanpa dimensi ini.
+        code:
+          type: string
+        name:
+          type: string
+        summary:
+          $ref: '#/components/schemas/ProfitLossSummary'
+    DimensionAccountRow:
+      type: object
+      required:
+        - accountCode
+        - accountName
+        - group
+        - amounts
+        - total
+      properties:
+        accountCode:
+          type: string
+        accountName:
+          type: string
+        group:
+          type: integer
+        amounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Money'
+        total:
+          $ref: '#/components/schemas/Money'
+    DimensionProfitLoss:
+      type: object
+      required:
+        - dimension
+        - dateFrom
+        - dateTo
+        - columns
+        - accounts
+        - total
+      properties:
+        dimension:
+          $ref: '#/components/schemas/DimensionKind'
+        dateFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        dateTo:
+          $ref: '#/components/schemas/BusinessDate'
+        columns:
+          type: array
+          items:
+            $ref: '#/components/schemas/DimensionColumn'
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/DimensionAccountRow'
+        total:
+          $ref: '#/components/schemas/ProfitLossSummary'
+        refreshedAt:
+          type: string
+          format: date-time
+    TaxMonth:
+      type: object
+      required:
+        - month
+        - pph21Withheld
+        - pph23Withheld
+        - pph42Withheld
+        - withholdingPaid
+        - finalTax
+        - finalTaxPaid
+        - turnover
+        - cumulativeTurnover
+      properties:
+        month:
+          $ref: '#/components/schemas/BusinessDate'
+        pph21Withheld:
+          $ref: '#/components/schemas/Money'
+        pph23Withheld:
+          $ref: '#/components/schemas/Money'
+        pph42Withheld:
+          $ref: '#/components/schemas/Money'
+        withholdingPaid:
+          $ref: '#/components/schemas/Money'
+        finalTax:
+          $ref: '#/components/schemas/Money'
+        finalTaxPaid:
+          $ref: '#/components/schemas/Money'
+        turnover:
+          $ref: '#/components/schemas/Money'
+        cumulativeTurnover:
+          $ref: '#/components/schemas/Money'
+    TaxJournalLine:
+      type: object
+      required:
+        - entryId
+        - businessDate
+        - number
+        - sourceType
+        - sourceLabel
+        - description
+        - accountCode
+        - accountName
+        - debit
+        - credit
+      properties:
+        entryId:
+          type: string
+          format: uuid
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        number:
+          type: string
+        sourceType:
+          type: string
+        sourceLabel:
+          type: string
+        description:
+          type: string
+        accountCode:
+          type: string
+        accountName:
+          type: string
+        debit:
+          $ref: '#/components/schemas/Money'
+        credit:
+          $ref: '#/components/schemas/Money'
+    TaxSummary:
+      type: object
+      required:
+        - year
+        - months
+        - turnover
+        - limit
+        - usedPercent
+        - warning
+        - limitExceeded
+        - lines
+      properties:
+        year:
+          type: integer
+        months:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxMonth'
+        turnover:
+          $ref: '#/components/schemas/Money'
+        limit:
+          $ref: '#/components/schemas/Money'
+        usedPercent:
+          type: string
+        warning:
+          type: boolean
+          description: Omzet kumulatif ≥ 80% batas.
+        limitExceeded:
+          type: boolean
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxJournalLine'
+        refreshedAt:
+          type: string
+          format: date-time
+    DashboardTrendPoint:
+      type: object
+      required:
+        - month
+        - revenue
+        - grossProfit
+        - netProfit
+      properties:
+        month:
+          $ref: '#/components/schemas/BusinessDate'
+        revenue:
+          $ref: '#/components/schemas/Money'
+        grossProfit:
+          $ref: '#/components/schemas/Money'
+        netProfit:
+          $ref: '#/components/schemas/Money'
+    DashboardChannel:
+      type: object
+      required:
+        - code
+        - name
+        - revenue
+        - grossProfit
+        - marginPercent
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        revenue:
+          $ref: '#/components/schemas/Money'
+        grossProfit:
+          $ref: '#/components/schemas/Money'
+        marginPercent:
+          type: string
+    ExecutiveDashboard:
+      type: object
+      required:
+        - dateFrom
+        - dateTo
+        - period
+        - previous
+        - cash
+        - receivables
+        - inventory
+        - payables
+        - trend
+        - channels
+      properties:
+        dateFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        dateTo:
+          $ref: '#/components/schemas/BusinessDate'
+        period:
+          $ref: '#/components/schemas/ProfitLossSummary'
+        previous:
+          $ref: '#/components/schemas/ProfitLossSummary'
+        cash:
+          $ref: '#/components/schemas/Money'
+        receivables:
+          $ref: '#/components/schemas/Money'
+        inventory:
+          $ref: '#/components/schemas/Money'
+        payables:
+          $ref: '#/components/schemas/Money'
+        trend:
+          type: array
+          items:
+            $ref: '#/components/schemas/DashboardTrendPoint'
+        channels:
+          type: array
+          items:
+            $ref: '#/components/schemas/DashboardChannel'
+        refreshedAt:
+          type: string
+          format: date-time
+    ReadModelRefresh:
+      type: object
+      required:
+        - name
+        - refreshedAt
+        - durationMs
+      properties:
+        name:
+          type: string
+        refreshedAt:
+          type: string
+          format: date-time
+        durationMs:
+          type: integer
+    ReadModelStatus:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReadModelRefresh'
     DocumentSequence:
       type: object
       required:
@@ -12127,6 +13469,73 @@ components:
               $ref: '#/components/schemas/BusinessDate'
             version:
               type: integer
+    StockCountVarianceRow:
+      type: object
+      required:
+        - stockCountId
+        - number
+        - countType
+        - businessDate
+        - status
+        - locationCode
+        - locationName
+        - sku
+        - productName
+        - batchNumber
+        - systemQty
+        - varianceQty
+        - varianceAmount
+        - isExtra
+      properties:
+        stockCountId:
+          type: string
+          format: uuid
+        number:
+          type: string
+        countType:
+          type: string
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        status:
+          type: string
+        locationCode:
+          type: string
+        locationName:
+          type: string
+        sku:
+          type: string
+        productName:
+          type: string
+        batchNumber:
+          type: string
+        systemQty:
+          type: string
+        countedQty:
+          type: string
+        varianceQty:
+          type: string
+        varianceAmount:
+          $ref: '#/components/schemas/Money'
+        isExtra:
+          type: boolean
+    StockCountVarianceReport:
+      type: object
+      required:
+        - items
+        - totalVarianceAmount
+        - totalShortageAmount
+        - totalOverageAmount
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockCountVarianceRow'
+        totalVarianceAmount:
+          $ref: '#/components/schemas/Money'
+        totalShortageAmount:
+          $ref: '#/components/schemas/Money'
+        totalOverageAmount:
+          $ref: '#/components/schemas/Money'
     StockStatus:
       type: string
       description: '`available` Tersedia, `quarantine` Karantina, `in_transit` Dalam Pengiriman, `reserved` Dialokasikan.'
@@ -12346,6 +13755,307 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/StockCardLine'
+    ReportProductRef:
+      type: object
+      required:
+        - id
+        - sku
+        - name
+        - uom
+      properties:
+        id:
+          type: string
+          format: uuid
+        sku:
+          type: string
+        name:
+          type: string
+        uom:
+          type: string
+    ReportLocationRef:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - warehouseName
+        - type
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        warehouseName:
+          type: string
+        type:
+          type: string
+    StockPositionRow:
+      type: object
+      required:
+        - product
+        - location
+        - batchNumber
+        - qty
+        - value
+      properties:
+        product:
+          $ref: '#/components/schemas/ReportProductRef'
+        location:
+          $ref: '#/components/schemas/ReportLocationRef'
+        batchId:
+          type: string
+          format: uuid
+        batchNumber:
+          type: string
+        expiryDate:
+          $ref: '#/components/schemas/BusinessDate'
+        firstInDate:
+          $ref: '#/components/schemas/BusinessDate'
+        qty:
+          type: string
+        value:
+          $ref: '#/components/schemas/Money'
+    StockTypeTotal:
+      type: object
+      required:
+        - locationType
+        - qty
+        - value
+      properties:
+        locationType:
+          type: string
+        qty:
+          type: string
+        value:
+          $ref: '#/components/schemas/Money'
+    StockPositionReport:
+      type: object
+      required:
+        - items
+        - totalQty
+        - totalValue
+        - byLocationType
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockPositionRow'
+        totalQty:
+          type: string
+        totalValue:
+          $ref: '#/components/schemas/Money'
+        byLocationType:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockTypeTotal'
+    StockMovementRow:
+      type: object
+      required:
+        - product
+        - location
+        - openingQty
+        - receiveQty
+        - issueQty
+        - moveInQty
+        - moveOutQty
+        - closingQty
+        - openingValue
+        - inValue
+        - outValue
+        - closingValue
+      properties:
+        product:
+          $ref: '#/components/schemas/ReportProductRef'
+        location:
+          $ref: '#/components/schemas/ReportLocationRef'
+        openingQty:
+          type: string
+        receiveQty:
+          type: string
+        issueQty:
+          type: string
+        moveInQty:
+          type: string
+        moveOutQty:
+          type: string
+        closingQty:
+          type: string
+        openingValue:
+          $ref: '#/components/schemas/Money'
+        inValue:
+          $ref: '#/components/schemas/Money'
+        outValue:
+          $ref: '#/components/schemas/Money'
+        closingValue:
+          $ref: '#/components/schemas/Money'
+    StockMovementReport:
+      type: object
+      required:
+        - dateFrom
+        - dateTo
+        - items
+      properties:
+        dateFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        dateTo:
+          $ref: '#/components/schemas/BusinessDate'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockMovementRow'
+    StockExpiryRow:
+      type: object
+      required:
+        - product
+        - location
+        - batchNumber
+        - qty
+        - value
+        - bucket
+      properties:
+        product:
+          $ref: '#/components/schemas/ReportProductRef'
+        location:
+          $ref: '#/components/schemas/ReportLocationRef'
+        batchNumber:
+          type: string
+        expiryDate:
+          $ref: '#/components/schemas/BusinessDate'
+        daysToExpiry:
+          type: integer
+        ageDays:
+          type: integer
+        qty:
+          type: string
+        value:
+          $ref: '#/components/schemas/Money'
+        bucket:
+          type: string
+          enum:
+            - expired
+            - near
+            - d31_90
+            - d91_180
+            - over_180
+            - no_expiry
+    StockExpiryReport:
+      type: object
+      required:
+        - today
+        - nearDays
+        - items
+      properties:
+        today:
+          $ref: '#/components/schemas/BusinessDate'
+        nearDays:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockExpiryRow'
+    InternalUsageReportRow:
+      type: object
+      required:
+        - usageId
+        - number
+        - businessDate
+        - purpose
+        - divisionName
+        - campaignCode
+        - campaignName
+        - product
+        - qty
+        - returnedQty
+        - consumedQty
+        - cost
+      properties:
+        usageId:
+          type: string
+          format: uuid
+        number:
+          type: string
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        purpose:
+          type: string
+        divisionName:
+          type: string
+        campaignCode:
+          type: string
+        campaignName:
+          type: string
+        product:
+          $ref: '#/components/schemas/ReportProductRef'
+        qty:
+          type: string
+        returnedQty:
+          type: string
+        consumedQty:
+          type: string
+        cost:
+          $ref: '#/components/schemas/Money'
+    InternalUsageReport:
+      type: object
+      required:
+        - items
+        - totalCost
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/InternalUsageReportRow'
+        totalCost:
+          $ref: '#/components/schemas/Money'
+    ReturnReportRow:
+      type: object
+      required:
+        - dispositionId
+        - number
+        - businessDate
+        - location
+        - product
+        - reasonCode
+        - reasonName
+        - disposition
+        - qty
+        - cost
+        - qcNote
+      properties:
+        dispositionId:
+          type: string
+          format: uuid
+        number:
+          type: string
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        location:
+          $ref: '#/components/schemas/ReportLocationRef'
+        product:
+          $ref: '#/components/schemas/ReportProductRef'
+        reasonCode:
+          type: string
+        reasonName:
+          type: string
+        disposition:
+          $ref: '#/components/schemas/ReturnDisposition'
+        qty:
+          type: string
+        cost:
+          $ref: '#/components/schemas/Money'
+        qcNote:
+          type: string
+    ReturnReport:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReturnReportRow'
     BatchSummary:
       type: object
       required:
@@ -15833,6 +17543,11 @@ components:
       properties:
         kind:
           type: string
+        params:
+          type: object
+          description: Parameter ekspor laporan (mis. dateFrom, dateTo, locationId); diabaikan untuk ekspor master.
+          additionalProperties:
+            type: string
     PurchaseOption:
       type: object
       required:
@@ -17789,6 +19504,230 @@ components:
           $ref: '#/components/schemas/Money'
         difference:
           $ref: '#/components/schemas/Money'
+    OutstandingPurchaseOrderLine:
+      type: object
+      required:
+        - purchaseOrderId
+        - number
+        - orderType
+        - supplierName
+        - orderDate
+        - expectedDate
+        - status
+        - lineNo
+        - item
+        - orderedQty
+        - receivedQty
+        - billedQty
+        - openQty
+        - unbilledQty
+        - unitPrice
+        - openValue
+      properties:
+        purchaseOrderId:
+          type: string
+          format: uuid
+        number:
+          type: string
+        orderType:
+          $ref: '#/components/schemas/PurchaseOrderType'
+        supplierName:
+          type: string
+        orderDate:
+          $ref: '#/components/schemas/BusinessDate'
+        expectedDate:
+          $ref: '#/components/schemas/BusinessDate'
+        status:
+          type: string
+        lineNo:
+          type: integer
+        item:
+          type: string
+        orderedQty:
+          type: string
+        receivedQty:
+          type: string
+        billedQty:
+          type: string
+        openQty:
+          type: string
+        unbilledQty:
+          type: string
+        unitPrice:
+          $ref: '#/components/schemas/Money'
+        openValue:
+          $ref: '#/components/schemas/Money'
+    OutstandingPurchaseOrderReport:
+      type: object
+      required:
+        - asOf
+        - items
+        - totalOpenValue
+      properties:
+        asOf:
+          $ref: '#/components/schemas/BusinessDate'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OutstandingPurchaseOrderLine'
+        totalOpenValue:
+          $ref: '#/components/schemas/Money'
+    PayableAgingAmounts:
+      type: object
+      required:
+        - current
+        - d1To30
+        - d31To60
+        - d61To90
+        - over90
+        - total
+      properties:
+        current:
+          $ref: '#/components/schemas/Money'
+        d1To30:
+          $ref: '#/components/schemas/Money'
+        d31To60:
+          $ref: '#/components/schemas/Money'
+        d61To90:
+          $ref: '#/components/schemas/Money'
+        over90:
+          $ref: '#/components/schemas/Money'
+        total:
+          $ref: '#/components/schemas/Money'
+    PayableAgingDocument:
+      type: object
+      required:
+        - documentType
+        - documentNumber
+        - businessDate
+        - dueDate
+        - amount
+        - open
+      properties:
+        documentType:
+          type: string
+          enum:
+            - supplier_bill
+            - debit_note
+        documentNumber:
+          type: string
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        dueDate:
+          $ref: '#/components/schemas/BusinessDate'
+        amount:
+          $ref: '#/components/schemas/Money'
+        open:
+          $ref: '#/components/schemas/Money'
+    PayableAgingSupplier:
+      type: object
+      required:
+        - supplierId
+        - supplierCode
+        - supplierName
+        - amounts
+        - documents
+      properties:
+        supplierId:
+          type: string
+          format: uuid
+        supplierCode:
+          type: string
+        supplierName:
+          type: string
+        amounts:
+          $ref: '#/components/schemas/PayableAgingAmounts'
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/PayableAgingDocument'
+    PayableAgingReport:
+      type: object
+      required:
+        - asOf
+        - items
+        - totals
+        - ledgerBalance
+        - difference
+      properties:
+        asOf:
+          $ref: '#/components/schemas/BusinessDate'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PayableAgingSupplier'
+        totals:
+          $ref: '#/components/schemas/PayableAgingAmounts'
+        ledgerBalance:
+          $ref: '#/components/schemas/Money'
+        difference:
+          $ref: '#/components/schemas/Money'
+          description: Saldo akun 2101 dikurangi total utang terbuka (harus nol).
+    BatchCostRow:
+      type: object
+      required:
+        - receiptId
+        - receiptNumber
+        - businessDate
+        - supplierName
+        - orderType
+        - sku
+        - productName
+        - batchNumber
+        - goodQty
+        - rejectQty
+        - rejectDisposition
+        - unitPrice
+        - serviceAmount
+        - materialCost
+        - inventoryAmount
+        - unitCost
+      properties:
+        receiptId:
+          type: string
+          format: uuid
+        receiptNumber:
+          type: string
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        supplierName:
+          type: string
+        orderType:
+          $ref: '#/components/schemas/PurchaseOrderType'
+        sku:
+          type: string
+        productName:
+          type: string
+        batchNumber:
+          type: string
+        goodQty:
+          type: string
+        rejectQty:
+          type: string
+        rejectDisposition:
+          type: string
+          enum:
+            - return_to_supplier
+            - absorbed
+        unitPrice:
+          $ref: '#/components/schemas/Money'
+        serviceAmount:
+          $ref: '#/components/schemas/Money'
+        materialCost:
+          $ref: '#/components/schemas/Money'
+        inventoryAmount:
+          $ref: '#/components/schemas/Money'
+        unitCost:
+          type: string
+    BatchCostReport:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/BatchCostRow'
   parameters:
     Search:
       name: q
@@ -17850,6 +19789,60 @@ components:
       schema:
         type: boolean
         default: false
+    ReportChannelId:
+      name: channelId
+      in: query
+      schema:
+        type: string
+        format: uuid
+    ReportSubChannelId:
+      name: subChannelId
+      in: query
+      schema:
+        type: string
+        format: uuid
+    ReportDivisionId:
+      name: divisionId
+      in: query
+      schema:
+        type: string
+        format: uuid
+    ReportCampaignId:
+      name: campaignId
+      in: query
+      schema:
+        type: string
+        format: uuid
+    ReportLocationId:
+      name: locationId
+      in: query
+      schema:
+        type: string
+        format: uuid
+    ReportLocationType:
+      name: locationType
+      in: query
+      description: Jenis lokasi (mis. consignment, vending_buffer, toll_manufacturer).
+      schema:
+        type: string
+    ReportProductId:
+      name: productId
+      in: query
+      schema:
+        type: string
+        format: uuid
+    ReportDateFrom:
+      name: dateFrom
+      in: query
+      required: true
+      schema:
+        $ref: '#/components/schemas/BusinessDate'
+    ReportDateTo:
+      name: dateTo
+      in: query
+      required: true
+      schema:
+        $ref: '#/components/schemas/BusinessDate'
     PartyVersion:
       name: version
       in: query

@@ -95,6 +95,22 @@ paths:
     $ref: "./paths/sales.yaml#/customerPaymentCancel"
   /api/v1/sales/receivable-aging:
     $ref: "./paths/sales.yaml#/receivableAging"
+  /api/v1/sales/reports/sales:
+    $ref: "./paths/sales_reports.yaml#/salesReport"
+  /api/v1/sales/reports/consignment:
+    $ref: "./paths/sales_reports.yaml#/consignmentReport"
+  /api/v1/sales/settlement-formats:
+    $ref: "./paths/sales_reports.yaml#/settlementFormats"
+  /api/v1/sales/marketplace-settlements:
+    $ref: "./paths/sales_reports.yaml#/marketplaceSettlements"
+  /api/v1/sales/marketplace-settlements/{id}:
+    $ref: "./paths/sales_reports.yaml#/marketplaceSettlement"
+  /api/v1/sales/marketplace-settlements/{id}/post:
+    $ref: "./paths/sales_reports.yaml#/marketplaceSettlementPost"
+  /api/v1/sales/marketplace-settlements/{id}/cancel:
+    $ref: "./paths/sales_reports.yaml#/marketplaceSettlementCancel"
+  /api/v1/sales/marketplace-receivables:
+    $ref: "./paths/sales_reports.yaml#/marketplaceReceivables"
   /api/v1/webhooks/biteship:
     $ref: "./paths/logistics.yaml#/biteshipWebhook"
   /api/v1/auth/login:
@@ -235,6 +251,18 @@ paths:
     $ref: "./paths/accounting.yaml#/journalEntryReverse"
   /api/v1/general-ledger:
     $ref: "./paths/accounting.yaml#/generalLedger"
+  /api/v1/reports/financial-statements:
+    $ref: "./paths/accounting_reports.yaml#/financialStatement"
+  /api/v1/reports/profit-loss-by-dimension:
+    $ref: "./paths/accounting_reports.yaml#/profitLossByDimension"
+  /api/v1/reports/tax-summary:
+    $ref: "./paths/accounting_reports.yaml#/taxSummary"
+  /api/v1/reports/executive-dashboard:
+    $ref: "./paths/accounting_reports.yaml#/executiveDashboard"
+  /api/v1/reports/read-models:
+    $ref: "./paths/accounting_reports.yaml#/readModels"
+  /api/v1/reports/read-models/refresh:
+    $ref: "./paths/accounting_reports.yaml#/readModelsRefresh"
   /api/v1/document-sequences:
     $ref: "./paths/document.yaml#/documentSequences"
   /api/v1/locations/{id}:
@@ -265,12 +293,24 @@ paths:
     $ref: "./paths/warehouse_documents.yaml#/stockCountActions"
   /api/v1/stock-count-schedules:
     $ref: "./paths/warehouse_documents.yaml#/stockCountSchedules"
+  /api/v1/warehouse/reports/stock-count-variances:
+    $ref: "./paths/warehouse_reports.yaml#/stockCountVariances"
   /api/v1/stock-count-schedules/{id}:
     $ref: "./paths/warehouse_documents.yaml#/stockCountSchedule"
   /api/v1/stock-balances:
     $ref: "./paths/inventory.yaml#/stockBalances"
   /api/v1/stock-card:
     $ref: "./paths/inventory.yaml#/stockCard"
+  /api/v1/inventory/reports/stock-position:
+    $ref: "./paths/inventory_reports.yaml#/stockPositionReport"
+  /api/v1/inventory/reports/stock-movements:
+    $ref: "./paths/inventory_reports.yaml#/stockMovementReport"
+  /api/v1/inventory/reports/stock-expiry:
+    $ref: "./paths/inventory_reports.yaml#/stockExpiryReport"
+  /api/v1/inventory/reports/internal-usage:
+    $ref: "./paths/inventory_reports.yaml#/internalUsageReport"
+  /api/v1/inventory/reports/returns:
+    $ref: "./paths/inventory_reports.yaml#/returnReport"
   /api/v1/batches:
     $ref: "./paths/inventory.yaml#/batches"
   /api/v1/batch-suggestions:
@@ -493,6 +533,12 @@ paths:
     $ref: "./paths/procurement_documents.yaml#/purchaseReturnCancel"
   /api/v1/procurement/reports/goods-received-not-invoiced:
     $ref: "./paths/procurement_documents.yaml#/goodsReceivedNotInvoiced"
+  /api/v1/procurement/reports/outstanding-purchase-orders:
+    $ref: "./paths/procurement_reports.yaml#/outstandingPurchaseOrders"
+  /api/v1/procurement/reports/payable-aging:
+    $ref: "./paths/procurement_reports.yaml#/payableAging"
+  /api/v1/procurement/reports/batch-costs:
+    $ref: "./paths/procurement_reports.yaml#/batchCosts"
 components:
   securitySchemes:
     bearerAuth:

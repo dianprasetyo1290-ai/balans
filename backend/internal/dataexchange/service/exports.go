@@ -28,14 +28,21 @@ func exportLink(j domain.ExportJob) string {
 }
 
 // CreateExport menjadwalkan ekspor jenis data; file xlsx dibuat job dataexchange.export di antrean bulk.
-func (s *Service) CreateExport(ctx context.Context, kind string) (domain.ExportJob, error) {
-	_, a, err := s.requireExporter(ctx, kind)
+func (s *Service) CreateExport(ctx context.Context, kind string, params map[string]string) (domain.ExportJob, error) {
+	exp, a, err := s.requireExporter(ctx, kind)
 	if err != nil {
 		return domain.ExportJob{}, err
 	}
+	if pe, ok := exp.(ParamExporter); ok {
+		if err := pe.ValidateParams(params); err != nil {
+			return domain.ExportJob{}, err
+		}
+	} else {
+		params = nil
+	}
 	var job domain.ExportJob
 	err = s.Tx.WithTx(ctx, func(ctx context.Context) error {
-		if job, err = s.Store.InsertExportJob(ctx, kind, a.UserID); err != nil {
+		if job, err = s.Store.InsertExportJob(ctx, kind, params, a.UserID); err != nil {
 			return err
 		}
 		return s.Jobs.Enqueue(ctx, ExportArgs{JobID: job.ID}, nil)
@@ -113,7 +120,12 @@ func (s *Service) RunExport(ctx context.Context, id uuid.UUID) error {
 	if err != nil {
 		return err
 	}
-	err = exp.Export(ctx, func(r tabular.Row) error { return w.Write(r, "") })
+	emit := func(r tabular.Row) error { return w.Write(r, "") }
+	if pe, ok := exp.(ParamExporter); ok {
+		err = pe.ExportWith(ctx, j.Params, emit)
+	} else {
+		err = exp.Export(ctx, emit)
+	}
 	if err != nil {
 		err = errors.Join(err, w.Discard())
 		if appErr := apperr.As(err); appErr.Code != apperr.CodeInternal {
