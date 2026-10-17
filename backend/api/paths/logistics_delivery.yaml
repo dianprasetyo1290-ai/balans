@@ -1,0 +1,760 @@
+couriers:
+  get:
+    operationId: listCouriers
+    tags: [delivery]
+    summary: Master kurir (Kurir & Resi)
+    description: Permission `logistics.shipment.read` atau `logistics.delivery_order.read`.
+    parameters:
+      - name: active
+        in: query
+        description: true = hanya kurir aktif (dropdown pengiriman).
+        schema:
+          type: boolean
+    responses:
+      "200":
+        description: Daftar kurir
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CourierList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createCourier
+    tags: [delivery]
+    summary: Menambah kurir
+    description: Permission `logistics.shipment.write`.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CourierInput"
+    responses:
+      "201":
+        description: Kurir dibuat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Courier"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+courier:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  put:
+    operationId: updateCourier
+    tags: [delivery]
+    summary: Mengubah nama, jenis, atau status kurir (kode tetap)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CourierUpdateInput"
+    responses:
+      "200":
+        description: Kurir diperbarui
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Courier"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+deliveryOrders:
+  get:
+    operationId: listDeliveryOrders
+    tags: [delivery]
+    summary: Daftar Delivery Order
+    description: Cari nomor DO, dokumen asal, penerima, resi, atau AWB. Permission `logistics.delivery_order.read`.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - $ref: "../components/common.yaml#/parameters/Search"
+      - name: status
+        in: query
+        schema:
+          $ref: "../components/common.yaml#/DeliveryOrderStatus"
+      - name: deliveryType
+        in: query
+        schema:
+          $ref: "../components/common.yaml#/DeliveryOrderType"
+      - name: sourceId
+        in: query
+        description: DO milik satu dokumen asal (mis. Sales Order).
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Daftar DO
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeliveryOrderList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createDeliveryOrder
+    tags: [delivery]
+    summary: Membuat Delivery Order Draft dari Sales Order Diproses (S-309)
+    description: |
+      Satu baris per alokasi yang belum dikirim, batch dari alokasi FEFO. Hanya satu DO terbuka per Sales Order.
+      Permission `logistics.delivery_order.write`.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeliveryOrderCreateInput"
+    responses:
+      "201":
+        description: DO dibuat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeliveryOrder"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+deliveryOrder:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  get:
+    operationId: getDeliveryOrder
+    tags: [delivery]
+    summary: Detail DO beserta Outbound, koli, label produk, pengiriman, dan riwayat pelacakan
+    description: Permission `logistics.delivery_order.read`, `logistics.shipment.read`, atau `logistics.label.post`.
+    responses:
+      "200":
+        description: Detail DO
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeliveryOrder"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+deliveryOrderRelease:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  post:
+    operationId: releaseDeliveryOrder
+    tags: [delivery]
+    summary: Release DO (Logistik Leader) — nomor DO dan Outbound dibuat
+    description: Permission `logistics.delivery_order.post`.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../components/common.yaml#/VersionInput"
+    responses:
+      "200":
+        description: DO Diproses
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeliveryOrder"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+deliveryOrderShip:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  post:
+    operationId: shipDeliveryOrder
+    tags: [delivery]
+    summary: Serah ke kurir — kurir, resi manual, AWB marketplace, kurir internal (S-312)
+    description: |
+      Hanya setelah Outbound selesai QC. Barang lulus QC keluar dari stok dan jurnal dokumen asal dibuat (HPP A-06;
+      marketplace A-10 saat serah ke kurir). Kurir internal wajib memilih Merchandiser. Permission
+      `logistics.shipment.write`.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeliveryOrderShipInput"
+    responses:
+      "200":
+        description: DO Dalam Pengiriman
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeliveryOrder"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+deliveryOrderDeliver:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  post:
+    operationId: deliverDeliveryOrder
+    tags: [delivery]
+    summary: Konfirmasi barang diterima (foto/tanda terima dari HP)
+    description: |
+      Kurir internal: hanya Merchandiser pengantar dan wajib foto/tanda terima (unggah ke owner `delivery_proof`).
+      Permission `logistics.shipment.post`.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeliveryOrderDeliverInput"
+    responses:
+      "200":
+        description: DO Diterima
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeliveryOrder"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+deliveryOrderCancel:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  post:
+    operationId: cancelDeliveryOrder
+    tags: [delivery]
+    summary: Membatalkan DO sebelum dikirim (Outbound ikut dibatalkan)
+    description: Permission `logistics.delivery_order.cancel`.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeliveryOrderCancelInput"
+    responses:
+      "200":
+        description: DO Dibatalkan
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeliveryOrder"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+shipments:
+  get:
+    operationId: listShipments
+    tags: [delivery]
+    summary: Daftar pengiriman (Pengiriman, Pelacakan Pengiriman)
+    description: Cari nomor DO, penerima, resi, atau AWB. Permission `logistics.shipment.read`.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - $ref: "../components/common.yaml#/parameters/Search"
+      - name: status
+        in: query
+        schema:
+          $ref: "../components/common.yaml#/ShipmentStatus"
+      - name: mine
+        in: query
+        description: true = hanya pengiriman kurir internal yang ditugaskan ke user ini.
+        schema:
+          type: boolean
+    responses:
+      "200":
+        description: Daftar pengiriman
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ShipmentList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+shipmentEvents:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  post:
+    operationId: recordShipmentEvent
+    tags: [delivery]
+    summary: Mencatat status pelacakan manual (diserahkan, dalam perjalanan, kembali)
+    description: Status Diterima dicatat lewat konfirmasi diterima DO. Permission `logistics.shipment.write`.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ShipmentEventInput"
+    responses:
+      "200":
+        description: Pengiriman setelah dicatat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Shipment"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+components:
+  schemas:
+    Courier:
+      type: object
+      required: [id, code, name, isInternal, isActive, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        isInternal:
+          type: boolean
+          description: Kurir internal (Merchandiser) — wajib memilih user pengantar.
+        isActive:
+          type: boolean
+        version:
+          type: integer
+    CourierList:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Courier"
+    CourierInput:
+      type: object
+      required: [code, name, isInternal, isActive]
+      properties:
+        code:
+          type: string
+          maxLength: 30
+        name:
+          type: string
+          maxLength: 100
+        isInternal:
+          type: boolean
+        isActive:
+          type: boolean
+    CourierUpdateInput:
+      type: object
+      required: [version, name, isInternal, isActive]
+      properties:
+        version:
+          type: integer
+        name:
+          type: string
+          maxLength: 100
+        isInternal:
+          type: boolean
+        isActive:
+          type: boolean
+    DeliveryQuantity:
+      type: string
+      description: Kuantitas desimal (maks. 3 angka di belakang koma).
+      pattern: "^-?[0-9]{1,15}(\\.[0-9]{1,3})?$"
+    DeliveryProductRef:
+      type: object
+      required: [id, sku, name, uom]
+      properties:
+        id:
+          type: string
+          format: uuid
+        sku:
+          type: string
+        name:
+          type: string
+        uom:
+          type: string
+        barcode:
+          type: string
+          description: Barcode utama produk.
+    DeliveryBatchRef:
+      type: object
+      required: [id, number]
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        expiryDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+    DeliveryOrderBatch:
+      type: object
+      required: [qty]
+      properties:
+        batch:
+          $ref: "#/components/schemas/DeliveryBatchRef"
+        qty:
+          $ref: "#/components/schemas/DeliveryQuantity"
+    DeliveryOrderLine:
+      type: object
+      required: [id, lineNo, product, qty, shippedQty, batches]
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        sourceLineId:
+          type: string
+          format: uuid
+        product:
+          $ref: "#/components/schemas/DeliveryProductRef"
+        qty:
+          $ref: "#/components/schemas/DeliveryQuantity"
+        shippedQty:
+          $ref: "#/components/schemas/DeliveryQuantity"
+        batches:
+          type: array
+          description: Rencana batch saat DO dibuat (batch final di picking list Outbound).
+          items:
+            $ref: "#/components/schemas/DeliveryOrderBatch"
+    DeliveryPrintLine:
+      type: object
+      description: Baris cetak DO/surat jalan tanpa harga — produk, batch, kedaluwarsa, qty.
+      required: [product, qty]
+      properties:
+        product:
+          $ref: "#/components/schemas/DeliveryProductRef"
+        batch:
+          $ref: "#/components/schemas/DeliveryBatchRef"
+        qty:
+          $ref: "#/components/schemas/DeliveryQuantity"
+    DeliveryPackageItem:
+      type: object
+      required: [product, qty]
+      properties:
+        product:
+          $ref: "#/components/schemas/DeliveryProductRef"
+        batch:
+          $ref: "#/components/schemas/DeliveryBatchRef"
+        qty:
+          $ref: "#/components/schemas/DeliveryQuantity"
+    DeliveryPackage:
+      type: object
+      required: [packageNumber, packageCount, items]
+      properties:
+        packageNumber:
+          type: integer
+        packageCount:
+          type: integer
+        weightGrams:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/DeliveryPackageItem"
+    DeliveryProductLabel:
+      type: object
+      description: Label produk per baris DO; kode produk mitra dipakai bila ada (S-316).
+      required: [product, qty, partnerCodeMissing]
+      properties:
+        product:
+          $ref: "#/components/schemas/DeliveryProductRef"
+        batch:
+          $ref: "#/components/schemas/DeliveryBatchRef"
+        qty:
+          $ref: "#/components/schemas/DeliveryQuantity"
+        partnerArticleCode:
+          type: string
+        partnerBarcode:
+          type: string
+        partnerCodeMissing:
+          type: boolean
+          description: DO untuk mitra tetapi produk belum punya kode produk mitra (tampilkan peringatan).
+    DeliveryOutboundRef:
+      type: object
+      required: [id, number, status, needsAttention]
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        status:
+          type: string
+          enum: [in_progress, completed, cancelled]
+        needsAttention:
+          type: boolean
+          description: Ada baris ditahan menunggu stok.
+    ShipmentEvent:
+      type: object
+      required: [id, status, occurredAt, source, note, createdByName]
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          $ref: "../components/common.yaml#/ShipmentStatus"
+        occurredAt:
+          type: string
+          format: date-time
+        source:
+          type: string
+          enum: [manual, webhook]
+        note:
+          type: string
+        createdByName:
+          type: string
+    Shipment:
+      type: object
+      required: [id, deliveryOrderId, courier, internalCourierName, serviceCode, trackingNumber, marketplaceAwb, shippingCost, packageCount, status, shippedAt, receivedByName, deliveryNote, proofFileIds, confirmedByName, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        deliveryOrderId:
+          type: string
+          format: uuid
+        courier:
+          $ref: "#/components/schemas/Courier"
+        internalCourierUserId:
+          type: string
+          format: uuid
+        internalCourierName:
+          type: string
+        serviceCode:
+          type: string
+        trackingNumber:
+          type: string
+        marketplaceAwb:
+          type: string
+        shippingCost:
+          $ref: "../components/common.yaml#/Money"
+        packageCount:
+          type: integer
+        status:
+          $ref: "../components/common.yaml#/ShipmentStatus"
+        shippedAt:
+          type: string
+          format: date-time
+        deliveredAt:
+          type: string
+          format: date-time
+        receivedByName:
+          type: string
+        deliveryNote:
+          type: string
+        proofFileIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        confirmedByName:
+          type: string
+        version:
+          type: integer
+    DeliveryOrderSummary:
+      type: object
+      required: [id, deliveryType, sourceType, sourceId, sourceLabel, recipientName, businessDate, status, lineCount, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        deliveryType:
+          $ref: "../components/common.yaml#/DeliveryOrderType"
+        sourceType:
+          type: string
+        sourceId:
+          type: string
+          format: uuid
+        sourceLabel:
+          type: string
+        recipientName:
+          type: string
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        status:
+          $ref: "../components/common.yaml#/DeliveryOrderStatus"
+        lineCount:
+          type: integer
+        courierName:
+          type: string
+        trackingNumber:
+          type: string
+        marketplaceAwb:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    DeliveryOrderList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/DeliveryOrderSummary"
+    DeliveryOrder:
+      allOf:
+        - $ref: "#/components/schemas/DeliveryOrderSummary"
+        - type: object
+          required: [recipientPhone, shipToAddress, location, note, releasedByName, cancelReason, lines, printLines, packages, productLabels, events, allowedActions, version]
+          properties:
+            salesOrderId:
+              type: string
+              format: uuid
+            partnerId:
+              type: string
+              format: uuid
+            customerId:
+              type: string
+              format: uuid
+            recipientPhone:
+              type: string
+            shipToAddress:
+              type: string
+            location:
+              $ref: "./warehouse_documents.yaml#/components/schemas/WhLocationRef"
+            note:
+              type: string
+            releasedByName:
+              type: string
+            releasedAt:
+              type: string
+              format: date-time
+            outboundCompletedAt:
+              type: string
+              format: date-time
+            shippedAt:
+              type: string
+              format: date-time
+            deliveredAt:
+              type: string
+              format: date-time
+            cancelReason:
+              type: string
+            outbound:
+              $ref: "#/components/schemas/DeliveryOutboundRef"
+            lines:
+              type: array
+              items:
+                $ref: "#/components/schemas/DeliveryOrderLine"
+            printLines:
+              type: array
+              items:
+                $ref: "#/components/schemas/DeliveryPrintLine"
+            packages:
+              type: array
+              items:
+                $ref: "#/components/schemas/DeliveryPackage"
+            productLabels:
+              type: array
+              items:
+                $ref: "#/components/schemas/DeliveryProductLabel"
+            shipment:
+              $ref: "#/components/schemas/Shipment"
+            events:
+              type: array
+              items:
+                $ref: "#/components/schemas/ShipmentEvent"
+            allowedActions:
+              type: array
+              items:
+                type: string
+                enum: [release, ship, deliver, cancel]
+            version:
+              type: integer
+    DeliveryOrderCreateInput:
+      type: object
+      required: [salesOrderId]
+      properties:
+        salesOrderId:
+          type: string
+          format: uuid
+        note:
+          type: string
+          maxLength: 500
+    DeliveryOrderShipInput:
+      type: object
+      required: [version, courierId]
+      properties:
+        version:
+          type: integer
+        courierId:
+          type: string
+          format: uuid
+        internalCourierUserId:
+          type: string
+          format: uuid
+          description: Wajib untuk kurir internal — user Merchandiser yang mengantar.
+        serviceCode:
+          type: string
+          maxLength: 40
+        trackingNumber:
+          type: string
+          maxLength: 60
+          description: Nomor resi kurir (manual).
+        marketplaceAwb:
+          type: string
+          maxLength: 60
+          description: AWB/barcode marketplace — wajib untuk DO marketplace.
+        shippingCost:
+          $ref: "../components/common.yaml#/Money"
+    DeliveryOrderDeliverInput:
+      type: object
+      properties:
+        receivedByName:
+          type: string
+          maxLength: 200
+        note:
+          type: string
+          maxLength: 500
+        proofFileIds:
+          type: array
+          maxItems: 5
+          items:
+            type: string
+            format: uuid
+    DeliveryOrderCancelInput:
+      type: object
+      required: [version, reason]
+      properties:
+        version:
+          type: integer
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 500
+    ShipmentSummary:
+      allOf:
+        - $ref: "#/components/schemas/Shipment"
+        - type: object
+          required: [deliveryOrderNumber, deliveryType, recipientName, sourceLabel]
+          properties:
+            deliveryOrderNumber:
+              type: string
+            deliveryType:
+              $ref: "../components/common.yaml#/DeliveryOrderType"
+            recipientName:
+              type: string
+            sourceLabel:
+              type: string
+    ShipmentList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/ShipmentSummary"
+    ShipmentEventInput:
+      type: object
+      required: [status]
+      properties:
+        status:
+          $ref: "../components/common.yaml#/ShipmentStatus"
+        note:
+          type: string
+          maxLength: 500

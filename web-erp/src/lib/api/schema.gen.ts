@@ -488,6 +488,229 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/v1/couriers": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Master kurir (Kurir & Resi)
+     * @description Permission `logistics.shipment.read` atau `logistics.delivery_order.read`.
+     */
+    get: operations["listCouriers"]
+    put?: never
+    /**
+     * Menambah kurir
+     * @description Permission `logistics.shipment.write`.
+     */
+    post: operations["createCourier"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/couriers/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    /** Mengubah nama, jenis, atau status kurir (kode tetap) */
+    put: operations["updateCourier"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/delivery-orders": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Daftar Delivery Order
+     * @description Cari nomor DO, dokumen asal, penerima, resi, atau AWB. Permission `logistics.delivery_order.read`.
+     */
+    get: operations["listDeliveryOrders"]
+    put?: never
+    /**
+     * Membuat Delivery Order Draft dari Sales Order Diproses (S-309)
+     * @description Satu baris per alokasi yang belum dikirim, batch dari alokasi FEFO. Hanya satu DO terbuka per Sales Order.
+     *     Permission `logistics.delivery_order.write`.
+     */
+    post: operations["createDeliveryOrder"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/delivery-orders/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    /**
+     * Detail DO beserta Outbound, koli, label produk, pengiriman, dan riwayat pelacakan
+     * @description Permission `logistics.delivery_order.read`, `logistics.shipment.read`, atau `logistics.label.post`.
+     */
+    get: operations["getDeliveryOrder"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/delivery-orders/{id}/release": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Release DO (Logistik Leader) — nomor DO dan Outbound dibuat
+     * @description Permission `logistics.delivery_order.post`.
+     */
+    post: operations["releaseDeliveryOrder"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/delivery-orders/{id}/ship": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Serah ke kurir — kurir, resi manual, AWB marketplace, kurir internal (S-312)
+     * @description Hanya setelah Outbound selesai QC. Barang lulus QC keluar dari stok dan jurnal dokumen asal dibuat (HPP A-06;
+     *     marketplace A-10 saat serah ke kurir). Kurir internal wajib memilih Merchandiser. Permission
+     *     `logistics.shipment.write`.
+     */
+    post: operations["shipDeliveryOrder"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/delivery-orders/{id}/deliver": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Konfirmasi barang diterima (foto/tanda terima dari HP)
+     * @description Kurir internal: hanya Merchandiser pengantar dan wajib foto/tanda terima (unggah ke owner `delivery_proof`).
+     *     Permission `logistics.shipment.post`.
+     */
+    post: operations["deliverDeliveryOrder"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/delivery-orders/{id}/cancel": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Membatalkan DO sebelum dikirim (Outbound ikut dibatalkan)
+     * @description Permission `logistics.delivery_order.cancel`.
+     */
+    post: operations["cancelDeliveryOrder"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/shipments": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Daftar pengiriman (Pengiriman, Pelacakan Pengiriman)
+     * @description Cari nomor DO, penerima, resi, atau AWB. Permission `logistics.shipment.read`.
+     */
+    get: operations["listShipments"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/shipments/{id}/events": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Mencatat status pelacakan manual (diserahkan, dalam perjalanan, kembali)
+     * @description Status Diterima dicatat lewat konfirmasi diterima DO. Permission `logistics.shipment.write`.
+     */
+    post: operations["recordShipmentEvent"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/v1/auth/login": {
     parameters: {
       query?: never
@@ -5187,6 +5410,279 @@ export interface components {
       courier_waybill_id?: string
       status: string
     }
+    Courier: {
+      /** Format: uuid */
+      id: string
+      code: string
+      name: string
+      /** @description Kurir internal (Merchandiser) — wajib memilih user pengantar. */
+      isInternal: boolean
+      isActive: boolean
+      version: number
+    }
+    CourierList: {
+      items: components["schemas"]["Courier"][]
+    }
+    CourierInput: {
+      code: string
+      name: string
+      isInternal: boolean
+      isActive: boolean
+    }
+    CourierUpdateInput: {
+      version: number
+      name: string
+      isInternal: boolean
+      isActive: boolean
+    }
+    /**
+     * @description Status Delivery Order (Desain Status Dokumen 5.4).
+     * @enum {string}
+     */
+    DeliveryOrderStatus:
+      "draft" | "in_progress" | "in_transit" | "received" | "cancelled"
+    /**
+     * @description Jenis Delivery Order: `sales` penjualan (MT beli putus, B2B, WA/IG, karyawan), `marketplace` pesanan marketplace
+     *     (serah ke kurir = pengakuan penjualan), `consignment` konsinyasi, `vending_buffer` buffer vending, `transfer` lainnya.
+     * @enum {string}
+     */
+    DeliveryOrderType:
+      "sales" | "marketplace" | "consignment" | "vending_buffer" | "transfer"
+    DeliveryOrderSummary: {
+      /** Format: uuid */
+      id: string
+      number?: string
+      deliveryType: components["schemas"]["DeliveryOrderType"]
+      sourceType: string
+      /** Format: uuid */
+      sourceId: string
+      sourceLabel: string
+      recipientName: string
+      businessDate: components["schemas"]["BusinessDate"]
+      status: components["schemas"]["DeliveryOrderStatus"]
+      lineCount: number
+      courierName?: string
+      trackingNumber?: string
+      marketplaceAwb?: string
+      /** Format: date-time */
+      createdAt: string
+    }
+    DeliveryOrderList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["DeliveryOrderSummary"][]
+    }
+    DeliveryOrderCreateInput: {
+      /** Format: uuid */
+      salesOrderId: string
+      note?: string
+    }
+    /**
+     * @description Di dalam gudang: `inbound`, `finished_goods` (FG Non-Ecommerce), `ecommerce` (E-commerce Stock), `petty_stock` (Petty Stock),
+     *     `raw_material` (RM), `goods_material` (GM), `returns`, `event`. Eksternal: `toll_manufacturer` (maklon),
+     *     `consignment`, `vending_buffer`, `vending_machine`.
+     * @enum {string}
+     */
+    LocationType:
+      | "inbound"
+      | "finished_goods"
+      | "ecommerce"
+      | "petty_stock"
+      | "raw_material"
+      | "goods_material"
+      | "returns"
+      | "event"
+      | "toll_manufacturer"
+      | "consignment"
+      | "vending_buffer"
+      | "vending_machine"
+    WhLocationRef: {
+      /** Format: uuid */
+      id: string
+      code: string
+      name: string
+      locationType: components["schemas"]["LocationType"]
+      locationTypeLabel: string
+      isExternal: boolean
+      warehouseName?: string
+    }
+    DeliveryOutboundRef: {
+      /** Format: uuid */
+      id: string
+      number: string
+      /** @enum {string} */
+      status: "in_progress" | "completed" | "cancelled"
+      /** @description Ada baris ditahan menunggu stok. */
+      needsAttention: boolean
+    }
+    DeliveryProductRef: {
+      /** Format: uuid */
+      id: string
+      sku: string
+      name: string
+      uom: string
+      /** @description Barcode utama produk. */
+      barcode?: string
+    }
+    /** @description Kuantitas desimal (maks. 3 angka di belakang koma). */
+    DeliveryQuantity: string
+    DeliveryBatchRef: {
+      /** Format: uuid */
+      id: string
+      number: string
+      expiryDate?: components["schemas"]["BusinessDate"]
+    }
+    DeliveryOrderBatch: {
+      batch?: components["schemas"]["DeliveryBatchRef"]
+      qty: components["schemas"]["DeliveryQuantity"]
+    }
+    DeliveryOrderLine: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      /** Format: uuid */
+      sourceLineId?: string
+      product: components["schemas"]["DeliveryProductRef"]
+      qty: components["schemas"]["DeliveryQuantity"]
+      shippedQty: components["schemas"]["DeliveryQuantity"]
+      /** @description Rencana batch saat DO dibuat (batch final di picking list Outbound). */
+      batches: components["schemas"]["DeliveryOrderBatch"][]
+    }
+    /** @description Baris cetak DO/surat jalan tanpa harga — produk, batch, kedaluwarsa, qty. */
+    DeliveryPrintLine: {
+      product: components["schemas"]["DeliveryProductRef"]
+      batch?: components["schemas"]["DeliveryBatchRef"]
+      qty: components["schemas"]["DeliveryQuantity"]
+    }
+    DeliveryPackageItem: {
+      product: components["schemas"]["DeliveryProductRef"]
+      batch?: components["schemas"]["DeliveryBatchRef"]
+      qty: components["schemas"]["DeliveryQuantity"]
+    }
+    DeliveryPackage: {
+      packageNumber: number
+      packageCount: number
+      weightGrams?: number
+      items: components["schemas"]["DeliveryPackageItem"][]
+    }
+    /** @description Label produk per baris DO; kode produk mitra dipakai bila ada (S-316). */
+    DeliveryProductLabel: {
+      product: components["schemas"]["DeliveryProductRef"]
+      batch?: components["schemas"]["DeliveryBatchRef"]
+      qty: components["schemas"]["DeliveryQuantity"]
+      partnerArticleCode?: string
+      partnerBarcode?: string
+      /** @description DO untuk mitra tetapi produk belum punya kode produk mitra (tampilkan peringatan). */
+      partnerCodeMissing: boolean
+    }
+    /**
+     * @description `picked_up` diserahkan ke kurir, `in_transit` dalam perjalanan, `delivered` diterima, `returned` kembali.
+     * @enum {string}
+     */
+    ShipmentStatus: "picked_up" | "in_transit" | "delivered" | "returned"
+    Shipment: {
+      /** Format: uuid */
+      id: string
+      /** Format: uuid */
+      deliveryOrderId: string
+      courier: components["schemas"]["Courier"]
+      /** Format: uuid */
+      internalCourierUserId?: string
+      internalCourierName: string
+      serviceCode: string
+      trackingNumber: string
+      marketplaceAwb: string
+      shippingCost: components["schemas"]["Money"]
+      packageCount: number
+      status: components["schemas"]["ShipmentStatus"]
+      /** Format: date-time */
+      shippedAt: string
+      /** Format: date-time */
+      deliveredAt?: string
+      receivedByName: string
+      deliveryNote: string
+      proofFileIds: string[]
+      confirmedByName: string
+      version: number
+    }
+    ShipmentEvent: {
+      /** Format: uuid */
+      id: string
+      status: components["schemas"]["ShipmentStatus"]
+      /** Format: date-time */
+      occurredAt: string
+      /** @enum {string} */
+      source: "manual" | "webhook"
+      note: string
+      createdByName: string
+    }
+    DeliveryOrder: components["schemas"]["DeliveryOrderSummary"] & {
+      /** Format: uuid */
+      salesOrderId?: string
+      /** Format: uuid */
+      partnerId?: string
+      /** Format: uuid */
+      customerId?: string
+      recipientPhone: string
+      shipToAddress: string
+      location: components["schemas"]["WhLocationRef"]
+      note: string
+      releasedByName: string
+      /** Format: date-time */
+      releasedAt?: string
+      /** Format: date-time */
+      outboundCompletedAt?: string
+      /** Format: date-time */
+      shippedAt?: string
+      /** Format: date-time */
+      deliveredAt?: string
+      cancelReason: string
+      outbound?: components["schemas"]["DeliveryOutboundRef"]
+      lines: components["schemas"]["DeliveryOrderLine"][]
+      printLines: components["schemas"]["DeliveryPrintLine"][]
+      packages: components["schemas"]["DeliveryPackage"][]
+      productLabels: components["schemas"]["DeliveryProductLabel"][]
+      shipment?: components["schemas"]["Shipment"]
+      events: components["schemas"]["ShipmentEvent"][]
+      allowedActions: ("release" | "ship" | "deliver" | "cancel")[]
+      version: number
+    }
+    DeliveryOrderShipInput: {
+      version: number
+      /** Format: uuid */
+      courierId: string
+      /**
+       * Format: uuid
+       * @description Wajib untuk kurir internal — user Merchandiser yang mengantar.
+       */
+      internalCourierUserId?: string
+      serviceCode?: string
+      /** @description Nomor resi kurir (manual). */
+      trackingNumber?: string
+      /** @description AWB/barcode marketplace — wajib untuk DO marketplace. */
+      marketplaceAwb?: string
+      shippingCost?: components["schemas"]["Money"]
+    }
+    DeliveryOrderDeliverInput: {
+      receivedByName?: string
+      note?: string
+      proofFileIds?: string[]
+    }
+    DeliveryOrderCancelInput: {
+      version: number
+      reason: string
+    }
+    ShipmentSummary: components["schemas"]["Shipment"] & {
+      deliveryOrderNumber: string
+      deliveryType: components["schemas"]["DeliveryOrderType"]
+      recipientName: string
+      sourceLabel: string
+    }
+    ShipmentList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["ShipmentSummary"][]
+    }
+    ShipmentEventInput: {
+      status: components["schemas"]["ShipmentStatus"]
+      note?: string
+    }
     LoginRequest: {
       /** Format: email */
       email: string
@@ -5722,25 +6218,6 @@ export interface components {
     }
     WarehouseUpdate: components["schemas"]["WarehouseFields"] &
       components["schemas"]["VersionInput"]
-    /**
-     * @description Di dalam gudang: `inbound`, `finished_goods` (FG Non-Ecommerce), `ecommerce` (E-commerce Stock), `petty_stock` (Petty Stock),
-     *     `raw_material` (RM), `goods_material` (GM), `returns`, `event`. Eksternal: `toll_manufacturer` (maklon),
-     *     `consignment`, `vending_buffer`, `vending_machine`.
-     * @enum {string}
-     */
-    LocationType:
-      | "inbound"
-      | "finished_goods"
-      | "ecommerce"
-      | "petty_stock"
-      | "raw_material"
-      | "goods_material"
-      | "returns"
-      | "event"
-      | "toll_manufacturer"
-      | "consignment"
-      | "vending_buffer"
-      | "vending_machine"
     /** @enum {string} */
     ExternalPartyType: "supplier" | "partner" | "vending_machine"
     Location: {
@@ -6127,16 +6604,6 @@ export interface components {
      * @enum {string}
      */
     InboundStatus: "in_progress" | "completed"
-    WhLocationRef: {
-      /** Format: uuid */
-      id: string
-      code: string
-      name: string
-      locationType: components["schemas"]["LocationType"]
-      locationTypeLabel: string
-      isExternal: boolean
-      warehouseName?: string
-    }
     InboundSummary: {
       /** Format: uuid */
       id: string
@@ -9846,6 +10313,346 @@ export interface operations {
           "application/problem+json": components["schemas"]["Problem"]
         }
       }
+    }
+  }
+  listCouriers: {
+    parameters: {
+      query?: {
+        /** @description true = hanya kurir aktif (dropdown pengiriman). */
+        active?: boolean
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar kurir */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CourierList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createCourier: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CourierInput"]
+      }
+    }
+    responses: {
+      /** @description Kurir dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Courier"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateCourier: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CourierUpdateInput"]
+      }
+    }
+    responses: {
+      /** @description Kurir diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Courier"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listDeliveryOrders: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["DeliveryOrderStatus"]
+        deliveryType?: components["schemas"]["DeliveryOrderType"]
+        /** @description DO milik satu dokumen asal (mis. Sales Order). */
+        sourceId?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar DO */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DeliveryOrderList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createDeliveryOrder: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DeliveryOrderCreateInput"]
+      }
+    }
+    responses: {
+      /** @description DO dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DeliveryOrder"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getDeliveryOrder: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Detail DO */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DeliveryOrder"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  releaseDeliveryOrder: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description DO Diproses */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DeliveryOrder"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  shipDeliveryOrder: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DeliveryOrderShipInput"]
+      }
+    }
+    responses: {
+      /** @description DO Dalam Pengiriman */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DeliveryOrder"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  deliverDeliveryOrder: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DeliveryOrderDeliverInput"]
+      }
+    }
+    responses: {
+      /** @description DO Diterima */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DeliveryOrder"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  cancelDeliveryOrder: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DeliveryOrderCancelInput"]
+      }
+    }
+    responses: {
+      /** @description DO Dibatalkan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DeliveryOrder"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listShipments: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["ShipmentStatus"]
+        /** @description true = hanya pengiriman kurir internal yang ditugaskan ke user ini. */
+        mine?: boolean
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar pengiriman */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ShipmentList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  recordShipmentEvent: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ShipmentEventInput"]
+      }
+    }
+    responses: {
+      /** @description Pengiriman setelah dicatat */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Shipment"]
+        }
+      }
+      default: components["responses"]["Problem"]
     }
   }
   login: {

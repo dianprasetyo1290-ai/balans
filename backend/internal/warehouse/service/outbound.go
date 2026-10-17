@@ -87,6 +87,14 @@ type QCReturns interface {
 	ReturnRejected(ctx context.Context, r OutboundReturn) (string, error)
 }
 
+// SetQCReturns memasang pembuat retur pembelian otomatis barang reject QC Outbound (dipanggil saat wiring
+// setelah modul procurement disusun).
+func (s *Service) SetQCReturns(r QCReturns) {
+	s.docs.mu.Lock()
+	defer s.docs.mu.Unlock()
+	s.docs.deps.Returns = r
+}
+
 // RegisterOutboundHandler mendaftarkan callback dokumen asal Outbound (registrasi terakhir menang).
 func (s *Service) RegisterOutboundHandler(sourceType string, h OutboundHandler) {
 	s.docs.mu.Lock()
@@ -421,7 +429,7 @@ func (s *Service) RecordOutboundQC(ctx context.Context, id, lineID uuid.UUID, in
 		return OutboundDetail{}, err
 	}
 	if held {
-		s.notify(ctx, d, s.heldRecipients(ctx, d), "outbound_held", "Baris Outbound ditahan: "+saved.Number,
+		s.notify(ctx, d, s.heldRecipients(ctx, d), "outbound.held", "Baris Outbound ditahan: "+saved.Number,
 			"Stok pengganti QC Outbound "+saved.SourceLabel+" tidak cukup. Baris ditahan menunggu stok; kirim sebagian hanya atas keputusan user.",
 			"/warehouse/outbounds/"+saved.ID.String())
 	}

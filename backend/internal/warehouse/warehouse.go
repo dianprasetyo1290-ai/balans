@@ -473,3 +473,6 @@ func (m *Module) CancelOutbound(ctx context.Context, sourceType string, sourceID
 func (m *Module) RegisterOutboundHandler(sourceType string, h OutboundHandler) {
 	m.svc.RegisterOutboundHandler(sourceType, h)
 }
+
+// SetQCReturns memasang retur pembelian otomatis untuk barang reject QC Outbound dari pemasok/maklon (D-24, S-311).
+func (m *Module) SetQCReturns(r QCReturns) { m.svc.SetQCReturns(r) }
