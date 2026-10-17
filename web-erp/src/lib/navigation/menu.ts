@@ -165,17 +165,48 @@ export const MENU: MenuGroup[] = [
     label: "Pengadaan",
     icon: ShoppingCartIcon,
     modules: ["procurement"],
-    items: items(
-      "Purchase Request",
-      "Purchase Order",
-      "Purchase Order Maklon",
-      "Purchase Order Reprocess",
-      "Persetujuan Pengadaan",
-      "Penerimaan Barang",
-      "Reject & Waste",
-      "Tagihan Pemasok",
-      "Uang Muka Pembelian"
-    ),
+    items: [
+      {
+        label: "Purchase Request",
+        to: "/procurement/purchase-requests",
+        permission: "procurement.purchase_request.read",
+        module: "procurement",
+      },
+      {
+        label: "Purchase Order",
+        to: "/procurement/purchase-orders",
+        permission: "procurement.purchase_order.read",
+        module: "procurement",
+      },
+      {
+        label: "Purchase Order Maklon",
+        to: "/procurement/toll-orders",
+        permission: "procurement.purchase_order.read",
+        module: "procurement",
+      },
+      {
+        label: "Purchase Order Reprocess",
+        to: "/procurement/reprocess-orders",
+        permission: "procurement.purchase_order.read",
+        module: "procurement",
+      },
+      {
+        label: "Persetujuan Pengadaan",
+        to: "/procurement/approvals",
+        permission: [
+          "procurement.purchase_request.approve",
+          "procurement.purchase_order.approve",
+        ],
+        module: "procurement",
+      },
+      ...items("Penerimaan Barang", "Reject & Waste", "Tagihan Pemasok"),
+      {
+        label: "Uang Muka Pembelian",
+        to: "/procurement/purchase-advances",
+        permission: "procurement.purchase_advance.read",
+        module: "procurement",
+      },
+    ],
   },
   {
     label: "Gudang",
