@@ -32,7 +32,7 @@ const (
 const progressEvery = 50
 
 func importLink(j domain.ImportJob) string {
-	return "/integrasi/impor-ekspor?kind=" + j.Kind + "&job=" + j.ID.String()
+	return "/integrations/data-exchange?tab=import&kind=" + j.Kind + "&job=" + j.ID.String()
 }
 
 // WriteTemplate menulis template impor jenis data ke w.

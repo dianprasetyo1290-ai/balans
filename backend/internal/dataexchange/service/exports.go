@@ -24,7 +24,7 @@ const (
 )
 
 func exportLink(j domain.ExportJob) string {
-	return "/integrasi/impor-ekspor?tab=ekspor&kind=" + j.Kind + "&job=" + j.ID.String()
+	return "/integrations/data-exchange?tab=export&kind=" + j.Kind
 }
 
 // CreateExport menjadwalkan ekspor jenis data; file xlsx dibuat job dataexchange.export di antrean bulk.

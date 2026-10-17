@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { usePermissions } from "@/features/auth/api/auth-api"
+import { DataExchangeButtons } from "@/features/dataexchange/components/data-exchange-buttons"
 import { parseProblem } from "@/lib/api/problem"
 import { useIdempotentMutation } from "@/lib/api/use-idempotent-mutation"
 import { showErrorDialog } from "@/stores/error-dialog-store"
@@ -162,11 +163,14 @@ export function SuppliersPage() {
             pembayaran.
           </p>
         </div>
-        {canWrite ? (
-          <Button className="min-h-11 sm:min-h-9" onClick={() => setForm({})}>
-            <PlusIcon /> Tambah Pemasok
-          </Button>
-        ) : null}
+        <div className="flex flex-wrap gap-2">
+          <DataExchangeButtons kind="party.supplier" />
+          {canWrite ? (
+            <Button className="min-h-11 sm:min-h-9" onClick={() => setForm({})}>
+              <PlusIcon /> Tambah Pemasok
+            </Button>
+          ) : null}
+        </div>
       </div>
       <div className="flex flex-wrap gap-2">
         <form

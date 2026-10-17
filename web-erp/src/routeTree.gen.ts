@@ -21,6 +21,7 @@ import { Route as AppFinanceAccountsRouteImport } from './routes/_app/finance/ac
 import { Route as AppFinanceFiscalPeriodsRouteImport } from './routes/_app/finance/fiscal-periods'
 import { Route as AppFinanceGeneralLedgerRouteImport } from './routes/_app/finance/general-ledger'
 import { Route as AppHrisEmployeesRouteImport } from './routes/_app/hris/employees'
+import { Route as AppIntegrationsDataExchangeRouteImport } from './routes/_app/integrations/data-exchange'
 import { Route as AppLogisticsProductLabelsRouteImport } from './routes/_app/logistics/product-labels'
 import { Route as AppMasterDataBundlesRouteImport } from './routes/_app/master-data/bundles'
 import { Route as AppMasterDataPackagingMaterialsRouteImport } from './routes/_app/master-data/packaging-materials'
@@ -106,6 +107,12 @@ const AppHrisEmployeesRoute = AppHrisEmployeesRouteImport.update({
   path: '/hris/employees',
   getParentRoute: () => AppRoute,
 } as any)
+const AppIntegrationsDataExchangeRoute =
+  AppIntegrationsDataExchangeRouteImport.update({
+    id: '/integrations/data-exchange',
+    path: '/integrations/data-exchange',
+    getParentRoute: () => AppRoute,
+  } as any)
 const AppLogisticsProductLabelsRoute =
   AppLogisticsProductLabelsRouteImport.update({
     id: '/logistics/product-labels',
@@ -254,6 +261,7 @@ export interface FileRoutesByFullPath {
   '/finance/fiscal-periods': typeof AppFinanceFiscalPeriodsRoute
   '/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
   '/hris/employees': typeof AppHrisEmployeesRoute
+  '/integrations/data-exchange': typeof AppIntegrationsDataExchangeRoute
   '/logistics/product-labels': typeof AppLogisticsProductLabelsRoute
   '/master-data/bundles': typeof AppMasterDataBundlesRoute
   '/master-data/packaging-materials': typeof AppMasterDataPackagingMaterialsRoute
@@ -292,6 +300,7 @@ export interface FileRoutesByTo {
   '/finance/fiscal-periods': typeof AppFinanceFiscalPeriodsRoute
   '/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
   '/hris/employees': typeof AppHrisEmployeesRoute
+  '/integrations/data-exchange': typeof AppIntegrationsDataExchangeRoute
   '/logistics/product-labels': typeof AppLogisticsProductLabelsRoute
   '/master-data/bundles': typeof AppMasterDataBundlesRoute
   '/master-data/packaging-materials': typeof AppMasterDataPackagingMaterialsRoute
@@ -332,6 +341,7 @@ export interface FileRoutesById {
   '/_app/finance/fiscal-periods': typeof AppFinanceFiscalPeriodsRoute
   '/_app/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
   '/_app/hris/employees': typeof AppHrisEmployeesRoute
+  '/_app/integrations/data-exchange': typeof AppIntegrationsDataExchangeRoute
   '/_app/logistics/product-labels': typeof AppLogisticsProductLabelsRoute
   '/_app/master-data/bundles': typeof AppMasterDataBundlesRoute
   '/_app/master-data/packaging-materials': typeof AppMasterDataPackagingMaterialsRoute
@@ -372,6 +382,7 @@ export interface FileRouteTypes {
     | '/finance/fiscal-periods'
     | '/finance/general-ledger'
     | '/hris/employees'
+    | '/integrations/data-exchange'
     | '/logistics/product-labels'
     | '/master-data/bundles'
     | '/master-data/packaging-materials'
@@ -410,6 +421,7 @@ export interface FileRouteTypes {
     | '/finance/fiscal-periods'
     | '/finance/general-ledger'
     | '/hris/employees'
+    | '/integrations/data-exchange'
     | '/logistics/product-labels'
     | '/master-data/bundles'
     | '/master-data/packaging-materials'
@@ -449,6 +461,7 @@ export interface FileRouteTypes {
     | '/_app/finance/fiscal-periods'
     | '/_app/finance/general-ledger'
     | '/_app/hris/employees'
+    | '/_app/integrations/data-exchange'
     | '/_app/logistics/product-labels'
     | '/_app/master-data/bundles'
     | '/_app/master-data/packaging-materials'
@@ -569,6 +582,13 @@ declare module '@tanstack/react-router' {
       path: '/hris/employees'
       fullPath: '/hris/employees'
       preLoaderRoute: typeof AppHrisEmployeesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/integrations/data-exchange': {
+      id: '/_app/integrations/data-exchange'
+      path: '/integrations/data-exchange'
+      fullPath: '/integrations/data-exchange'
+      preLoaderRoute: typeof AppIntegrationsDataExchangeRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/logistics/product-labels': {
@@ -756,6 +776,7 @@ interface AppRouteChildren {
   AppFinanceFiscalPeriodsRoute: typeof AppFinanceFiscalPeriodsRoute
   AppFinanceGeneralLedgerRoute: typeof AppFinanceGeneralLedgerRoute
   AppHrisEmployeesRoute: typeof AppHrisEmployeesRoute
+  AppIntegrationsDataExchangeRoute: typeof AppIntegrationsDataExchangeRoute
   AppLogisticsProductLabelsRoute: typeof AppLogisticsProductLabelsRoute
   AppMasterDataBundlesRoute: typeof AppMasterDataBundlesRoute
   AppMasterDataPackagingMaterialsRoute: typeof AppMasterDataPackagingMaterialsRoute
@@ -790,6 +811,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppFinanceFiscalPeriodsRoute: AppFinanceFiscalPeriodsRoute,
   AppFinanceGeneralLedgerRoute: AppFinanceGeneralLedgerRoute,
   AppHrisEmployeesRoute: AppHrisEmployeesRoute,
+  AppIntegrationsDataExchangeRoute: AppIntegrationsDataExchangeRoute,
   AppLogisticsProductLabelsRoute: AppLogisticsProductLabelsRoute,
   AppMasterDataBundlesRoute: AppMasterDataBundlesRoute,
   AppMasterDataPackagingMaterialsRoute: AppMasterDataPackagingMaterialsRoute,
