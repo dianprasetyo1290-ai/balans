@@ -2,7 +2,10 @@ products:
   get:
     operationId: listProducts
     tags: [catalog]
-    summary: Daftar produk (Produk Jadi, Packaging, Material)
+    summary: Daftar produk (Produk Jadi, Packaging, Material, Bundling)
+    description: |
+      Produk yang dihapus tidak tampil kecuali `deleted=true` (hanya produk terhapus, untuk dipulihkan Admin Sistem).
+      `q` mencari SKU, nama, varian, atau barcode persis.
     parameters:
       - $ref: "../components/common.yaml#/parameters/Page"
       - $ref: "../components/common.yaml#/parameters/PageSize"
@@ -10,9 +13,25 @@ products:
       - $ref: "../components/common.yaml#/parameters/Search"
       - name: productType
         in: query
+        description: Bisa lebih dari satu, mis. `productType=packaging&productType=reprocess_material`.
         schema:
-          $ref: "#/components/schemas/ProductType"
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductType"
       - name: isBundle
+        in: query
+        schema:
+          type: boolean
+      - name: categoryId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: isActive
+        in: query
+        schema:
+          type: boolean
+      - name: deleted
         in: query
         schema:
           type: boolean
@@ -29,7 +48,10 @@ products:
     operationId: createProduct
     tags: [catalog]
     summary: Membuat produk (MD-01, MD-02, MD-03)
-    description: SKU unik permanen dan tidak bisa dipakai ulang walau produk dihapus (`DUPLICATE_CODE`).
+    description: |
+      SKU unik permanen dan tidak bisa dipakai ulang walau produk dihapus (`DUPLICATE_CODE`). Produk Jadi wajib
+      umur simpan dan tipe kemasan dan selalu memakai batch. Bundel virtual wajib punya komponen Produk Jadi
+      non-bundel dan tidak punya stok, batch, maupun umur simpan sendiri.
     parameters:
       - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
     requestBody:
@@ -47,13 +69,34 @@ products:
               $ref: "#/components/schemas/Product"
       default:
         $ref: "../components/common.yaml#/responses/Problem"
+productLookup:
+  get:
+    operationId: lookupProduct
+    tags: [catalog]
+    summary: Mencari satu produk aktif berdasarkan SKU atau barcode persis (pindai barcode)
+    parameters:
+      - name: code
+        in: query
+        required: true
+        schema:
+          type: string
+          minLength: 1
+    responses:
+      "200":
+        description: Produk dengan SKU atau barcode tersebut
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
 product:
   parameters:
     - $ref: "../components/common.yaml#/parameters/Id"
   get:
     operationId: getProduct
     tags: [catalog]
-    summary: Detail produk
+    summary: Detail produk (produk terhapus tetap bisa dibuka untuk dokumen lama)
     responses:
       "200":
         description: Detail produk
@@ -67,6 +110,7 @@ product:
     operationId: updateProduct
     tags: [catalog]
     summary: Mengubah produk (optimistic locking dengan `version`)
+    description: SKU, jenis produk, dan status bundel tidak bisa diubah.
     parameters:
       - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
     requestBody:
@@ -74,13 +118,7 @@ product:
       content:
         application/json:
           schema:
-            allOf:
-              - $ref: "#/components/schemas/ProductInput"
-              - type: object
-                required: [version]
-                properties:
-                  version:
-                    type: integer
+            $ref: "#/components/schemas/ProductUpdate"
     responses:
       "200":
         description: Produk diubah
@@ -94,6 +132,7 @@ product:
     operationId: deleteProduct
     tags: [catalog]
     summary: Menghapus produk (soft delete; tetap tampil di dokumen lama)
+    description: Produk yang masih menjadi komponen bundel aktif tidak bisa dihapus (`INVALID_STATE_TRANSITION`).
     parameters:
       - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
     responses:
@@ -101,37 +140,189 @@ product:
         description: Produk dihapus
       default:
         $ref: "../components/common.yaml#/responses/Problem"
+productRestore:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  post:
+    operationId: restoreProduct
+    tags: [catalog]
+    summary: Memulihkan produk yang dihapus (hanya Admin Sistem)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    responses:
+      "200":
+        description: Produk dipulihkan
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+productCategories:
+  get:
+    operationId: listProductCategories
+    tags: [catalog]
+    summary: Daftar kategori produk
+    parameters:
+      - name: deleted
+        in: query
+        schema:
+          type: boolean
+    responses:
+      "200":
+        description: Kategori urut kode
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/ProductCategory"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createProductCategory
+    tags: [catalog]
+    summary: Membuat kategori produk (kode unik permanen)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProductCategoryInput"
+    responses:
+      "201":
+        description: Kategori dibuat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductCategory"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+productCategory:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  put:
+    operationId: updateProductCategory
+    tags: [catalog]
+    summary: Mengubah nama kategori
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProductCategoryUpdate"
+    responses:
+      "200":
+        description: Kategori diubah
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductCategory"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  delete:
+    operationId: deleteProductCategory
+    tags: [catalog]
+    summary: Menghapus kategori (soft delete)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    responses:
+      "204":
+        description: Kategori dihapus
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+productCategoryRestore:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  post:
+    operationId: restoreProductCategory
+    tags: [catalog]
+    summary: Memulihkan kategori yang dihapus (hanya Admin Sistem)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    responses:
+      "200":
+        description: Kategori dipulihkan
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductCategory"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
 components:
   schemas:
     ProductType:
       type: string
+      description: "`finished_good` = Produk Jadi, `packaging` = Packaging (RM), `reprocess_material` = Material (GM)."
       enum: [finished_good, packaging, reprocess_material]
     PackagingType:
       type: string
       enum: [tube, pouch, roll_sachet]
-    BundleComponent:
+    BarcodeSymbology:
+      type: string
+      description: 13 digit dengan digit periksa benar = EAN-13, selain itu Code 128.
+      enum: [ean13, code128]
+    Quantity:
+      type: string
+      description: Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+      pattern: "^[0-9]{1,15}(\\.[0-9]{1,3})?$"
+      example: "2.000"
+    ProductBarcodeInput:
+      type: object
+      required: [barcode, isPrimary]
+      properties:
+        barcode:
+          type: string
+          minLength: 1
+          maxLength: 48
+        isPrimary:
+          type: boolean
+    ProductBarcode:
+      type: object
+      required: [barcode, symbology, isPrimary]
+      properties:
+        barcode:
+          type: string
+        symbology:
+          $ref: "#/components/schemas/BarcodeSymbology"
+        isPrimary:
+          type: boolean
+    BundleComponentInput:
       type: object
       required: [componentProductId, qty]
       properties:
         componentProductId:
           type: string
           format: uuid
+        qty:
+          $ref: "#/components/schemas/Quantity"
+    BundleComponent:
+      type: object
+      required: [componentProductId, qty, componentSku, componentName, componentVariant, componentUom, componentDeleted]
+      properties:
+        componentProductId:
+          type: string
+          format: uuid
+        qty:
+          $ref: "#/components/schemas/Quantity"
         componentSku:
           type: string
-          readOnly: true
-        qty:
+        componentName:
           type: string
-          description: Kuantitas desimal sebagai string.
-          example: "2.000"
-    ProductInput:
+        componentVariant:
+          type: string
+        componentUom:
+          type: string
+        componentDeleted:
+          type: boolean
+    ProductFields:
       type: object
-      required: [sku, name, productType, uom, hasBatch, isBundle]
+      required: [name, uom, hasBatch, isActive]
       properties:
-        sku:
-          type: string
-          minLength: 1
-          maxLength: 40
-          pattern: "^[A-Z0-9][A-Z0-9-]*$"
         name:
           type: string
           minLength: 1
@@ -139,52 +330,143 @@ components:
         variant:
           type: string
           maxLength: 80
-        productType:
-          $ref: "#/components/schemas/ProductType"
         packagingType:
-          $ref: "#/components/schemas/PackagingType"
+          allOf:
+            - $ref: "#/components/schemas/PackagingType"
+          nullable: true
         uom:
           type: string
+          minLength: 1
+          maxLength: 20
           example: pcs
         shelfLifeDays:
           type: integer
           minimum: 1
+          nullable: true
+          description: Umur simpan dalam hari; wajib untuk Produk Jadi non-bundel.
+        hasBatch:
+          type: boolean
+          description: Hanya dipakai untuk Packaging & Material; Produk Jadi selalu memakai batch, bundel tidak.
+        categoryId:
+          type: string
+          format: uuid
+          nullable: true
+        minStockQty:
+          allOf:
+            - $ref: "#/components/schemas/Quantity"
+          nullable: true
+        unitsPerCarton:
+          type: integer
+          minimum: 1
+          nullable: true
+        isActive:
+          type: boolean
+        barcodes:
+          type: array
+          description: Tepat satu barcode utama jika ada barcode; barcode unik di semua produk.
+          items:
+            $ref: "#/components/schemas/ProductBarcodeInput"
+        bundleComponents:
+          type: array
+          description: Wajib untuk bundel; komponen harus Produk Jadi non-bundel yang aktif.
+          items:
+            $ref: "#/components/schemas/BundleComponentInput"
+    ProductInput:
+      allOf:
+        - $ref: "#/components/schemas/ProductFields"
+        - type: object
+          required: [sku, productType, isBundle]
+          properties:
+            sku:
+              type: string
+              minLength: 1
+              maxLength: 40
+              description: Huruf besar, angka, dan tanda minus; huruf kecil diubah menjadi besar.
+            productType:
+              $ref: "#/components/schemas/ProductType"
+            isBundle:
+              type: boolean
+              description: Bundel virtual tidak punya stok sendiri; stok komponen terpotong saat terjual (MD-03).
+    ProductUpdate:
+      allOf:
+        - $ref: "#/components/schemas/ProductFields"
+        - $ref: "../components/common.yaml#/VersionInput"
+    ProductAction:
+      type: string
+      enum: [update, delete, restore]
+    Product:
+      type: object
+      required: [id, sku, name, variant, productType, uom, hasBatch, isBundle, isActive, barcodes, bundleComponents,
+        createdAt, updatedAt, version, allowedActions]
+      properties:
+        id:
+          type: string
+          format: uuid
+        sku:
+          type: string
+        name:
+          type: string
+        variant:
+          type: string
+        productType:
+          $ref: "#/components/schemas/ProductType"
+        packagingType:
+          allOf:
+            - $ref: "#/components/schemas/PackagingType"
+          nullable: true
+        uom:
+          type: string
+        shelfLifeDays:
+          type: integer
+          nullable: true
         hasBatch:
           type: boolean
         isBundle:
           type: boolean
-          description: Bundle virtual tidak punya stok sendiri; stok komponen terpotong saat terjual (MD-03).
         categoryId:
           type: string
           format: uuid
+          nullable: true
+        categoryName:
+          type: string
+          nullable: true
+        minStockQty:
+          allOf:
+            - $ref: "#/components/schemas/Quantity"
+          nullable: true
+        unitsPerCarton:
+          type: integer
+          nullable: true
+        isActive:
+          type: boolean
         barcodes:
           type: array
           items:
-            type: string
-        minStockQty:
+            $ref: "#/components/schemas/ProductBarcode"
+        primaryBarcode:
           type: string
-          example: "100.000"
+          nullable: true
+          description: Barcode utama yang dicetak di label produk.
         bundleComponents:
           type: array
           items:
             $ref: "#/components/schemas/BundleComponent"
-    Product:
-      allOf:
-        - $ref: "#/components/schemas/ProductInput"
-        - $ref: "../components/common.yaml#/AuditFields"
-        - type: object
-          required: [id, isActive, allowedActions]
-          properties:
-            id:
-              type: string
-              format: uuid
-            isActive:
-              type: boolean
-            allowedActions:
-              type: array
-              items:
-                type: string
-                enum: [update, delete]
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+        allowedActions:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductAction"
     ProductList:
       allOf:
         - $ref: "../components/common.yaml#/Pagination"
@@ -195,3 +477,52 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/Product"
+    ProductCategoryInput:
+      type: object
+      required: [code, name]
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 20
+        name:
+          type: string
+          minLength: 1
+          maxLength: 80
+    ProductCategoryUpdate:
+      allOf:
+        - type: object
+          required: [name]
+          properties:
+            name:
+              type: string
+              minLength: 1
+              maxLength: 80
+        - $ref: "../components/common.yaml#/VersionInput"
+    ProductCategory:
+      type: object
+      required: [id, code, name, createdAt, updatedAt, version, allowedActions]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+        allowedActions:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductAction"

@@ -13,6 +13,7 @@ import (
 
 	"balans/internal/approval"
 	"balans/internal/audit"
+	"balans/internal/catalog"
 	"balans/internal/identity"
 	"balans/internal/integration/mockconsole"
 	"balans/internal/integration/mockpayment"
@@ -30,6 +31,7 @@ import (
 	"balans/internal/platform/webhook"
 	"balans/internal/sales"
 	"balans/internal/system"
+	"balans/internal/warehouse"
 )
 
 // App berisi dependensi bersama dan modul yang aktif.
@@ -48,6 +50,8 @@ type App struct {
 	audit       *audit.Module
 	identity    *identity.Module
 	approval    *approval.Module
+	catalog     *catalog.Module
+	warehouse   *warehouse.Module
 	modules     []module
 	console     *mockconsole.Console
 }
@@ -165,6 +169,16 @@ func (a *App) buildModules() error {
 			registerDevApprovalHandlers(a.approval, a.Log)
 		}
 	}
+	if cfg.IsEnabled(catalog.Name) {
+		a.catalog = catalog.New(catalog.Deps{Pool: a.Pool, Tx: a.Tx, Clock: a.Clock, Responder: a.Responder, Audit: a.audit})
+		a.modules = append(a.modules, a.catalog)
+		registerAuditEntities(a.audit, catalog.AuditEntities())
+	}
+	if cfg.IsEnabled(warehouse.Name) {
+		a.warehouse = warehouse.New(warehouse.Deps{Pool: a.Pool, Tx: a.Tx, Clock: a.Clock, Responder: a.Responder, Audit: a.audit})
+		a.modules = append(a.modules, a.warehouse)
+		registerAuditEntities(a.audit, warehouse.AuditEntities())
+	}
 	if cfg.IsEnabled(sales.Name) {
 		if cfg.PaymentGateway != config.ProviderMock {
 			return providerNotAvailable("PAYMENT_GATEWAY", cfg.PaymentGateway)
@@ -215,12 +229,35 @@ func (a *App) SeedDev(ctx context.Context, password string) ([]identity.DevUser,
 	if err != nil {
 		return nil, err
 	}
+	if err := a.seedDevMasters(ctx); err != nil {
+		return nil, err
+	}
 	n, err := a.seedDevApprovals(ctx)
 	if err != nil {
 		return nil, err
 	}
 	a.Log.InfoContext(ctx, "dev approvals seeded", "count", n)
 	return users, nil
+}
+
+// registerAuditEntities memberi pemegang permission baca entitas hak melihat tab Riwayat entitas itu.
+func registerAuditEntities(m *audit.Module, entities map[string]string) {
+	for entityType, readPermission := range entities {
+		m.RegisterEntity(entityType, readPermission)
+	}
+}
+
+// seedDevMasters mengisi Gudang Utama dan produk contoh untuk demo lokal.
+func (a *App) seedDevMasters(ctx context.Context) error {
+	if a.warehouse != nil {
+		if err := a.warehouse.SeedDev(ctx); err != nil {
+			return err
+		}
+	}
+	if a.catalog != nil {
+		return a.catalog.SeedDev(ctx)
+	}
+	return nil
 }
 
 // newCipher membaca kunci PII. Di APP_ENV=local tanpa kunci dipakai kunci pengembangan deterministik;

@@ -820,14 +820,37 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Daftar produk (Produk Jadi, Packaging, Material) */
+    /**
+     * Daftar produk (Produk Jadi, Packaging, Material, Bundling)
+     * @description Produk yang dihapus tidak tampil kecuali `deleted=true` (hanya produk terhapus, untuk dipulihkan Admin Sistem).
+     *     `q` mencari SKU, nama, varian, atau barcode persis.
+     */
     get: operations["listProducts"]
     put?: never
     /**
      * Membuat produk (MD-01, MD-02, MD-03)
-     * @description SKU unik permanen dan tidak bisa dipakai ulang walau produk dihapus (`DUPLICATE_CODE`).
+     * @description SKU unik permanen dan tidak bisa dipakai ulang walau produk dihapus (`DUPLICATE_CODE`). Produk Jadi wajib
+     *     umur simpan dan tipe kemasan dan selalu memakai batch. Bundel virtual wajib punya komponen Produk Jadi
+     *     non-bundel dan tidak punya stok, batch, maupun umur simpan sendiri.
      */
     post: operations["createProduct"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/products/lookup": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Mencari satu produk aktif berdasarkan SKU atau barcode persis (pindai barcode) */
+    get: operations["lookupProduct"]
+    put?: never
+    post?: never
     delete?: never
     options?: never
     head?: never
@@ -843,13 +866,95 @@ export interface paths {
       }
       cookie?: never
     }
-    /** Detail produk */
+    /** Detail produk (produk terhapus tetap bisa dibuka untuk dokumen lama) */
     get: operations["getProduct"]
-    /** Mengubah produk (optimistic locking dengan `version`) */
+    /**
+     * Mengubah produk (optimistic locking dengan `version`)
+     * @description SKU, jenis produk, dan status bundel tidak bisa diubah.
+     */
     put: operations["updateProduct"]
     post?: never
-    /** Menghapus produk (soft delete; tetap tampil di dokumen lama) */
+    /**
+     * Menghapus produk (soft delete; tetap tampil di dokumen lama)
+     * @description Produk yang masih menjadi komponen bundel aktif tidak bisa dihapus (`INVALID_STATE_TRANSITION`).
+     */
     delete: operations["deleteProduct"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/products/{id}/restore": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Memulihkan produk yang dihapus (hanya Admin Sistem) */
+    post: operations["restoreProduct"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/product-categories": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Daftar kategori produk */
+    get: operations["listProductCategories"]
+    put?: never
+    /** Membuat kategori produk (kode unik permanen) */
+    post: operations["createProductCategory"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/product-categories/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    /** Mengubah nama kategori */
+    put: operations["updateProductCategory"]
+    post?: never
+    /** Menghapus kategori (soft delete) */
+    delete: operations["deleteProductCategory"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/product-categories/{id}/restore": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Memulihkan kategori yang dihapus (hanya Admin Sistem) */
+    post: operations["restoreProductCategory"]
+    delete?: never
     options?: never
     head?: never
     patch?: never
@@ -862,14 +967,58 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Daftar gudang fisik */
+    /**
+     * Daftar gudang fisik
+     * @description Gudang yang dihapus tidak tampil kecuali `deleted=true` (hanya gudang terhapus).
+     */
     get: operations["listWarehouses"]
     put?: never
     /**
-     * Membuat gudang fisik beserta lokasi standarnya (WMS-01)
-     * @description Lokasi Inbound, FG Non-Ecommerce, E-commerce Stock, Gudang Material, dan Gudang Retur dibuat otomatis (U-08).
+     * Membuat gudang fisik beserta lokasi standarnya (MD-09, F1-114)
+     * @description Lokasi Inbound, FG Non-Ecommerce, E-commerce Stock (Petty Stock), RM, GM (Gudang GM), dan Gudang Retur dibuat
+     *     otomatis dengan kode `<kode gudang>-INB/FG/ECM/RM/GM/RET` (U-08). Kode gudang unik permanen.
      */
     post: operations["createWarehouse"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/warehouses/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    /** Detail gudang (gudang terhapus tetap bisa dibuka untuk dokumen lama) */
+    get: operations["getWarehouse"]
+    /** Mengubah nama, alamat, atau status aktif gudang */
+    put: operations["updateWarehouse"]
+    post?: never
+    /** Menghapus gudang beserta lokasinya (soft delete) */
+    delete: operations["deleteWarehouse"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/warehouses/{id}/restore": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Memulihkan gudang beserta lokasi yang ikut terhapus (hanya Admin Sistem) */
+    post: operations["restoreWarehouse"]
     delete?: never
     options?: never
     head?: never
@@ -886,8 +1035,53 @@ export interface paths {
     /** Daftar lokasi stok (internal dan eksternal) */
     get: operations["listLocations"]
     put?: never
-    /** Membuat lokasi (termasuk lokasi eksternal maklon, konsinyasi, buffer vending, mesin) */
+    /**
+     * Membuat lokasi (termasuk lokasi eksternal maklon, konsinyasi, buffer vending, mesin)
+     * @description Lokasi internal wajib `warehouseId`. Lokasi eksternal wajib `externalPartyType` + `externalPartyId` (maklon =
+     *     `supplier`, konsinyasi = `partner`, buffer vending = `partner`/`vending_machine`, mesin = `vending_machine`);
+     *     satu lokasi per jenis per pihak.
+     */
     post: operations["createLocation"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/locations/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    /** Detail lokasi (lokasi terhapus tetap bisa dibuka untuk dokumen lama) */
+    get: operations["getLocation"]
+    /** Mengubah nama atau status aktif lokasi */
+    put: operations["updateLocation"]
+    post?: never
+    /** Menghapus lokasi tambahan (soft delete); lokasi standar ikut gudangnya */
+    delete: operations["deleteLocation"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/locations/{id}/restore": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Memulihkan lokasi yang dihapus (hanya Admin Sistem) */
+    post: operations["restoreLocation"]
     delete?: never
     options?: never
     head?: never
@@ -1410,71 +1604,170 @@ export interface components {
       /** Format: int64 */
       unreadCount: number
     }
-    /** @enum {string} */
+    /**
+     * @description `finished_good` = Produk Jadi, `packaging` = Packaging (RM), `reprocess_material` = Material (GM).
+     * @enum {string}
+     */
     ProductType: "finished_good" | "packaging" | "reprocess_material"
     /** @enum {string} */
     PackagingType: "tube" | "pouch" | "roll_sachet"
+    /**
+     * @description Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+     * @example 2.000
+     */
+    Quantity: string
+    /**
+     * @description 13 digit dengan digit periksa benar = EAN-13, selain itu Code 128.
+     * @enum {string}
+     */
+    BarcodeSymbology: "ean13" | "code128"
+    ProductBarcode: {
+      barcode: string
+      symbology: components["schemas"]["BarcodeSymbology"]
+      isPrimary: boolean
+    }
     BundleComponent: {
       /** Format: uuid */
       componentProductId: string
-      readonly componentSku?: string
-      /**
-       * @description Kuantitas desimal sebagai string.
-       * @example 2.000
-       */
-      qty: string
+      qty: components["schemas"]["Quantity"]
+      componentSku: string
+      componentName: string
+      componentVariant: string
+      componentUom: string
+      componentDeleted: boolean
     }
-    ProductInput: {
+    /** @enum {string} */
+    ProductAction: "update" | "delete" | "restore"
+    Product: {
+      /** Format: uuid */
+      id: string
       sku: string
       name: string
-      variant?: string
+      variant: string
       productType: components["schemas"]["ProductType"]
-      packagingType?: components["schemas"]["PackagingType"]
-      /** @example pcs */
+      packagingType?: components["schemas"]["PackagingType"] | null
       uom: string
-      shelfLifeDays?: number
+      shelfLifeDays?: number | null
       hasBatch: boolean
-      /** @description Bundle virtual tidak punya stok sendiri; stok komponen terpotong saat terjual (MD-03). */
       isBundle: boolean
       /** Format: uuid */
-      categoryId?: string
-      barcodes?: string[]
-      /** @example 100.000 */
-      minStockQty?: string
-      bundleComponents?: components["schemas"]["BundleComponent"][]
-    }
-    AuditFields: {
+      categoryId?: string | null
+      categoryName?: string | null
+      minStockQty?: components["schemas"]["Quantity"] | null
+      unitsPerCarton?: number | null
+      isActive: boolean
+      barcodes: components["schemas"]["ProductBarcode"][]
+      /** @description Barcode utama yang dicetak di label produk. */
+      primaryBarcode?: string | null
+      bundleComponents: components["schemas"]["BundleComponent"][]
+      /** Format: date-time */
+      deletedAt?: string | null
       /** Format: date-time */
       createdAt: string
       /** Format: date-time */
       updatedAt: string
-      /** @description Dipakai optimistic locking; kirim kembali saat update (Technical Guideline 7.2). */
       version: number
+      allowedActions: components["schemas"]["ProductAction"][]
     }
-    Product: components["schemas"]["ProductInput"] &
-      components["schemas"]["AuditFields"] & {
-        /** Format: uuid */
-        id: string
-        isActive: boolean
-        allowedActions: ("update" | "delete")[]
-      }
     ProductList: components["schemas"]["Pagination"] & {
       items: components["schemas"]["Product"][]
     }
-    WarehouseInput: {
+    ProductBarcodeInput: {
+      barcode: string
+      isPrimary: boolean
+    }
+    BundleComponentInput: {
+      /** Format: uuid */
+      componentProductId: string
+      qty: components["schemas"]["Quantity"]
+    }
+    ProductFields: {
+      name: string
+      variant?: string
+      packagingType?: components["schemas"]["PackagingType"] | null
+      /** @example pcs */
+      uom: string
+      /** @description Umur simpan dalam hari; wajib untuk Produk Jadi non-bundel. */
+      shelfLifeDays?: number | null
+      /** @description Hanya dipakai untuk Packaging & Material; Produk Jadi selalu memakai batch, bundel tidak. */
+      hasBatch: boolean
+      /** Format: uuid */
+      categoryId?: string | null
+      minStockQty?: components["schemas"]["Quantity"] | null
+      unitsPerCarton?: number | null
+      isActive: boolean
+      /** @description Tepat satu barcode utama jika ada barcode; barcode unik di semua produk. */
+      barcodes?: components["schemas"]["ProductBarcodeInput"][]
+      /** @description Wajib untuk bundel; komponen harus Produk Jadi non-bundel yang aktif. */
+      bundleComponents?: components["schemas"]["BundleComponentInput"][]
+    }
+    ProductInput: components["schemas"]["ProductFields"] & {
+      /** @description Huruf besar, angka, dan tanda minus; huruf kecil diubah menjadi besar. */
+      sku: string
+      productType: components["schemas"]["ProductType"]
+      /** @description Bundel virtual tidak punya stok sendiri; stok komponen terpotong saat terjual (MD-03). */
+      isBundle: boolean
+    }
+    ProductUpdate: components["schemas"]["ProductFields"] &
+      components["schemas"]["VersionInput"]
+    ProductCategory: {
+      /** Format: uuid */
+      id: string
+      code: string
+      name: string
+      /** Format: date-time */
+      deletedAt?: string | null
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+      allowedActions: components["schemas"]["ProductAction"][]
+    }
+    ProductCategoryInput: {
+      code: string
+      name: string
+    }
+    ProductCategoryUpdate: {
+      name: string
+    } & components["schemas"]["VersionInput"]
+    /** @enum {string} */
+    RecordAction: "update" | "delete" | "restore"
+    Warehouse: {
+      /** Format: uuid */
+      id: string
       code: string
       name: string
       address: string
+      isActive: boolean
+      /** Format: date-time */
+      deletedAt?: string | null
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+      allowedActions: components["schemas"]["RecordAction"][]
     }
-    Warehouse: components["schemas"]["WarehouseInput"] &
-      components["schemas"]["AuditFields"] & {
-        /** Format: uuid */
-        id: string
-      }
     WarehouseList: components["schemas"]["Pagination"] & {
       items: components["schemas"]["Warehouse"][]
     }
-    /** @enum {string} */
+    WarehouseFields: {
+      name: string
+      address?: string
+      isActive: boolean
+    }
+    WarehouseInput: components["schemas"]["WarehouseFields"] & {
+      code: string
+    }
+    WarehouseUpdate: components["schemas"]["WarehouseFields"] &
+      components["schemas"]["VersionInput"]
+    /**
+     * @description Di dalam gudang: `inbound`, `finished_goods` (FG Non-Ecommerce), `ecommerce` (E-commerce Stock / Petty Stock),
+     *     `raw_material` (RM), `goods_material` (GM), `returns`, `event`. Eksternal: `toll_manufacturer` (maklon),
+     *     `consignment`, `vending_buffer`, `vending_machine`.
+     * @enum {string}
+     */
     LocationType:
       | "inbound"
       | "finished_goods"
@@ -1487,6 +1780,39 @@ export interface components {
       | "consignment"
       | "vending_buffer"
       | "vending_machine"
+    /** @enum {string} */
+    ExternalPartyType: "supplier" | "partner" | "vending_machine"
+    Location: {
+      /** Format: uuid */
+      id: string
+      code: string
+      name: string
+      locationType: components["schemas"]["LocationType"]
+      locationTypeLabel: string
+      /** Format: uuid */
+      warehouseId?: string | null
+      warehouseName?: string | null
+      externalPartyType?: components["schemas"]["ExternalPartyType"] | null
+      /** Format: uuid */
+      externalPartyId?: string | null
+      isExternal: boolean
+      /** @description Stok di lokasi ini bisa dialokasikan ke penjualan. */
+      isSellable: boolean
+      /** @description Lokasi standar dibuat otomatis bersama gudang dan ikut terhapus/dipulihkan bersama gudang. */
+      isStandard: boolean
+      isActive: boolean
+      /** Format: date-time */
+      deletedAt?: string | null
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+      allowedActions: components["schemas"]["RecordAction"][]
+    }
+    LocationList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["Location"][]
+    }
     LocationInput: {
       code: string
       name: string
@@ -1495,23 +1821,19 @@ export interface components {
        * Format: uuid
        * @description Wajib untuk lokasi internal; kosong untuk lokasi eksternal.
        */
-      warehouseId?: string
-      /** @enum {string} */
-      externalPartyType?: "supplier" | "partner" | "vending_machine"
-      /** Format: uuid */
-      externalPartyId?: string
+      warehouseId?: string | null
+      externalPartyType?: components["schemas"]["ExternalPartyType"] | null
+      /**
+       * Format: uuid
+       * @description ID pemasok/maklon, mitra, atau mesin vending di modul pemiliknya.
+       */
+      externalPartyId?: string | null
+      isActive: boolean
     }
-    Location: components["schemas"]["LocationInput"] &
-      components["schemas"]["AuditFields"] & {
-        /** Format: uuid */
-        id: string
-        /** @description Stok di lokasi ini bisa dialokasikan ke penjualan. */
-        isSellable: boolean
-        isActive: boolean
-      }
-    LocationList: components["schemas"]["Pagination"] & {
-      items: components["schemas"]["Location"][]
-    }
+    LocationUpdate: {
+      name: string
+      isActive: boolean
+    } & components["schemas"]["VersionInput"]
   }
   responses: {
     /** @description Error standar (problem+json) */
@@ -2780,8 +3102,12 @@ export interface operations {
         /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
         sort?: components["parameters"]["Sort"]
         q?: components["parameters"]["Search"]
-        productType?: components["schemas"]["ProductType"]
+        /** @description Bisa lebih dari satu, mis. `productType=packaging&productType=reprocess_material`. */
+        productType?: components["schemas"]["ProductType"][]
         isBundle?: boolean
+        categoryId?: string
+        isActive?: boolean
+        deleted?: boolean
       }
       header?: never
       path?: never
@@ -2829,6 +3155,29 @@ export interface operations {
       default: components["responses"]["Problem"]
     }
   }
+  lookupProduct: {
+    parameters: {
+      query: {
+        code: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Produk dengan SKU atau barcode tersebut */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Product"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
   getProduct: {
     parameters: {
       query?: never
@@ -2866,9 +3215,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["ProductInput"] & {
-          version: number
-        }
+        "application/json": components["schemas"]["ProductUpdate"]
       }
     }
     responses: {
@@ -2908,12 +3255,36 @@ export interface operations {
       default: components["responses"]["Problem"]
     }
   }
-  listWarehouses: {
+  restoreProduct: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Produk dipulihkan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Product"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listProductCategories: {
     parameters: {
       query?: {
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
-        q?: components["parameters"]["Search"]
+        deleted?: boolean
       }
       header?: never
       path?: never
@@ -2921,7 +3292,144 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Daftar gudang */
+      /** @description Kategori urut kode */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ProductCategory"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createProductCategory: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ProductCategoryInput"]
+      }
+    }
+    responses: {
+      /** @description Kategori dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ProductCategory"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateProductCategory: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ProductCategoryUpdate"]
+      }
+    }
+    responses: {
+      /** @description Kategori diubah */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ProductCategory"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  deleteProductCategory: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Kategori dihapus */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  restoreProductCategory: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Kategori dipulihkan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ProductCategory"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listWarehouses: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
+        sort?: components["parameters"]["Sort"]
+        q?: components["parameters"]["Search"]
+        isActive?: boolean
+        deleted?: boolean
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar gudang; field sort yang diizinkan `code`, `name`, `createdAt` */
       200: {
         headers: {
           [name: string]: unknown
@@ -2961,14 +3469,126 @@ export interface operations {
       default: components["responses"]["Problem"]
     }
   }
+  getWarehouse: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Detail gudang */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Warehouse"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateWarehouse: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["WarehouseUpdate"]
+      }
+    }
+    responses: {
+      /** @description Gudang diubah */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Warehouse"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  deleteWarehouse: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Gudang dihapus */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  restoreWarehouse: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Gudang dipulihkan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Warehouse"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
   listLocations: {
     parameters: {
       query?: {
         page?: components["parameters"]["Page"]
         pageSize?: components["parameters"]["PageSize"]
+        /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
+        sort?: components["parameters"]["Sort"]
         q?: components["parameters"]["Search"]
         warehouseId?: string
-        locationType?: components["schemas"]["LocationType"]
+        /** @description Bisa lebih dari satu. */
+        locationType?: components["schemas"]["LocationType"][]
+        /** @description `true` hanya lokasi eksternal, `false` hanya lokasi di dalam gudang. */
+        external?: boolean
+        externalPartyType?: components["schemas"]["ExternalPartyType"]
+        externalPartyId?: string
+        isActive?: boolean
+        deleted?: boolean
       }
       header?: never
       path?: never
@@ -2976,7 +3596,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Daftar lokasi */
+      /** @description Daftar lokasi; field sort yang diizinkan `code`, `name`, `createdAt` */
       200: {
         headers: {
           [name: string]: unknown
@@ -3006,6 +3626,109 @@ export interface operations {
     responses: {
       /** @description Lokasi dibuat */
       201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Location"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getLocation: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Detail lokasi */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Location"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateLocation: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["LocationUpdate"]
+      }
+    }
+    responses: {
+      /** @description Lokasi diubah */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Location"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  deleteLocation: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Lokasi dihapus */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  restoreLocation: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Lokasi dipulihkan */
+      200: {
         headers: {
           [name: string]: unknown
         }
