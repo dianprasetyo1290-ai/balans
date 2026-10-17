@@ -219,8 +219,10 @@ func (s *Service) post(ctx context.Context, p domain.Posting, release bool) (Pos
 		if err := s.applyReservations(ctx, parts, m, actorID); err != nil {
 			return err
 		}
-		res, err = s.persist(ctx, postingID, p, parts, actorID)
-		return err
+		if res, err = s.persist(ctx, postingID, p, parts, actorID); err != nil {
+			return err
+		}
+		return s.enqueueRecosts(ctx, p.Source, res, actorID)
 	})
 	if err != nil {
 		return PostingResult{}, err

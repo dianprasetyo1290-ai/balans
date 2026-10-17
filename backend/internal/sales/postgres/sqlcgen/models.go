@@ -243,6 +243,48 @@ type CustomerAddress struct {
 	DeletedBy     uuid.NullUUID
 }
 
+type Disposal struct {
+	ID                  uuid.UUID
+	Number              pgtype.Text
+	Reason              string
+	DisposalDate        clock.BusinessDate
+	Method              string
+	Witnesses           []string
+	PhotoFileIds        []uuid.UUID
+	Note                string
+	Status              string
+	EstimatedCost       decimal.Decimal
+	CostAmount          decimal.Decimal
+	PostingRuleCode     string
+	JournalID           uuid.NullUUID
+	ReturnDispositionID uuid.NullUUID
+	SubmittedBy         uuid.NullUUID
+	SubmittedByName     string
+	SubmittedAt         *time.Time
+	PostedBy            uuid.NullUUID
+	PostedByName        string
+	PostedAt            *time.Time
+	CreatedAt           time.Time
+	CreatedBy           uuid.UUID
+	CreatedByName       string
+	UpdatedAt           time.Time
+	UpdatedBy           uuid.UUID
+	Version             int32
+}
+
+type DisposalLine struct {
+	ID          uuid.UUID
+	DisposalID  uuid.UUID
+	LineNo      int32
+	ProductID   uuid.UUID
+	BatchID     uuid.NullUUID
+	LocationID  uuid.UUID
+	StockStatus string
+	Qty         decimal.Decimal
+	CostAmount  decimal.Decimal
+	Note        string
+}
+
 type Division struct {
 	ID        uuid.UUID
 	Code      string
@@ -401,6 +443,57 @@ type ImportJobRow struct {
 	IsValid    bool
 	CellValues []byte
 	Errors     []byte
+}
+
+type InternalUsage struct {
+	ID                  uuid.UUID
+	Number              pgtype.Text
+	Purpose             string
+	DivisionID          uuid.UUID
+	CampaignID          uuid.NullUUID
+	SourceLocationID    uuid.UUID
+	EventLocationID     uuid.NullUUID
+	EventEndDate        pgtype.Date
+	SettleDueDate       pgtype.Date
+	BusinessDate        clock.BusinessDate
+	Note                string
+	Status              string
+	EstimatedCost       decimal.Decimal
+	CostAmount          decimal.Decimal
+	JournalID           uuid.NullUUID
+	ReturnDispositionID uuid.NullUUID
+	RequestedBy         uuid.UUID
+	RequestedByName     string
+	ReleasedBy          uuid.NullUUID
+	ReleasedByName      string
+	ReleasedAt          *time.Time
+	HandedOverBy        uuid.NullUUID
+	HandedOverByName    string
+	HandedOverAt        *time.Time
+	SettledBy           uuid.NullUUID
+	SettledByName       string
+	SettledAt           *time.Time
+	PostedBy            uuid.NullUUID
+	PostedByName        string
+	PostedAt            *time.Time
+	RemindedOn          pgtype.Date
+	CreatedAt           time.Time
+	CreatedBy           uuid.UUID
+	UpdatedAt           time.Time
+	UpdatedBy           uuid.UUID
+	Version             int32
+}
+
+type InternalUsageLine struct {
+	ID              uuid.UUID
+	InternalUsageID uuid.UUID
+	LineNo          int32
+	ProductID       uuid.UUID
+	Qty             decimal.Decimal
+	ReturnedQty     decimal.Decimal
+	ConsumedQty     decimal.Decimal
+	CostAmount      decimal.Decimal
+	Note            string
 }
 
 type JournalEntry struct {
@@ -702,6 +795,118 @@ type ProductCategory struct {
 	Version   int32
 	DeletedAt *time.Time
 	DeletedBy uuid.NullUUID
+}
+
+type RecostLine struct {
+	ID              uuid.UUID
+	RecostRunID     uuid.UUID
+	StockMovementID uuid.UUID
+	LocationID      uuid.UUID
+	SourceType      string
+	SourceID        uuid.UUID
+	PreviousCost    decimal.Decimal
+	RecomputedCost  decimal.Decimal
+	Difference      decimal.Decimal
+	CreatedAt       time.Time
+}
+
+type RecostRun struct {
+	ID                  uuid.UUID
+	ProductID           uuid.UUID
+	BatchID             uuid.NullUUID
+	FromBusinessDate    clock.BusinessDate
+	TriggerSourceType   string
+	TriggerSourceID     uuid.UUID
+	TriggerSourceLabel  string
+	Status              string
+	AdjustmentAmount    decimal.Decimal
+	AdjustmentJournalID uuid.NullUUID
+	Error               string
+	CreatedAt           time.Time
+	CreatedBy           uuid.UUID
+	CompletedAt         *time.Time
+}
+
+type Repacking struct {
+	ID                  uuid.UUID
+	Number              pgtype.Text
+	BusinessDate        clock.BusinessDate
+	Note                string
+	Status              string
+	CostAmount          decimal.Decimal
+	JournalID           uuid.NullUUID
+	ReturnDispositionID uuid.NullUUID
+	StartedBy           uuid.NullUUID
+	StartedByName       string
+	StartedAt           *time.Time
+	PostedBy            uuid.NullUUID
+	PostedByName        string
+	PostedAt            *time.Time
+	CreatedAt           time.Time
+	CreatedBy           uuid.UUID
+	CreatedByName       string
+	UpdatedAt           time.Time
+	UpdatedBy           uuid.UUID
+	Version             int32
+}
+
+type RepackingLine struct {
+	ID             uuid.UUID
+	RepackingID    uuid.UUID
+	LineNo         int32
+	Direction      string
+	ProductID      uuid.UUID
+	LocationID     uuid.UUID
+	StockStatus    string
+	BatchID        uuid.NullUUID
+	BatchNumber    string
+	ProductionDate pgtype.Date
+	ExpiryDate     pgtype.Date
+	Qty            decimal.Decimal
+	CostAmount     decimal.Decimal
+	Note           string
+}
+
+type ReturnDisposition struct {
+	ID              uuid.UUID
+	Number          pgtype.Text
+	LocationID      uuid.UUID
+	InboundID       uuid.NullUUID
+	BusinessDate    clock.BusinessDate
+	Note            string
+	Status          string
+	DisposalValue   decimal.Decimal
+	CostAmount      decimal.Decimal
+	JournalID       uuid.NullUUID
+	SubmittedBy     uuid.NullUUID
+	SubmittedByName string
+	SubmittedAt     *time.Time
+	PostedBy        uuid.NullUUID
+	PostedByName    string
+	PostedAt        *time.Time
+	CreatedAt       time.Time
+	CreatedBy       uuid.UUID
+	CreatedByName   string
+	UpdatedAt       time.Time
+	UpdatedBy       uuid.UUID
+	Version         int32
+}
+
+type ReturnDispositionLine struct {
+	ID                  uuid.UUID
+	ReturnDispositionID uuid.UUID
+	LineNo              int32
+	ProductID           uuid.UUID
+	BatchID             uuid.NullUUID
+	StockStatus         string
+	Qty                 decimal.Decimal
+	ReasonID            uuid.NullUUID
+	Disposition         string
+	QcNote              string
+	EstimatedCost       decimal.Decimal
+	CostAmount          decimal.Decimal
+	TargetType          string
+	TargetID            uuid.NullUUID
 }
 
 type ReturnReason struct {

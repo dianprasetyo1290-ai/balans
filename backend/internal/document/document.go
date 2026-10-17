@@ -50,6 +50,8 @@ const (
 	TypeResellerDeposit           = domain.TypeResellerDeposit
 	TypeVendingRefill             = domain.TypeVendingRefill
 	TypeVendingReconciliation     = domain.TypeVendingReconciliation
+	TypeRepacking                 = domain.TypeRepacking
+	TypeReturnDisposition         = domain.TypeReturnDisposition
 )
 
 // ErrNoTransaction: Next dipanggil di luar transaksi bisnis.
