@@ -26,6 +26,7 @@ const (
 	SubjectPriceListVersion          SubjectType = "price_list_version"
 	SubjectSalesOrderDiscount        SubjectType = "sales_order_discount"
 	SubjectSupplierBillException     SubjectType = "supplier_bill_exception"
+	SubjectPurchaseReturn            SubjectType = "purchase_return"
 	SubjectPettyCashReplenishment    SubjectType = "petty_cash_replenishment"
 	SubjectFiscalPeriodReopen        SubjectType = "fiscal_period_reopen"
 )
@@ -61,6 +62,7 @@ var subjectTypes = []SubjectTypeInfo{
 	{SubjectPriceListVersion, "Daftar Harga", "—", nil},
 	{SubjectSalesOrderDiscount, "Diskon Sales Order", "Nilai diskon", nil},
 	{SubjectSupplierBillException, "Tagihan Pemasok di Luar Toleransi", "Total tagihan", nil},
+	{SubjectPurchaseReturn, "Retur Pembelian", "Nilai retur", nil},
 	{SubjectPettyCashReplenishment, "Pengisian Kembali Kas Kecil", "Nilai pengisian", nil},
 	{SubjectFiscalPeriodReopen, "Buka Kembali Periode", "—", nil},
 }

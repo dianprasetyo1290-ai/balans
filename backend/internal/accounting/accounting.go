@@ -20,6 +20,7 @@ import (
 	"balans/internal/platform/clock"
 	"balans/internal/platform/db"
 	"balans/internal/platform/httpx"
+	"balans/internal/platform/money"
 	"balans/internal/platform/jobqueue"
 	"balans/internal/platform/tabular"
 )
@@ -193,6 +194,12 @@ func (m *Module) PostableAccounts(ctx context.Context, codePrefix string) ([]Acc
 // ExpenseTypeByCode membaca jenis biaya berdasarkan kode (impor data, seed).
 func (m *Module) ExpenseTypeByCode(ctx context.Context, code string) (ExpenseType, error) {
 	return m.svc.ExpenseTypeByCode(ctx, code)
+}
+
+// AccountBalance menghitung saldo akun (sesuai saldo normal) dari jurnal diposting sampai asOf. Tidak memeriksa
+// permission; dipakai laporan rekonsiliasi modul lain (mis. Barang Diterima Belum Ditagih vs 2102).
+func (m *Module) AccountBalance(ctx context.Context, code string, asOf clock.BusinessDate) (money.Amount, error) {
+	return m.svc.AccountBalance(ctx, code, asOf)
 }
 
 // DimensionValue adalah satu nilai master dimensi (channel, sub-channel, divisi, kampanye).

@@ -28,12 +28,16 @@ const (
 	StatusClosed            Status = "closed"
 	StatusCancelled         Status = "cancelled"
 	StatusPosted            Status = "posted"
+	StatusAwaitingPayment   Status = "awaiting_payment"
+	StatusPartiallyPaid     Status = "partially_paid"
+	StatusPaid              Status = "paid"
 )
 
 var statusLabels = map[Status]string{
 	StatusDraft: "Draft", StatusPendingApproval: "Menunggu Persetujuan", StatusApproved: "Disetujui",
 	StatusRejected: "Ditolak", StatusPartiallyReceived: "Diterima Sebagian", StatusReceived: "Diterima",
 	StatusCompleted: "Selesai", StatusClosed: "Ditutup", StatusCancelled: "Dibatalkan", StatusPosted: "Diposting",
+	StatusAwaitingPayment: "Menunggu Pembayaran", StatusPartiallyPaid: "Dibayar Sebagian", StatusPaid: "Lunas",
 }
 
 // Label mengembalikan label UI status.
@@ -57,6 +61,7 @@ const (
 	ActionPrint         Action = "print"
 	ActionCreateAdvance Action = "create_advance"
 	ActionPost          Action = "post"
+	ActionCreateReturn  Action = "create_return"
 )
 
 // transitions adalah tabel transisi status satu jenis dokumen.

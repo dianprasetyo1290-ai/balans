@@ -359,6 +359,86 @@ type FiscalPeriod struct {
 	Version       int32
 }
 
+type GoodsReceipt struct {
+	ID                     uuid.UUID
+	Number                 pgtype.Text
+	PurchaseOrderID        uuid.UUID
+	SupplierID             uuid.UUID
+	DivisionID             uuid.UUID
+	OrderType              string
+	BusinessDate           clock.BusinessDate
+	LocationID             uuid.UUID
+	TollLocationID         uuid.NullUUID
+	DeliveryNoteNumber     string
+	Note                   string
+	InventoryAmount        decimal.Decimal
+	MaterialAmount         decimal.Decimal
+	GrniAmount             decimal.Decimal
+	Status                 string
+	InboundID              uuid.NullUUID
+	JournalEntryID         uuid.NullUUID
+	ReversalJournalEntryID uuid.NullUUID
+	CancelReason           string
+	PostedAt               *time.Time
+	CancelledAt            *time.Time
+	CreatedAt              time.Time
+	CreatedBy              uuid.UUID
+	UpdatedAt              time.Time
+	UpdatedBy              uuid.UUID
+	Version                int32
+	DeletedAt              *time.Time
+	DeletedBy              uuid.NullUUID
+}
+
+type GoodsReceiptLine struct {
+	ID                   uuid.UUID
+	GoodsReceiptID       uuid.UUID
+	LineNo               int32
+	PurchaseOrderLineID  uuid.UUID
+	ProductID            uuid.UUID
+	GoodQty              decimal.Decimal
+	RejectQty            decimal.Decimal
+	RejectDisposition    string
+	BatchNumber          string
+	ProductionDate       pgtype.Date
+	ExpiryDate           pgtype.Date
+	BatchID              uuid.NullUUID
+	UnitPriceAmount      decimal.Decimal
+	GrniQty              decimal.Decimal
+	GrniAmount           decimal.Decimal
+	MaterialCostAmount   decimal.Decimal
+	InventoryAmount      decimal.Decimal
+	UnitCost             decimal.Decimal
+	InventoryAccountCode string
+	BilledQty            decimal.Decimal
+	BilledGrniAmount     decimal.Decimal
+	ReturnedQty          decimal.Decimal
+	ReturnedUnbilledQty  decimal.Decimal
+	ReturnedGrniAmount   decimal.Decimal
+	Note                 string
+}
+
+type GoodsReceiptMaterialConsumption struct {
+	ID       uuid.UUID
+	UsageID  uuid.UUID
+	BatchID  uuid.NullUUID
+	Qty      decimal.Decimal
+	UnitCost decimal.Decimal
+}
+
+type GoodsReceiptMaterialUsage struct {
+	ID                uuid.UUID
+	GoodsReceiptID    uuid.UUID
+	LineNo            int32
+	MaterialProductID uuid.UUID
+	FromLocationID    uuid.UUID
+	UsedGoodQty       decimal.Decimal
+	UsedRejectQty     decimal.Decimal
+	CostAmount        decimal.Decimal
+	AccountCode       string
+	Note              string
+}
+
 type IdempotencyKey struct {
 	UserID        uuid.UUID
 	Key           uuid.UUID
@@ -818,6 +898,57 @@ type PurchaseRequestLine struct {
 	Note                 string
 }
 
+type PurchaseReturn struct {
+	ID              uuid.UUID
+	Number          pgtype.Text
+	DebitNoteNumber pgtype.Text
+	SupplierID      uuid.UUID
+	SupplierName    string
+	PurchaseOrderID uuid.UUID
+	DivisionID      uuid.UUID
+	Origin          string
+	SourceType      string
+	SourceID        uuid.NullUUID
+	SourceLabel     string
+	BusinessDate    clock.BusinessDate
+	Reason          string
+	Note            string
+	TotalAmount     decimal.Decimal
+	UnbilledAmount  decimal.Decimal
+	BilledAmount    decimal.Decimal
+	Status          string
+	JournalEntryID  uuid.NullUUID
+	CancelReason    string
+	SubmittedAt     *time.Time
+	ApprovedAt      *time.Time
+	PostedAt        *time.Time
+	CreatedAt       time.Time
+	CreatedBy       uuid.UUID
+	UpdatedAt       time.Time
+	UpdatedBy       uuid.UUID
+	Version         int32
+	DeletedAt       *time.Time
+	DeletedBy       uuid.NullUUID
+}
+
+type PurchaseReturnLine struct {
+	ID                   uuid.UUID
+	PurchaseReturnID     uuid.UUID
+	LineNo               int32
+	GoodsReceiptLineID   uuid.UUID
+	ProductID            uuid.UUID
+	BatchID              uuid.NullUUID
+	LocationID           uuid.UUID
+	StockStatus          string
+	Qty                  decimal.Decimal
+	UnitCost             decimal.Decimal
+	Amount               decimal.Decimal
+	UnbilledQty          decimal.Decimal
+	UnbilledAmount       decimal.Decimal
+	InventoryAccountCode string
+	Note                 string
+}
+
 type ReturnReason struct {
 	ID                 uuid.UUID
 	Code               string
@@ -975,6 +1106,84 @@ type Supplier struct {
 	Version            int32
 	DeletedAt          *time.Time
 	DeletedBy          uuid.NullUUID
+}
+
+type SupplierBill struct {
+	ID                    uuid.UUID
+	Number                string
+	SupplierID            uuid.UUID
+	PurchaseOrderID       uuid.UUID
+	DivisionID            uuid.UUID
+	BillDate              clock.BusinessDate
+	DueDate               clock.BusinessDate
+	Note                  string
+	SubtotalAmount        decimal.Decimal
+	GrniAmount            decimal.Decimal
+	PriceVarianceAmount   decimal.Decimal
+	WithholdingType       string
+	WithholdingRate       decimal.Decimal
+	WithholdingAmount     decimal.Decimal
+	AdvanceAppliedAmount  decimal.Decimal
+	TotalPayableAmount    decimal.Decimal
+	PaidAmount            decimal.Decimal
+	MatchStatus           string
+	Status                string
+	JournalEntryID        uuid.NullUUID
+	AdvanceJournalEntryID uuid.NullUUID
+	CancelReason          string
+	SubmittedAt           *time.Time
+	PostedAt              *time.Time
+	CreatedAt             time.Time
+	CreatedBy             uuid.UUID
+	UpdatedAt             time.Time
+	UpdatedBy             uuid.UUID
+	Version               int32
+	DeletedAt             *time.Time
+	DeletedBy             uuid.NullUUID
+}
+
+type SupplierBillAdvance struct {
+	ID                uuid.UUID
+	SupplierBillID    uuid.UUID
+	PurchaseAdvanceID uuid.UUID
+	Amount            decimal.Decimal
+}
+
+type SupplierBillLine struct {
+	ID                  uuid.UUID
+	SupplierBillID      uuid.UUID
+	LineNo              int32
+	GoodsReceiptLineID  uuid.UUID
+	PurchaseOrderLineID uuid.UUID
+	ProductID           uuid.UUID
+	Qty                 decimal.Decimal
+	ReceiptOpenQty      decimal.Decimal
+	UnitPriceAmount     decimal.Decimal
+	PoUnitPriceAmount   decimal.Decimal
+	LineAmount          decimal.Decimal
+	GrniAmount          decimal.Decimal
+	PriceVarianceAmount decimal.Decimal
+	ExceedsTolerance    bool
+	Note                string
+}
+
+type SupplierPayable struct {
+	ID              uuid.UUID
+	DocumentType    string
+	DocumentID      uuid.UUID
+	DocumentNumber  string
+	SupplierID      uuid.UUID
+	PurchaseOrderID uuid.UUID
+	DivisionID      uuid.UUID
+	BusinessDate    clock.BusinessDate
+	DueDate         clock.BusinessDate
+	Amount          decimal.Decimal
+	OpenAmount      decimal.Decimal
+	CreatedAt       time.Time
+	CreatedBy       uuid.UUID
+	UpdatedAt       time.Time
+	UpdatedBy       uuid.UUID
+	Version         int32
 }
 
 type User struct {

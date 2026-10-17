@@ -60,6 +60,7 @@ const (
 	SubjectPriceListVersion          = domain.SubjectPriceListVersion
 	SubjectSalesOrderDiscount        = domain.SubjectSalesOrderDiscount
 	SubjectSupplierBillException     = domain.SubjectSupplierBillException
+	SubjectPurchaseReturn            = domain.SubjectPurchaseReturn
 	SubjectPettyCashReplenishment    = domain.SubjectPettyCashReplenishment
 	SubjectFiscalPeriodReopen        = domain.SubjectFiscalPeriodReopen
 

@@ -7,6 +7,7 @@ import (
 	"balans/internal/accounting/postgres"
 	"balans/internal/platform/actor"
 	"balans/internal/platform/apperr"
+	"balans/internal/platform/clock"
 	"balans/internal/platform/money"
 	"balans/internal/platform/paging"
 )
@@ -90,4 +91,23 @@ func (s *Service) GeneralLedger(ctx context.Context, f postgres.LedgerFilter, pa
 		out.Lines[i] = LedgerEntry{LedgerLine: l, Balance: opening.Add(movement)}
 	}
 	return out, nil
+}
+
+// AccountBalance menghitung saldo satu akun (sesuai saldo normal) dari semua jurnal diposting sampai tanggal asOf,
+// tanpa cek permission (laporan modul lain, mis. rekonsiliasi Barang Diterima Belum Ditagih 2102).
+func (s *Service) AccountBalance(ctx context.Context, code string, asOf clock.BusinessDate) (money.Amount, error) {
+	accs, err := s.Store.AccountsByCodes(ctx, []string{code})
+	if err != nil {
+		return money.Zero, err
+	}
+	acc, ok := accs[code]
+	if !ok {
+		return money.Zero, apperr.WithMessage(apperr.CodeNotFound, "Akun "+code+" tidak ditemukan.")
+	}
+	next := asOf.AddDays(1)
+	sum, err := s.Store.LedgerSummary(ctx, postgres.LedgerFilter{AccountID: acc.ID, DateFrom: next, DateTo: next})
+	if err != nil {
+		return money.Zero, err
+	}
+	return acc.NormalBalance.Balance(sum.OpeningDebit, sum.OpeningCredit), nil
 }
