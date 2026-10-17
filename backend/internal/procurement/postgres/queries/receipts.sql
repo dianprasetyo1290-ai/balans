@@ -122,14 +122,14 @@ VALUES (sqlc.arg('usage_id'), sqlc.narg('batch_id'), sqlc.arg('qty'), sqlc.arg('
 
 -- name: ReceiptLinesByIDs :many
 -- Baris GR beserta status & nomor GR dan PO-nya (3-way match tagihan, retur).
-SELECT l.*, r.number AS receipt_number, r.status AS receipt_status, r.purchase_order_id, r.location_id
+SELECT l.*, r.number AS receipt_number, r.status AS receipt_status, r.purchase_order_id, r.location_id, r.business_date
 FROM goods_receipt_lines l
 JOIN goods_receipts r ON r.id = l.goods_receipt_id
 WHERE l.id = ANY(sqlc.arg('ids')::uuid[]);
 
 -- name: ReceiptLinesByOrder :many
 -- Baris GR diposting satu PO (form tagihan & retur).
-SELECT l.*, r.number AS receipt_number, r.status AS receipt_status, r.purchase_order_id, r.location_id
+SELECT l.*, r.number AS receipt_number, r.status AS receipt_status, r.purchase_order_id, r.location_id, r.business_date
 FROM goods_receipt_lines l
 JOIN goods_receipts r ON r.id = l.goods_receipt_id
 WHERE r.purchase_order_id = $1 AND r.status = 'posted'

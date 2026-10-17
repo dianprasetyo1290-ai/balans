@@ -237,6 +237,7 @@ type ReceiptLineRef struct {
 	ReceiptStatus   domain.Status
 	PurchaseOrderID uuid.UUID
 	LocationID      uuid.UUID
+	BusinessDate    clock.BusinessDate
 }
 
 func toReceiptLineRef(r sqlcgen.ReceiptLinesByIDsRow) ReceiptLineRef {
@@ -253,6 +254,7 @@ func toReceiptLineRef(r sqlcgen.ReceiptLinesByIDsRow) ReceiptLineRef {
 	return ReceiptLineRef{
 		Line: toReceiptLine(l), ReceiptID: r.GoodsReceiptID, ReceiptNumber: r.ReceiptNumber.String,
 		ReceiptStatus: domain.Status(r.ReceiptStatus), PurchaseOrderID: r.PurchaseOrderID, LocationID: r.LocationID,
+		BusinessDate: r.BusinessDate,
 	}
 }
 

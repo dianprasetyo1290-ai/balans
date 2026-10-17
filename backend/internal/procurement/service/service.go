@@ -201,8 +201,8 @@ type InboundRequest struct {
 // ditolak dan dikembalikan ke pemasok memanggil procurement.Module.CreateReturnFromQC.
 type Inbounds interface {
 	CreateInbound(ctx context.Context, r InboundRequest) (uuid.UUID, error)
-	// CancelInbound membatalkan Inbound yang belum di-QC; menolak (INVALID_STATE_TRANSITION) bila QC sudah berjalan.
-	CancelInbound(ctx context.Context, inboundID uuid.UUID, reason string) error
+	// CancelInbound dipanggil saat GR Diposting dibatalkan; menolak (INVALID_STATE_TRANSITION) bila QC sudah berjalan.
+	CancelInbound(ctx context.Context, sourceType string, sourceID uuid.UUID, reason string) error
 }
 
 // Approvals mengajukan dokumen ke engine approval.

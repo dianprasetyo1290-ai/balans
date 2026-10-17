@@ -3397,6 +3397,359 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/v1/procurement/inbound-locations": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Lokasi Inbound aktif untuk form Penerimaan Barang */
+    get: operations["listProcurementInboundLocations"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/goods-receipts": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Daftar Penerimaan Barang (S-206, S-207) */
+    get: operations["listGoodsReceipts"]
+    put?: never
+    /** Menyimpan draft Penerimaan Barang untuk PO Disetujui/Diterima Sebagian */
+    post: operations["createGoodsReceipt"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/goods-receipts/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail Penerimaan Barang */
+    get: operations["getGoodsReceipt"]
+    /** Mengubah draft Penerimaan Barang */
+    put: operations["updateGoodsReceipt"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/goods-receipts/{id}/post": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Posting Penerimaan Barang (stok Inbound Karantina, jurnal A-01/A-03)
+     * @description Nomor `GR/TAHUN/BULAN/NOMOR`; PO maklon/reprocess mengeluarkan packaging/bahan terpakai (baik + reject) dari
+     *     lokasi maklon dengan HPP FIFO; HPP per unit = nilai batch ÷ qty baik; stok baik masuk lokasi Inbound berstatus
+     *     Karantina; jurnal A-01 atau A-03; qty diterima PO dan dokumen Inbound/QC, semuanya di satu transaksi.
+     */
+    post: operations["postGoodsReceipt"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/goods-receipts/{id}/cancel": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Batalkan Penerimaan Barang
+     * @description Draft (hak tulis) atau Diposting yang belum ditagih/diretur dan belum di-QC (hak batal, alasan wajib): stok dan
+     *     jurnal dibalik di transaksi yang sama.
+     */
+    post: operations["cancelGoodsReceipt"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/procurement/billable-receipts": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Baris Penerimaan Barang PO yang belum ditagih (form Tagihan Pemasok) */
+    get: operations["listBillableReceipts"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/supplier-bills": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Daftar Tagihan Pemasok (S-208) */
+    get: operations["listSupplierBills"]
+    put?: never
+    /** Menyimpan draft tagihan pemasok dan menampilkan hasil 3-way match */
+    post: operations["createSupplierBill"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/supplier-bills/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail tagihan pemasok */
+    get: operations["getSupplierBill"]
+    /** Mengubah draft tagihan pemasok */
+    put: operations["updateSupplierBill"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/supplier-bills/{id}/post": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Posting tagihan pemasok (3-way match, jurnal A-18)
+     * @description Dalam toleransi (qty 0%, harga 1%): jurnal A-18 (Dr 2102 + selisih harga 5103, Cr 2101 dan utang PPh sesuai
+     *     PPh default pemasok), uang muka PO dipotong otomatis (A-19 `advance_applied`), qty ditagih PO/GR, dan utang
+     *     terbentuk. Di luar toleransi: Menunggu Persetujuan `supplier_bill_exception` (Head F&A), pembayaran diblokir.
+     */
+    post: operations["postSupplierBill"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/supplier-bills/{id}/revise": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Kembalikan tagihan yang ditolak ke Draft */
+    post: operations["reviseSupplierBill"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/supplier-bills/{id}/cancel": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Batalkan tagihan Draft atau Ditolak */
+    post: operations["cancelSupplierBill"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/procurement/returnable-receipts": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Baris Penerimaan Barang PO yang masih bisa diretur (form Retur Pembelian) */
+    get: operations["listReturnableReceipts"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/purchase-returns": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Daftar Retur Pembelian & nota debit (S-210) */
+    get: operations["listPurchaseReturns"]
+    put?: never
+    /**
+     * Menyimpan draft retur pembelian manual
+     * @description Retur manual butuh persetujuan Head Logistik sebelum diposting; retur asal QC dibuat modul gudang.
+     */
+    post: operations["createPurchaseReturn"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/purchase-returns/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail retur pembelian */
+    get: operations["getPurchaseReturn"]
+    /** Mengubah draft retur pembelian */
+    put: operations["updatePurchaseReturn"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/purchase-returns/{id}/submit": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Ajukan retur pembelian ke Head Logistik (nomor RB) */
+    post: operations["submitPurchaseReturn"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/purchase-returns/{id}/post": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Posting retur pembelian (nota debit DN, jurnal A-02)
+     * @description Barang keluar dari lokasi/status asal dengan HPP FIFO; bagian yang belum ditagih mengurangi 2102 (qty diterima PO
+     *     ikut berkurang), bagian yang sudah ditagih mengurangi utang 2101 lewat nota debit.
+     */
+    post: operations["postPurchaseReturn"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/purchase-returns/{id}/revise": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Kembalikan retur yang ditolak ke Draft */
+    post: operations["revisePurchaseReturn"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/purchase-returns/{id}/cancel": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Batalkan retur Draft atau Disetujui */
+    post: operations["cancelPurchaseReturn"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/procurement/reports/goods-received-not-invoiced": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Laporan Barang Diterima Belum Ditagih per PO/GR (S-209)
+     * @description Saldo per baris GR dan rekonsiliasi ke saldo akun 2102 (total sub-ledger, saldo buku besar, selisih).
+     */
+    get: operations["getGoodsReceivedNotInvoiced"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -6108,6 +6461,8 @@ export interface components {
       sku: string
       name: string
       uom: string
+      /** @description Produk dilacak per batch (nomor batch, tanggal produksi & kedaluwarsa wajib saat diterima). */
+      hasBatch?: boolean
     }
     PurchaseRequestLine: {
       /** Format: uuid */
@@ -6359,6 +6714,464 @@ export interface components {
     }
     PurchaseAdvanceUpdate: components["schemas"]["PurchaseAdvanceFields"] &
       components["schemas"]["VersionInput"]
+    /** @enum {string} */
+    GoodsReceiptStatus: "draft" | "posted" | "cancelled"
+    GoodsReceiptSummary: {
+      /** Format: uuid */
+      id: string
+      /** @description Nomor GR, diisi saat diposting. */
+      number?: string | null
+      /** Format: uuid */
+      purchaseOrderId: string
+      purchaseOrderNumber: string
+      orderType: components["schemas"]["PurchaseOrderType"]
+      /** Format: uuid */
+      supplierId: string
+      supplierName: string
+      businessDate: components["schemas"]["BusinessDate"]
+      deliveryNote: string
+      inventoryAmount: components["schemas"]["Money"]
+      grniAmount: components["schemas"]["Money"]
+      status: components["schemas"]["GoodsReceiptStatus"]
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    GoodsReceiptList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["GoodsReceiptSummary"][]
+    }
+    /**
+     * @description `absorbed` reject ditanggung Balans (ikut ditagih, nilai diserap ke HPP barang baik); `return_to_supplier`
+     *     ditolak di tempat dan diganti pemasok (tidak masuk stok maupun tagihan).
+     * @enum {string}
+     */
+    RejectDisposition: "absorbed" | "return_to_supplier"
+    GoodsReceiptLineInput: {
+      /** Format: uuid */
+      purchaseOrderLineId: string
+      goodQty: components["schemas"]["PurchaseQuantity"]
+      rejectQty?: components["schemas"]["PurchaseQuantity"]
+      rejectDisposition?: components["schemas"]["RejectDisposition"]
+      batchNumber?: string
+      productionDate?: components["schemas"]["BusinessDate"] | null
+      expiryDate?: components["schemas"]["BusinessDate"] | null
+      note?: string
+    }
+    GoodsReceiptMaterialInput: {
+      /** Format: uuid */
+      productId: string
+      usedGoodQty: components["schemas"]["PurchaseQuantity"]
+      usedRejectQty: components["schemas"]["PurchaseQuantity"]
+      note?: string
+    }
+    GoodsReceiptFields: {
+      businessDate: components["schemas"]["BusinessDate"]
+      /** Format: uuid */
+      locationId: string
+      deliveryNote?: string
+      note?: string
+      lines: components["schemas"]["GoodsReceiptLineInput"][]
+      materials?: components["schemas"]["GoodsReceiptMaterialInput"][]
+    }
+    GoodsReceiptInput: components["schemas"]["GoodsReceiptFields"] & {
+      /** Format: uuid */
+      purchaseOrderId: string
+    }
+    /**
+     * @description HPP per unit, maks. 4 angka di belakang koma.
+     * @example 12500.0000
+     */
+    PurchaseUnitCost: string
+    GoodsReceiptLine: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      /** Format: uuid */
+      purchaseOrderLineId: string
+      product: components["schemas"]["PurchaseProductRef"]
+      orderedQty: components["schemas"]["PurchaseQuantity"]
+      goodQty: components["schemas"]["PurchaseQuantity"]
+      rejectQty: components["schemas"]["PurchaseQuantity"]
+      rejectDisposition: components["schemas"]["RejectDisposition"]
+      batchNumber: string
+      productionDate?: components["schemas"]["BusinessDate"] | null
+      expiryDate?: components["schemas"]["BusinessDate"] | null
+      /** Format: uuid */
+      batchId?: string | null
+      unitPrice: components["schemas"]["Money"]
+      grniQty: components["schemas"]["PurchaseQuantity"]
+      grniAmount: components["schemas"]["Money"]
+      materialCostAmount: components["schemas"]["Money"]
+      inventoryAmount: components["schemas"]["Money"]
+      unitCost: components["schemas"]["PurchaseUnitCost"]
+      inventoryAccountCode: string
+      billedQty: components["schemas"]["PurchaseQuantity"]
+      returnedQty: components["schemas"]["PurchaseQuantity"]
+      openQty: components["schemas"]["PurchaseQuantity"]
+      note: string
+    }
+    GoodsReceiptMaterial: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      product: components["schemas"]["PurchaseProductRef"]
+      usedGoodQty: components["schemas"]["PurchaseQuantity"]
+      usedRejectQty: components["schemas"]["PurchaseQuantity"]
+      costAmount: components["schemas"]["Money"]
+      accountCode: string
+      note: string
+    }
+    GoodsReceipt: components["schemas"]["GoodsReceiptSummary"] & {
+      /** Format: uuid */
+      divisionId: string
+      divisionName: string
+      location: components["schemas"]["PurchaseLocationRef"]
+      tollLocation?: components["schemas"]["PurchaseLocationRef"] | null
+      note: string
+      materialAmount: components["schemas"]["Money"]
+      /** Format: uuid */
+      inboundId?: string | null
+      /** Format: uuid */
+      journalEntryId?: string | null
+      /** Format: uuid */
+      reversalJournalEntryId?: string | null
+      cancelReason: string
+      /** Format: date-time */
+      postedAt?: string | null
+      createdByName: string
+      lines: components["schemas"]["GoodsReceiptLine"][]
+      materials: components["schemas"]["GoodsReceiptMaterial"][]
+      allowedActions: ("edit" | "post" | "cancel")[]
+    }
+    GoodsReceiptUpdate: components["schemas"]["GoodsReceiptFields"] &
+      components["schemas"]["VersionInput"]
+    /**
+     * @description Persentase desimal maks. 4 angka di belakang koma, mis. "2" untuk 2%.
+     * @example 2.0000
+     */
+    PurchasePercent: string
+    BillableReceiptLine: {
+      /** Format: uuid */
+      goodsReceiptLineId: string
+      /** Format: uuid */
+      goodsReceiptId: string
+      goodsReceiptNumber: string
+      businessDate: components["schemas"]["BusinessDate"]
+      product: components["schemas"]["PurchaseProductRef"]
+      batchNumber: string
+      poUnitPrice: components["schemas"]["Money"]
+      receivedQty: components["schemas"]["PurchaseQuantity"]
+      billedQty: components["schemas"]["PurchaseQuantity"]
+      openQty: components["schemas"]["PurchaseQuantity"]
+      pendingQty: components["schemas"]["PurchaseQuantity"]
+    }
+    BillableReceipts: {
+      /** Format: uuid */
+      purchaseOrderId: string
+      purchaseOrderNumber: string
+      /** Format: uuid */
+      supplierId: string
+      supplierName: string
+      paymentTermDays: number
+      defaultWithholdingType: components["schemas"]["WithholdingType"]
+      defaultWithholdingRate: components["schemas"]["PurchasePercent"]
+      outstandingAdvanceAmount: components["schemas"]["Money"]
+      qtyTolerancePercent: components["schemas"]["PurchasePercent"]
+      priceTolerancePercent: components["schemas"]["PurchasePercent"]
+      lines: components["schemas"]["BillableReceiptLine"][]
+    }
+    /** @enum {string} */
+    SupplierBillStatus:
+      | "draft"
+      | "pending_approval"
+      | "rejected"
+      | "awaiting_payment"
+      | "partially_paid"
+      | "paid"
+      | "cancelled"
+    /** @enum {string} */
+    SupplierBillMatchStatus:
+      "matched" | "exceeds_tolerance" | "approved_exception"
+    SupplierBillSummary: {
+      /** Format: uuid */
+      id: string
+      /** @description Nomor tagihan dari pemasok (unik per pemasok). */
+      number: string
+      /** Format: uuid */
+      purchaseOrderId: string
+      purchaseOrderNumber: string
+      /** Format: uuid */
+      supplierId: string
+      supplierName: string
+      billDate: components["schemas"]["BusinessDate"]
+      dueDate: components["schemas"]["BusinessDate"]
+      subtotalAmount: components["schemas"]["Money"]
+      totalPayableAmount: components["schemas"]["Money"]
+      paidAmount: components["schemas"]["Money"]
+      matchStatus: components["schemas"]["SupplierBillMatchStatus"]
+      status: components["schemas"]["SupplierBillStatus"]
+      /** @description true selama utang belum terbentuk (draft, menunggu persetujuan selisih, ditolak). */
+      paymentBlocked: boolean
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    SupplierBillList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["SupplierBillSummary"][]
+    }
+    SupplierBillLineInput: {
+      /** Format: uuid */
+      goodsReceiptLineId: string
+      qty: components["schemas"]["PurchaseQuantity"]
+      unitPrice: components["schemas"]["Money"]
+      note?: string
+    }
+    SupplierBillFields: {
+      number: string
+      billDate: components["schemas"]["BusinessDate"]
+      /** @description Kosong = tanggal tagihan + termin PO. */
+      dueDate?: components["schemas"]["BusinessDate"] | null
+      /** @description Kosong = PPh default pemasok. */
+      withholdingType?: components["schemas"]["WithholdingType"] | null
+      /** @description Kosong = tarif awal jenis PPh. */
+      withholdingRate?: components["schemas"]["PurchasePercent"] | null
+      note?: string
+      lines: components["schemas"]["SupplierBillLineInput"][]
+    }
+    SupplierBillInput: components["schemas"]["SupplierBillFields"] & {
+      /** Format: uuid */
+      purchaseOrderId: string
+    }
+    SupplierBillLine: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      /** Format: uuid */
+      goodsReceiptLineId: string
+      /** Format: uuid */
+      goodsReceiptId: string
+      goodsReceiptNumber: string
+      product: components["schemas"]["PurchaseProductRef"]
+      batchNumber: string
+      qty: components["schemas"]["PurchaseQuantity"]
+      receiptOpenQty: components["schemas"]["PurchaseQuantity"]
+      unitPrice: components["schemas"]["Money"]
+      poUnitPrice: components["schemas"]["Money"]
+      amount: components["schemas"]["Money"]
+      grniAmount: components["schemas"]["Money"]
+      priceVarianceAmount: components["schemas"]["Money"]
+      priceVariancePercent: components["schemas"]["PurchasePercent"]
+      qtyMismatch: boolean
+      priceMismatch: boolean
+      exceedsTolerance: boolean
+      note: string
+    }
+    SupplierBillAdvance: {
+      /** Format: uuid */
+      advanceId: string
+      advanceNumber: string
+      amount: components["schemas"]["Money"]
+    }
+    SupplierBill: components["schemas"]["SupplierBillSummary"] & {
+      /** Format: uuid */
+      divisionId: string
+      divisionName: string
+      note: string
+      grniAmount: components["schemas"]["Money"]
+      priceVarianceAmount: components["schemas"]["Money"]
+      withholdingType: components["schemas"]["WithholdingType"]
+      withholdingRate: components["schemas"]["PurchasePercent"]
+      withholdingAmount: components["schemas"]["Money"]
+      advanceAppliedAmount: components["schemas"]["Money"]
+      openAmount: components["schemas"]["Money"]
+      /** Format: uuid */
+      journalEntryId?: string | null
+      /** Format: uuid */
+      advanceJournalEntryId?: string | null
+      cancelReason: string
+      /** Format: date-time */
+      submittedAt?: string | null
+      /** Format: date-time */
+      postedAt?: string | null
+      createdByName: string
+      qtyTolerancePercent: components["schemas"]["PurchasePercent"]
+      priceTolerancePercent: components["schemas"]["PurchasePercent"]
+      lines: components["schemas"]["SupplierBillLine"][]
+      advances: components["schemas"]["SupplierBillAdvance"][]
+      allowedActions: ("edit" | "post" | "cancel" | "revise")[]
+    }
+    SupplierBillUpdate: components["schemas"]["SupplierBillFields"] &
+      components["schemas"]["VersionInput"]
+    ReturnableReceiptLine: {
+      /** Format: uuid */
+      goodsReceiptLineId: string
+      /** Format: uuid */
+      goodsReceiptId: string
+      goodsReceiptNumber: string
+      product: components["schemas"]["PurchaseProductRef"]
+      batchNumber: string
+      location: components["schemas"]["PurchaseLocationRef"]
+      goodQty: components["schemas"]["PurchaseQuantity"]
+      returnedQty: components["schemas"]["PurchaseQuantity"]
+      pendingQty: components["schemas"]["PurchaseQuantity"]
+      returnableQty: components["schemas"]["PurchaseQuantity"]
+      openQty: components["schemas"]["PurchaseQuantity"]
+      unitCost: components["schemas"]["PurchaseUnitCost"]
+    }
+    ReturnableReceipts: {
+      /** Format: uuid */
+      purchaseOrderId: string
+      purchaseOrderNumber: string
+      supplierName: string
+      lines: components["schemas"]["ReturnableReceiptLine"][]
+    }
+    /** @enum {string} */
+    PurchaseReturnStatus:
+      | "draft"
+      | "pending_approval"
+      | "approved"
+      | "rejected"
+      | "posted"
+      | "cancelled"
+    /**
+     * @description `manual` butuh persetujuan Head Logistik; `qc_inbound`/`qc_outbound` dari hasil QC tanpa approval (D-24).
+     * @enum {string}
+     */
+    PurchaseReturnOrigin: "manual" | "qc_inbound" | "qc_outbound"
+    PurchaseReturnSummary: {
+      /** Format: uuid */
+      id: string
+      /** @description Nomor RB (diajukan/diposting). */
+      number?: string | null
+      /** @description Nomor nota debit DN (diposting). */
+      debitNoteNumber?: string | null
+      /** Format: uuid */
+      purchaseOrderId: string
+      purchaseOrderNumber: string
+      /** Format: uuid */
+      supplierId: string
+      supplierName: string
+      origin: components["schemas"]["PurchaseReturnOrigin"]
+      businessDate: components["schemas"]["BusinessDate"]
+      reason: string
+      totalAmount: components["schemas"]["Money"]
+      status: components["schemas"]["PurchaseReturnStatus"]
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    PurchaseReturnList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["PurchaseReturnSummary"][]
+    }
+    /**
+     * @description Status stok asal retur.
+     * @enum {string}
+     */
+    PurchaseStockStatus: "quarantine" | "available"
+    PurchaseReturnLineInput: {
+      /** Format: uuid */
+      goodsReceiptLineId: string
+      /** Format: uuid */
+      locationId: string
+      stockStatus?: components["schemas"]["PurchaseStockStatus"]
+      qty: components["schemas"]["PurchaseQuantity"]
+      note?: string
+    }
+    PurchaseReturnFields: {
+      businessDate: components["schemas"]["BusinessDate"]
+      reason: string
+      note?: string
+      lines: components["schemas"]["PurchaseReturnLineInput"][]
+    }
+    PurchaseReturnInput: components["schemas"]["PurchaseReturnFields"] & {
+      /** Format: uuid */
+      purchaseOrderId: string
+    }
+    PurchaseReturnLine: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      /** Format: uuid */
+      goodsReceiptLineId: string
+      goodsReceiptNumber: string
+      product: components["schemas"]["PurchaseProductRef"]
+      batchNumber: string
+      location: components["schemas"]["PurchaseLocationRef"]
+      stockStatus: components["schemas"]["PurchaseStockStatus"]
+      qty: components["schemas"]["PurchaseQuantity"]
+      unitCost: components["schemas"]["PurchaseUnitCost"]
+      amount: components["schemas"]["Money"]
+      unbilledQty: components["schemas"]["PurchaseQuantity"]
+      unbilledAmount: components["schemas"]["Money"]
+      billedAmount: components["schemas"]["Money"]
+      inventoryAccountCode: string
+      note: string
+    }
+    PurchaseReturn: components["schemas"]["PurchaseReturnSummary"] & {
+      /** Format: uuid */
+      divisionId: string
+      divisionName: string
+      sourceType: string
+      sourceLabel: string
+      note: string
+      unbilledAmount: components["schemas"]["Money"]
+      billedAmount: components["schemas"]["Money"]
+      /** Format: uuid */
+      journalEntryId?: string | null
+      cancelReason: string
+      /** Format: date-time */
+      submittedAt?: string | null
+      /** Format: date-time */
+      approvedAt?: string | null
+      /** Format: date-time */
+      postedAt?: string | null
+      createdByName: string
+      lines: components["schemas"]["PurchaseReturnLine"][]
+      allowedActions: ("edit" | "submit" | "post" | "cancel" | "revise")[]
+    }
+    PurchaseReturnUpdate: components["schemas"]["PurchaseReturnFields"] &
+      components["schemas"]["VersionInput"]
+    GoodsReceivedNotInvoicedLine: {
+      /** Format: uuid */
+      goodsReceiptLineId: string
+      /** Format: uuid */
+      goodsReceiptId: string
+      goodsReceiptNumber: string
+      businessDate: components["schemas"]["BusinessDate"]
+      /** Format: uuid */
+      purchaseOrderId: string
+      purchaseOrderNumber: string
+      orderType: components["schemas"]["PurchaseOrderType"]
+      /** Format: uuid */
+      supplierId: string
+      supplierName: string
+      product: components["schemas"]["PurchaseProductRef"]
+      unitPrice: components["schemas"]["Money"]
+      receivedQty: components["schemas"]["PurchaseQuantity"]
+      receivedAmount: components["schemas"]["Money"]
+      billedQty: components["schemas"]["PurchaseQuantity"]
+      billedAmount: components["schemas"]["Money"]
+      returnedQty: components["schemas"]["PurchaseQuantity"]
+      returnedAmount: components["schemas"]["Money"]
+      openQty: components["schemas"]["PurchaseQuantity"]
+      openAmount: components["schemas"]["Money"]
+    }
+    GoodsReceivedNotInvoicedReport: {
+      asOf: components["schemas"]["BusinessDate"]
+      /** @example 2102 */
+      accountCode: string
+      lines: components["schemas"]["GoodsReceivedNotInvoicedLine"][]
+      filteredTotal: components["schemas"]["Money"]
+      subledgerTotal: components["schemas"]["Money"]
+      ledgerBalance: components["schemas"]["Money"]
+      difference: components["schemas"]["Money"]
+    }
   }
   responses: {
     /** @description Error standar (problem+json) */
@@ -12899,6 +13712,704 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["PurchaseAdvance"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listProcurementInboundLocations: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Lokasi Inbound aktif */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PurchaseLocationRef"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listGoodsReceipts: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["GoodsReceiptStatus"]
+        orderType?: components["schemas"]["PurchaseOrderType"][]
+        purchaseOrderId?: string
+        supplierId?: string
+        dateFrom?: components["schemas"]["BusinessDate"]
+        dateTo?: components["schemas"]["BusinessDate"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Penerimaan terbaru lebih dulu */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["GoodsReceiptList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createGoodsReceipt: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["GoodsReceiptInput"]
+      }
+    }
+    responses: {
+      /** @description Draft dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["GoodsReceipt"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getGoodsReceipt: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Penerimaan Barang */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["GoodsReceipt"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateGoodsReceipt: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["GoodsReceiptUpdate"]
+      }
+    }
+    responses: {
+      /** @description Draft diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["GoodsReceipt"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  postGoodsReceipt: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Diposting */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["GoodsReceipt"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  cancelGoodsReceipt: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PurchaseCancelInput"]
+      }
+    }
+    responses: {
+      /** @description Dibatalkan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["GoodsReceipt"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listBillableReceipts: {
+    parameters: {
+      query: {
+        purchaseOrderId: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Baris GR yang masih bisa ditagih beserta default PPh, termin, sisa uang muka, dan toleransi */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["BillableReceipts"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listSupplierBills: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["SupplierBillStatus"]
+        matchStatus?: components["schemas"]["SupplierBillMatchStatus"]
+        purchaseOrderId?: string
+        supplierId?: string
+        dateFrom?: components["schemas"]["BusinessDate"]
+        dateTo?: components["schemas"]["BusinessDate"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Tagihan terbaru lebih dulu */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SupplierBillList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createSupplierBill: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SupplierBillInput"]
+      }
+    }
+    responses: {
+      /** @description Draft dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SupplierBill"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getSupplierBill: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Tagihan pemasok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SupplierBill"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateSupplierBill: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SupplierBillUpdate"]
+      }
+    }
+    responses: {
+      /** @description Draft diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SupplierBill"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  postSupplierBill: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Diposting atau menunggu persetujuan selisih */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SupplierBill"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  reviseSupplierBill: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Kembali Draft */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SupplierBill"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  cancelSupplierBill: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PurchaseCancelInput"]
+      }
+    }
+    responses: {
+      /** @description Dibatalkan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SupplierBill"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listReturnableReceipts: {
+    parameters: {
+      query: {
+        purchaseOrderId: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Baris GR yang masih bisa diretur */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ReturnableReceipts"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listPurchaseReturns: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["PurchaseReturnStatus"]
+        origin?: components["schemas"]["PurchaseReturnOrigin"]
+        purchaseOrderId?: string
+        supplierId?: string
+        dateFrom?: components["schemas"]["BusinessDate"]
+        dateTo?: components["schemas"]["BusinessDate"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Retur terbaru lebih dulu */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PurchaseReturnList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createPurchaseReturn: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PurchaseReturnInput"]
+      }
+    }
+    responses: {
+      /** @description Draft dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PurchaseReturn"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getPurchaseReturn: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Retur pembelian */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PurchaseReturn"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updatePurchaseReturn: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PurchaseReturnUpdate"]
+      }
+    }
+    responses: {
+      /** @description Draft diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PurchaseReturn"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  submitPurchaseReturn: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Menunggu persetujuan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PurchaseReturn"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  postPurchaseReturn: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Diposting */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PurchaseReturn"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  revisePurchaseReturn: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Kembali Draft */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PurchaseReturn"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  cancelPurchaseReturn: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PurchaseCancelInput"]
+      }
+    }
+    responses: {
+      /** @description Dibatalkan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PurchaseReturn"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getGoodsReceivedNotInvoiced: {
+    parameters: {
+      query?: {
+        q?: components["parameters"]["Search"]
+        supplierId?: string
+        purchaseOrderId?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Laporan per hari ini */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["GoodsReceivedNotInvoicedReport"]
         }
       }
       default: components["responses"]["Problem"]

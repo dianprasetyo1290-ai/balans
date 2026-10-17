@@ -705,7 +705,7 @@ func (q *Queries) ReceiptLineByBatch(ctx context.Context, arg ReceiptLineByBatch
 }
 
 const receiptLinesByIDs = `-- name: ReceiptLinesByIDs :many
-SELECT l.id, l.goods_receipt_id, l.line_no, l.purchase_order_line_id, l.product_id, l.good_qty, l.reject_qty, l.reject_disposition, l.batch_number, l.production_date, l.expiry_date, l.batch_id, l.unit_price_amount, l.grni_qty, l.grni_amount, l.material_cost_amount, l.inventory_amount, l.unit_cost, l.inventory_account_code, l.billed_qty, l.billed_grni_amount, l.returned_qty, l.returned_unbilled_qty, l.returned_grni_amount, l.note, r.number AS receipt_number, r.status AS receipt_status, r.purchase_order_id, r.location_id
+SELECT l.id, l.goods_receipt_id, l.line_no, l.purchase_order_line_id, l.product_id, l.good_qty, l.reject_qty, l.reject_disposition, l.batch_number, l.production_date, l.expiry_date, l.batch_id, l.unit_price_amount, l.grni_qty, l.grni_amount, l.material_cost_amount, l.inventory_amount, l.unit_cost, l.inventory_account_code, l.billed_qty, l.billed_grni_amount, l.returned_qty, l.returned_unbilled_qty, l.returned_grni_amount, l.note, r.number AS receipt_number, r.status AS receipt_status, r.purchase_order_id, r.location_id, r.business_date
 FROM goods_receipt_lines l
 JOIN goods_receipts r ON r.id = l.goods_receipt_id
 WHERE l.id = ANY($1::uuid[])
@@ -741,6 +741,7 @@ type ReceiptLinesByIDsRow struct {
 	ReceiptStatus        string
 	PurchaseOrderID      uuid.UUID
 	LocationID           uuid.UUID
+	BusinessDate         clock.BusinessDate
 }
 
 // Baris GR beserta status & nomor GR dan PO-nya (3-way match tagihan, retur).
@@ -783,6 +784,7 @@ func (q *Queries) ReceiptLinesByIDs(ctx context.Context, ids []uuid.UUID) ([]Rec
 			&i.ReceiptStatus,
 			&i.PurchaseOrderID,
 			&i.LocationID,
+			&i.BusinessDate,
 		); err != nil {
 			return nil, err
 		}
@@ -795,7 +797,7 @@ func (q *Queries) ReceiptLinesByIDs(ctx context.Context, ids []uuid.UUID) ([]Rec
 }
 
 const receiptLinesByOrder = `-- name: ReceiptLinesByOrder :many
-SELECT l.id, l.goods_receipt_id, l.line_no, l.purchase_order_line_id, l.product_id, l.good_qty, l.reject_qty, l.reject_disposition, l.batch_number, l.production_date, l.expiry_date, l.batch_id, l.unit_price_amount, l.grni_qty, l.grni_amount, l.material_cost_amount, l.inventory_amount, l.unit_cost, l.inventory_account_code, l.billed_qty, l.billed_grni_amount, l.returned_qty, l.returned_unbilled_qty, l.returned_grni_amount, l.note, r.number AS receipt_number, r.status AS receipt_status, r.purchase_order_id, r.location_id
+SELECT l.id, l.goods_receipt_id, l.line_no, l.purchase_order_line_id, l.product_id, l.good_qty, l.reject_qty, l.reject_disposition, l.batch_number, l.production_date, l.expiry_date, l.batch_id, l.unit_price_amount, l.grni_qty, l.grni_amount, l.material_cost_amount, l.inventory_amount, l.unit_cost, l.inventory_account_code, l.billed_qty, l.billed_grni_amount, l.returned_qty, l.returned_unbilled_qty, l.returned_grni_amount, l.note, r.number AS receipt_number, r.status AS receipt_status, r.purchase_order_id, r.location_id, r.business_date
 FROM goods_receipt_lines l
 JOIN goods_receipts r ON r.id = l.goods_receipt_id
 WHERE r.purchase_order_id = $1 AND r.status = 'posted'
@@ -832,6 +834,7 @@ type ReceiptLinesByOrderRow struct {
 	ReceiptStatus        string
 	PurchaseOrderID      uuid.UUID
 	LocationID           uuid.UUID
+	BusinessDate         clock.BusinessDate
 }
 
 // Baris GR diposting satu PO (form tagihan & retur).
@@ -874,6 +877,7 @@ func (q *Queries) ReceiptLinesByOrder(ctx context.Context, purchaseOrderID uuid.
 			&i.ReceiptStatus,
 			&i.PurchaseOrderID,
 			&i.LocationID,
+			&i.BusinessDate,
 		); err != nil {
 			return nil, err
 		}

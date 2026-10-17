@@ -620,6 +620,9 @@ components:
           type: string
         uom:
           type: string
+        hasBatch:
+          type: boolean
+          description: Produk dilacak per batch (nomor batch, tanggal produksi & kedaluwarsa wajib saat diterima).
     PurchaseLocationRef:
       type: object
       required: [id, code, name]

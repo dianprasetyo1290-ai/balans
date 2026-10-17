@@ -25,7 +25,9 @@ import (
 	"balans/internal/accounting"
 	"balans/internal/approval"
 	"balans/internal/audit"
+	"balans/internal/catalog"
 	"balans/internal/document"
+	"balans/internal/inventory"
 	"balans/internal/notification"
 	"balans/internal/platform/actor"
 	"balans/internal/platform/apperr"
@@ -36,6 +38,7 @@ import (
 	"balans/internal/platform/jobqueue"
 	"balans/internal/platform/money"
 	"balans/internal/procurement"
+	"balans/internal/warehouse"
 )
 
 func TestMain(m *testing.M) { os.Exit(dbtest.Main(m)) }
@@ -166,6 +169,52 @@ func (m *masters) product(sku, productType string) uuid.UUID {
 	return id
 }
 
+// batchProduct membuat produk yang dilacak per batch.
+func (m *masters) batchProduct(sku, productType string) uuid.UUID {
+	id := m.product(sku, productType)
+	p := m.products[id]
+	p.HasBatch = true
+	m.products[id] = p
+	return id
+}
+
+func (m *masters) InboundLocations(context.Context) ([]procurement.LocationRef, error) {
+	out := []procurement.LocationRef{}
+	for _, l := range m.locations {
+		if l.Type == "inbound" {
+			out = append(out, l)
+		}
+	}
+	return out, nil
+}
+
+// stockMasters menyesuaikan masters untuk modul inventory (catalog.Product, warehouse.Location).
+type stockMasters struct{ m *masters }
+
+func (s stockMasters) Products(_ context.Context, ids []uuid.UUID) (map[uuid.UUID]catalog.Product, error) {
+	out := map[uuid.UUID]catalog.Product{}
+	for _, id := range ids {
+		if p, ok := s.m.products[id]; ok {
+			shelf := 365
+			out[id] = catalog.Product{
+				ID: id, SKU: p.SKU, Name: p.Name, UOM: p.UOM, Type: catalog.ProductType(p.Type), HasBatch: p.HasBatch,
+				ShelfLifeDays: &shelf, IsActive: true,
+			}
+		}
+	}
+	return out, nil
+}
+
+func (s stockMasters) Locations(_ context.Context, ids []uuid.UUID) (map[uuid.UUID]warehouse.Location, error) {
+	out := map[uuid.UUID]warehouse.Location{}
+	for _, id := range ids {
+		if l, ok := s.m.locations[id]; ok {
+			out[id] = warehouse.Location{ID: id, Code: l.Code, Name: l.Name, Type: warehouse.LocationType(l.Type), IsActive: true}
+		}
+	}
+	return out, nil
+}
+
 func (m *masters) supplier(code string, toll bool) uuid.UUID {
 	id := uuid.New()
 	m.suppliers[id] = procurement.SupplierRef{ID: id, Code: code, Name: "PT " + code, IsTollManufacturer: toll, PaymentTermDays: 30}
@@ -215,12 +264,17 @@ func (l ledger) Reverse(ctx context.Context, req accounting.ReversalRequest) (ac
 	return l.acc.Reverse(ctx, req)
 }
 
+func (l ledger) AccountBalance(ctx context.Context, code string, asOf clock.BusinessDate) (money.Amount, error) {
+	return l.acc.AccountBalance(ctx, code, asOf)
+}
+
 type numberer struct{ docs *document.Module }
 
 func (n numberer) Next(ctx context.Context, t procurement.DocumentType, d clock.BusinessDate) (string, error) {
 	types := map[procurement.DocumentType]document.Type{
 		procurement.DocPurchaseRequest: document.TypePurchaseRequest, procurement.DocPurchaseOrder: document.TypePurchaseOrder,
-		procurement.DocPayment: document.TypePayment,
+		procurement.DocPayment: document.TypePayment, procurement.DocGoodsReceipt: document.TypeGoodsReceipt,
+		procurement.DocPurchaseReturn: document.TypePurchaseReturn, procurement.DocDebitNote: document.TypeDebitNote,
 	}
 	return n.docs.Next(ctx, types[t], d)
 }
@@ -245,19 +299,24 @@ type harness struct {
 	masters  *masters
 	approval *approval.Module
 	accounts *accounting.Module
+	stock    *inventory.Module
 	srv      *httptest.Server
 	current  actor.Actor
 	mu       sync.Mutex
 	division uuid.UUID
 
-	purchasing, divHead, hfa, director, presDir, finance, leader approval.Principal
+	purchasing, divHead, hfa, director, presDir, finance, leader, headLog approval.Principal
 }
 
 var allPerms = []string{
 	"procurement.purchase_request.read", "procurement.purchase_request.write", "procurement.purchase_request.submit",
 	"procurement.purchase_order.read", "procurement.purchase_order.write", "procurement.purchase_order.submit",
 	"procurement.purchase_order.cancel", "procurement.purchase_advance.read", "procurement.purchase_advance.write",
-	"procurement.purchase_advance.post",
+	"procurement.purchase_advance.post", "procurement.goods_receipt.read", "procurement.goods_receipt.write",
+	"procurement.goods_receipt.post", "procurement.goods_receipt.cancel", "procurement.supplier_bill.read",
+	"procurement.supplier_bill.write", "procurement.supplier_bill.post", "procurement.supplier_bill.cancel",
+	"procurement.purchase_return.read", "procurement.purchase_return.write", "procurement.purchase_return.submit",
+	"procurement.purchase_return.post", "accounting.report.read",
 }
 
 func setup(t *testing.T) (*harness, *procurement.Module) {
@@ -292,14 +351,17 @@ func setup(t *testing.T) (*harness, *procurement.Module) {
 		products: map[uuid.UUID]procurement.ProductRef{}, suppliers: map[uuid.UUID]procurement.SupplierRef{},
 		locations: map[uuid.UUID]procurement.LocationRef{}, toll: map[uuid.UUID]uuid.UUID{},
 	}
+	stock := inventory.New(inventory.Deps{
+		Pool: pool, Tx: tx, Clock: fixed, Log: log, Responder: rs, Products: stockMasters{ms}, Locations: stockMasters{ms},
+	})
 	m := procurement.New(procurement.Deps{
 		Pool: pool, Tx: tx, Clock: fixed, Log: log, Responder: rs, Audit: auditMod, Catalog: ms, Suppliers: ms,
 		Locations: ms, Ledger: ledger{acc}, Approvals: apr, Numberer: numberer{docs}, Users: users{dir}, Notifier: notifier,
-		BaseURL: "https://erp.balans.test",
+		Stock: stock, BaseURL: "https://erp.balans.test",
 	})
 	m.RegisterApprovalHandlers(apr)
 
-	h := &harness{t: t, pool: pool, clock: fixed, dir: dir, masters: ms, approval: apr, accounts: acc}
+	h := &harness{t: t, pool: pool, clock: fixed, dir: dir, masters: ms, approval: apr, accounts: acc, stock: stock}
 	divisions, err := acc.DivisionOptions(ctx)
 	require.NoError(t, err)
 	require.NotEmpty(t, divisions)
@@ -311,6 +373,7 @@ func setup(t *testing.T) (*harness, *procurement.Module) {
 	h.presDir = dir.add("Eko Dirut", approval.RoleGrant{Code: "president_director"})
 	h.finance = dir.add("Fajar Finance", approval.RoleGrant{Code: "finance"})
 	h.leader = dir.add("Lina Logistik Leader", approval.RoleGrant{Code: "logistics_leader"})
+	h.headLog = dir.add("Gita Head Logistik", approval.RoleGrant{Code: "head_logistics"})
 
 	r := chi.NewRouter()
 	r.Use(func(next http.Handler) http.Handler {

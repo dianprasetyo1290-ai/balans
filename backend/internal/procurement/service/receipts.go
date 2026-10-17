@@ -497,7 +497,7 @@ func (s *Service) CancelReceipt(ctx context.Context, id uuid.UUID, version int, 
 			return r.CancelReason, nil
 		}
 		if s.Inbounds != nil && r.InboundID != nil {
-			if err := s.Inbounds.CancelInbound(ctx, *r.InboundID, r.CancelReason); err != nil {
+			if err := s.Inbounds.CancelInbound(ctx, SourceGoodsReceipt, r.ID, r.CancelReason); err != nil {
 				return "", err
 			}
 		}

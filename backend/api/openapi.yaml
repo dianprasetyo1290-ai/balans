@@ -39,7 +39,7 @@ tags:
   - name: hris
     description: Data karyawan dasar (R1.1)
   - name: procurement
-    description: Purchase Request, Purchase Order (barang, maklon, reprocess), uang muka pembelian (R1.2)
+    description: Purchase Request, Purchase Order (barang, maklon, reprocess), uang muka, Penerimaan Barang, Tagihan Pemasok, Retur Pembelian, Barang Diterima Belum Ditagih (R1.2)
   - name: filestore
     description: Upload dan unduhan file bertanda tangan (R1.1)
   - name: pricing
@@ -387,6 +387,44 @@ paths:
     $ref: "./paths/procurement.yaml#/purchaseAdvancePost"
   /api/v1/purchase-advances/{id}/cancel:
     $ref: "./paths/procurement.yaml#/purchaseAdvanceCancel"
+  /api/v1/procurement/inbound-locations:
+    $ref: "./paths/procurement_documents.yaml#/procurementInboundLocations"
+  /api/v1/goods-receipts:
+    $ref: "./paths/procurement_documents.yaml#/goodsReceipts"
+  /api/v1/goods-receipts/{id}:
+    $ref: "./paths/procurement_documents.yaml#/goodsReceipt"
+  /api/v1/goods-receipts/{id}/post:
+    $ref: "./paths/procurement_documents.yaml#/goodsReceiptPost"
+  /api/v1/goods-receipts/{id}/cancel:
+    $ref: "./paths/procurement_documents.yaml#/goodsReceiptCancel"
+  /api/v1/procurement/billable-receipts:
+    $ref: "./paths/procurement_documents.yaml#/billableReceipts"
+  /api/v1/supplier-bills:
+    $ref: "./paths/procurement_documents.yaml#/supplierBills"
+  /api/v1/supplier-bills/{id}:
+    $ref: "./paths/procurement_documents.yaml#/supplierBill"
+  /api/v1/supplier-bills/{id}/post:
+    $ref: "./paths/procurement_documents.yaml#/supplierBillPost"
+  /api/v1/supplier-bills/{id}/revise:
+    $ref: "./paths/procurement_documents.yaml#/supplierBillRevise"
+  /api/v1/supplier-bills/{id}/cancel:
+    $ref: "./paths/procurement_documents.yaml#/supplierBillCancel"
+  /api/v1/procurement/returnable-receipts:
+    $ref: "./paths/procurement_documents.yaml#/returnableReceipts"
+  /api/v1/purchase-returns:
+    $ref: "./paths/procurement_documents.yaml#/purchaseReturns"
+  /api/v1/purchase-returns/{id}:
+    $ref: "./paths/procurement_documents.yaml#/purchaseReturn"
+  /api/v1/purchase-returns/{id}/submit:
+    $ref: "./paths/procurement_documents.yaml#/purchaseReturnSubmit"
+  /api/v1/purchase-returns/{id}/post:
+    $ref: "./paths/procurement_documents.yaml#/purchaseReturnPost"
+  /api/v1/purchase-returns/{id}/revise:
+    $ref: "./paths/procurement_documents.yaml#/purchaseReturnRevise"
+  /api/v1/purchase-returns/{id}/cancel:
+    $ref: "./paths/procurement_documents.yaml#/purchaseReturnCancel"
+  /api/v1/procurement/reports/goods-received-not-invoiced:
+    $ref: "./paths/procurement_documents.yaml#/goodsReceivedNotInvoiced"
 components:
   securitySchemes:
     bearerAuth:

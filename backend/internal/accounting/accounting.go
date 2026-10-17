@@ -20,8 +20,8 @@ import (
 	"balans/internal/platform/clock"
 	"balans/internal/platform/db"
 	"balans/internal/platform/httpx"
-	"balans/internal/platform/money"
 	"balans/internal/platform/jobqueue"
+	"balans/internal/platform/money"
 	"balans/internal/platform/tabular"
 )
 
