@@ -1,10 +1,18 @@
-# Override production: batas memori sesuai Technical Guideline 14.1, tuning Postgres, WAL archiving,
-# dan backup harian ke object storage di luar VPS (14.7).
+# Override production: batas memori & CPU sesuai Technical Guideline 14.1/14.8 (anggaran VPS 4 core / 8 GB di
+# Runbook 8.1), tuning Postgres, WAL archiving, dan backup harian database + file ke object storage di luar VPS (14.7).
+#
+# - mem_limit = memswap_limit: container tidak memakai swap; melewati batas berarti OOM kill + restart, bukan
+#   VPS melambat untuk semua proses.
+# - cpus adalah plafon, bukan reservasi; totalnya boleh melebihi 4 core. Go >= 1.25 membaca plafon CPU cgroup
+#   untuk GOMAXPROCS sehingga tidak perlu diatur manual.
+# - GOMEMLIMIT ± 80% mem_limit agar GC bekerja lebih keras sebelum container mendekati batas.
 
 services:
   postgres:
     command:
       - postgres
+      # Memori (container 3 GB): shared_buffers 2 GB + work_mem per operasi sort/hash; koneksi nyata ± 20
+      # (pool api/worker), max_connections 100 sebagai batas atas.
       - -c
       - shared_buffers=2GB
       - -c
@@ -12,22 +20,67 @@ services:
       - -c
       - work_mem=16MB
       - -c
+      - maintenance_work_mem=256MB
+      - -c
       - max_connections=100
+      # CPU: plafon 2 core → paralelisme kecil agar laporan tidak memakan seluruh CPU api.
+      - -c
+      - max_worker_processes=4
+      - -c
+      - max_parallel_workers=2
+      - -c
+      - max_parallel_workers_per_gather=1
+      - -c
+      - max_parallel_maintenance_workers=1
+      # Disk SSD/NVMe VPS.
+      - -c
+      - random_page_cost=1.1
+      - -c
+      - effective_io_concurrency=200
+      # WAL & checkpoint.
       - -c
       - wal_level=replica
+      - -c
+      - max_wal_size=2GB
+      - -c
+      - min_wal_size=512MB
+      - -c
+      - checkpoint_completion_target=0.9
       - -c
       - archive_mode=on
       - -c
       - archive_command=wal-g wal-push %p
       - -c
       - archive_timeout=60
-    shm_size: 2gb
+      # Query OLTP pendek: JIT menambah latensi tanpa manfaat.
+      - -c
+      - jit=off
+      # Transaksi menggantung menahan lock & vacuum; 5 menit jauh di atas transaksi terpanjang aplikasi.
+      - -c
+      - idle_in_transaction_session_timeout=5min
+      # Query lambat (> 1 detik) dan tunggu lock dicatat untuk analisis p95 (NFR-10).
+      - -c
+      - log_min_duration_statement=1000
+      - -c
+      - log_lock_waits=on
+    shm_size: 1gb
     mem_limit: 3g
+    memswap_limit: 3g
+    cpus: 2.0
+
+  migrate:
+    environment:
+      GOMEMLIMIT: 200MiB
+    mem_limit: 256m
+    memswap_limit: 256m
+    cpus: 1.0
 
   api:
     environment:
       GOMEMLIMIT: 400MiB
     mem_limit: 512m
+    memswap_limit: 512m
+    cpus: 1.5
     networks:
       edge:
         aliases: [production-api]
@@ -36,9 +89,13 @@ services:
     environment:
       GOMEMLIMIT: 400MiB
     mem_limit: 512m
+    memswap_limit: 512m
+    cpus: 1.0
 
   web:
     mem_limit: 128m
+    memswap_limit: 128m
+    cpus: 0.5
     networks:
       edge:
         aliases: [production-web]
@@ -46,6 +103,9 @@ services:
   backup:
     image: ${REGISTRY}/balans-postgres:${POSTGRES_IMAGE_TAG}
     env_file: ${ENV_FILE}
+    environment:
+      # Folder file modul filestore yang ikut di-backup harian (backup-files).
+      FILESTORE_BACKUP_DIR: /var/lib/balans/files
     command: ["backup-loop"]
     restart: unless-stopped
     logging:
@@ -59,6 +119,10 @@ services:
     volumes:
       # Backup membaca data directory yang sama dengan Postgres (WAL-G backup-push).
       - postgres-data:/var/lib/postgresql
+      # File modul filestore (PDF PKS, foto QC) di-backup sebagai arsip harian (Runbook 5.1).
+      - filestore-data:/var/lib/balans/files:ro
     mem_limit: 256m
+    memswap_limit: 256m
+    cpus: 0.5
     networks:
       - internal
