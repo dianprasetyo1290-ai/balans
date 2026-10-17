@@ -209,3 +209,6 @@ SELECT id FROM proforma_invoices
 WHERE status = 'awaiting_payment' AND valid_until < sqlc.arg('today')::date AND deleted_at IS NULL
 ORDER BY valid_until, id
 LIMIT 200;
+
+-- name: DeleteAllocationBatches :exec
+DELETE FROM sales_order_allocation_batches WHERE allocation_id = $1;

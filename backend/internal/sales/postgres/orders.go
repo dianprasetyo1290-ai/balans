@@ -324,6 +324,21 @@ func (s *Store) ReplaceAllocations(ctx context.Context, orderID uuid.UUID, alloc
 	return nil
 }
 
+// ReplaceAllocationBatches menulis ulang batch satu alokasi (ganti batch karena QC Outbound gagal).
+func (s *Store) ReplaceAllocationBatches(ctx context.Context, allocationID uuid.UUID, batches []domain.AllocationBatch) error {
+	if err := s.q(ctx).DeleteAllocationBatches(ctx, allocationID); err != nil {
+		return fmt.Errorf("delete allocation batches: %w", err)
+	}
+	for _, b := range batches {
+		if err := s.q(ctx).InsertSalesOrderAllocationBatch(ctx, sqlcgen.InsertSalesOrderAllocationBatchParams{
+			AllocationID: allocationID, BatchID: nullUUID(b.BatchID), Qty: b.Qty,
+		}); err != nil {
+			return fmt.Errorf("insert allocation batch: %w", err)
+		}
+	}
+	return nil
+}
+
 // SaveAllocationState menyimpan qty dikirim dan tanda dilepas per alokasi.
 func (s *Store) SaveAllocationState(ctx context.Context, allocs []domain.Allocation) error {
 	for _, a := range allocs {

@@ -71,6 +71,10 @@ type (
 	ShipmentInput = service.ShipmentInput
 	// ShipmentQty adalah qty kirim per alokasi.
 	ShipmentQty = domain.ShipmentQty
+	// ReallocateInput adalah permintaan ganti batch alokasi karena QC Outbound gagal.
+	ReallocateInput = service.ReallocateInput
+	// Reallocation adalah hasil ganti batch (Karantina, batch pengganti, kekurangan).
+	Reallocation = service.Reallocation
 	// Status adalah status dokumen penjualan.
 	Status = domain.Status
 	// CustomerPayment adalah pembayaran pelanggan beserta alokasi invoice.
@@ -304,6 +308,15 @@ func (m *Module) MarkHandedOver(ctx context.Context, in ShipmentInput) (Shipment
 // MarkDelivered menandai pesanan Dalam Pengiriman sudah diterima (Selesai).
 func (m *Module) MarkDelivered(ctx context.Context, orderID uuid.UUID) (Order, error) {
 	return m.docs.MarkDelivered(ctx, orderID)
+}
+
+// ReallocateBatch mengganti batch alokasi yang gagal QC Outbound di transaksi pemanggil (WMS-12, D-24): qty
+// RejectQty batch RejectBatchID pindah reserved → Karantina di lokasi alokasi, lalu stok pengganti FEFO langsung
+// direservasi dari stok available lain (batch atau unit lain). Kekurangan dikembalikan di Reallocation.Shortfall
+// (baris ditahan); panggil lagi dengan RejectQty nol untuk mengisi kekurangan setelah stok tersedia. Tanpa cek
+// permission.
+func (m *Module) ReallocateBatch(ctx context.Context, in ReallocateInput) (Reallocation, error) {
+	return m.docs.ReallocateBatch(ctx, in)
 }
 
 // --- API untuk rekonsiliasi bank (R1.4) ------------------------------------------------------

@@ -79,6 +79,15 @@ func (q *Queries) CountSalesOrders(ctx context.Context, arg CountSalesOrdersPara
 	return count, err
 }
 
+const deleteAllocationBatches = `-- name: DeleteAllocationBatches :exec
+DELETE FROM sales_order_allocation_batches WHERE allocation_id = $1
+`
+
+func (q *Queries) DeleteAllocationBatches(ctx context.Context, allocationID uuid.UUID) error {
+	_, err := q.db.Exec(ctx, deleteAllocationBatches, allocationID)
+	return err
+}
+
 const deleteReleasedAllocationBatches = `-- name: DeleteReleasedAllocationBatches :exec
 DELETE FROM sales_order_allocation_batches b USING sales_order_allocations a
 WHERE b.allocation_id = a.id AND a.sales_order_id = $1 AND a.shipped_qty = 0
