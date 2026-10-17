@@ -1,0 +1,440 @@
+outbounds:
+  get:
+    operationId: listOutbounds
+    tags: [warehouse]
+    summary: Daftar Outbound — picking, packing, dan QC barang keluar (WMS-12)
+    description: Terbaru lebih dulu. Permission `warehouse.outbound.read` atau `warehouse.outbound_qc.read`.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - $ref: "../components/common.yaml#/parameters/Search"
+      - name: status
+        in: query
+        schema:
+          $ref: "#/components/schemas/OutboundStatus"
+      - name: sourceType
+        in: query
+        schema:
+          type: string
+    responses:
+      "200":
+        description: Daftar Outbound
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OutboundList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+outbound:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  get:
+    operationId: getOutbound
+    tags: [warehouse]
+    summary: Detail Outbound beserta picking list per batch, koli, dan catatan QC
+    responses:
+      "200":
+        description: Detail Outbound
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Outbound"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+outboundPick:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  post:
+    operationId: pickOutbound
+    tags: [warehouse]
+    summary: Konfirmasi picking (Staf Gudang, penyiap barang)
+    description: |
+      Baris yang dipilih (kosong = semua baris menunggu picking) dicatat sudah diambil sesuai batch dan qty alokasi.
+      User ini menjadi penyiap barang (`prepared_by`) dan tidak boleh melakukan QC. Permission `warehouse.outbound.write`.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OutboundPickInput"
+    responses:
+      "200":
+        description: Outbound setelah picking
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Outbound"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+outboundPack:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  post:
+    operationId: packOutbound
+    tags: [warehouse]
+    summary: Packing dan pencatatan koli (S-316)
+    description: |
+      Semua baris yang diambil/lulus QC harus masuk koli seluruhnya. Packing ulang menggantikan koli sebelumnya
+      (wajib setelah QC gagal dan stok pengganti). Permission `warehouse.outbound.write`.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OutboundPackInput"
+    responses:
+      "200":
+        description: Outbound setelah packing
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Outbound"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+outboundLineQc:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+    - $ref: "#/components/parameters/OutboundLineId"
+  post:
+    operationId: recordOutboundQc
+    tags: [warehouse]
+    summary: QC Outbound satu baris (Fulfillment Leader/Merchandiser, bukan penyiap barang)
+    description: |
+      Qty lulus + ditolak = qty diambil. Qty ditolak pindah ke Karantina dan stok pengganti FEFO langsung
+      dialokasikan (baris pengganti menunggu picking ulang); stok kurang → baris ditahan dan Sales/CS mendapat
+      notifikasi; barang dari pemasok/maklon diretur otomatis tanpa approval (nota debit, A-02). QC oleh penyiap
+      barang ditolak `FORBIDDEN`. Permission `warehouse.outbound_qc.post`.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OutboundQcInput"
+    responses:
+      "200":
+        description: Outbound setelah QC
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Outbound"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+outboundLineReallocate:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+    - $ref: "#/components/parameters/OutboundLineId"
+  post:
+    operationId: reallocateOutboundLine
+    tags: [warehouse]
+    summary: Alokasi ulang baris yang ditahan setelah stok tersedia
+    description: Permission `warehouse.outbound.write`. Stok tetap kurang → `STOCK_INSUFFICIENT`.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    responses:
+      "200":
+        description: Outbound setelah alokasi ulang
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Outbound"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+outboundLineDrop:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+    - $ref: "#/components/parameters/OutboundLineId"
+  post:
+    operationId: dropOutboundLine
+    tags: [warehouse]
+    summary: Kirim sebagian — qty baris ditahan tidak ikut dikirim (keputusan user)
+    description: Sisa pesanan tetap terbuka untuk dikirim dengan dokumen berikutnya. Permission `warehouse.outbound.post`.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OutboundDropInput"
+    responses:
+      "200":
+        description: Outbound setelah keputusan kirim sebagian
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Outbound"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+components:
+  parameters:
+    OutboundLineId:
+      name: lineId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    OutboundStatus:
+      type: string
+      description: "`in_progress` Diproses, `completed` Selesai (siap diserahkan), `cancelled` Dibatalkan."
+      enum: [in_progress, completed, cancelled]
+    OutboundLineStatus:
+      type: string
+      description: |
+        `pending` menunggu picking, `picked` sudah diambil (menunggu QC), `passed` lulus QC, `qc_rejected` Ditolak QC,
+        `held` ditahan menunggu stok pengganti, `dropped` tidak ikut dikirim (kirim sebagian).
+      enum: [pending, picked, passed, qc_rejected, held, dropped]
+    OutboundAction:
+      type: string
+      enum: [pick, pack]
+    OutboundLineAction:
+      type: string
+      enum: [qc, reallocate, drop]
+    OutboundPickInput:
+      type: object
+      required: [version]
+      properties:
+        version:
+          type: integer
+        lineIds:
+          type: array
+          maxItems: 200
+          items:
+            type: string
+            format: uuid
+    OutboundPackItemInput:
+      type: object
+      required: [lineId, qty]
+      properties:
+        lineId:
+          type: string
+          format: uuid
+        qty:
+          $ref: "./warehouse_documents.yaml#/components/schemas/WhQuantity"
+    OutboundPackageInput:
+      type: object
+      required: [items]
+      properties:
+        weightGrams:
+          type: integer
+          minimum: 1
+        items:
+          type: array
+          minItems: 1
+          maxItems: 200
+          items:
+            $ref: "#/components/schemas/OutboundPackItemInput"
+    OutboundPackInput:
+      type: object
+      required: [version, packages]
+      properties:
+        version:
+          type: integer
+        packages:
+          type: array
+          minItems: 1
+          maxItems: 500
+          items:
+            $ref: "#/components/schemas/OutboundPackageInput"
+    OutboundQcInput:
+      type: object
+      required: [passedQty, rejectedQty, checks]
+      properties:
+        passedQty:
+          $ref: "./warehouse_documents.yaml#/components/schemas/WhQuantity"
+        rejectedQty:
+          $ref: "./warehouse_documents.yaml#/components/schemas/WhQuantity"
+        checks:
+          $ref: "./warehouse_documents.yaml#/components/schemas/InboundQcChecklist"
+        rejectReason:
+          type: string
+          maxLength: 500
+        note:
+          type: string
+          maxLength: 500
+        photoFileIds:
+          type: array
+          maxItems: 5
+          items:
+            type: string
+            format: uuid
+    OutboundDropInput:
+      type: object
+      required: [reason]
+      properties:
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 500
+    OutboundLine:
+      type: object
+      required: [id, lineNo, product, allocatedQty, pickedQty, passedQty, rejectedQty, status, rejectReason, returnLabel, allowedActions]
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        sourceLineId:
+          type: string
+          format: uuid
+        product:
+          $ref: "./warehouse_documents.yaml#/components/schemas/WhProductRef"
+        batch:
+          $ref: "./warehouse_documents.yaml#/components/schemas/WhBatchRef"
+        allocatedQty:
+          $ref: "./warehouse_documents.yaml#/components/schemas/WhQuantity"
+        pickedQty:
+          $ref: "./warehouse_documents.yaml#/components/schemas/WhQuantity"
+        passedQty:
+          $ref: "./warehouse_documents.yaml#/components/schemas/WhQuantity"
+        rejectedQty:
+          $ref: "./warehouse_documents.yaml#/components/schemas/WhQuantity"
+        status:
+          $ref: "#/components/schemas/OutboundLineStatus"
+        replacementOfLineId:
+          type: string
+          format: uuid
+        rejectReason:
+          type: string
+        returnLabel:
+          type: string
+          description: Nomor retur pembelian otomatis (RB) barang yang ditolak.
+        checkedByName:
+          type: string
+        checkedAt:
+          type: string
+          format: date-time
+        allowedActions:
+          type: array
+          items:
+            $ref: "#/components/schemas/OutboundLineAction"
+    OutboundPackageItem:
+      type: object
+      required: [lineId, product, qty]
+      properties:
+        lineId:
+          type: string
+          format: uuid
+        product:
+          $ref: "./warehouse_documents.yaml#/components/schemas/WhProductRef"
+        batch:
+          $ref: "./warehouse_documents.yaml#/components/schemas/WhBatchRef"
+        qty:
+          $ref: "./warehouse_documents.yaml#/components/schemas/WhQuantity"
+    OutboundPackage:
+      type: object
+      required: [packageNumber, packageCount, items]
+      properties:
+        packageNumber:
+          type: integer
+        packageCount:
+          type: integer
+        weightGrams:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OutboundPackageItem"
+    OutboundSummary:
+      type: object
+      required: [id, number, sourceType, sourceTypeLabel, sourceId, sourceLabel, location, businessDate, recipientName, status, lineCount, pendingCount, heldCount, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        sourceType:
+          type: string
+        sourceTypeLabel:
+          type: string
+        sourceId:
+          type: string
+          format: uuid
+        sourceLabel:
+          type: string
+        location:
+          $ref: "./warehouse_documents.yaml#/components/schemas/WhLocationRef"
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        recipientName:
+          type: string
+        status:
+          $ref: "#/components/schemas/OutboundStatus"
+        lineCount:
+          type: integer
+        pendingCount:
+          type: integer
+          description: Baris menunggu picking atau QC.
+        heldCount:
+          type: integer
+          description: Baris ditahan menunggu stok.
+        createdAt:
+          type: string
+          format: date-time
+    OutboundList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/OutboundSummary"
+    Outbound:
+      allOf:
+        - $ref: "#/components/schemas/OutboundSummary"
+        - type: object
+          required: [recipientPhone, recipientAddress, note, preparedByName, checkedByName, needsRepack, lines, packages, checks, allowedActions, version]
+          properties:
+            recipientPhone:
+              type: string
+            recipientAddress:
+              type: string
+            note:
+              type: string
+            preparedById:
+              type: string
+              format: uuid
+            preparedByName:
+              type: string
+            packedAt:
+              type: string
+              format: date-time
+            checkedByName:
+              type: string
+            completedAt:
+              type: string
+              format: date-time
+            cancelReason:
+              type: string
+            needsRepack:
+              type: boolean
+              description: Isi barang berubah setelah QC (stok pengganti); koli harus dicatat ulang.
+            version:
+              type: integer
+            lines:
+              type: array
+              items:
+                $ref: "#/components/schemas/OutboundLine"
+            packages:
+              type: array
+              items:
+                $ref: "#/components/schemas/OutboundPackage"
+            checks:
+              type: array
+              items:
+                $ref: "./warehouse_documents.yaml#/components/schemas/InboundQualityCheck"
+            allowedActions:
+              type: array
+              items:
+                $ref: "#/components/schemas/OutboundAction"

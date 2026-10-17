@@ -27,7 +27,7 @@ tags:
   - name: catalog
     description: Master produk, packaging, material, bundling (R1.1)
   - name: warehouse
-    description: Gudang dan lokasi stok (R1.1); Inbound/QC, Transfer Stok, Petty Stock, Stock Count (R1.2)
+    description: Gudang dan lokasi stok (R1.1); Inbound/QC, Transfer Stok, Petty Stock, Stock Count (R1.2); Outbound/QC (R1.3)
   - name: inventory
     description: Ledger stok, batch, HPP FIFO, saran FEFO (R1.2)
   - name: accounting
@@ -247,6 +247,20 @@ paths:
     $ref: "./paths/warehouse_documents.yaml#/inbound"
   /api/v1/inbounds/{id}/lines/{lineId}/qc:
     $ref: "./paths/warehouse_documents.yaml#/inboundLineQc"
+  /api/v1/outbounds:
+    $ref: "./paths/warehouse_outbounds.yaml#/outbounds"
+  /api/v1/outbounds/{id}:
+    $ref: "./paths/warehouse_outbounds.yaml#/outbound"
+  /api/v1/outbounds/{id}/pick:
+    $ref: "./paths/warehouse_outbounds.yaml#/outboundPick"
+  /api/v1/outbounds/{id}/pack:
+    $ref: "./paths/warehouse_outbounds.yaml#/outboundPack"
+  /api/v1/outbounds/{id}/lines/{lineId}/qc:
+    $ref: "./paths/warehouse_outbounds.yaml#/outboundLineQc"
+  /api/v1/outbounds/{id}/lines/{lineId}/reallocate:
+    $ref: "./paths/warehouse_outbounds.yaml#/outboundLineReallocate"
+  /api/v1/outbounds/{id}/lines/{lineId}/drop:
+    $ref: "./paths/warehouse_outbounds.yaml#/outboundLineDrop"
   /api/v1/stock-transfers:
     $ref: "./paths/warehouse_documents.yaml#/stockTransfers"
   /api/v1/stock-transfers/in-transit:

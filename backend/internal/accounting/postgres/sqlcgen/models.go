@@ -821,6 +821,64 @@ type NotificationEmail struct {
 	SentAt    *time.Time
 }
 
+type Outbound struct {
+	ID               uuid.UUID
+	Number           string
+	SourceType       string
+	SourceID         uuid.UUID
+	SourceLabel      string
+	WarehouseID      uuid.UUID
+	LocationID       uuid.UUID
+	BusinessDate     clock.BusinessDate
+	RecipientName    string
+	RecipientPhone   string
+	RecipientAddress string
+	Status           string
+	Note             string
+	PreparedBy       uuid.NullUUID
+	PreparedByName   string
+	PackedAt         *time.Time
+	CheckedBy        uuid.NullUUID
+	CheckedByName    string
+	CompletedAt      *time.Time
+	CancelledAt      *time.Time
+	CancelReason     string
+	CreatedAt        time.Time
+	CreatedBy        uuid.UUID
+	UpdatedAt        time.Time
+	UpdatedBy        uuid.UUID
+	Version          int32
+}
+
+type OutboundLine struct {
+	ID                  uuid.UUID
+	OutboundID          uuid.UUID
+	LineNo              int32
+	SourceLineID        uuid.NullUUID
+	ProductID           uuid.UUID
+	BatchID             uuid.NullUUID
+	AllocatedQty        decimal.Decimal
+	PickedQty           decimal.Decimal
+	PassedQty           decimal.Decimal
+	RejectedQty         decimal.Decimal
+	Status              string
+	ReplacementOfLineID uuid.NullUUID
+	RejectReason        string
+	ReturnLabel         string
+	CheckedBy           uuid.NullUUID
+	CheckedByName       string
+	CheckedAt           *time.Time
+}
+
+type OutboundPackage struct {
+	ID            uuid.UUID
+	OutboundID    uuid.UUID
+	PackageNumber int32
+	PackageCount  int32
+	WeightGrams   pgtype.Int4
+	Contents      []byte
+}
+
 type Partner struct {
 	ID                 uuid.UUID
 	Code               string

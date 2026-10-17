@@ -1966,6 +1966,163 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/v1/outbounds": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Daftar Outbound — picking, packing, dan QC barang keluar (WMS-12)
+     * @description Terbaru lebih dulu. Permission `warehouse.outbound.read` atau `warehouse.outbound_qc.read`.
+     */
+    get: operations["listOutbounds"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/outbounds/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    /** Detail Outbound beserta picking list per batch, koli, dan catatan QC */
+    get: operations["getOutbound"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/outbounds/{id}/pick": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Konfirmasi picking (Staf Gudang, penyiap barang)
+     * @description Baris yang dipilih (kosong = semua baris menunggu picking) dicatat sudah diambil sesuai batch dan qty alokasi.
+     *     User ini menjadi penyiap barang (`prepared_by`) dan tidak boleh melakukan QC. Permission `warehouse.outbound.write`.
+     */
+    post: operations["pickOutbound"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/outbounds/{id}/pack": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Packing dan pencatatan koli (S-316)
+     * @description Semua baris yang diambil/lulus QC harus masuk koli seluruhnya. Packing ulang menggantikan koli sebelumnya
+     *     (wajib setelah QC gagal dan stok pengganti). Permission `warehouse.outbound.write`.
+     */
+    post: operations["packOutbound"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/outbounds/{id}/lines/{lineId}/qc": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+        lineId: components["parameters"]["OutboundLineId"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * QC Outbound satu baris (Fulfillment Leader/Merchandiser, bukan penyiap barang)
+     * @description Qty lulus + ditolak = qty diambil. Qty ditolak pindah ke Karantina dan stok pengganti FEFO langsung
+     *     dialokasikan (baris pengganti menunggu picking ulang); stok kurang → baris ditahan dan Sales/CS mendapat
+     *     notifikasi; barang dari pemasok/maklon diretur otomatis tanpa approval (nota debit, A-02). QC oleh penyiap
+     *     barang ditolak `FORBIDDEN`. Permission `warehouse.outbound_qc.post`.
+     */
+    post: operations["recordOutboundQc"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/outbounds/{id}/lines/{lineId}/reallocate": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+        lineId: components["parameters"]["OutboundLineId"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Alokasi ulang baris yang ditahan setelah stok tersedia
+     * @description Permission `warehouse.outbound.write`. Stok tetap kurang → `STOCK_INSUFFICIENT`.
+     */
+    post: operations["reallocateOutboundLine"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/outbounds/{id}/lines/{lineId}/drop": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+        lineId: components["parameters"]["OutboundLineId"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Kirim sebagian — qty baris ditahan tidak ikut dikirim (keputusan user)
+     * @description Sisa pesanan tetap terbuka untuk dikirim dengan dokumen berikutnya. Permission `warehouse.outbound.post`.
+     */
+    post: operations["dropOutboundLine"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/v1/stock-transfers": {
     parameters: {
       query?: never
@@ -6087,6 +6244,131 @@ export interface components {
       photoFileIds?: string[]
     }
     /**
+     * @description `in_progress` Diproses, `completed` Selesai (siap diserahkan), `cancelled` Dibatalkan.
+     * @enum {string}
+     */
+    OutboundStatus: "in_progress" | "completed" | "cancelled"
+    OutboundSummary: {
+      /** Format: uuid */
+      id: string
+      number: string
+      sourceType: string
+      sourceTypeLabel: string
+      /** Format: uuid */
+      sourceId: string
+      sourceLabel: string
+      location: components["schemas"]["WhLocationRef"]
+      businessDate: components["schemas"]["BusinessDate"]
+      recipientName: string
+      status: components["schemas"]["OutboundStatus"]
+      lineCount: number
+      /** @description Baris menunggu picking atau QC. */
+      pendingCount: number
+      /** @description Baris ditahan menunggu stok. */
+      heldCount: number
+      /** Format: date-time */
+      createdAt: string
+    }
+    OutboundList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["OutboundSummary"][]
+    }
+    /**
+     * @description `pending` menunggu picking, `picked` sudah diambil (menunggu QC), `passed` lulus QC, `qc_rejected` Ditolak QC,
+     *     `held` ditahan menunggu stok pengganti, `dropped` tidak ikut dikirim (kirim sebagian).
+     * @enum {string}
+     */
+    OutboundLineStatus:
+      "pending" | "picked" | "passed" | "qc_rejected" | "held" | "dropped"
+    /** @enum {string} */
+    OutboundLineAction: "qc" | "reallocate" | "drop"
+    OutboundLine: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      /** Format: uuid */
+      sourceLineId?: string
+      product: components["schemas"]["WhProductRef"]
+      batch?: components["schemas"]["WhBatchRef"]
+      allocatedQty: components["schemas"]["WhQuantity"]
+      pickedQty: components["schemas"]["WhQuantity"]
+      passedQty: components["schemas"]["WhQuantity"]
+      rejectedQty: components["schemas"]["WhQuantity"]
+      status: components["schemas"]["OutboundLineStatus"]
+      /** Format: uuid */
+      replacementOfLineId?: string
+      rejectReason: string
+      /** @description Nomor retur pembelian otomatis (RB) barang yang ditolak. */
+      returnLabel: string
+      checkedByName?: string
+      /** Format: date-time */
+      checkedAt?: string
+      allowedActions: components["schemas"]["OutboundLineAction"][]
+    }
+    OutboundPackageItem: {
+      /** Format: uuid */
+      lineId: string
+      product: components["schemas"]["WhProductRef"]
+      batch?: components["schemas"]["WhBatchRef"]
+      qty: components["schemas"]["WhQuantity"]
+    }
+    OutboundPackage: {
+      packageNumber: number
+      packageCount: number
+      weightGrams?: number
+      items: components["schemas"]["OutboundPackageItem"][]
+    }
+    /** @enum {string} */
+    OutboundAction: "pick" | "pack"
+    Outbound: components["schemas"]["OutboundSummary"] & {
+      recipientPhone: string
+      recipientAddress: string
+      note: string
+      /** Format: uuid */
+      preparedById?: string
+      preparedByName: string
+      /** Format: date-time */
+      packedAt?: string
+      checkedByName: string
+      /** Format: date-time */
+      completedAt?: string
+      cancelReason?: string
+      /** @description Isi barang berubah setelah QC (stok pengganti); koli harus dicatat ulang. */
+      needsRepack: boolean
+      version: number
+      lines: components["schemas"]["OutboundLine"][]
+      packages: components["schemas"]["OutboundPackage"][]
+      checks: components["schemas"]["InboundQualityCheck"][]
+      allowedActions: components["schemas"]["OutboundAction"][]
+    }
+    OutboundPickInput: {
+      version: number
+      lineIds?: string[]
+    }
+    OutboundPackItemInput: {
+      /** Format: uuid */
+      lineId: string
+      qty: components["schemas"]["WhQuantity"]
+    }
+    OutboundPackageInput: {
+      weightGrams?: number
+      items: components["schemas"]["OutboundPackItemInput"][]
+    }
+    OutboundPackInput: {
+      version: number
+      packages: components["schemas"]["OutboundPackageInput"][]
+    }
+    OutboundQcInput: {
+      passedQty: components["schemas"]["WhQuantity"]
+      rejectedQty: components["schemas"]["WhQuantity"]
+      checks: components["schemas"]["InboundQcChecklist"]
+      rejectReason?: string
+      note?: string
+      photoFileIds?: string[]
+    }
+    OutboundDropInput: {
+      reason: string
+    }
+    /**
      * @description `direct` Transfer Stok, `request` Permintaan Petty Stock.
      * @enum {string}
      */
@@ -8708,6 +8990,7 @@ export interface components {
     /** @description Versi terakhir yang dilihat user (optimistic locking). */
     Version: number
     IncludeInactive: boolean
+    OutboundLineId: string
     /** @description Versi terakhir yang dilihat user (optimistic locking). */
     PartyVersion: number
     /** @description Waktu kedaluwarsa URL (Unix detik). */
@@ -12349,6 +12632,205 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["Inbound"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listOutbounds: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["OutboundStatus"]
+        sourceType?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar Outbound */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["OutboundList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getOutbound: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Detail Outbound */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Outbound"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  pickOutbound: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OutboundPickInput"]
+      }
+    }
+    responses: {
+      /** @description Outbound setelah picking */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Outbound"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  packOutbound: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OutboundPackInput"]
+      }
+    }
+    responses: {
+      /** @description Outbound setelah packing */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Outbound"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  recordOutboundQc: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+        lineId: components["parameters"]["OutboundLineId"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OutboundQcInput"]
+      }
+    }
+    responses: {
+      /** @description Outbound setelah QC */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Outbound"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  reallocateOutboundLine: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+        lineId: components["parameters"]["OutboundLineId"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Outbound setelah alokasi ulang */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Outbound"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  dropOutboundLine: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+        lineId: components["parameters"]["OutboundLineId"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OutboundDropInput"]
+      }
+    }
+    responses: {
+      /** @description Outbound setelah keputusan kirim sebagian */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Outbound"]
         }
       }
       default: components["responses"]["Problem"]

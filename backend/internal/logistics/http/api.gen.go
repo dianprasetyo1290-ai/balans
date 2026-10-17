@@ -165,6 +165,9 @@ type WebhookAck struct {
 // Id defines model for Id.
 type Id = openapi_types.UUID
 
+// OutboundLineId defines model for OutboundLineId.
+type OutboundLineId = openapi_types.UUID
+
 // ReceiveBiteshipWebhookParams defines parameters for ReceiveBiteshipWebhook.
 type ReceiveBiteshipWebhookParams struct {
 	XBiteshipSignature string `json:"X-Biteship-Signature"`

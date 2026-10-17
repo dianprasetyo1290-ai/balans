@@ -926,6 +926,9 @@ type IdempotencyKey = openapi_types.UUID
 // IncludeInactive defines model for IncludeInactive.
 type IncludeInactive = bool
 
+// OutboundLineId defines model for OutboundLineId.
+type OutboundLineId = openapi_types.UUID
+
 // Page defines model for Page.
 type Page = int
 

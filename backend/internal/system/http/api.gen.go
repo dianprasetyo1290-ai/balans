@@ -299,6 +299,9 @@ type SystemInfoEnvironment string
 // Id defines model for Id.
 type Id = openapi_types.UUID
 
+// OutboundLineId defines model for OutboundLineId.
+type OutboundLineId = openapi_types.UUID
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// GetSystemInfo Informasi versi, lingkungan, dan modul aktif

@@ -273,6 +273,8 @@ type DocumentDeps struct {
 	Partners  Partners
 	Notifier  Notifier
 	Users     Users
+	// Returns opsional: retur pembelian otomatis barang reject QC Outbound (D-24, S-311).
+	Returns QCReturns
 }
 
 type documentStore interface {
@@ -299,6 +301,12 @@ type documentStore interface {
 	GetSchedule(ctx context.Context, id uuid.UUID) (domain.CountSchedule, error)
 	ListSchedules(ctx context.Context) ([]domain.CountSchedule, error)
 	DueSchedules(ctx context.Context, today clock.BusinessDate) ([]domain.CountSchedule, error)
+
+	InsertOutbound(ctx context.Context, o domain.Outbound, actorID uuid.UUID) (domain.Outbound, error)
+	GetOutbound(ctx context.Context, id uuid.UUID, forUpdate bool) (domain.Outbound, error)
+	OutboundBySource(ctx context.Context, sourceType string, sourceID uuid.UUID) (domain.Outbound, error)
+	SaveOutbound(ctx context.Context, o domain.Outbound, w postgres.OutboundWrite, actorID uuid.UUID) (domain.Outbound, error)
+	ListOutbounds(ctx context.Context, f postgres.OutboundFilter, page paging.Page) (paging.Result[postgres.OutboundSummary], error)
 }
 
 var _ documentStore = (*postgres.Store)(nil)
@@ -308,6 +316,7 @@ type documents struct {
 	mu       sync.RWMutex
 	deps     DocumentDeps
 	handlers map[string]InboundHandler
+	outbound map[string]OutboundHandler
 }
 
 // SetDocumentDeps memasang dependensi dokumen gudang (dipanggil saat wiring setelah inventory dibuat).

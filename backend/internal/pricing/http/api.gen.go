@@ -1034,6 +1034,9 @@ type Id = openapi_types.UUID
 // IdempotencyKey defines model for IdempotencyKey.
 type IdempotencyKey = openapi_types.UUID
 
+// OutboundLineId defines model for OutboundLineId.
+type OutboundLineId = openapi_types.UUID
+
 // PricingIncludeEnded defines model for PricingIncludeEnded.
 type PricingIncludeEnded = bool
 
