@@ -48,6 +48,16 @@ PurchaseOrderType:
     Jenis PO: `goods` barang, `packaging` packaging (RM), `toll_manufacturing` jasa maklon per batch,
     `reprocess` reprocess bahan GM di maklon, `other` lainnya (baris boleh berupa uraian).
   enum: [goods, packaging, toll_manufacturing, reprocess, other]
+PriceRule:
+  type: string
+  description: |
+    Aturan harga yang menghasilkan harga baris transaksi (BRD 5.18, disimpan sebagai `price_rule`): harga khusus,
+    promo, harga bertingkat, daftar harga channel/mitra/karyawan, atau Harga Dasar & HET.
+  enum: [special_price, promotion, tiered_price, price_list, base_price]
+DiscountKind:
+  type: string
+  description: Bentuk diskon manual (MD-05) — persen dari dasar atau nominal rupiah.
+  enum: [percent, amount]
 VersionInput:
   type: object
   required: [version]

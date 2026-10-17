@@ -6,6 +6,8 @@ import { todayBusinessDate } from "@/lib/format/date"
 import { formatQuantity } from "@/lib/format/number"
 import { formatRupiah, formatUnitCost } from "@/lib/format/money"
 
+import { locationsQuery } from "@/features/warehouse/api/warehouse-api"
+
 import {
   stockBalancesQuery,
   type StockBalance,
@@ -15,6 +17,7 @@ import {
   BatchFilter,
   ExpiryCell,
   LocationFilter,
+  LocationTypeFilter,
   ProductFilter,
   StatusFilter,
   StockStatusBadge,
@@ -22,11 +25,31 @@ import {
 
 const route = getRouteApi("/_app/inventory/stock")
 
+const NO_LOCATION = "00000000-0000-0000-0000-000000000000"
+
 /** Persediaan › Stok per Lokasi: saldo per produk × lokasi × batch × status (S-212, S-213). */
 export function StockBalancesPage() {
   const search = route.useSearch()
   const navigate = route.useNavigate()
-  const balances = useQuery(stockBalancesQuery(search))
+  const locations = useQuery({
+    ...locationsQuery({ page: 1 }),
+    enabled: Boolean(search.locationType),
+  })
+  // Jenis lokasi tanpa lokasi tertentu: semua lokasi jenis itu; jenis tanpa lokasi = tidak ada saldo.
+  const typeLocationIds =
+    search.locationType && !search.locationId
+      ? (locations.data?.items ?? [])
+          .filter((l) => l.locationType === search.locationType)
+          .map((l) => l.id)
+      : undefined
+  const balances = useQuery({
+    ...stockBalancesQuery(
+      search,
+      typeLocationIds?.length === 0 ? [NO_LOCATION] : typeLocationIds
+    ),
+    enabled:
+      !search.locationType || Boolean(search.locationId) || locations.isSuccess,
+  })
   const setSearch = (patch: Partial<StockBalanceSearch>) =>
     void navigate({ search: (s) => ({ ...s, ...patch, page: 1 }) })
 
@@ -139,11 +162,18 @@ export function StockBalancesPage() {
           batch.
         </p>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <ProductFilter
           id="stock-product"
           value={search.productId}
           onChange={(productId) => setSearch({ productId, batchId: undefined })}
+        />
+        <LocationTypeFilter
+          id="stock-location-type"
+          value={search.locationType}
+          onChange={(locationType) =>
+            setSearch({ locationType, locationId: undefined })
+          }
         />
         <LocationFilter
           id="stock-location"

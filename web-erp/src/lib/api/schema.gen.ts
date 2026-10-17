@@ -1558,6 +1558,268 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/v1/inbounds": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Antrian Inbound — barang Karantina per dokumen asal (WMS-02, WMS-09)
+     * @description Terbaru lebih dulu. Permission `warehouse.inbound.read`.
+     */
+    get: operations["listInbounds"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/inbounds/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    /** Detail Inbound beserta baris dan catatan QC */
+    get: operations["getInbound"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/inbounds/{id}/lines/{lineId}/qc": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+        lineId: string
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * QC satu baris Inbound (checklist, qty lulus/ditolak, foto, lokasi tujuan)
+     * @description Qty lulus pindah Karantina → Tersedia di lokasi tujuan; qty ditolak tetap Karantina (ditahan di Inbound untuk
+     *     barang pemasok/maklon, atau pindah ke Gudang Retur). Qty lulus + ditolak = qty baris. Permission
+     *     `warehouse.inbound.post`.
+     */
+    post: operations["recordInboundQc"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/stock-transfers": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Daftar Transfer Stok atau Permintaan Petty Stock */
+    get: operations["listStockTransfers"]
+    put?: never
+    /** Membuat Transfer Stok / Permintaan Petty Stock berstatus Draft */
+    post: operations["createStockTransfer"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/stock-transfers/in-transit": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Stok dalam Pengiriman — baris transfer yang belum diterima penuh (WMS-10) */
+    get: operations["listStockInTransit"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/stock-transfers/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    /** Detail transfer */
+    get: operations["getStockTransfer"]
+    /** Mengubah transfer Draft */
+    put: operations["updateStockTransfer"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/stock-transfers/{id}/actions": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Aksi status transfer (submit, release, prepare, post, ship, receive, complete, cancel)
+     * @description Transfer langsung: `post` (dalam satu gudang, langsung Selesai) atau `ship` (antar gudang/eksternal →
+     *     Dalam Pengiriman), `receive` (qty diterima per baris), `complete` (sisa dicatat kekurangan). Permintaan
+     *     Petty Stock: `submit` (Fulfillment Leader), `release` (Logistik Leader; stok asal dialokasikan FEFO),
+     *     `prepare` (Staf Gudang), `receive` (Fulfillment Leader mengonfirmasi qty; sisa alokasi dilepas).
+     *     Aksi yang boleh dijalankan ada di `allowedActions`.
+     */
+    post: operations["actOnStockTransfer"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/stock-counts": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Daftar Stock Count (Merchandiser hanya lokasi konsinyasi mitra yang ditugaskan) */
+    get: operations["listStockCounts"]
+    put?: never
+    /** Membuat Stock Count Draft, satu dokumen per lokasi */
+    post: operations["createStockCounts"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/stock-counts/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    /** Detail Stock Count (hitung buta — qty sistem dan selisih kosong sampai hasil dikirim) */
+    get: operations["getStockCount"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/stock-counts/{id}/entries": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    /** Menyimpan isian hitung (autosave form HP), barang tambahan, dan foto */
+    put: operations["saveStockCountEntries"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/stock-counts/{id}/actions": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Aksi status Stock Count (start, submit, recount, cancel)
+     * @description `start` memberi nomor SC dan mengambil snapshot saldo sistem; `submit` menghitung selisih — ada selisih
+     *     pada stock count gudang → approval `stock_count` (nominal = nilai selisih absolut); tanpa selisih atau
+     *     konsinyasi/vending → Selesai. Setelah disetujui, penyesuaian stok + jurnal A-14 diposting otomatis.
+     */
+    post: operations["actOnStockCount"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/stock-count-schedules": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Jadwal Stock Count (cycle count, konsinyasi/vending bulanan, penuh akhir tahun) */
+    get: operations["listStockCountSchedules"]
+    put?: never
+    /** Membuat jadwal Stock Count */
+    post: operations["createStockCountSchedule"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/stock-count-schedules/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    /** Mengubah jadwal Stock Count */
+    put: operations["updateStockCountSchedule"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/v1/stock-balances": {
     parameters: {
       query?: never
@@ -2105,6 +2367,471 @@ export interface paths {
      */
     put: operations["putFileContent"]
     post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/price-lists": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Data Master › Daftar Harga
+     * @description Butuh `pricing.price_list.read` (atau `pricing.price_list.approve` untuk approver). Harga Dasar & HET selalu
+     *     paling atas. `deleted=true` hanya menampilkan daftar harga terhapus (untuk dipulihkan Admin Sistem).
+     */
+    get: operations["listPriceLists"]
+    put?: never
+    /**
+     * Menambah daftar harga
+     * @description Harga diisi lewat versi yang diajukan untuk approval (Head Sales → Head Finance & Accounting).
+     */
+    post: operations["createPriceList"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/price-lists/options": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Pilihan daftar harga aktif (acuan persentase, harga bertingkat) */
+    get: operations["listPriceListOptions"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/price-lists/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    /** Detail daftar harga dan riwayat versi */
+    get: operations["getPriceList"]
+    /** Mengubah header daftar harga (kode dan jenis tetap) */
+    put: operations["updatePriceList"]
+    post?: never
+    /**
+     * Menghapus (soft delete) daftar harga
+     * @description Harga Dasar & HET tidak bisa dihapus. Transaksi lama tetap menyimpan harga dan versinya.
+     */
+    delete: operations["deletePriceList"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/price-lists/{id}/restore": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Memulihkan daftar harga yang dihapus (hanya Admin Sistem) */
+    post: operations["restorePriceList"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/price-lists/{id}/versions": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Menyiapkan versi draft baru
+     * @description `copyFromVersionId` menyalin harga versi lain bila `items` kosong. Paling banyak satu versi draft/diajukan per
+     *     daftar harga. Tanggal mulai berlaku tidak boleh sebelum hari ini.
+     */
+    post: operations["createPriceListVersion"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/price-list-versions/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    /** Detail versi beserta harga per produk */
+    get: operations["getPriceListVersion"]
+    /** Mengubah versi draft (seluruh item diganti) */
+    put: operations["updatePriceListVersion"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/price-list-versions/{id}/submit": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Mengajukan versi untuk approval price_list_version
+     * @description Versi berlaku setelah disetujui Head Sales lalu Head Finance & Accounting.
+     */
+    post: operations["submitPriceListVersion"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/price-list-versions/{id}/withdraw": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Menarik kembali pengajuan menjadi draft */
+    post: operations["withdrawPriceListVersion"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/price-list-versions/{id}/cancel": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Membatalkan versi draft */
+    post: operations["cancelPriceListVersion"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/special-prices": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Data Master › Aturan Harga › Harga Khusus */
+    get: operations["listSpecialPrices"]
+    put?: never
+    /**
+     * Menambah harga khusus pelanggan/mitra
+     * @description Harga khusus lama tanpa tanggal berakhir untuk pihak & produk yang sama ditutup otomatis.
+     */
+    post: operations["createSpecialPrice"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/special-prices/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Menghapus harga khusus yang belum pernah berlaku */
+    delete: operations["deleteSpecialPrice"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/special-prices/{id}/end": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Mengisi tanggal berakhir harga khusus */
+    post: operations["endSpecialPrice"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/promotions": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Data Master › Aturan Harga › Promo */
+    get: operations["listPromotions"]
+    put?: never
+    /** Menambah promo periode */
+    post: operations["createPromotion"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/promotions/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    /** Detail promo beserta item */
+    get: operations["getPromotion"]
+    /**
+     * Mengubah promo
+     * @description Promo yang sudah berjalan hanya boleh diubah nama, keterangan, status, dan tanggal selesai (paling cepat
+     *     kemarin); `items` harus sama dengan yang tersimpan atau dikosongkan.
+     */
+    put: operations["updatePromotion"]
+    post?: never
+    /** Menghapus promo yang belum berjalan */
+    delete: operations["deletePromotion"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/tiered-prices": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Data Master › Aturan Harga › Harga Bertingkat */
+    get: operations["listTieredPrices"]
+    put?: never
+    /** Menambah harga bertingkat per qty minimum */
+    post: operations["createTieredPrice"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/tiered-prices/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Menghapus harga bertingkat yang belum pernah berlaku */
+    delete: operations["deleteTieredPrice"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/tiered-prices/{id}/end": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Mengisi tanggal berakhir harga bertingkat */
+    post: operations["endTieredPrice"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/discount-limits": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Penjualan › Harga & Diskon › Batas Diskon per Role */
+    get: operations["listDiscountLimits"]
+    put?: never
+    /**
+     * Menetapkan batas diskon role mulai tanggal tertentu
+     * @description Batas lama tanpa tanggal berakhir ditutup otomatis sehari sebelum batas baru berlaku.
+     */
+    post: operations["createDiscountLimit"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/discount-limits/roles": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Pilihan role untuk batas diskon */
+    get: operations["listDiscountLimitRoles"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/discount-limits/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Menghapus batas diskon yang belum pernah berlaku */
+    delete: operations["deleteDiscountLimit"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/discount-limits/{id}/end": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Mengisi tanggal berakhir batas diskon */
+    post: operations["endDiscountLimit"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/pricing/quote": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Simulasi harga (resolver 5 aturan BRD 5.18)
+     * @description Menjalankan resolver yang sama dengan transaksi: harga khusus → promo → harga bertingkat → daftar harga
+     *     channel/mitra/karyawan → Harga Dasar & HET, berdasarkan tanggal transaksi. Tidak menyimpan data, sehingga
+     *     tidak memakai Idempotency-Key.
+     */
+    post: operations["quotePrice"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/pricing/discount-check": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Simulasi diskon manual terhadap batas diskon role user yang login
+     * @description Subtotal dokumen = total bruto baris dikurangi diskon baris. Diskon di atas batas berarti Sales Order butuh
+     *     approval `sales_order_discount` (Head Sales). Tidak menyimpan data.
+     */
+    post: operations["checkDiscount"]
     delete?: never
     options?: never
     head?: never
@@ -3786,6 +4513,401 @@ export interface components {
       isActive: boolean
     } & components["schemas"]["VersionInput"]
     /**
+     * @description `in_progress` Diproses, `completed` Selesai.
+     * @enum {string}
+     */
+    InboundStatus: "in_progress" | "completed"
+    WhLocationRef: {
+      /** Format: uuid */
+      id: string
+      code: string
+      name: string
+      locationType: components["schemas"]["LocationType"]
+      locationTypeLabel: string
+      isExternal: boolean
+      warehouseName?: string
+    }
+    InboundSummary: {
+      /** Format: uuid */
+      id: string
+      number: string
+      sourceType: string
+      sourceTypeLabel: string
+      sourceLabel: string
+      location: components["schemas"]["WhLocationRef"]
+      businessDate: components["schemas"]["BusinessDate"]
+      status: components["schemas"]["InboundStatus"]
+      lineCount: number
+      pendingCount: number
+      /** Format: date-time */
+      createdAt: string
+    }
+    InboundList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["InboundSummary"][]
+    }
+    /**
+     * @description `hold` ditahan di Inbound (reject ke pemasok/maklon), `returns` ke Gudang Retur.
+     * @enum {string}
+     */
+    InboundRejectAction: "hold" | "returns"
+    WhProductRef: {
+      /** Format: uuid */
+      id: string
+      sku: string
+      name: string
+      uom: string
+    }
+    WhBatchRef: {
+      /** Format: uuid */
+      id: string
+      number: string
+      expiryDate?: components["schemas"]["BusinessDate"]
+    }
+    /**
+     * @description Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+     * @example 12.000
+     */
+    WhQuantity: string
+    /**
+     * @description `quarantine` Karantina (belum QC), `posted` Diposting (lulus), `qc_rejected` Ditolak QC.
+     * @enum {string}
+     */
+    InboundLineStatus: "quarantine" | "posted" | "qc_rejected"
+    InboundLine: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      product: components["schemas"]["WhProductRef"]
+      batch?: components["schemas"]["WhBatchRef"]
+      qty: components["schemas"]["WhQuantity"]
+      passedQty: components["schemas"]["WhQuantity"]
+      rejectedQty: components["schemas"]["WhQuantity"]
+      destination: components["schemas"]["WhLocationRef"]
+      rejectLocation?: components["schemas"]["WhLocationRef"]
+      status: components["schemas"]["InboundLineStatus"]
+      rejectReason: string
+      checkedByName?: string
+      /** Format: date-time */
+      checkedAt?: string
+      allowedActions: "qc"[]
+    }
+    InboundQcChecklist: {
+      batch: boolean
+      expiry: boolean
+      condition: boolean
+      seal: boolean
+    }
+    InboundQualityCheck: {
+      /** Format: uuid */
+      id: string
+      /** Format: uuid */
+      lineId: string
+      /** @enum {string} */
+      result: "passed" | "rejected"
+      qty: components["schemas"]["WhQuantity"]
+      checks: components["schemas"]["InboundQcChecklist"]
+      note: string
+      photoFileIds: string[]
+      checkedByName: string
+      /** Format: date-time */
+      checkedAt: string
+    }
+    Inbound: components["schemas"]["InboundSummary"] & {
+      /** Format: uuid */
+      sourceId: string
+      rejectAction: components["schemas"]["InboundRejectAction"]
+      note: string
+      /** Format: date-time */
+      completedAt?: string
+      version: number
+      lines: components["schemas"]["InboundLine"][]
+      checks: components["schemas"]["InboundQualityCheck"][]
+    }
+    InboundQcInput: {
+      passedQty: components["schemas"]["WhQuantity"]
+      rejectedQty: components["schemas"]["WhQuantity"]
+      checks: components["schemas"]["InboundQcChecklist"]
+      rejectReason?: string
+      /** Format: uuid */
+      destinationLocationId?: string
+      note?: string
+      photoFileIds?: string[]
+    }
+    /**
+     * @description `direct` Transfer Stok, `request` Permintaan Petty Stock.
+     * @enum {string}
+     */
+    StockTransferType: "direct" | "request"
+    /** @enum {string} */
+    StockTransferStatus:
+      | "draft"
+      | "submitted"
+      | "in_progress"
+      | "in_transit"
+      | "partially_received"
+      | "received"
+      | "completed"
+      | "cancelled"
+    StockTransferSummary: {
+      /** Format: uuid */
+      id: string
+      number?: string
+      transferType: components["schemas"]["StockTransferType"]
+      from: components["schemas"]["WhLocationRef"]
+      to: components["schemas"]["WhLocationRef"]
+      requiresShipping: boolean
+      businessDate: components["schemas"]["BusinessDate"]
+      status: components["schemas"]["StockTransferStatus"]
+      requestedByName: string
+      lineCount: number
+      totalQty: components["schemas"]["WhQuantity"]
+      /** Format: date-time */
+      createdAt: string
+    }
+    StockTransferList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["StockTransferSummary"][]
+    }
+    StockTransferLineInput: {
+      /** Format: uuid */
+      productId: string
+      /** Format: uuid */
+      batchId?: string
+      qty: components["schemas"]["WhQuantity"]
+      batchReason?: string
+      note?: string
+    }
+    StockTransferInput: {
+      transferType: components["schemas"]["StockTransferType"]
+      /** Format: uuid */
+      fromLocationId: string
+      /** Format: uuid */
+      toLocationId: string
+      businessDate: components["schemas"]["BusinessDate"]
+      note?: string
+      lines: components["schemas"]["StockTransferLineInput"][]
+    }
+    StockTransferLine: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      product: components["schemas"]["WhProductRef"]
+      batch?: components["schemas"]["WhBatchRef"]
+      qty: components["schemas"]["WhQuantity"]
+      receivedQty: components["schemas"]["WhQuantity"]
+      shortageQty: components["schemas"]["WhQuantity"]
+      costAmount: components["schemas"]["Money"]
+      batchReason: string
+      note: string
+    }
+    /** @enum {string} */
+    StockTransferAction:
+      | "edit"
+      | "submit"
+      | "release"
+      | "prepare"
+      | "post"
+      | "ship"
+      | "receive"
+      | "complete"
+      | "cancel"
+    StockTransfer: components["schemas"]["StockTransferSummary"] & {
+      note: string
+      sourceType?: string
+      /** Format: uuid */
+      sourceId?: string
+      /** Format: date-time */
+      submittedAt?: string
+      releasedByName?: string
+      /** Format: date-time */
+      releasedAt?: string
+      preparedByName?: string
+      /** Format: date-time */
+      preparedAt?: string
+      shippedByName?: string
+      /** Format: date-time */
+      shippedAt?: string
+      receivedByName?: string
+      /** Format: date-time */
+      receivedAt?: string
+      /** Format: date-time */
+      completedAt?: string
+      /** Format: date-time */
+      cancelledAt?: string
+      cancelReason: string
+      version: number
+      lines: components["schemas"]["StockTransferLine"][]
+      allowedActions: components["schemas"]["StockTransferAction"][]
+    }
+    StockInTransitLine: {
+      /** Format: uuid */
+      transferId: string
+      number?: string
+      /** Format: uuid */
+      lineId: string
+      from: components["schemas"]["WhLocationRef"]
+      to: components["schemas"]["WhLocationRef"]
+      businessDate: components["schemas"]["BusinessDate"]
+      /** Format: date-time */
+      shippedAt?: string
+      status: components["schemas"]["StockTransferStatus"]
+      product: components["schemas"]["WhProductRef"]
+      batch?: components["schemas"]["WhBatchRef"]
+      qty: components["schemas"]["WhQuantity"]
+      receivedQty: components["schemas"]["WhQuantity"]
+      outstandingQty: components["schemas"]["WhQuantity"]
+      costAmount: components["schemas"]["Money"]
+    }
+    StockInTransitList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["StockInTransitLine"][]
+    }
+    StockTransferReceiveLine: {
+      /** Format: uuid */
+      lineId: string
+      qty: components["schemas"]["WhQuantity"]
+    }
+    StockTransferActionInput: {
+      action: components["schemas"]["StockTransferAction"]
+      version: number
+      reason?: string
+      lines?: components["schemas"]["StockTransferReceiveLine"][]
+    }
+    /** @enum {string} */
+    StockCountStatus:
+      | "draft"
+      | "in_progress"
+      | "pending_approval"
+      | "rejected"
+      | "posted"
+      | "completed"
+      | "cancelled"
+    /**
+     * @description `full` Penuh, `cycle` Cycle count, `consignment` Konsinyasi, `vending` Vending.
+     * @enum {string}
+     */
+    StockCountType: "full" | "cycle" | "consignment" | "vending"
+    StockCountSummary: {
+      /** Format: uuid */
+      id: string
+      number?: string
+      countType: components["schemas"]["StockCountType"]
+      location: components["schemas"]["WhLocationRef"]
+      businessDate: components["schemas"]["BusinessDate"]
+      status: components["schemas"]["StockCountStatus"]
+      /** Format: uuid */
+      scheduleId?: string
+      assignedToName: string
+      lineCount: number
+      countedCount: number
+      /** @description Kosong sampai hasil dikirim. */
+      varianceAmount?: components["schemas"]["Money"]
+      /** Format: date-time */
+      createdAt: string
+    }
+    StockCountList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["StockCountSummary"][]
+    }
+    StockCountInput: {
+      countType: components["schemas"]["StockCountType"]
+      locationIds: string[]
+      businessDate?: components["schemas"]["BusinessDate"]
+      note?: string
+    }
+    StockCountLine: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      product: components["schemas"]["WhProductRef"]
+      batch?: components["schemas"]["WhBatchRef"]
+      /** @description Kosong saat hitung buta (Draft, Diproses, Ditolak). */
+      systemQty?: components["schemas"]["WhQuantity"]
+      countedQty?: components["schemas"]["WhQuantity"]
+      varianceQty?: components["schemas"]["WhQuantity"]
+      unitCost?: string
+      varianceAmount?: components["schemas"]["Money"]
+      isExtra: boolean
+      /** Format: uuid */
+      photoFileId?: string
+      note: string
+      /** Format: date-time */
+      countedAt?: string
+    }
+    /** @enum {string} */
+    StockCountAction: "start" | "count" | "submit" | "recount" | "cancel"
+    StockCount: components["schemas"]["StockCountSummary"] & {
+      note: string
+      photoFileIds: string[]
+      /** @description true = qty sistem dan selisih ditampilkan (setelah hasil dikirim). */
+      revealed: boolean
+      /** Format: date-time */
+      snapshotAt?: string
+      startedByName?: string
+      submittedByName?: string
+      /** Format: date-time */
+      submittedAt?: string
+      netVariance?: components["schemas"]["Money"]
+      /** Format: date-time */
+      decidedAt?: string
+      decisionNote: string
+      /** Format: date-time */
+      postedAt?: string
+      /** Format: uuid */
+      journalEntryId?: string
+      version: number
+      lines: components["schemas"]["StockCountLine"][]
+      allowedActions: components["schemas"]["StockCountAction"][]
+    }
+    StockCountEntry: {
+      /** Format: uuid */
+      lineId: string
+      countedQty?: components["schemas"]["WhQuantity"]
+      note?: string
+      /** Format: uuid */
+      photoFileId?: string
+    }
+    StockCountExtraEntry: {
+      /** Format: uuid */
+      productId: string
+      /** Format: uuid */
+      batchId?: string
+      countedQty: components["schemas"]["WhQuantity"]
+      note?: string
+    }
+    StockCountEntriesInput: {
+      lines?: components["schemas"]["StockCountEntry"][]
+      extraLines?: components["schemas"]["StockCountExtraEntry"][]
+      /** @description Diisi = mengganti foto lokasi/rak; tidak dikirim = foto tidak berubah. */
+      photoFileIds?: string[]
+    }
+    StockCountActionInput: {
+      action: components["schemas"]["StockCountAction"]
+      version: number
+      reason?: string
+    }
+    /** @enum {string} */
+    StockCountFrequency: "weekly" | "monthly" | "yearly"
+    StockCountScheduleInput: {
+      name: string
+      countType: components["schemas"]["StockCountType"]
+      frequency: components["schemas"]["StockCountFrequency"]
+      dayOfWeek?: number
+      dayOfMonth?: number
+      monthOfYear?: number
+      /** Format: uuid */
+      warehouseId?: string
+      locationIds?: string[]
+      /** Format: uuid */
+      assigneeUserId?: string
+      isActive: boolean
+    }
+    StockCountSchedule: components["schemas"]["StockCountScheduleInput"] & {
+      /** Format: uuid */
+      id: string
+      assigneeName: string
+      nextRunDate: components["schemas"]["BusinessDate"]
+      lastRunDate?: components["schemas"]["BusinessDate"]
+      version: number
+    }
+    /**
      * @description `available` Tersedia, `quarantine` Karantina, `in_transit` Dalam Pengiriman, `reserved` Dialokasikan.
      * @enum {string}
      */
@@ -4398,6 +5520,403 @@ export interface components {
       /** Format: date-time */
       expiresAt: string
     }
+    /**
+     * @description Cakupan daftar harga (BRD 5.18): `base` Harga Dasar & HET, `channel` per channel/sub-channel, `partner` per
+     *     mitra, `reseller` per level reseller (Fase 2), `employee` harga karyawan, `vending` per channel vending/mesin.
+     * @enum {string}
+     */
+    PriceListType:
+      "base" | "channel" | "partner" | "reseller" | "employee" | "vending"
+    /**
+     * @description `fixed` harga per produk; `percent` persentase dari daftar harga acuan.
+     * @enum {string}
+     */
+    PriceListBasis: "fixed" | "percent"
+    /** @enum {string} */
+    PriceListVersionStatus:
+      "draft" | "pending_approval" | "active" | "rejected" | "cancelled"
+    /**
+     * @description Persen desimal maks. 4 angka di belakang koma, mis. `12.5`.
+     * @example 10
+     */
+    PricingPercent: string
+    PriceListVersionSummary: {
+      /** Format: uuid */
+      id: string
+      versionNo: number
+      status: components["schemas"]["PriceListVersionStatus"]
+      validFrom: components["schemas"]["BusinessDate"]
+      validTo?: components["schemas"]["BusinessDate"] | null
+      percent?: components["schemas"]["PricingPercent"] | null
+      itemCount: number
+      notes: string
+      /** Format: date-time */
+      submittedAt?: string | null
+      /** Format: date-time */
+      decidedAt?: string | null
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    PriceList: {
+      /** Format: uuid */
+      id: string
+      /** @example MT-BELI-PUTUS */
+      code: string
+      name: string
+      priceListType: components["schemas"]["PriceListType"]
+      /** Format: uuid */
+      channelId?: string | null
+      /** Format: uuid */
+      subChannelId?: string | null
+      /** Format: uuid */
+      partnerId?: string | null
+      partnerName?: string | null
+      resellerLevel: string
+      basis: components["schemas"]["PriceListBasis"]
+      /** Format: uuid */
+      referencePriceListId?: string | null
+      referencePriceListName?: string | null
+      description: string
+      isActive: boolean
+      /** Format: date-time */
+      deletedAt?: string | null
+      /** @description Versi yang berlaku hari ini. */
+      currentVersion?: components["schemas"]["PriceListVersionSummary"] | null
+      /** @description Versi aktif terdekat yang mulai berlaku setelah hari ini. */
+      nextVersion?: components["schemas"]["PriceListVersionSummary"] | null
+      /** @description Versi draft atau yang sedang diajukan. */
+      openVersion?: components["schemas"]["PriceListVersionSummary"] | null
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    PriceListFields: {
+      name: string
+      /** Format: uuid */
+      channelId?: string | null
+      /** Format: uuid */
+      subChannelId?: string | null
+      /** Format: uuid */
+      partnerId?: string | null
+      resellerLevel?: string
+      basis?: components["schemas"]["PriceListBasis"]
+      /** Format: uuid */
+      referencePriceListId?: string | null
+      description?: string
+      isActive: boolean
+    }
+    PriceListInput: components["schemas"]["PriceListFields"] & {
+      code: string
+      priceListType: components["schemas"]["PriceListType"]
+    }
+    PriceListDetail: components["schemas"]["PriceList"] & {
+      /** @description Riwayat versi, terbaru dulu. */
+      versions: components["schemas"]["PriceListVersionSummary"][]
+      /** @description update, create_version, delete, restore */
+      allowedActions: string[]
+    }
+    PriceListOption: {
+      /** Format: uuid */
+      id: string
+      code: string
+      name: string
+      priceListType: components["schemas"]["PriceListType"]
+      basis: components["schemas"]["PriceListBasis"]
+    }
+    PriceListUpdate: components["schemas"]["PriceListFields"] &
+      components["schemas"]["VersionInput"]
+    PriceListItemInput: {
+      /** Format: uuid */
+      productId: string
+      priceAmount: components["schemas"]["Money"]
+      maxRetailPriceAmount?: components["schemas"]["Money"] | null
+    }
+    PriceListVersionFields: {
+      validFrom: components["schemas"]["BusinessDate"]
+      validTo?: components["schemas"]["BusinessDate"] | null
+      /** @description Wajib untuk daftar harga basis percent. */
+      percent?: components["schemas"]["PricingPercent"] | null
+      notes?: string
+      items: components["schemas"]["PriceListItemInput"][]
+    }
+    PriceListVersionInput: components["schemas"]["PriceListVersionFields"] & {
+      /** Format: uuid */
+      copyFromVersionId?: string | null
+    }
+    PriceListItem: {
+      /** Format: uuid */
+      productId: string
+      productSku: string
+      productName: string
+      priceAmount: components["schemas"]["Money"]
+      /** @description HET, hanya di Harga Dasar & HET. */
+      maxRetailPriceAmount?: components["schemas"]["Money"] | null
+    }
+    PriceListVersion: components["schemas"]["PriceListVersionSummary"] & {
+      /** Format: uuid */
+      priceListId: string
+      priceListCode: string
+      priceListName: string
+      priceListType: components["schemas"]["PriceListType"]
+      basis: components["schemas"]["PriceListBasis"]
+      items: components["schemas"]["PriceListItem"][]
+      /** @description update, cancel, submit, withdraw */
+      allowedActions: string[]
+    }
+    PriceListVersionUpdate: components["schemas"]["PriceListVersionFields"] &
+      components["schemas"]["VersionInput"]
+    /** @enum {string} */
+    SpecialPricePartyType: "customer" | "partner"
+    /**
+     * @description Posisi periode berlaku terhadap hari ini.
+     * @enum {string}
+     */
+    PricingPeriodStatus: "scheduled" | "active" | "expired"
+    SpecialPrice: {
+      /** Format: uuid */
+      id: string
+      partyType: components["schemas"]["SpecialPricePartyType"]
+      /** Format: uuid */
+      partyId: string
+      partyCode: string
+      partyName: string
+      /** Format: uuid */
+      productId: string
+      productSku: string
+      productName: string
+      priceAmount: components["schemas"]["Money"]
+      validFrom: components["schemas"]["BusinessDate"]
+      validTo?: components["schemas"]["BusinessDate"] | null
+      status: components["schemas"]["PricingPeriodStatus"]
+      notes: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    SpecialPriceInput: {
+      partyType: components["schemas"]["SpecialPricePartyType"]
+      /** Format: uuid */
+      partyId: string
+      /** Format: uuid */
+      productId: string
+      priceAmount: components["schemas"]["Money"]
+      validFrom: components["schemas"]["BusinessDate"]
+      validTo?: components["schemas"]["BusinessDate"] | null
+      notes?: string
+    }
+    PricingEndInput: {
+      validTo: components["schemas"]["BusinessDate"]
+      version: number
+    }
+    PromotionItem: {
+      /** Format: uuid */
+      productId: string
+      productSku: string
+      productName: string
+      priceAmount?: components["schemas"]["Money"] | null
+      discountPercent?: components["schemas"]["PricingPercent"] | null
+    }
+    Promotion: {
+      /** Format: uuid */
+      id: string
+      /** @example PROMO-1111 */
+      code: string
+      name: string
+      /**
+       * Format: uuid
+       * @description Kosong = semua channel.
+       */
+      channelId?: string | null
+      /** Format: uuid */
+      subChannelId?: string | null
+      validFrom: components["schemas"]["BusinessDate"]
+      validTo: components["schemas"]["BusinessDate"]
+      isActive: boolean
+      description: string
+      status: components["schemas"]["PricingPeriodStatus"]
+      itemCount: number
+      /** @description Hanya di detail. */
+      items?: components["schemas"]["PromotionItem"][]
+      /** @description update, delete */
+      allowedActions: string[]
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    /** @description Isi salah satu dari harga promo atau potongan persen dari harga normal. */
+    PromotionItemInput: {
+      /** Format: uuid */
+      productId: string
+      priceAmount?: components["schemas"]["Money"] | null
+      discountPercent?: components["schemas"]["PricingPercent"] | null
+    }
+    PromotionFields: {
+      name: string
+      /** Format: uuid */
+      channelId?: string | null
+      /** Format: uuid */
+      subChannelId?: string | null
+      validFrom: components["schemas"]["BusinessDate"]
+      validTo: components["schemas"]["BusinessDate"]
+      isActive: boolean
+      description?: string
+      items: components["schemas"]["PromotionItemInput"][]
+    }
+    PromotionInput: components["schemas"]["PromotionFields"] & {
+      code: string
+    }
+    PromotionUpdate: components["schemas"]["PromotionFields"] &
+      components["schemas"]["VersionInput"]
+    /**
+     * @description Kuantitas desimal maks. 3 angka di belakang koma.
+     * @example 12
+     */
+    PricingQuantity: string
+    TieredPrice: {
+      /** Format: uuid */
+      id: string
+      /**
+       * Format: uuid
+       * @description Kosong = berlaku untuk semua daftar harga.
+       */
+      priceListId?: string | null
+      priceListCode?: string | null
+      priceListName?: string | null
+      /** Format: uuid */
+      productId: string
+      productSku: string
+      productName: string
+      minQty: components["schemas"]["PricingQuantity"]
+      priceAmount: components["schemas"]["Money"]
+      validFrom: components["schemas"]["BusinessDate"]
+      validTo?: components["schemas"]["BusinessDate"] | null
+      status: components["schemas"]["PricingPeriodStatus"]
+      notes: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    TieredPriceInput: {
+      /** Format: uuid */
+      priceListId?: string | null
+      /** Format: uuid */
+      productId: string
+      minQty: components["schemas"]["PricingQuantity"]
+      priceAmount: components["schemas"]["Money"]
+      validFrom: components["schemas"]["BusinessDate"]
+      validTo?: components["schemas"]["BusinessDate"] | null
+      notes?: string
+    }
+    DiscountLimit: {
+      /** Format: uuid */
+      id: string
+      roleCode: string
+      roleName: string
+      maxLineDiscountPercent: components["schemas"]["PricingPercent"]
+      maxDocumentDiscountPercent: components["schemas"]["PricingPercent"]
+      validFrom: components["schemas"]["BusinessDate"]
+      validTo?: components["schemas"]["BusinessDate"] | null
+      status: components["schemas"]["PricingPeriodStatus"]
+      notes: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    DiscountLimitInput: {
+      roleCode: string
+      maxLineDiscountPercent: components["schemas"]["PricingPercent"]
+      maxDocumentDiscountPercent: components["schemas"]["PricingPercent"]
+      validFrom: components["schemas"]["BusinessDate"]
+      validTo?: components["schemas"]["BusinessDate"] | null
+      notes?: string
+    }
+    DiscountLimitRole: {
+      code: string
+      name: string
+    }
+    PriceQuoteRequest: {
+      /** Format: uuid */
+      productId: string
+      qty: components["schemas"]["PricingQuantity"]
+      /** Format: uuid */
+      channelId?: string | null
+      /** Format: uuid */
+      subChannelId?: string | null
+      /** Format: uuid */
+      customerId?: string | null
+      /** Format: uuid */
+      partnerId?: string | null
+      date: components["schemas"]["BusinessDate"]
+    }
+    /**
+     * @description Aturan harga yang menghasilkan harga baris transaksi (BRD 5.18, disimpan sebagai `price_rule`): harga khusus,
+     *     promo, harga bertingkat, daftar harga channel/mitra/karyawan, atau Harga Dasar & HET.
+     * @enum {string}
+     */
+    PriceRule:
+      | "special_price"
+      | "promotion"
+      | "tiered_price"
+      | "price_list"
+      | "base_price"
+    PriceQuote: {
+      unitPrice: components["schemas"]["Money"]
+      rule: components["schemas"]["PriceRule"]
+      /**
+       * Format: uuid
+       * @description Disimpan di baris transaksi sebagai `price_source_id`.
+       */
+      sourceId: string
+      /** Format: uuid */
+      priceListId?: string | null
+      /** Format: uuid */
+      priceListVersionId?: string | null
+      /** Format: uuid */
+      promotionId?: string | null
+      /** Format: uuid */
+      specialPriceId?: string | null
+      /** Format: uuid */
+      tieredPriceId?: string | null
+      /** @description Harga tanpa promo (dasar potongan persen promo). */
+      regularPrice?: components["schemas"]["Money"] | null
+      /** @description HET bila harga berasal dari Harga Dasar & HET. */
+      maxRetailPrice?: components["schemas"]["Money"] | null
+      description: string
+    }
+    /**
+     * @description Bentuk diskon manual (MD-05) — persen dari dasar atau nominal rupiah.
+     * @enum {string}
+     */
+    DiscountKind: "percent" | "amount"
+    DiscountValue: {
+      kind: components["schemas"]["DiscountKind"]
+      /** @description Persen (maks. 4 desimal) atau nominal rupiah (maks. 2 desimal) sebagai string desimal. */
+      value: string
+    }
+    DiscountCheckLine: {
+      grossAmount: components["schemas"]["Money"]
+      discount?: components["schemas"]["DiscountValue"] | null
+    }
+    DiscountCheckRequest: {
+      lines: components["schemas"]["DiscountCheckLine"][]
+      documentDiscount?: components["schemas"]["DiscountValue"] | null
+    }
+    DiscountCheckOutcome: {
+      discountAmount: components["schemas"]["Money"]
+      discountPercent: components["schemas"]["PricingPercent"]
+      exceedsLimit: boolean
+    }
+    DiscountCheckResult: {
+      maxLineDiscountPercent: components["schemas"]["PricingPercent"]
+      maxDocumentDiscountPercent: components["schemas"]["PricingPercent"]
+      lines: components["schemas"]["DiscountCheckOutcome"][]
+      document: components["schemas"]["DiscountCheckOutcome"]
+      subtotalAmount: components["schemas"]["Money"]
+      totalDiscountAmount: components["schemas"]["Money"]
+      /** @description Diskon di atas batas → Sales Order butuh approval `sales_order_discount` (Head Sales). */
+      requiresApproval: boolean
+    }
     DataExchangeColumn: {
       /** @description Nama field (dipakai di `values` dan `errors[].column` preview). */
       key: string
@@ -4870,6 +6389,10 @@ export interface components {
     /** @description Waktu kedaluwarsa URL (Unix detik). */
     FileExpires: number
     FileSignature: string
+    /** @description Versi terakhir yang dilihat user (optimistic locking). */
+    PricingVersion: number
+    /** @description Tampilkan juga data yang periodenya sudah berakhir (riwayat). */
+    PricingIncludeEnded: boolean
     /** @description Jenis data = resource permission, mis. `catalog.product`. */
     DataExchangeKindPath: string
     DataExchangeKindQuery: string
@@ -7861,6 +9384,478 @@ export interface operations {
       default: components["responses"]["Problem"]
     }
   }
+  listInbounds: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["InboundStatus"]
+        sourceType?: string
+        warehouseId?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar Inbound */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["InboundList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getInbound: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Detail Inbound */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Inbound"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  recordInboundQc: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+        lineId: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["InboundQcInput"]
+      }
+    }
+    responses: {
+      /** @description Inbound setelah QC */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Inbound"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listStockTransfers: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        transferType?: components["schemas"]["StockTransferType"]
+        /** @description Bisa lebih dari satu. */
+        status?: components["schemas"]["StockTransferStatus"][]
+        locationId?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar transfer */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockTransferList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createStockTransfer: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["StockTransferInput"]
+      }
+    }
+    responses: {
+      /** @description Transfer dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockTransfer"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listStockInTransit: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        locationId?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Baris Dalam Pengiriman */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockInTransitList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getStockTransfer: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Detail transfer */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockTransfer"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateStockTransfer: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["StockTransferInput"] &
+          components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Transfer diubah */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockTransfer"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  actOnStockTransfer: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["StockTransferActionInput"]
+      }
+    }
+    responses: {
+      /** @description Transfer setelah aksi */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockTransfer"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listStockCounts: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        /** @description Bisa lebih dari satu. */
+        status?: components["schemas"]["StockCountStatus"][]
+        countType?: components["schemas"]["StockCountType"]
+        locationId?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar stock count */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockCountList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createStockCounts: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["StockCountInput"]
+      }
+    }
+    responses: {
+      /** @description Stock count dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": {
+            items: components["schemas"]["StockCountSummary"][]
+          }
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getStockCount: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Detail stock count */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockCount"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  saveStockCountEntries: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["StockCountEntriesInput"]
+      }
+    }
+    responses: {
+      /** @description Stock count setelah disimpan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockCount"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  actOnStockCount: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["StockCountActionInput"]
+      }
+    }
+    responses: {
+      /** @description Stock count setelah aksi */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockCount"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listStockCountSchedules: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Jadwal */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": {
+            items: components["schemas"]["StockCountSchedule"][]
+          }
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createStockCountSchedule: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["StockCountScheduleInput"]
+      }
+    }
+    responses: {
+      /** @description Jadwal dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockCountSchedule"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateStockCountSchedule: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["StockCountScheduleInput"] &
+          components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Jadwal diubah */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockCountSchedule"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
   listStockBalances: {
     parameters: {
       query?: {
@@ -9004,6 +10999,902 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listPriceLists: {
+    parameters: {
+      query?: {
+        q?: components["parameters"]["Search"]
+        priceListType?: components["schemas"]["PriceListType"]
+        includeInactive?: boolean
+        deleted?: boolean
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar harga beserta versi yang berlaku, versi terjadwal, dan versi yang sedang disiapkan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PriceList"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createPriceList: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PriceListInput"]
+      }
+    }
+    responses: {
+      /** @description Daftar harga dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PriceListDetail"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listPriceListOptions: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar harga aktif yang belum dihapus */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PriceListOption"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getPriceList: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar harga */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PriceListDetail"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updatePriceList: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PriceListUpdate"]
+      }
+    }
+    responses: {
+      /** @description Daftar harga diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PriceListDetail"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  deletePriceList: {
+    parameters: {
+      query: {
+        /** @description Versi terakhir yang dilihat user (optimistic locking). */
+        version: components["parameters"]["PricingVersion"]
+      }
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar harga dihapus */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  restorePriceList: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Daftar harga dipulihkan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PriceListDetail"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createPriceListVersion: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PriceListVersionInput"]
+      }
+    }
+    responses: {
+      /** @description Versi draft dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PriceListVersion"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getPriceListVersion: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Versi daftar harga */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PriceListVersion"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updatePriceListVersion: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PriceListVersionUpdate"]
+      }
+    }
+    responses: {
+      /** @description Versi diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PriceListVersion"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  submitPriceListVersion: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Versi diajukan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PriceListVersion"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  withdrawPriceListVersion: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Pengajuan ditarik */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PriceListVersion"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  cancelPriceListVersion: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Versi dibatalkan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PriceListVersion"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listSpecialPrices: {
+    parameters: {
+      query?: {
+        partyType?: components["schemas"]["SpecialPricePartyType"]
+        partyId?: string
+        productId?: string
+        /** @description Tampilkan juga data yang periodenya sudah berakhir (riwayat). */
+        includeEnded?: components["parameters"]["PricingIncludeEnded"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Harga khusus */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SpecialPrice"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createSpecialPrice: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SpecialPriceInput"]
+      }
+    }
+    responses: {
+      /** @description Harga khusus dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SpecialPrice"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  deleteSpecialPrice: {
+    parameters: {
+      query: {
+        /** @description Versi terakhir yang dilihat user (optimistic locking). */
+        version: components["parameters"]["PricingVersion"]
+      }
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Harga khusus dihapus */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  endSpecialPrice: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PricingEndInput"]
+      }
+    }
+    responses: {
+      /** @description Harga khusus diakhiri */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SpecialPrice"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listPromotions: {
+    parameters: {
+      query?: {
+        q?: components["parameters"]["Search"]
+        channelId?: string
+        /** @description Tampilkan juga data yang periodenya sudah berakhir (riwayat). */
+        includeEnded?: components["parameters"]["PricingIncludeEnded"]
+        deleted?: boolean
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Promo tanpa item, terbaru dulu */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Promotion"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createPromotion: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PromotionInput"]
+      }
+    }
+    responses: {
+      /** @description Promo dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Promotion"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getPromotion: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Promo */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Promotion"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updatePromotion: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PromotionUpdate"]
+      }
+    }
+    responses: {
+      /** @description Promo diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Promotion"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  deletePromotion: {
+    parameters: {
+      query: {
+        /** @description Versi terakhir yang dilihat user (optimistic locking). */
+        version: components["parameters"]["PricingVersion"]
+      }
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Promo dihapus */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listTieredPrices: {
+    parameters: {
+      query?: {
+        productId?: string
+        priceListId?: string
+        /** @description Tampilkan juga data yang periodenya sudah berakhir (riwayat). */
+        includeEnded?: components["parameters"]["PricingIncludeEnded"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Harga bertingkat */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["TieredPrice"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createTieredPrice: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TieredPriceInput"]
+      }
+    }
+    responses: {
+      /** @description Harga bertingkat dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["TieredPrice"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  deleteTieredPrice: {
+    parameters: {
+      query: {
+        /** @description Versi terakhir yang dilihat user (optimistic locking). */
+        version: components["parameters"]["PricingVersion"]
+      }
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Harga bertingkat dihapus */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  endTieredPrice: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PricingEndInput"]
+      }
+    }
+    responses: {
+      /** @description Harga bertingkat diakhiri */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["TieredPrice"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listDiscountLimits: {
+    parameters: {
+      query?: {
+        /** @description Tampilkan juga data yang periodenya sudah berakhir (riwayat). */
+        includeEnded?: components["parameters"]["PricingIncludeEnded"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Batas diskon per role */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DiscountLimit"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createDiscountLimit: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DiscountLimitInput"]
+      }
+    }
+    responses: {
+      /** @description Batas diskon dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DiscountLimit"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listDiscountLimitRoles: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Role pembuat dokumen penjualan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DiscountLimitRole"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  deleteDiscountLimit: {
+    parameters: {
+      query: {
+        /** @description Versi terakhir yang dilihat user (optimistic locking). */
+        version: components["parameters"]["PricingVersion"]
+      }
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Batas diskon dihapus */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  endDiscountLimit: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PricingEndInput"]
+      }
+    }
+    responses: {
+      /** @description Batas diskon diakhiri */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DiscountLimit"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  quotePrice: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PriceQuoteRequest"]
+      }
+    }
+    responses: {
+      /** @description Harga dan aturan yang dipakai */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PriceQuote"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  checkDiscount: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DiscountCheckRequest"]
+      }
+    }
+    responses: {
+      /** @description Hasil pemeriksaan diskon */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DiscountCheckResult"]
+        }
       }
       default: components["responses"]["Problem"]
     }

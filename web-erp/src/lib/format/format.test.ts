@@ -87,7 +87,8 @@ describe("label status", () => {
     expect(statusLabel("pending_approval").label).toBe("Menunggu Persetujuan")
     expect(statusLabel("qc_rejected").label).toBe("Ditolak QC")
     expect(statusLabel("posted").label).toBe("Diposting")
-    expect(Object.keys(STATUS_LABELS)).toHaveLength(19)
+    expect(statusLabel("submitted").label).toBe("Diajukan")
+    expect(Object.keys(STATUS_LABELS)).toHaveLength(20)
   })
 
   it("menampilkan kode yang belum terdaftar apa adanya", () => {

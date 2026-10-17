@@ -8,6 +8,7 @@ export const Route = createFileRoute("/_app/inventory/stock")({
     page: z.number().int().min(1).catch(1),
     productId: z.string().optional(),
     locationId: z.string().optional(),
+    locationType: z.string().optional(),
     batchId: z.string().optional(),
     status: z
       .enum(["available", "quarantine", "in_transit", "reserved"])

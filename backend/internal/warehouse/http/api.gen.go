@@ -155,6 +155,96 @@ func (e ExternalPartyType) Valid() bool {
 	}
 }
 
+// Defines values for InboundLineAllowedActions.
+const (
+	Qc InboundLineAllowedActions = "qc"
+)
+
+// Valid indicates whether the value is a known member of the InboundLineAllowedActions enum.
+func (e InboundLineAllowedActions) Valid() bool {
+	switch e {
+	case Qc:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for InboundLineStatus.
+const (
+	InboundLineStatusPosted     InboundLineStatus = "posted"
+	InboundLineStatusQcRejected InboundLineStatus = "qc_rejected"
+	InboundLineStatusQuarantine InboundLineStatus = "quarantine"
+)
+
+// Valid indicates whether the value is a known member of the InboundLineStatus enum.
+func (e InboundLineStatus) Valid() bool {
+	switch e {
+	case InboundLineStatusPosted:
+		return true
+	case InboundLineStatusQcRejected:
+		return true
+	case InboundLineStatusQuarantine:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for InboundQualityCheckResult.
+const (
+	InboundQualityCheckResultPassed   InboundQualityCheckResult = "passed"
+	InboundQualityCheckResultRejected InboundQualityCheckResult = "rejected"
+)
+
+// Valid indicates whether the value is a known member of the InboundQualityCheckResult enum.
+func (e InboundQualityCheckResult) Valid() bool {
+	switch e {
+	case InboundQualityCheckResultPassed:
+		return true
+	case InboundQualityCheckResultRejected:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for InboundRejectAction.
+const (
+	InboundRejectActionHold    InboundRejectAction = "hold"
+	InboundRejectActionReturns InboundRejectAction = "returns"
+)
+
+// Valid indicates whether the value is a known member of the InboundRejectAction enum.
+func (e InboundRejectAction) Valid() bool {
+	switch e {
+	case InboundRejectActionHold:
+		return true
+	case InboundRejectActionReturns:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for InboundStatus.
+const (
+	InboundStatusCompleted  InboundStatus = "completed"
+	InboundStatusInProgress InboundStatus = "in_progress"
+)
+
+// Valid indicates whether the value is a known member of the InboundStatus enum.
+func (e InboundStatus) Valid() bool {
+	switch e {
+	case InboundStatusCompleted:
+		return true
+	case InboundStatusInProgress:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for LocationType.
 const (
 	LocationTypeConsignment      LocationType = "consignment"
@@ -224,11 +314,363 @@ func (e RecordAction) Valid() bool {
 	}
 }
 
+// Defines values for StockCountAction.
+const (
+	StockCountActionCancel  StockCountAction = "cancel"
+	StockCountActionCount   StockCountAction = "count"
+	StockCountActionRecount StockCountAction = "recount"
+	StockCountActionStart   StockCountAction = "start"
+	StockCountActionSubmit  StockCountAction = "submit"
+)
+
+// Valid indicates whether the value is a known member of the StockCountAction enum.
+func (e StockCountAction) Valid() bool {
+	switch e {
+	case StockCountActionCancel:
+		return true
+	case StockCountActionCount:
+		return true
+	case StockCountActionRecount:
+		return true
+	case StockCountActionStart:
+		return true
+	case StockCountActionSubmit:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for StockCountFrequency.
+const (
+	Monthly StockCountFrequency = "monthly"
+	Weekly  StockCountFrequency = "weekly"
+	Yearly  StockCountFrequency = "yearly"
+)
+
+// Valid indicates whether the value is a known member of the StockCountFrequency enum.
+func (e StockCountFrequency) Valid() bool {
+	switch e {
+	case Monthly:
+		return true
+	case Weekly:
+		return true
+	case Yearly:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for StockCountStatus.
+const (
+	StockCountStatusCancelled       StockCountStatus = "cancelled"
+	StockCountStatusCompleted       StockCountStatus = "completed"
+	StockCountStatusDraft           StockCountStatus = "draft"
+	StockCountStatusInProgress      StockCountStatus = "in_progress"
+	StockCountStatusPendingApproval StockCountStatus = "pending_approval"
+	StockCountStatusPosted          StockCountStatus = "posted"
+	StockCountStatusRejected        StockCountStatus = "rejected"
+)
+
+// Valid indicates whether the value is a known member of the StockCountStatus enum.
+func (e StockCountStatus) Valid() bool {
+	switch e {
+	case StockCountStatusCancelled:
+		return true
+	case StockCountStatusCompleted:
+		return true
+	case StockCountStatusDraft:
+		return true
+	case StockCountStatusInProgress:
+		return true
+	case StockCountStatusPendingApproval:
+		return true
+	case StockCountStatusPosted:
+		return true
+	case StockCountStatusRejected:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for StockCountType.
+const (
+	StockCountTypeConsignment StockCountType = "consignment"
+	StockCountTypeCycle       StockCountType = "cycle"
+	StockCountTypeFull        StockCountType = "full"
+	StockCountTypeVending     StockCountType = "vending"
+)
+
+// Valid indicates whether the value is a known member of the StockCountType enum.
+func (e StockCountType) Valid() bool {
+	switch e {
+	case StockCountTypeConsignment:
+		return true
+	case StockCountTypeCycle:
+		return true
+	case StockCountTypeFull:
+		return true
+	case StockCountTypeVending:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for StockTransferAction.
+const (
+	StockTransferActionCancel   StockTransferAction = "cancel"
+	StockTransferActionComplete StockTransferAction = "complete"
+	StockTransferActionEdit     StockTransferAction = "edit"
+	StockTransferActionPost     StockTransferAction = "post"
+	StockTransferActionPrepare  StockTransferAction = "prepare"
+	StockTransferActionReceive  StockTransferAction = "receive"
+	StockTransferActionRelease  StockTransferAction = "release"
+	StockTransferActionShip     StockTransferAction = "ship"
+	StockTransferActionSubmit   StockTransferAction = "submit"
+)
+
+// Valid indicates whether the value is a known member of the StockTransferAction enum.
+func (e StockTransferAction) Valid() bool {
+	switch e {
+	case StockTransferActionCancel:
+		return true
+	case StockTransferActionComplete:
+		return true
+	case StockTransferActionEdit:
+		return true
+	case StockTransferActionPost:
+		return true
+	case StockTransferActionPrepare:
+		return true
+	case StockTransferActionReceive:
+		return true
+	case StockTransferActionRelease:
+		return true
+	case StockTransferActionShip:
+		return true
+	case StockTransferActionSubmit:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for StockTransferStatus.
+const (
+	StockTransferStatusCancelled         StockTransferStatus = "cancelled"
+	StockTransferStatusCompleted         StockTransferStatus = "completed"
+	StockTransferStatusDraft             StockTransferStatus = "draft"
+	StockTransferStatusInProgress        StockTransferStatus = "in_progress"
+	StockTransferStatusInTransit         StockTransferStatus = "in_transit"
+	StockTransferStatusPartiallyReceived StockTransferStatus = "partially_received"
+	StockTransferStatusReceived          StockTransferStatus = "received"
+	StockTransferStatusSubmitted         StockTransferStatus = "submitted"
+)
+
+// Valid indicates whether the value is a known member of the StockTransferStatus enum.
+func (e StockTransferStatus) Valid() bool {
+	switch e {
+	case StockTransferStatusCancelled:
+		return true
+	case StockTransferStatusCompleted:
+		return true
+	case StockTransferStatusDraft:
+		return true
+	case StockTransferStatusInProgress:
+		return true
+	case StockTransferStatusInTransit:
+		return true
+	case StockTransferStatusPartiallyReceived:
+		return true
+	case StockTransferStatusReceived:
+		return true
+	case StockTransferStatusSubmitted:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for StockTransferType.
+const (
+	Direct  StockTransferType = "direct"
+	Request StockTransferType = "request"
+)
+
+// Valid indicates whether the value is a known member of the StockTransferType enum.
+func (e StockTransferType) Valid() bool {
+	switch e {
+	case Direct:
+		return true
+	case Request:
+		return true
+	default:
+		return false
+	}
+}
+
+// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+//
+// Example: 2026-10-19
+type BusinessDate = openapi_types.Date
+
 // ErrorCode Katalog kode error (Technical Guideline Lampiran A).
 type ErrorCode string
 
 // ExternalPartyType defines model for ExternalPartyType.
 type ExternalPartyType string
+
+// Inbound defines model for Inbound.
+type Inbound struct {
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate          `json:"businessDate"`
+	Checks       []InboundQualityCheck `json:"checks"`
+	CompletedAt  *time.Time            `json:"completedAt,omitempty"`
+	CreatedAt    time.Time             `json:"createdAt"`
+	Id           openapi_types.UUID    `json:"id"`
+	LineCount    int                   `json:"lineCount"`
+	Lines        []InboundLine         `json:"lines"`
+	Location     WhLocationRef         `json:"location"`
+	Note         string                `json:"note"`
+	Number       string                `json:"number"`
+	PendingCount int                   `json:"pendingCount"`
+
+	// RejectAction `hold` ditahan di Inbound (reject ke pemasok/maklon), `returns` ke Gudang Retur.
+	RejectAction    InboundRejectAction `json:"rejectAction"`
+	SourceId        openapi_types.UUID  `json:"sourceId"`
+	SourceLabel     string              `json:"sourceLabel"`
+	SourceType      string              `json:"sourceType"`
+	SourceTypeLabel string              `json:"sourceTypeLabel"`
+
+	// Status `in_progress` Diproses, `completed` Selesai.
+	Status  InboundStatus `json:"status"`
+	Version int           `json:"version"`
+}
+
+// InboundLine defines model for InboundLine.
+type InboundLine struct {
+	AllowedActions []InboundLineAllowedActions `json:"allowedActions"`
+	Batch          *WhBatchRef                 `json:"batch,omitempty"`
+	CheckedAt      *time.Time                  `json:"checkedAt,omitempty"`
+	CheckedByName  *string                     `json:"checkedByName,omitempty"`
+	Destination    WhLocationRef               `json:"destination"`
+	Id             openapi_types.UUID          `json:"id"`
+	LineNo         int                         `json:"lineNo"`
+
+	// PassedQty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+	//
+	// Example: 12.000
+	PassedQty WhQuantity   `json:"passedQty"`
+	Product   WhProductRef `json:"product"`
+
+	// Qty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+	//
+	// Example: 12.000
+	Qty            WhQuantity     `json:"qty"`
+	RejectLocation *WhLocationRef `json:"rejectLocation,omitempty"`
+	RejectReason   string         `json:"rejectReason"`
+
+	// RejectedQty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+	//
+	// Example: 12.000
+	RejectedQty WhQuantity `json:"rejectedQty"`
+
+	// Status `quarantine` Karantina (belum QC), `posted` Diposting (lulus), `qc_rejected` Ditolak QC.
+	Status InboundLineStatus `json:"status"`
+}
+
+// InboundLineAllowedActions defines model for InboundLine.AllowedActions.
+type InboundLineAllowedActions string
+
+// InboundLineStatus `quarantine` Karantina (belum QC), `posted` Diposting (lulus), `qc_rejected` Ditolak QC.
+type InboundLineStatus string
+
+// InboundList defines model for InboundList.
+type InboundList struct {
+	Items      []InboundSummary `json:"items"`
+	Page       int              `json:"page"`
+	PageSize   int              `json:"pageSize"`
+	TotalItems int64            `json:"totalItems"`
+	TotalPages int              `json:"totalPages"`
+}
+
+// InboundQcChecklist defines model for InboundQcChecklist.
+type InboundQcChecklist struct {
+	Batch     bool `json:"batch"`
+	Condition bool `json:"condition"`
+	Expiry    bool `json:"expiry"`
+	Seal      bool `json:"seal"`
+}
+
+// InboundQcInput defines model for InboundQcInput.
+type InboundQcInput struct {
+	Checks                InboundQcChecklist  `json:"checks"`
+	DestinationLocationId *openapi_types.UUID `json:"destinationLocationId,omitempty"`
+	Note                  *string             `json:"note,omitempty"`
+
+	// PassedQty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+	//
+	// Example: 12.000
+	PassedQty    WhQuantity            `json:"passedQty"`
+	PhotoFileIds *[]openapi_types.UUID `json:"photoFileIds,omitempty"`
+	RejectReason *string               `json:"rejectReason,omitempty"`
+
+	// RejectedQty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+	//
+	// Example: 12.000
+	RejectedQty WhQuantity `json:"rejectedQty"`
+}
+
+// InboundQualityCheck defines model for InboundQualityCheck.
+type InboundQualityCheck struct {
+	CheckedAt     time.Time            `json:"checkedAt"`
+	CheckedByName string               `json:"checkedByName"`
+	Checks        InboundQcChecklist   `json:"checks"`
+	Id            openapi_types.UUID   `json:"id"`
+	LineId        openapi_types.UUID   `json:"lineId"`
+	Note          string               `json:"note"`
+	PhotoFileIds  []openapi_types.UUID `json:"photoFileIds"`
+
+	// Qty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+	//
+	// Example: 12.000
+	Qty    WhQuantity                `json:"qty"`
+	Result InboundQualityCheckResult `json:"result"`
+}
+
+// InboundQualityCheckResult defines model for InboundQualityCheck.Result.
+type InboundQualityCheckResult string
+
+// InboundRejectAction `hold` ditahan di Inbound (reject ke pemasok/maklon), `returns` ke Gudang Retur.
+type InboundRejectAction string
+
+// InboundStatus `in_progress` Diproses, `completed` Selesai.
+type InboundStatus string
+
+// InboundSummary defines model for InboundSummary.
+type InboundSummary struct {
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate    BusinessDate       `json:"businessDate"`
+	CreatedAt       time.Time          `json:"createdAt"`
+	Id              openapi_types.UUID `json:"id"`
+	LineCount       int                `json:"lineCount"`
+	Location        WhLocationRef      `json:"location"`
+	Number          string             `json:"number"`
+	PendingCount    int                `json:"pendingCount"`
+	SourceLabel     string             `json:"sourceLabel"`
+	SourceType      string             `json:"sourceType"`
+	SourceTypeLabel string             `json:"sourceTypeLabel"`
+
+	// Status `in_progress` Diproses, `completed` Selesai.
+	Status InboundStatus `json:"status"`
+}
 
 // Location defines model for Location.
 type Location struct {
@@ -302,6 +744,11 @@ type LocationUpdate struct {
 	Version int `json:"version"`
 }
 
+// Money Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+//
+// Example: 1250000.00
+type Money = string
+
 // Pagination Metadata pagination standar (Technical Guideline 8.2).
 type Pagination struct {
 	Page       int   `json:"page"`
@@ -326,6 +773,434 @@ type Problem struct {
 
 // RecordAction defines model for RecordAction.
 type RecordAction string
+
+// StockCount defines model for StockCount.
+type StockCount struct {
+	AllowedActions []StockCountAction `json:"allowedActions"`
+	AssignedToName string             `json:"assignedToName"`
+
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate `json:"businessDate"`
+
+	// CountType `full` Penuh, `cycle` Cycle count, `consignment` Konsinyasi, `vending` Vending.
+	CountType      StockCountType      `json:"countType"`
+	CountedCount   int                 `json:"countedCount"`
+	CreatedAt      time.Time           `json:"createdAt"`
+	DecidedAt      *time.Time          `json:"decidedAt,omitempty"`
+	DecisionNote   string              `json:"decisionNote"`
+	Id             openapi_types.UUID  `json:"id"`
+	JournalEntryId *openapi_types.UUID `json:"journalEntryId,omitempty"`
+	LineCount      int                 `json:"lineCount"`
+	Lines          []StockCountLine    `json:"lines"`
+	Location       WhLocationRef       `json:"location"`
+
+	// NetVariance Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	NetVariance  *Money               `json:"netVariance,omitempty"`
+	Note         string               `json:"note"`
+	Number       *string              `json:"number,omitempty"`
+	PhotoFileIds []openapi_types.UUID `json:"photoFileIds"`
+	PostedAt     *time.Time           `json:"postedAt,omitempty"`
+
+	// Revealed true = qty sistem dan selisih ditampilkan (setelah hasil dikirim).
+	Revealed        bool                `json:"revealed"`
+	ScheduleId      *openapi_types.UUID `json:"scheduleId,omitempty"`
+	SnapshotAt      *time.Time          `json:"snapshotAt,omitempty"`
+	StartedByName   *string             `json:"startedByName,omitempty"`
+	Status          StockCountStatus    `json:"status"`
+	SubmittedAt     *time.Time          `json:"submittedAt,omitempty"`
+	SubmittedByName *string             `json:"submittedByName,omitempty"`
+
+	// VarianceAmount Kosong sampai hasil dikirim.
+	VarianceAmount *Money `json:"varianceAmount,omitempty"`
+	Version        int    `json:"version"`
+}
+
+// StockCountAction defines model for StockCountAction.
+type StockCountAction string
+
+// StockCountActionInput defines model for StockCountActionInput.
+type StockCountActionInput struct {
+	Action  StockCountAction `json:"action"`
+	Reason  *string          `json:"reason,omitempty"`
+	Version int              `json:"version"`
+}
+
+// StockCountEntriesInput defines model for StockCountEntriesInput.
+type StockCountEntriesInput struct {
+	ExtraLines *[]StockCountExtraEntry `json:"extraLines,omitempty"`
+	Lines      *[]StockCountEntry      `json:"lines,omitempty"`
+
+	// PhotoFileIds Diisi = mengganti foto lokasi/rak; tidak dikirim = foto tidak berubah.
+	PhotoFileIds *[]openapi_types.UUID `json:"photoFileIds,omitempty"`
+}
+
+// StockCountEntry defines model for StockCountEntry.
+type StockCountEntry struct {
+	// CountedQty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+	//
+	// Example: 12.000
+	CountedQty  *WhQuantity         `json:"countedQty,omitempty"`
+	LineId      openapi_types.UUID  `json:"lineId"`
+	Note        *string             `json:"note,omitempty"`
+	PhotoFileId *openapi_types.UUID `json:"photoFileId,omitempty"`
+}
+
+// StockCountExtraEntry defines model for StockCountExtraEntry.
+type StockCountExtraEntry struct {
+	BatchId *openapi_types.UUID `json:"batchId,omitempty"`
+
+	// CountedQty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+	//
+	// Example: 12.000
+	CountedQty WhQuantity         `json:"countedQty"`
+	Note       *string            `json:"note,omitempty"`
+	ProductId  openapi_types.UUID `json:"productId"`
+}
+
+// StockCountFrequency defines model for StockCountFrequency.
+type StockCountFrequency string
+
+// StockCountInput defines model for StockCountInput.
+type StockCountInput struct {
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate *BusinessDate `json:"businessDate,omitempty"`
+
+	// CountType `full` Penuh, `cycle` Cycle count, `consignment` Konsinyasi, `vending` Vending.
+	CountType   StockCountType       `json:"countType"`
+	LocationIds []openapi_types.UUID `json:"locationIds"`
+	Note        *string              `json:"note,omitempty"`
+}
+
+// StockCountLine defines model for StockCountLine.
+type StockCountLine struct {
+	Batch     *WhBatchRef `json:"batch,omitempty"`
+	CountedAt *time.Time  `json:"countedAt,omitempty"`
+
+	// CountedQty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+	//
+	// Example: 12.000
+	CountedQty  *WhQuantity         `json:"countedQty,omitempty"`
+	Id          openapi_types.UUID  `json:"id"`
+	IsExtra     bool                `json:"isExtra"`
+	LineNo      int                 `json:"lineNo"`
+	Note        string              `json:"note"`
+	PhotoFileId *openapi_types.UUID `json:"photoFileId,omitempty"`
+	Product     WhProductRef        `json:"product"`
+
+	// SystemQty Kosong saat hitung buta (Draft, Diproses, Ditolak).
+	SystemQty *WhQuantity `json:"systemQty,omitempty"`
+	UnitCost  *string     `json:"unitCost,omitempty"`
+
+	// VarianceAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	VarianceAmount *Money `json:"varianceAmount,omitempty"`
+
+	// VarianceQty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+	//
+	// Example: 12.000
+	VarianceQty *WhQuantity `json:"varianceQty,omitempty"`
+}
+
+// StockCountList defines model for StockCountList.
+type StockCountList struct {
+	Items      []StockCountSummary `json:"items"`
+	Page       int                 `json:"page"`
+	PageSize   int                 `json:"pageSize"`
+	TotalItems int64               `json:"totalItems"`
+	TotalPages int                 `json:"totalPages"`
+}
+
+// StockCountSchedule defines model for StockCountSchedule.
+type StockCountSchedule struct {
+	AssigneeName   string              `json:"assigneeName"`
+	AssigneeUserId *openapi_types.UUID `json:"assigneeUserId,omitempty"`
+
+	// CountType `full` Penuh, `cycle` Cycle count, `consignment` Konsinyasi, `vending` Vending.
+	CountType  StockCountType      `json:"countType"`
+	DayOfMonth *int                `json:"dayOfMonth,omitempty"`
+	DayOfWeek  *int                `json:"dayOfWeek,omitempty"`
+	Frequency  StockCountFrequency `json:"frequency"`
+	Id         openapi_types.UUID  `json:"id"`
+	IsActive   bool                `json:"isActive"`
+
+	// LastRunDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	LastRunDate *BusinessDate        `json:"lastRunDate,omitempty"`
+	LocationIds []openapi_types.UUID `json:"locationIds"`
+	MonthOfYear *int                 `json:"monthOfYear,omitempty"`
+	Name        string               `json:"name"`
+
+	// NextRunDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	NextRunDate BusinessDate        `json:"nextRunDate"`
+	Version     int                 `json:"version"`
+	WarehouseId *openapi_types.UUID `json:"warehouseId,omitempty"`
+}
+
+// StockCountScheduleInput defines model for StockCountScheduleInput.
+type StockCountScheduleInput struct {
+	AssigneeUserId *openapi_types.UUID `json:"assigneeUserId,omitempty"`
+
+	// CountType `full` Penuh, `cycle` Cycle count, `consignment` Konsinyasi, `vending` Vending.
+	CountType   StockCountType        `json:"countType"`
+	DayOfMonth  *int                  `json:"dayOfMonth,omitempty"`
+	DayOfWeek   *int                  `json:"dayOfWeek,omitempty"`
+	Frequency   StockCountFrequency   `json:"frequency"`
+	IsActive    bool                  `json:"isActive"`
+	LocationIds *[]openapi_types.UUID `json:"locationIds,omitempty"`
+	MonthOfYear *int                  `json:"monthOfYear,omitempty"`
+	Name        string                `json:"name"`
+	WarehouseId *openapi_types.UUID   `json:"warehouseId,omitempty"`
+}
+
+// StockCountStatus defines model for StockCountStatus.
+type StockCountStatus string
+
+// StockCountSummary defines model for StockCountSummary.
+type StockCountSummary struct {
+	AssignedToName string `json:"assignedToName"`
+
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate `json:"businessDate"`
+
+	// CountType `full` Penuh, `cycle` Cycle count, `consignment` Konsinyasi, `vending` Vending.
+	CountType    StockCountType      `json:"countType"`
+	CountedCount int                 `json:"countedCount"`
+	CreatedAt    time.Time           `json:"createdAt"`
+	Id           openapi_types.UUID  `json:"id"`
+	LineCount    int                 `json:"lineCount"`
+	Location     WhLocationRef       `json:"location"`
+	Number       *string             `json:"number,omitempty"`
+	ScheduleId   *openapi_types.UUID `json:"scheduleId,omitempty"`
+	Status       StockCountStatus    `json:"status"`
+
+	// VarianceAmount Kosong sampai hasil dikirim.
+	VarianceAmount *Money `json:"varianceAmount,omitempty"`
+}
+
+// StockCountType `full` Penuh, `cycle` Cycle count, `consignment` Konsinyasi, `vending` Vending.
+type StockCountType string
+
+// StockInTransitLine defines model for StockInTransitLine.
+type StockInTransitLine struct {
+	Batch *WhBatchRef `json:"batch,omitempty"`
+
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate `json:"businessDate"`
+
+	// CostAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	CostAmount Money              `json:"costAmount"`
+	From       WhLocationRef      `json:"from"`
+	LineId     openapi_types.UUID `json:"lineId"`
+	Number     *string            `json:"number,omitempty"`
+
+	// OutstandingQty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+	//
+	// Example: 12.000
+	OutstandingQty WhQuantity   `json:"outstandingQty"`
+	Product        WhProductRef `json:"product"`
+
+	// Qty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+	//
+	// Example: 12.000
+	Qty WhQuantity `json:"qty"`
+
+	// ReceivedQty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+	//
+	// Example: 12.000
+	ReceivedQty WhQuantity          `json:"receivedQty"`
+	ShippedAt   *time.Time          `json:"shippedAt,omitempty"`
+	Status      StockTransferStatus `json:"status"`
+	To          WhLocationRef       `json:"to"`
+	TransferId  openapi_types.UUID  `json:"transferId"`
+}
+
+// StockInTransitList defines model for StockInTransitList.
+type StockInTransitList struct {
+	Items      []StockInTransitLine `json:"items"`
+	Page       int                  `json:"page"`
+	PageSize   int                  `json:"pageSize"`
+	TotalItems int64                `json:"totalItems"`
+	TotalPages int                  `json:"totalPages"`
+}
+
+// StockTransfer defines model for StockTransfer.
+type StockTransfer struct {
+	AllowedActions []StockTransferAction `json:"allowedActions"`
+
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate     BusinessDate        `json:"businessDate"`
+	CancelReason     string              `json:"cancelReason"`
+	CancelledAt      *time.Time          `json:"cancelledAt,omitempty"`
+	CompletedAt      *time.Time          `json:"completedAt,omitempty"`
+	CreatedAt        time.Time           `json:"createdAt"`
+	From             WhLocationRef       `json:"from"`
+	Id               openapi_types.UUID  `json:"id"`
+	LineCount        int                 `json:"lineCount"`
+	Lines            []StockTransferLine `json:"lines"`
+	Note             string              `json:"note"`
+	Number           *string             `json:"number,omitempty"`
+	PreparedAt       *time.Time          `json:"preparedAt,omitempty"`
+	PreparedByName   *string             `json:"preparedByName,omitempty"`
+	ReceivedAt       *time.Time          `json:"receivedAt,omitempty"`
+	ReceivedByName   *string             `json:"receivedByName,omitempty"`
+	ReleasedAt       *time.Time          `json:"releasedAt,omitempty"`
+	ReleasedByName   *string             `json:"releasedByName,omitempty"`
+	RequestedByName  string              `json:"requestedByName"`
+	RequiresShipping bool                `json:"requiresShipping"`
+	ShippedAt        *time.Time          `json:"shippedAt,omitempty"`
+	ShippedByName    *string             `json:"shippedByName,omitempty"`
+	SourceId         *openapi_types.UUID `json:"sourceId,omitempty"`
+	SourceType       *string             `json:"sourceType,omitempty"`
+	Status           StockTransferStatus `json:"status"`
+	SubmittedAt      *time.Time          `json:"submittedAt,omitempty"`
+	To               WhLocationRef       `json:"to"`
+
+	// TotalQty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+	//
+	// Example: 12.000
+	TotalQty WhQuantity `json:"totalQty"`
+
+	// TransferType `direct` Transfer Stok, `request` Permintaan Petty Stock.
+	TransferType StockTransferType `json:"transferType"`
+	Version      int               `json:"version"`
+}
+
+// StockTransferAction defines model for StockTransferAction.
+type StockTransferAction string
+
+// StockTransferActionInput defines model for StockTransferActionInput.
+type StockTransferActionInput struct {
+	Action  StockTransferAction         `json:"action"`
+	Lines   *[]StockTransferReceiveLine `json:"lines,omitempty"`
+	Reason  *string                     `json:"reason,omitempty"`
+	Version int                         `json:"version"`
+}
+
+// StockTransferInput defines model for StockTransferInput.
+type StockTransferInput struct {
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate   BusinessDate             `json:"businessDate"`
+	FromLocationId openapi_types.UUID       `json:"fromLocationId"`
+	Lines          []StockTransferLineInput `json:"lines"`
+	Note           *string                  `json:"note,omitempty"`
+	ToLocationId   openapi_types.UUID       `json:"toLocationId"`
+
+	// TransferType `direct` Transfer Stok, `request` Permintaan Petty Stock.
+	TransferType StockTransferType `json:"transferType"`
+}
+
+// StockTransferLine defines model for StockTransferLine.
+type StockTransferLine struct {
+	Batch       *WhBatchRef `json:"batch,omitempty"`
+	BatchReason string      `json:"batchReason"`
+
+	// CostAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	CostAmount Money              `json:"costAmount"`
+	Id         openapi_types.UUID `json:"id"`
+	LineNo     int                `json:"lineNo"`
+	Note       string             `json:"note"`
+	Product    WhProductRef       `json:"product"`
+
+	// Qty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+	//
+	// Example: 12.000
+	Qty WhQuantity `json:"qty"`
+
+	// ReceivedQty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+	//
+	// Example: 12.000
+	ReceivedQty WhQuantity `json:"receivedQty"`
+
+	// ShortageQty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+	//
+	// Example: 12.000
+	ShortageQty WhQuantity `json:"shortageQty"`
+}
+
+// StockTransferLineInput defines model for StockTransferLineInput.
+type StockTransferLineInput struct {
+	BatchId     *openapi_types.UUID `json:"batchId,omitempty"`
+	BatchReason *string             `json:"batchReason,omitempty"`
+	Note        *string             `json:"note,omitempty"`
+	ProductId   openapi_types.UUID  `json:"productId"`
+
+	// Qty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+	//
+	// Example: 12.000
+	Qty WhQuantity `json:"qty"`
+}
+
+// StockTransferList defines model for StockTransferList.
+type StockTransferList struct {
+	Items      []StockTransferSummary `json:"items"`
+	Page       int                    `json:"page"`
+	PageSize   int                    `json:"pageSize"`
+	TotalItems int64                  `json:"totalItems"`
+	TotalPages int                    `json:"totalPages"`
+}
+
+// StockTransferReceiveLine defines model for StockTransferReceiveLine.
+type StockTransferReceiveLine struct {
+	LineId openapi_types.UUID `json:"lineId"`
+
+	// Qty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+	//
+	// Example: 12.000
+	Qty WhQuantity `json:"qty"`
+}
+
+// StockTransferStatus defines model for StockTransferStatus.
+type StockTransferStatus string
+
+// StockTransferSummary defines model for StockTransferSummary.
+type StockTransferSummary struct {
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate     BusinessDate        `json:"businessDate"`
+	CreatedAt        time.Time           `json:"createdAt"`
+	From             WhLocationRef       `json:"from"`
+	Id               openapi_types.UUID  `json:"id"`
+	LineCount        int                 `json:"lineCount"`
+	Number           *string             `json:"number,omitempty"`
+	RequestedByName  string              `json:"requestedByName"`
+	RequiresShipping bool                `json:"requiresShipping"`
+	Status           StockTransferStatus `json:"status"`
+	To               WhLocationRef       `json:"to"`
+
+	// TotalQty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+	//
+	// Example: 12.000
+	TotalQty WhQuantity `json:"totalQty"`
+
+	// TransferType `direct` Transfer Stok, `request` Permintaan Petty Stock.
+	TransferType StockTransferType `json:"transferType"`
+}
+
+// StockTransferType `direct` Transfer Stok, `request` Permintaan Petty Stock.
+type StockTransferType string
 
 // VersionInput defines model for VersionInput.
 type VersionInput struct {
@@ -381,6 +1256,44 @@ type WarehouseUpdate struct {
 	Version int `json:"version"`
 }
 
+// WhBatchRef defines model for WhBatchRef.
+type WhBatchRef struct {
+	// ExpiryDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	ExpiryDate *BusinessDate      `json:"expiryDate,omitempty"`
+	Id         openapi_types.UUID `json:"id"`
+	Number     string             `json:"number"`
+}
+
+// WhLocationRef defines model for WhLocationRef.
+type WhLocationRef struct {
+	Code       string             `json:"code"`
+	Id         openapi_types.UUID `json:"id"`
+	IsExternal bool               `json:"isExternal"`
+
+	// LocationType Di dalam gudang: `inbound`, `finished_goods` (FG Non-Ecommerce), `ecommerce` (E-commerce Stock), `petty_stock` (Petty Stock),
+	// `raw_material` (RM), `goods_material` (GM), `returns`, `event`. Eksternal: `toll_manufacturer` (maklon),
+	// `consignment`, `vending_buffer`, `vending_machine`.
+	LocationType      LocationType `json:"locationType"`
+	LocationTypeLabel string       `json:"locationTypeLabel"`
+	Name              string       `json:"name"`
+	WarehouseName     *string      `json:"warehouseName,omitempty"`
+}
+
+// WhProductRef defines model for WhProductRef.
+type WhProductRef struct {
+	Id   openapi_types.UUID `json:"id"`
+	Name string             `json:"name"`
+	Sku  string             `json:"sku"`
+	Uom  string             `json:"uom"`
+}
+
+// WhQuantity Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+//
+// Example: 12.000
+type WhQuantity = string
+
 // Id defines model for Id.
 type Id = openapi_types.UUID
 
@@ -398,6 +1311,22 @@ type Search = string
 
 // Sort defines model for Sort.
 type Sort = string
+
+// ListInboundsParams defines parameters for ListInbounds.
+type ListInboundsParams struct {
+	Page        *Page               `form:"page,omitempty" json:"page,omitempty"`
+	PageSize    *PageSize           `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+	Q           *Search             `form:"q,omitempty" json:"q,omitempty"`
+	Status      *InboundStatus      `form:"status,omitempty" json:"status,omitempty"`
+	SourceType  *string             `form:"sourceType,omitempty" json:"sourceType,omitempty"`
+	WarehouseId *openapi_types.UUID `form:"warehouseId,omitempty" json:"warehouseId,omitempty"`
+}
+
+// RecordInboundQcParams defines parameters for RecordInboundQc.
+type RecordInboundQcParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
 
 // ListLocationsParams defines parameters for ListLocations.
 type ListLocationsParams struct {
@@ -444,6 +1373,122 @@ type RestoreLocationParams struct {
 	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
 }
 
+// CreateStockCountScheduleParams defines parameters for CreateStockCountSchedule.
+type CreateStockCountScheduleParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// UpdateStockCountScheduleJSONBody defines parameters for UpdateStockCountSchedule.
+type UpdateStockCountScheduleJSONBody struct {
+	AssigneeUserId *openapi_types.UUID `json:"assigneeUserId,omitempty"`
+
+	// CountType `full` Penuh, `cycle` Cycle count, `consignment` Konsinyasi, `vending` Vending.
+	CountType   StockCountType        `json:"countType"`
+	DayOfMonth  *int                  `json:"dayOfMonth,omitempty"`
+	DayOfWeek   *int                  `json:"dayOfWeek,omitempty"`
+	Frequency   StockCountFrequency   `json:"frequency"`
+	IsActive    bool                  `json:"isActive"`
+	LocationIds *[]openapi_types.UUID `json:"locationIds,omitempty"`
+	MonthOfYear *int                  `json:"monthOfYear,omitempty"`
+	Name        string                `json:"name"`
+
+	// Version Versi terakhir yang dilihat user (optimistic locking).
+	Version     int                 `json:"version"`
+	WarehouseId *openapi_types.UUID `json:"warehouseId,omitempty"`
+}
+
+// UpdateStockCountScheduleParams defines parameters for UpdateStockCountSchedule.
+type UpdateStockCountScheduleParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// ListStockCountsParams defines parameters for ListStockCounts.
+type ListStockCountsParams struct {
+	Page     *Page     `form:"page,omitempty" json:"page,omitempty"`
+	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+	Q        *Search   `form:"q,omitempty" json:"q,omitempty"`
+
+	// Status Bisa lebih dari satu.
+	Status     *[]StockCountStatus `form:"status,omitempty" json:"status,omitempty"`
+	CountType  *StockCountType     `form:"countType,omitempty" json:"countType,omitempty"`
+	LocationId *openapi_types.UUID `form:"locationId,omitempty" json:"locationId,omitempty"`
+}
+
+// CreateStockCountsParams defines parameters for CreateStockCounts.
+type CreateStockCountsParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// ActOnStockCountParams defines parameters for ActOnStockCount.
+type ActOnStockCountParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// SaveStockCountEntriesParams defines parameters for SaveStockCountEntries.
+type SaveStockCountEntriesParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// ListStockTransfersParams defines parameters for ListStockTransfers.
+type ListStockTransfersParams struct {
+	Page         *Page              `form:"page,omitempty" json:"page,omitempty"`
+	PageSize     *PageSize          `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+	Q            *Search            `form:"q,omitempty" json:"q,omitempty"`
+	TransferType *StockTransferType `form:"transferType,omitempty" json:"transferType,omitempty"`
+
+	// Status Bisa lebih dari satu.
+	Status     *[]StockTransferStatus `form:"status,omitempty" json:"status,omitempty"`
+	LocationId *openapi_types.UUID    `form:"locationId,omitempty" json:"locationId,omitempty"`
+}
+
+// CreateStockTransferParams defines parameters for CreateStockTransfer.
+type CreateStockTransferParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// ListStockInTransitParams defines parameters for ListStockInTransit.
+type ListStockInTransitParams struct {
+	Page       *Page               `form:"page,omitempty" json:"page,omitempty"`
+	PageSize   *PageSize           `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+	LocationId *openapi_types.UUID `form:"locationId,omitempty" json:"locationId,omitempty"`
+}
+
+// UpdateStockTransferJSONBody defines parameters for UpdateStockTransfer.
+type UpdateStockTransferJSONBody struct {
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate   BusinessDate             `json:"businessDate"`
+	FromLocationId openapi_types.UUID       `json:"fromLocationId"`
+	Lines          []StockTransferLineInput `json:"lines"`
+	Note           *string                  `json:"note,omitempty"`
+	ToLocationId   openapi_types.UUID       `json:"toLocationId"`
+
+	// TransferType `direct` Transfer Stok, `request` Permintaan Petty Stock.
+	TransferType StockTransferType `json:"transferType"`
+
+	// Version Versi terakhir yang dilihat user (optimistic locking).
+	Version int `json:"version"`
+}
+
+// UpdateStockTransferParams defines parameters for UpdateStockTransfer.
+type UpdateStockTransferParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// ActOnStockTransferParams defines parameters for ActOnStockTransfer.
+type ActOnStockTransferParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
 // ListWarehousesParams defines parameters for ListWarehouses.
 type ListWarehousesParams struct {
 	Page     *Page     `form:"page,omitempty" json:"page,omitempty"`
@@ -480,11 +1525,38 @@ type RestoreWarehouseParams struct {
 	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
 }
 
+// RecordInboundQcJSONRequestBody defines body for RecordInboundQc for application/json ContentType.
+type RecordInboundQcJSONRequestBody = InboundQcInput
+
 // CreateLocationJSONRequestBody defines body for CreateLocation for application/json ContentType.
 type CreateLocationJSONRequestBody = LocationInput
 
 // UpdateLocationJSONRequestBody defines body for UpdateLocation for application/json ContentType.
 type UpdateLocationJSONRequestBody = LocationUpdate
+
+// CreateStockCountScheduleJSONRequestBody defines body for CreateStockCountSchedule for application/json ContentType.
+type CreateStockCountScheduleJSONRequestBody = StockCountScheduleInput
+
+// UpdateStockCountScheduleJSONRequestBody defines body for UpdateStockCountSchedule for application/json ContentType.
+type UpdateStockCountScheduleJSONRequestBody UpdateStockCountScheduleJSONBody
+
+// CreateStockCountsJSONRequestBody defines body for CreateStockCounts for application/json ContentType.
+type CreateStockCountsJSONRequestBody = StockCountInput
+
+// ActOnStockCountJSONRequestBody defines body for ActOnStockCount for application/json ContentType.
+type ActOnStockCountJSONRequestBody = StockCountActionInput
+
+// SaveStockCountEntriesJSONRequestBody defines body for SaveStockCountEntries for application/json ContentType.
+type SaveStockCountEntriesJSONRequestBody = StockCountEntriesInput
+
+// CreateStockTransferJSONRequestBody defines body for CreateStockTransfer for application/json ContentType.
+type CreateStockTransferJSONRequestBody = StockTransferInput
+
+// UpdateStockTransferJSONRequestBody defines body for UpdateStockTransfer for application/json ContentType.
+type UpdateStockTransferJSONRequestBody UpdateStockTransferJSONBody
+
+// ActOnStockTransferJSONRequestBody defines body for ActOnStockTransfer for application/json ContentType.
+type ActOnStockTransferJSONRequestBody = StockTransferActionInput
 
 // CreateWarehouseJSONRequestBody defines body for CreateWarehouse for application/json ContentType.
 type CreateWarehouseJSONRequestBody = WarehouseInput
@@ -494,6 +1566,15 @@ type UpdateWarehouseJSONRequestBody = WarehouseUpdate
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// ListInbounds Antrian Inbound — barang Karantina per dokumen asal (WMS-02, WMS-09)
+	// (GET /api/v1/inbounds)
+	ListInbounds(w http.ResponseWriter, r *http.Request, params ListInboundsParams)
+	// GetInbound Detail Inbound beserta baris dan catatan QC
+	// (GET /api/v1/inbounds/{id})
+	GetInbound(w http.ResponseWriter, r *http.Request, id Id)
+	// RecordInboundQc QC satu baris Inbound (checklist, qty lulus/ditolak, foto, lokasi tujuan)
+	// (POST /api/v1/inbounds/{id}/lines/{lineId}/qc)
+	RecordInboundQc(w http.ResponseWriter, r *http.Request, id Id, lineId openapi_types.UUID, params RecordInboundQcParams)
 	// ListLocations Daftar lokasi stok (internal dan eksternal)
 	// (GET /api/v1/locations)
 	ListLocations(w http.ResponseWriter, r *http.Request, params ListLocationsParams)
@@ -512,6 +1593,48 @@ type ServerInterface interface {
 	// RestoreLocation Memulihkan lokasi yang dihapus (hanya Admin Sistem)
 	// (POST /api/v1/locations/{id}/restore)
 	RestoreLocation(w http.ResponseWriter, r *http.Request, id Id, params RestoreLocationParams)
+	// ListStockCountSchedules Jadwal Stock Count (cycle count, konsinyasi/vending bulanan, penuh akhir tahun)
+	// (GET /api/v1/stock-count-schedules)
+	ListStockCountSchedules(w http.ResponseWriter, r *http.Request)
+	// CreateStockCountSchedule Membuat jadwal Stock Count
+	// (POST /api/v1/stock-count-schedules)
+	CreateStockCountSchedule(w http.ResponseWriter, r *http.Request, params CreateStockCountScheduleParams)
+	// UpdateStockCountSchedule Mengubah jadwal Stock Count
+	// (PUT /api/v1/stock-count-schedules/{id})
+	UpdateStockCountSchedule(w http.ResponseWriter, r *http.Request, id Id, params UpdateStockCountScheduleParams)
+	// ListStockCounts Daftar Stock Count (Merchandiser hanya lokasi konsinyasi mitra yang ditugaskan)
+	// (GET /api/v1/stock-counts)
+	ListStockCounts(w http.ResponseWriter, r *http.Request, params ListStockCountsParams)
+	// CreateStockCounts Membuat Stock Count Draft, satu dokumen per lokasi
+	// (POST /api/v1/stock-counts)
+	CreateStockCounts(w http.ResponseWriter, r *http.Request, params CreateStockCountsParams)
+	// GetStockCount Detail Stock Count (hitung buta — qty sistem dan selisih kosong sampai hasil dikirim)
+	// (GET /api/v1/stock-counts/{id})
+	GetStockCount(w http.ResponseWriter, r *http.Request, id Id)
+	// ActOnStockCount Aksi status Stock Count (start, submit, recount, cancel)
+	// (POST /api/v1/stock-counts/{id}/actions)
+	ActOnStockCount(w http.ResponseWriter, r *http.Request, id Id, params ActOnStockCountParams)
+	// SaveStockCountEntries Menyimpan isian hitung (autosave form HP), barang tambahan, dan foto
+	// (PUT /api/v1/stock-counts/{id}/entries)
+	SaveStockCountEntries(w http.ResponseWriter, r *http.Request, id Id, params SaveStockCountEntriesParams)
+	// ListStockTransfers Daftar Transfer Stok atau Permintaan Petty Stock
+	// (GET /api/v1/stock-transfers)
+	ListStockTransfers(w http.ResponseWriter, r *http.Request, params ListStockTransfersParams)
+	// CreateStockTransfer Membuat Transfer Stok / Permintaan Petty Stock berstatus Draft
+	// (POST /api/v1/stock-transfers)
+	CreateStockTransfer(w http.ResponseWriter, r *http.Request, params CreateStockTransferParams)
+	// ListStockInTransit Stok dalam Pengiriman — baris transfer yang belum diterima penuh (WMS-10)
+	// (GET /api/v1/stock-transfers/in-transit)
+	ListStockInTransit(w http.ResponseWriter, r *http.Request, params ListStockInTransitParams)
+	// GetStockTransfer Detail transfer
+	// (GET /api/v1/stock-transfers/{id})
+	GetStockTransfer(w http.ResponseWriter, r *http.Request, id Id)
+	// UpdateStockTransfer Mengubah transfer Draft
+	// (PUT /api/v1/stock-transfers/{id})
+	UpdateStockTransfer(w http.ResponseWriter, r *http.Request, id Id, params UpdateStockTransferParams)
+	// ActOnStockTransfer Aksi status transfer (submit, release, prepare, post, ship, receive, complete, cancel)
+	// (POST /api/v1/stock-transfers/{id}/actions)
+	ActOnStockTransfer(w http.ResponseWriter, r *http.Request, id Id, params ActOnStockTransferParams)
 	// ListWarehouses Daftar gudang fisik
 	// (GET /api/v1/warehouses)
 	ListWarehouses(w http.ResponseWriter, r *http.Request, params ListWarehousesParams)
@@ -535,6 +1658,24 @@ type ServerInterface interface {
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
 
 type Unimplemented struct{}
+
+// ListInbounds Antrian Inbound — barang Karantina per dokumen asal (WMS-02, WMS-09)
+// (GET /api/v1/inbounds)
+func (_ Unimplemented) ListInbounds(w http.ResponseWriter, r *http.Request, params ListInboundsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetInbound Detail Inbound beserta baris dan catatan QC
+// (GET /api/v1/inbounds/{id})
+func (_ Unimplemented) GetInbound(w http.ResponseWriter, r *http.Request, id Id) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// RecordInboundQc QC satu baris Inbound (checklist, qty lulus/ditolak, foto, lokasi tujuan)
+// (POST /api/v1/inbounds/{id}/lines/{lineId}/qc)
+func (_ Unimplemented) RecordInboundQc(w http.ResponseWriter, r *http.Request, id Id, lineId openapi_types.UUID, params RecordInboundQcParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
 
 // ListLocations Daftar lokasi stok (internal dan eksternal)
 // (GET /api/v1/locations)
@@ -569,6 +1710,90 @@ func (_ Unimplemented) UpdateLocation(w http.ResponseWriter, r *http.Request, id
 // RestoreLocation Memulihkan lokasi yang dihapus (hanya Admin Sistem)
 // (POST /api/v1/locations/{id}/restore)
 func (_ Unimplemented) RestoreLocation(w http.ResponseWriter, r *http.Request, id Id, params RestoreLocationParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListStockCountSchedules Jadwal Stock Count (cycle count, konsinyasi/vending bulanan, penuh akhir tahun)
+// (GET /api/v1/stock-count-schedules)
+func (_ Unimplemented) ListStockCountSchedules(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// CreateStockCountSchedule Membuat jadwal Stock Count
+// (POST /api/v1/stock-count-schedules)
+func (_ Unimplemented) CreateStockCountSchedule(w http.ResponseWriter, r *http.Request, params CreateStockCountScheduleParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// UpdateStockCountSchedule Mengubah jadwal Stock Count
+// (PUT /api/v1/stock-count-schedules/{id})
+func (_ Unimplemented) UpdateStockCountSchedule(w http.ResponseWriter, r *http.Request, id Id, params UpdateStockCountScheduleParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListStockCounts Daftar Stock Count (Merchandiser hanya lokasi konsinyasi mitra yang ditugaskan)
+// (GET /api/v1/stock-counts)
+func (_ Unimplemented) ListStockCounts(w http.ResponseWriter, r *http.Request, params ListStockCountsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// CreateStockCounts Membuat Stock Count Draft, satu dokumen per lokasi
+// (POST /api/v1/stock-counts)
+func (_ Unimplemented) CreateStockCounts(w http.ResponseWriter, r *http.Request, params CreateStockCountsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetStockCount Detail Stock Count (hitung buta — qty sistem dan selisih kosong sampai hasil dikirim)
+// (GET /api/v1/stock-counts/{id})
+func (_ Unimplemented) GetStockCount(w http.ResponseWriter, r *http.Request, id Id) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ActOnStockCount Aksi status Stock Count (start, submit, recount, cancel)
+// (POST /api/v1/stock-counts/{id}/actions)
+func (_ Unimplemented) ActOnStockCount(w http.ResponseWriter, r *http.Request, id Id, params ActOnStockCountParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// SaveStockCountEntries Menyimpan isian hitung (autosave form HP), barang tambahan, dan foto
+// (PUT /api/v1/stock-counts/{id}/entries)
+func (_ Unimplemented) SaveStockCountEntries(w http.ResponseWriter, r *http.Request, id Id, params SaveStockCountEntriesParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListStockTransfers Daftar Transfer Stok atau Permintaan Petty Stock
+// (GET /api/v1/stock-transfers)
+func (_ Unimplemented) ListStockTransfers(w http.ResponseWriter, r *http.Request, params ListStockTransfersParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// CreateStockTransfer Membuat Transfer Stok / Permintaan Petty Stock berstatus Draft
+// (POST /api/v1/stock-transfers)
+func (_ Unimplemented) CreateStockTransfer(w http.ResponseWriter, r *http.Request, params CreateStockTransferParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListStockInTransit Stok dalam Pengiriman — baris transfer yang belum diterima penuh (WMS-10)
+// (GET /api/v1/stock-transfers/in-transit)
+func (_ Unimplemented) ListStockInTransit(w http.ResponseWriter, r *http.Request, params ListStockInTransitParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetStockTransfer Detail transfer
+// (GET /api/v1/stock-transfers/{id})
+func (_ Unimplemented) GetStockTransfer(w http.ResponseWriter, r *http.Request, id Id) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// UpdateStockTransfer Mengubah transfer Draft
+// (PUT /api/v1/stock-transfers/{id})
+func (_ Unimplemented) UpdateStockTransfer(w http.ResponseWriter, r *http.Request, id Id, params UpdateStockTransferParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ActOnStockTransfer Aksi status transfer (submit, release, prepare, post, ship, receive, complete, cancel)
+// (POST /api/v1/stock-transfers/{id}/actions)
+func (_ Unimplemented) ActOnStockTransfer(w http.ResponseWriter, r *http.Request, id Id, params ActOnStockTransferParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -616,6 +1841,193 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(http.Handler) http.Handler
+
+// ListInbounds operation middleware
+func (siw *ServerInterfaceWrapper) ListInbounds(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListInboundsParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", r.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "page"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "pageSize", r.URL.Query(), &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "pageSize"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "q" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "q", r.URL.Query(), &params.Q, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "q"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "q", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "status" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "status", r.URL.Query(), &params.Status, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "status"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "status", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "sourceType" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "sourceType", r.URL.Query(), &params.SourceType, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "sourceType"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "sourceType", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "warehouseId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "warehouseId", r.URL.Query(), &params.WarehouseId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "warehouseId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "warehouseId", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListInbounds(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetInbound operation middleware
+func (siw *ServerInterfaceWrapper) GetInbound(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetInbound(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// RecordInboundQc operation middleware
+func (siw *ServerInterfaceWrapper) RecordInboundQc(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "lineId" -------------
+	var lineId openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "lineId", chi.URLParam(r, "lineId"), &lineId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "lineId", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params RecordInboundQcParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.RecordInboundQc(w, r, id, lineId, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
 
 // ListLocations operation middleware
 func (siw *ServerInterfaceWrapper) ListLocations(w http.ResponseWriter, r *http.Request) {
@@ -1004,6 +2416,732 @@ func (siw *ServerInterfaceWrapper) RestoreLocation(w http.ResponseWriter, r *htt
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.RestoreLocation(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListStockCountSchedules operation middleware
+func (siw *ServerInterfaceWrapper) ListStockCountSchedules(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListStockCountSchedules(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateStockCountSchedule operation middleware
+func (siw *ServerInterfaceWrapper) CreateStockCountSchedule(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateStockCountScheduleParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateStockCountSchedule(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateStockCountSchedule operation middleware
+func (siw *ServerInterfaceWrapper) UpdateStockCountSchedule(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params UpdateStockCountScheduleParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateStockCountSchedule(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListStockCounts operation middleware
+func (siw *ServerInterfaceWrapper) ListStockCounts(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListStockCountsParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", r.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "page"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "pageSize", r.URL.Query(), &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "pageSize"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "q" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "q", r.URL.Query(), &params.Q, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "q"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "q", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "status" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "status", r.URL.Query(), &params.Status, runtime.BindQueryParameterOptions{Type: "array", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "status"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "status", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "countType" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "countType", r.URL.Query(), &params.CountType, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "countType"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "countType", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "locationId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "locationId", r.URL.Query(), &params.LocationId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "locationId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "locationId", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListStockCounts(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateStockCounts operation middleware
+func (siw *ServerInterfaceWrapper) CreateStockCounts(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateStockCountsParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateStockCounts(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetStockCount operation middleware
+func (siw *ServerInterfaceWrapper) GetStockCount(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetStockCount(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ActOnStockCount operation middleware
+func (siw *ServerInterfaceWrapper) ActOnStockCount(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ActOnStockCountParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ActOnStockCount(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// SaveStockCountEntries operation middleware
+func (siw *ServerInterfaceWrapper) SaveStockCountEntries(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params SaveStockCountEntriesParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.SaveStockCountEntries(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListStockTransfers operation middleware
+func (siw *ServerInterfaceWrapper) ListStockTransfers(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListStockTransfersParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", r.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "page"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "pageSize", r.URL.Query(), &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "pageSize"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "q" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "q", r.URL.Query(), &params.Q, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "q"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "q", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "transferType" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "transferType", r.URL.Query(), &params.TransferType, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "transferType"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "transferType", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "status" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "status", r.URL.Query(), &params.Status, runtime.BindQueryParameterOptions{Type: "array", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "status"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "status", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "locationId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "locationId", r.URL.Query(), &params.LocationId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "locationId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "locationId", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListStockTransfers(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateStockTransfer operation middleware
+func (siw *ServerInterfaceWrapper) CreateStockTransfer(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateStockTransferParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateStockTransfer(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListStockInTransit operation middleware
+func (siw *ServerInterfaceWrapper) ListStockInTransit(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListStockInTransitParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", r.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "page"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "pageSize", r.URL.Query(), &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "pageSize"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "locationId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "locationId", r.URL.Query(), &params.LocationId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "locationId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "locationId", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListStockInTransit(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetStockTransfer operation middleware
+func (siw *ServerInterfaceWrapper) GetStockTransfer(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetStockTransfer(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateStockTransfer operation middleware
+func (siw *ServerInterfaceWrapper) UpdateStockTransfer(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params UpdateStockTransferParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateStockTransfer(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ActOnStockTransfer operation middleware
+func (siw *ServerInterfaceWrapper) ActOnStockTransfer(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ActOnStockTransferParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ActOnStockTransfer(w, r, id, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -1493,11 +3631,182 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/api/v1/locations/{id}/restore", wrapper.RestoreLocation)
 	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/inbounds", wrapper.ListInbounds)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/inbounds/{id}", wrapper.GetInbound)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/inbounds/{id}/lines/{lineId}/qc", wrapper.RecordInboundQc)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/stock-transfers", wrapper.ListStockTransfers)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/stock-transfers", wrapper.CreateStockTransfer)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/stock-transfers/in-transit", wrapper.ListStockInTransit)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/stock-transfers/{id}", wrapper.GetStockTransfer)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/stock-transfers/{id}", wrapper.UpdateStockTransfer)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/stock-transfers/{id}/actions", wrapper.ActOnStockTransfer)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/stock-counts", wrapper.ListStockCounts)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/stock-counts", wrapper.CreateStockCounts)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/stock-counts/{id}", wrapper.GetStockCount)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/stock-counts/{id}/entries", wrapper.SaveStockCountEntries)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/stock-counts/{id}/actions", wrapper.ActOnStockCount)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/stock-count-schedules", wrapper.ListStockCountSchedules)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/stock-count-schedules", wrapper.CreateStockCountSchedule)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/stock-count-schedules/{id}", wrapper.UpdateStockCountSchedule)
+	})
 
 	return r
 }
 
 type ProblemApplicationProblemPlusJSONResponse Problem
+
+type ListInboundsRequestObject struct {
+	Params ListInboundsParams
+}
+
+type ListInboundsResponseObject interface {
+	VisitListInboundsResponse(w http.ResponseWriter) error
+}
+
+type ListInbounds200JSONResponse InboundList
+
+func (response ListInbounds200JSONResponse) VisitListInboundsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListInboundsdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListInboundsdefaultApplicationProblemPlusJSONResponse) VisitListInboundsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetInboundRequestObject struct {
+	Id Id `json:"id"`
+}
+
+type GetInboundResponseObject interface {
+	VisitGetInboundResponse(w http.ResponseWriter) error
+}
+
+type GetInbound200JSONResponse Inbound
+
+func (response GetInbound200JSONResponse) VisitGetInboundResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetInbounddefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetInbounddefaultApplicationProblemPlusJSONResponse) VisitGetInboundResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RecordInboundQcRequestObject struct {
+	Id     Id                 `json:"id"`
+	LineId openapi_types.UUID `json:"lineId"`
+	Params RecordInboundQcParams
+	Body   *RecordInboundQcJSONRequestBody
+}
+
+type RecordInboundQcResponseObject interface {
+	VisitRecordInboundQcResponse(w http.ResponseWriter) error
+}
+
+type RecordInboundQc200JSONResponse Inbound
+
+func (response RecordInboundQc200JSONResponse) VisitRecordInboundQcResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RecordInboundQcdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response RecordInboundQcdefaultApplicationProblemPlusJSONResponse) VisitRecordInboundQcResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
 
 type ListLocationsRequestObject struct {
 	Params ListLocationsParams
@@ -1721,6 +4030,568 @@ type RestoreLocationdefaultApplicationProblemPlusJSONResponse struct {
 }
 
 func (response RestoreLocationdefaultApplicationProblemPlusJSONResponse) VisitRestoreLocationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListStockCountSchedulesRequestObject struct {
+}
+
+type ListStockCountSchedulesResponseObject interface {
+	VisitListStockCountSchedulesResponse(w http.ResponseWriter) error
+}
+
+type ListStockCountSchedules200JSONResponse struct {
+	Items []StockCountSchedule `json:"items"`
+}
+
+func (response ListStockCountSchedules200JSONResponse) VisitListStockCountSchedulesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListStockCountSchedulesdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListStockCountSchedulesdefaultApplicationProblemPlusJSONResponse) VisitListStockCountSchedulesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateStockCountScheduleRequestObject struct {
+	Params CreateStockCountScheduleParams
+	Body   *CreateStockCountScheduleJSONRequestBody
+}
+
+type CreateStockCountScheduleResponseObject interface {
+	VisitCreateStockCountScheduleResponse(w http.ResponseWriter) error
+}
+
+type CreateStockCountSchedule201JSONResponse StockCountSchedule
+
+func (response CreateStockCountSchedule201JSONResponse) VisitCreateStockCountScheduleResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateStockCountScheduledefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response CreateStockCountScheduledefaultApplicationProblemPlusJSONResponse) VisitCreateStockCountScheduleResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateStockCountScheduleRequestObject struct {
+	Id     Id `json:"id"`
+	Params UpdateStockCountScheduleParams
+	Body   *UpdateStockCountScheduleJSONRequestBody
+}
+
+type UpdateStockCountScheduleResponseObject interface {
+	VisitUpdateStockCountScheduleResponse(w http.ResponseWriter) error
+}
+
+type UpdateStockCountSchedule200JSONResponse StockCountSchedule
+
+func (response UpdateStockCountSchedule200JSONResponse) VisitUpdateStockCountScheduleResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateStockCountScheduledefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response UpdateStockCountScheduledefaultApplicationProblemPlusJSONResponse) VisitUpdateStockCountScheduleResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListStockCountsRequestObject struct {
+	Params ListStockCountsParams
+}
+
+type ListStockCountsResponseObject interface {
+	VisitListStockCountsResponse(w http.ResponseWriter) error
+}
+
+type ListStockCounts200JSONResponse StockCountList
+
+func (response ListStockCounts200JSONResponse) VisitListStockCountsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListStockCountsdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListStockCountsdefaultApplicationProblemPlusJSONResponse) VisitListStockCountsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateStockCountsRequestObject struct {
+	Params CreateStockCountsParams
+	Body   *CreateStockCountsJSONRequestBody
+}
+
+type CreateStockCountsResponseObject interface {
+	VisitCreateStockCountsResponse(w http.ResponseWriter) error
+}
+
+type CreateStockCounts201JSONResponse struct {
+	Items []StockCountSummary `json:"items"`
+}
+
+func (response CreateStockCounts201JSONResponse) VisitCreateStockCountsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateStockCountsdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response CreateStockCountsdefaultApplicationProblemPlusJSONResponse) VisitCreateStockCountsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetStockCountRequestObject struct {
+	Id Id `json:"id"`
+}
+
+type GetStockCountResponseObject interface {
+	VisitGetStockCountResponse(w http.ResponseWriter) error
+}
+
+type GetStockCount200JSONResponse StockCount
+
+func (response GetStockCount200JSONResponse) VisitGetStockCountResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetStockCountdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetStockCountdefaultApplicationProblemPlusJSONResponse) VisitGetStockCountResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ActOnStockCountRequestObject struct {
+	Id     Id `json:"id"`
+	Params ActOnStockCountParams
+	Body   *ActOnStockCountJSONRequestBody
+}
+
+type ActOnStockCountResponseObject interface {
+	VisitActOnStockCountResponse(w http.ResponseWriter) error
+}
+
+type ActOnStockCount200JSONResponse StockCount
+
+func (response ActOnStockCount200JSONResponse) VisitActOnStockCountResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ActOnStockCountdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ActOnStockCountdefaultApplicationProblemPlusJSONResponse) VisitActOnStockCountResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SaveStockCountEntriesRequestObject struct {
+	Id     Id `json:"id"`
+	Params SaveStockCountEntriesParams
+	Body   *SaveStockCountEntriesJSONRequestBody
+}
+
+type SaveStockCountEntriesResponseObject interface {
+	VisitSaveStockCountEntriesResponse(w http.ResponseWriter) error
+}
+
+type SaveStockCountEntries200JSONResponse StockCount
+
+func (response SaveStockCountEntries200JSONResponse) VisitSaveStockCountEntriesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SaveStockCountEntriesdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response SaveStockCountEntriesdefaultApplicationProblemPlusJSONResponse) VisitSaveStockCountEntriesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListStockTransfersRequestObject struct {
+	Params ListStockTransfersParams
+}
+
+type ListStockTransfersResponseObject interface {
+	VisitListStockTransfersResponse(w http.ResponseWriter) error
+}
+
+type ListStockTransfers200JSONResponse StockTransferList
+
+func (response ListStockTransfers200JSONResponse) VisitListStockTransfersResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListStockTransfersdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListStockTransfersdefaultApplicationProblemPlusJSONResponse) VisitListStockTransfersResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateStockTransferRequestObject struct {
+	Params CreateStockTransferParams
+	Body   *CreateStockTransferJSONRequestBody
+}
+
+type CreateStockTransferResponseObject interface {
+	VisitCreateStockTransferResponse(w http.ResponseWriter) error
+}
+
+type CreateStockTransfer201JSONResponse StockTransfer
+
+func (response CreateStockTransfer201JSONResponse) VisitCreateStockTransferResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateStockTransferdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response CreateStockTransferdefaultApplicationProblemPlusJSONResponse) VisitCreateStockTransferResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListStockInTransitRequestObject struct {
+	Params ListStockInTransitParams
+}
+
+type ListStockInTransitResponseObject interface {
+	VisitListStockInTransitResponse(w http.ResponseWriter) error
+}
+
+type ListStockInTransit200JSONResponse StockInTransitList
+
+func (response ListStockInTransit200JSONResponse) VisitListStockInTransitResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListStockInTransitdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListStockInTransitdefaultApplicationProblemPlusJSONResponse) VisitListStockInTransitResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetStockTransferRequestObject struct {
+	Id Id `json:"id"`
+}
+
+type GetStockTransferResponseObject interface {
+	VisitGetStockTransferResponse(w http.ResponseWriter) error
+}
+
+type GetStockTransfer200JSONResponse StockTransfer
+
+func (response GetStockTransfer200JSONResponse) VisitGetStockTransferResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetStockTransferdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetStockTransferdefaultApplicationProblemPlusJSONResponse) VisitGetStockTransferResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateStockTransferRequestObject struct {
+	Id     Id `json:"id"`
+	Params UpdateStockTransferParams
+	Body   *UpdateStockTransferJSONRequestBody
+}
+
+type UpdateStockTransferResponseObject interface {
+	VisitUpdateStockTransferResponse(w http.ResponseWriter) error
+}
+
+type UpdateStockTransfer200JSONResponse StockTransfer
+
+func (response UpdateStockTransfer200JSONResponse) VisitUpdateStockTransferResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateStockTransferdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response UpdateStockTransferdefaultApplicationProblemPlusJSONResponse) VisitUpdateStockTransferResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ActOnStockTransferRequestObject struct {
+	Id     Id `json:"id"`
+	Params ActOnStockTransferParams
+	Body   *ActOnStockTransferJSONRequestBody
+}
+
+type ActOnStockTransferResponseObject interface {
+	VisitActOnStockTransferResponse(w http.ResponseWriter) error
+}
+
+type ActOnStockTransfer200JSONResponse StockTransfer
+
+func (response ActOnStockTransfer200JSONResponse) VisitActOnStockTransferResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ActOnStockTransferdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ActOnStockTransferdefaultApplicationProblemPlusJSONResponse) VisitActOnStockTransferResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
@@ -1967,6 +4838,15 @@ func (response RestoreWarehousedefaultApplicationProblemPlusJSONResponse) VisitR
 
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
+	// ListInbounds Antrian Inbound — barang Karantina per dokumen asal (WMS-02, WMS-09)
+	// (GET /api/v1/inbounds)
+	ListInbounds(ctx context.Context, request ListInboundsRequestObject) (ListInboundsResponseObject, error)
+	// GetInbound Detail Inbound beserta baris dan catatan QC
+	// (GET /api/v1/inbounds/{id})
+	GetInbound(ctx context.Context, request GetInboundRequestObject) (GetInboundResponseObject, error)
+	// RecordInboundQc QC satu baris Inbound (checklist, qty lulus/ditolak, foto, lokasi tujuan)
+	// (POST /api/v1/inbounds/{id}/lines/{lineId}/qc)
+	RecordInboundQc(ctx context.Context, request RecordInboundQcRequestObject) (RecordInboundQcResponseObject, error)
 	// ListLocations Daftar lokasi stok (internal dan eksternal)
 	// (GET /api/v1/locations)
 	ListLocations(ctx context.Context, request ListLocationsRequestObject) (ListLocationsResponseObject, error)
@@ -1985,6 +4865,48 @@ type StrictServerInterface interface {
 	// RestoreLocation Memulihkan lokasi yang dihapus (hanya Admin Sistem)
 	// (POST /api/v1/locations/{id}/restore)
 	RestoreLocation(ctx context.Context, request RestoreLocationRequestObject) (RestoreLocationResponseObject, error)
+	// ListStockCountSchedules Jadwal Stock Count (cycle count, konsinyasi/vending bulanan, penuh akhir tahun)
+	// (GET /api/v1/stock-count-schedules)
+	ListStockCountSchedules(ctx context.Context, request ListStockCountSchedulesRequestObject) (ListStockCountSchedulesResponseObject, error)
+	// CreateStockCountSchedule Membuat jadwal Stock Count
+	// (POST /api/v1/stock-count-schedules)
+	CreateStockCountSchedule(ctx context.Context, request CreateStockCountScheduleRequestObject) (CreateStockCountScheduleResponseObject, error)
+	// UpdateStockCountSchedule Mengubah jadwal Stock Count
+	// (PUT /api/v1/stock-count-schedules/{id})
+	UpdateStockCountSchedule(ctx context.Context, request UpdateStockCountScheduleRequestObject) (UpdateStockCountScheduleResponseObject, error)
+	// ListStockCounts Daftar Stock Count (Merchandiser hanya lokasi konsinyasi mitra yang ditugaskan)
+	// (GET /api/v1/stock-counts)
+	ListStockCounts(ctx context.Context, request ListStockCountsRequestObject) (ListStockCountsResponseObject, error)
+	// CreateStockCounts Membuat Stock Count Draft, satu dokumen per lokasi
+	// (POST /api/v1/stock-counts)
+	CreateStockCounts(ctx context.Context, request CreateStockCountsRequestObject) (CreateStockCountsResponseObject, error)
+	// GetStockCount Detail Stock Count (hitung buta — qty sistem dan selisih kosong sampai hasil dikirim)
+	// (GET /api/v1/stock-counts/{id})
+	GetStockCount(ctx context.Context, request GetStockCountRequestObject) (GetStockCountResponseObject, error)
+	// ActOnStockCount Aksi status Stock Count (start, submit, recount, cancel)
+	// (POST /api/v1/stock-counts/{id}/actions)
+	ActOnStockCount(ctx context.Context, request ActOnStockCountRequestObject) (ActOnStockCountResponseObject, error)
+	// SaveStockCountEntries Menyimpan isian hitung (autosave form HP), barang tambahan, dan foto
+	// (PUT /api/v1/stock-counts/{id}/entries)
+	SaveStockCountEntries(ctx context.Context, request SaveStockCountEntriesRequestObject) (SaveStockCountEntriesResponseObject, error)
+	// ListStockTransfers Daftar Transfer Stok atau Permintaan Petty Stock
+	// (GET /api/v1/stock-transfers)
+	ListStockTransfers(ctx context.Context, request ListStockTransfersRequestObject) (ListStockTransfersResponseObject, error)
+	// CreateStockTransfer Membuat Transfer Stok / Permintaan Petty Stock berstatus Draft
+	// (POST /api/v1/stock-transfers)
+	CreateStockTransfer(ctx context.Context, request CreateStockTransferRequestObject) (CreateStockTransferResponseObject, error)
+	// ListStockInTransit Stok dalam Pengiriman — baris transfer yang belum diterima penuh (WMS-10)
+	// (GET /api/v1/stock-transfers/in-transit)
+	ListStockInTransit(ctx context.Context, request ListStockInTransitRequestObject) (ListStockInTransitResponseObject, error)
+	// GetStockTransfer Detail transfer
+	// (GET /api/v1/stock-transfers/{id})
+	GetStockTransfer(ctx context.Context, request GetStockTransferRequestObject) (GetStockTransferResponseObject, error)
+	// UpdateStockTransfer Mengubah transfer Draft
+	// (PUT /api/v1/stock-transfers/{id})
+	UpdateStockTransfer(ctx context.Context, request UpdateStockTransferRequestObject) (UpdateStockTransferResponseObject, error)
+	// ActOnStockTransfer Aksi status transfer (submit, release, prepare, post, ship, receive, complete, cancel)
+	// (POST /api/v1/stock-transfers/{id}/actions)
+	ActOnStockTransfer(ctx context.Context, request ActOnStockTransferRequestObject) (ActOnStockTransferResponseObject, error)
 	// ListWarehouses Daftar gudang fisik
 	// (GET /api/v1/warehouses)
 	ListWarehouses(ctx context.Context, request ListWarehousesRequestObject) (ListWarehousesResponseObject, error)
@@ -2042,6 +4964,93 @@ type strictHandler struct {
 	ssi         StrictServerInterface
 	middlewares []StrictMiddlewareFunc
 	options     StrictHTTPServerOptions
+}
+
+// ListInbounds operation middleware
+func (sh *strictHandler) ListInbounds(w http.ResponseWriter, r *http.Request, params ListInboundsParams) {
+	var request ListInboundsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListInbounds(ctx, request.(ListInboundsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListInbounds")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListInboundsResponseObject); ok {
+		if err := validResponse.VisitListInboundsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetInbound operation middleware
+func (sh *strictHandler) GetInbound(w http.ResponseWriter, r *http.Request, id Id) {
+	var request GetInboundRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetInbound(ctx, request.(GetInboundRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetInbound")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetInboundResponseObject); ok {
+		if err := validResponse.VisitGetInboundResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// RecordInboundQc operation middleware
+func (sh *strictHandler) RecordInboundQc(w http.ResponseWriter, r *http.Request, id Id, lineId openapi_types.UUID, params RecordInboundQcParams) {
+	var request RecordInboundQcRequestObject
+
+	request.Id = id
+	request.LineId = lineId
+	request.Params = params
+
+	var body RecordInboundQcJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.RecordInboundQc(ctx, request.(RecordInboundQcRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RecordInboundQc")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(RecordInboundQcResponseObject); ok {
+		if err := validResponse.VisitRecordInboundQcResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
 }
 
 // ListLocations operation middleware
@@ -2210,6 +5219,429 @@ func (sh *strictHandler) RestoreLocation(w http.ResponseWriter, r *http.Request,
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(RestoreLocationResponseObject); ok {
 		if err := validResponse.VisitRestoreLocationResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListStockCountSchedules operation middleware
+func (sh *strictHandler) ListStockCountSchedules(w http.ResponseWriter, r *http.Request) {
+	var request ListStockCountSchedulesRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListStockCountSchedules(ctx, request.(ListStockCountSchedulesRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListStockCountSchedules")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListStockCountSchedulesResponseObject); ok {
+		if err := validResponse.VisitListStockCountSchedulesResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreateStockCountSchedule operation middleware
+func (sh *strictHandler) CreateStockCountSchedule(w http.ResponseWriter, r *http.Request, params CreateStockCountScheduleParams) {
+	var request CreateStockCountScheduleRequestObject
+
+	request.Params = params
+
+	var body CreateStockCountScheduleJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CreateStockCountSchedule(ctx, request.(CreateStockCountScheduleRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateStockCountSchedule")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreateStockCountScheduleResponseObject); ok {
+		if err := validResponse.VisitCreateStockCountScheduleResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateStockCountSchedule operation middleware
+func (sh *strictHandler) UpdateStockCountSchedule(w http.ResponseWriter, r *http.Request, id Id, params UpdateStockCountScheduleParams) {
+	var request UpdateStockCountScheduleRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body UpdateStockCountScheduleJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateStockCountSchedule(ctx, request.(UpdateStockCountScheduleRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateStockCountSchedule")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdateStockCountScheduleResponseObject); ok {
+		if err := validResponse.VisitUpdateStockCountScheduleResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListStockCounts operation middleware
+func (sh *strictHandler) ListStockCounts(w http.ResponseWriter, r *http.Request, params ListStockCountsParams) {
+	var request ListStockCountsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListStockCounts(ctx, request.(ListStockCountsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListStockCounts")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListStockCountsResponseObject); ok {
+		if err := validResponse.VisitListStockCountsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreateStockCounts operation middleware
+func (sh *strictHandler) CreateStockCounts(w http.ResponseWriter, r *http.Request, params CreateStockCountsParams) {
+	var request CreateStockCountsRequestObject
+
+	request.Params = params
+
+	var body CreateStockCountsJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CreateStockCounts(ctx, request.(CreateStockCountsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateStockCounts")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreateStockCountsResponseObject); ok {
+		if err := validResponse.VisitCreateStockCountsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetStockCount operation middleware
+func (sh *strictHandler) GetStockCount(w http.ResponseWriter, r *http.Request, id Id) {
+	var request GetStockCountRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetStockCount(ctx, request.(GetStockCountRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetStockCount")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetStockCountResponseObject); ok {
+		if err := validResponse.VisitGetStockCountResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ActOnStockCount operation middleware
+func (sh *strictHandler) ActOnStockCount(w http.ResponseWriter, r *http.Request, id Id, params ActOnStockCountParams) {
+	var request ActOnStockCountRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body ActOnStockCountJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ActOnStockCount(ctx, request.(ActOnStockCountRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ActOnStockCount")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ActOnStockCountResponseObject); ok {
+		if err := validResponse.VisitActOnStockCountResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// SaveStockCountEntries operation middleware
+func (sh *strictHandler) SaveStockCountEntries(w http.ResponseWriter, r *http.Request, id Id, params SaveStockCountEntriesParams) {
+	var request SaveStockCountEntriesRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body SaveStockCountEntriesJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.SaveStockCountEntries(ctx, request.(SaveStockCountEntriesRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "SaveStockCountEntries")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(SaveStockCountEntriesResponseObject); ok {
+		if err := validResponse.VisitSaveStockCountEntriesResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListStockTransfers operation middleware
+func (sh *strictHandler) ListStockTransfers(w http.ResponseWriter, r *http.Request, params ListStockTransfersParams) {
+	var request ListStockTransfersRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListStockTransfers(ctx, request.(ListStockTransfersRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListStockTransfers")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListStockTransfersResponseObject); ok {
+		if err := validResponse.VisitListStockTransfersResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreateStockTransfer operation middleware
+func (sh *strictHandler) CreateStockTransfer(w http.ResponseWriter, r *http.Request, params CreateStockTransferParams) {
+	var request CreateStockTransferRequestObject
+
+	request.Params = params
+
+	var body CreateStockTransferJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CreateStockTransfer(ctx, request.(CreateStockTransferRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateStockTransfer")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreateStockTransferResponseObject); ok {
+		if err := validResponse.VisitCreateStockTransferResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListStockInTransit operation middleware
+func (sh *strictHandler) ListStockInTransit(w http.ResponseWriter, r *http.Request, params ListStockInTransitParams) {
+	var request ListStockInTransitRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListStockInTransit(ctx, request.(ListStockInTransitRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListStockInTransit")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListStockInTransitResponseObject); ok {
+		if err := validResponse.VisitListStockInTransitResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetStockTransfer operation middleware
+func (sh *strictHandler) GetStockTransfer(w http.ResponseWriter, r *http.Request, id Id) {
+	var request GetStockTransferRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetStockTransfer(ctx, request.(GetStockTransferRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetStockTransfer")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetStockTransferResponseObject); ok {
+		if err := validResponse.VisitGetStockTransferResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateStockTransfer operation middleware
+func (sh *strictHandler) UpdateStockTransfer(w http.ResponseWriter, r *http.Request, id Id, params UpdateStockTransferParams) {
+	var request UpdateStockTransferRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body UpdateStockTransferJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateStockTransfer(ctx, request.(UpdateStockTransferRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateStockTransfer")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdateStockTransferResponseObject); ok {
+		if err := validResponse.VisitUpdateStockTransferResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ActOnStockTransfer operation middleware
+func (sh *strictHandler) ActOnStockTransfer(w http.ResponseWriter, r *http.Request, id Id, params ActOnStockTransferParams) {
+	var request ActOnStockTransferRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body ActOnStockTransferJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ActOnStockTransfer(ctx, request.(ActOnStockTransferRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ActOnStockTransfer")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ActOnStockTransferResponseObject); ok {
+		if err := validResponse.VisitActOnStockTransferResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

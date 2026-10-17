@@ -10,6 +10,7 @@ import (
 
 	"balans/internal/inventory"
 	"balans/internal/platform/actor"
+	"balans/internal/platform/apperr"
 	"balans/internal/platform/clock"
 	"balans/internal/warehouse"
 )
@@ -97,6 +98,19 @@ func (a *App) seedDevStock(ctx context.Context) error {
 		if _, err := a.inventory.Post(ctx, p); err != nil && !errors.Is(err, inventory.ErrAlreadyPosted) {
 			return fmt.Errorf("seed stok %s: %w", p.Source.Type, err)
 		}
+	}
+	// Antrian Inbound contoh untuk batch Vanila yang masih Karantina (Gudang › Inbound).
+	inb := location["UTAMA-INB"]
+	_, err = a.warehouse.InboundBySource(ctx, opening.Source.Type, opening.Source.ID)
+	if apperr.HasCode(err, apperr.CodeNotFound) {
+		_, err = a.warehouse.CreateInbound(ctx, warehouse.InboundRequest{
+			SourceType: opening.Source.Type, SourceID: opening.Source.ID, SourceLabel: opening.Source.Label, LocationID: &inb,
+			BusinessDate: opening.Source.BusinessDate,
+			Lines:        []warehouse.InboundLineInput{{ProductID: vanila, Qty: decimal.NewFromInt(60)}},
+		})
+	}
+	if err != nil && !apperr.HasCode(err, apperr.CodeProviderUnavailable) {
+		return fmt.Errorf("seed inbound: %w", err)
 	}
 	return nil
 }
