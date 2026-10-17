@@ -21,8 +21,10 @@ type LocationType string
 const (
 	LocationInbound       LocationType = "inbound"
 	LocationFinishedGoods LocationType = "finished_goods"
-	// LocationEcommerce adalah E-commerce Stock (Petty Stock) yang dikelola Fulfillment.
+	// LocationEcommerce adalah E-commerce Stock: stok untuk order marketplace.
 	LocationEcommerce LocationType = "ecommerce"
+	// LocationPettyStock adalah Petty Stock yang dikelola Fulfillment, diisi lewat permintaan dari FG Non-Ecommerce (WMS-03).
+	LocationPettyStock LocationType = "petty_stock"
 	// LocationRawMaterial adalah lokasi RM (packaging) di Gudang GM.
 	LocationRawMaterial LocationType = "raw_material"
 	// LocationGoodsMaterial adalah lokasi GM (barang jadi menunggu reprocess) di Gudang GM.
@@ -39,7 +41,7 @@ const (
 )
 
 var locationLabels = map[LocationType]string{
-	LocationInbound: "Inbound", LocationFinishedGoods: "FG Non-Ecommerce", LocationEcommerce: "E-commerce Stock",
+	LocationInbound: "Inbound", LocationFinishedGoods: "FG Non-Ecommerce", LocationEcommerce: "E-commerce Stock", LocationPettyStock: "Petty Stock",
 	LocationRawMaterial: "RM", LocationGoodsMaterial: "GM", LocationReturns: "Retur", LocationEvent: "Event",
 	LocationTollManufacturer: "Maklon", LocationConsignment: "Konsinyasi", LocationVendingBuffer: "Buffer Vending",
 	LocationVendingMachine: "Mesin Vending",
@@ -60,7 +62,7 @@ func (t LocationType) IsExternal() bool { return len(AllowedPartyTypes(t)) > 0 }
 // Sellable memeriksa apakah stok di lokasi jenis ini bisa dialokasikan ke penjualan.
 func (t LocationType) Sellable() bool {
 	switch t {
-	case LocationFinishedGoods, LocationEcommerce, LocationConsignment, LocationVendingMachine:
+	case LocationFinishedGoods, LocationEcommerce, LocationPettyStock, LocationConsignment, LocationVendingMachine:
 		return true
 	}
 	return false

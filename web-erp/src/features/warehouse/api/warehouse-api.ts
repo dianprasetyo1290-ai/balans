@@ -37,6 +37,7 @@ export const INTERNAL_LOCATION_TYPES: { type: LocationType; label: string }[] =
     { type: "inbound", label: "Inbound" },
     { type: "finished_goods", label: "FG Non-Ecommerce" },
     { type: "ecommerce", label: "E-commerce Stock" },
+    { type: "petty_stock", label: "Petty Stock" },
     { type: "raw_material", label: "RM" },
     { type: "goods_material", label: "GM" },
     { type: "returns", label: "Retur" },

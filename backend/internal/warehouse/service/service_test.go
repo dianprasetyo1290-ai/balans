@@ -103,10 +103,10 @@ func TestCreateWarehouseCreatesStandardLocations(t *testing.T) {
 	w, locs, err := h.svc.CreateWarehouse(h.head, domain.WarehouseInput{Code: "utama", Name: "Gudang Utama", Address: "Jl. Raya 1", IsActive: true})
 	require.NoError(t, err)
 	assert.Equal(t, "UTAMA", w.Code)
-	require.Len(t, locs, 6)
+	require.Len(t, locs, 7)
 
 	list := h.locations(service.LocationFilter{WarehouseID: &w.ID})
-	assert.Equal(t, []string{"UTAMA-INB", "UTAMA-FG", "UTAMA-ECM", "UTAMA-RM", "UTAMA-GM", "UTAMA-RET"}, codes(list))
+	assert.Equal(t, []string{"UTAMA-INB", "UTAMA-FG", "UTAMA-ECM", "UTAMA-PTY", "UTAMA-RM", "UTAMA-GM", "UTAMA-RET"}, codes(list))
 	for _, l := range list {
 		assert.True(t, l.IsStandard)
 		assert.Equal(t, "Gudang Utama", l.WarehouseName)
@@ -267,7 +267,7 @@ func TestDeleteAndRestoreWarehouseCascades(t *testing.T) {
 	w, err = h.svc.RestoreWarehouse(h.admin, w.ID)
 	require.NoError(t, err)
 	assert.False(t, w.Deleted())
-	assert.Equal(t, []string{"UTAMA-INB", "UTAMA-FG", "UTAMA-ECM", "UTAMA-RM", "UTAMA-GM", "UTAMA-RET"},
+	assert.Equal(t, []string{"UTAMA-INB", "UTAMA-FG", "UTAMA-ECM", "UTAMA-PTY", "UTAMA-RM", "UTAMA-GM", "UTAMA-RET"},
 		codes(h.locations(service.LocationFilter{WarehouseID: &w.ID})))
 	assert.Equal(t, []string{"create", "delete", "restore"}, h.auditActions(locs[0].ID))
 	assert.Equal(t, []string{"create", "delete", "restore"}, h.auditActions(w.ID))
@@ -288,5 +288,5 @@ func TestSeedDevIsIdempotent(t *testing.T) {
 	h := setup(t)
 	require.NoError(t, h.svc.SeedDev(context.Background()))
 	require.NoError(t, h.svc.SeedDev(context.Background()))
-	assert.Len(t, h.locations(service.LocationFilter{}), 6)
+	assert.Len(t, h.locations(service.LocationFilter{}), 7)
 }

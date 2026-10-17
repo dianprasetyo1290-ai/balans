@@ -99,7 +99,7 @@ function WarehouseForm({ onOpenChange, warehouse }: WarehouseFormDialogProps) {
         <DialogDescription>
           {warehouse
             ? "Kode gudang tidak bisa diubah."
-            : "Lokasi Inbound, FG Non-Ecommerce, E-commerce Stock (Petty Stock), RM, GM, dan Gudang Retur dibuat otomatis."}
+            : "Lokasi Inbound, FG Non-Ecommerce, E-commerce Stock, Petty Stock, RM, GM, dan Gudang Retur dibuat otomatis."}
         </DialogDescription>
       </DialogHeader>
       <form

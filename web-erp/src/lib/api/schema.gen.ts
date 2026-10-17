@@ -975,7 +975,7 @@ export interface paths {
     put?: never
     /**
      * Membuat gudang fisik beserta lokasi standarnya (MD-09, F1-114)
-     * @description Lokasi Inbound, FG Non-Ecommerce, E-commerce Stock (Petty Stock), RM, GM (Gudang GM), dan Gudang Retur dibuat
+     * @description Lokasi Inbound, FG Non-Ecommerce, E-commerce Stock, Petty Stock, RM, GM (Gudang GM), dan Gudang Retur dibuat
      *     otomatis dengan kode `<kode gudang>-INB/FG/ECM/RM/GM/RET` (U-08). Kode gudang unik permanen.
      */
     post: operations["createWarehouse"]
@@ -2569,7 +2569,7 @@ export interface components {
     WarehouseUpdate: components["schemas"]["WarehouseFields"] &
       components["schemas"]["VersionInput"]
     /**
-     * @description Di dalam gudang: `inbound`, `finished_goods` (FG Non-Ecommerce), `ecommerce` (E-commerce Stock / Petty Stock),
+     * @description Di dalam gudang: `inbound`, `finished_goods` (FG Non-Ecommerce), `ecommerce` (E-commerce Stock), `petty_stock` (Petty Stock),
      *     `raw_material` (RM), `goods_material` (GM), `returns`, `event`. Eksternal: `toll_manufacturer` (maklon),
      *     `consignment`, `vending_buffer`, `vending_machine`.
      * @enum {string}
@@ -2578,6 +2578,7 @@ export interface components {
       | "inbound"
       | "finished_goods"
       | "ecommerce"
+      | "petty_stock"
       | "raw_material"
       | "goods_material"
       | "returns"

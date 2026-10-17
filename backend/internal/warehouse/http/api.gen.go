@@ -163,6 +163,7 @@ const (
 	LocationTypeFinishedGoods    LocationType = "finished_goods"
 	LocationTypeGoodsMaterial    LocationType = "goods_material"
 	LocationTypeInbound          LocationType = "inbound"
+	LocationTypePettyStock       LocationType = "petty_stock"
 	LocationTypeRawMaterial      LocationType = "raw_material"
 	LocationTypeReturns          LocationType = "returns"
 	LocationTypeTollManufacturer LocationType = "toll_manufacturer"
@@ -184,6 +185,8 @@ func (e LocationType) Valid() bool {
 	case LocationTypeGoodsMaterial:
 		return true
 	case LocationTypeInbound:
+		return true
+	case LocationTypePettyStock:
 		return true
 	case LocationTypeRawMaterial:
 		return true
@@ -245,7 +248,7 @@ type Location struct {
 	// IsStandard Lokasi standar dibuat otomatis bersama gudang dan ikut terhapus/dipulihkan bersama gudang.
 	IsStandard bool `json:"isStandard"`
 
-	// LocationType Di dalam gudang: `inbound`, `finished_goods` (FG Non-Ecommerce), `ecommerce` (E-commerce Stock / Petty Stock),
+	// LocationType Di dalam gudang: `inbound`, `finished_goods` (FG Non-Ecommerce), `ecommerce` (E-commerce Stock), `petty_stock` (Petty Stock),
 	// `raw_material` (RM), `goods_material` (GM), `returns`, `event`. Eksternal: `toll_manufacturer` (maklon),
 	// `consignment`, `vending_buffer`, `vending_machine`.
 	LocationType      LocationType        `json:"locationType"`
@@ -266,7 +269,7 @@ type LocationInput struct {
 	ExternalPartyType *ExternalPartyType  `json:"externalPartyType,omitempty"`
 	IsActive          bool                `json:"isActive"`
 
-	// LocationType Di dalam gudang: `inbound`, `finished_goods` (FG Non-Ecommerce), `ecommerce` (E-commerce Stock / Petty Stock),
+	// LocationType Di dalam gudang: `inbound`, `finished_goods` (FG Non-Ecommerce), `ecommerce` (E-commerce Stock), `petty_stock` (Petty Stock),
 	// `raw_material` (RM), `goods_material` (GM), `returns`, `event`. Eksternal: `toll_manufacturer` (maklon),
 	// `consignment`, `vending_buffer`, `vending_machine`.
 	LocationType LocationType `json:"locationType"`
@@ -285,7 +288,7 @@ type LocationList struct {
 	TotalPages int        `json:"totalPages"`
 }
 
-// LocationType Di dalam gudang: `inbound`, `finished_goods` (FG Non-Ecommerce), `ecommerce` (E-commerce Stock / Petty Stock),
+// LocationType Di dalam gudang: `inbound`, `finished_goods` (FG Non-Ecommerce), `ecommerce` (E-commerce Stock), `petty_stock` (Petty Stock),
 // `raw_material` (RM), `goods_material` (GM), `returns`, `event`. Eksternal: `toll_manufacturer` (maklon),
 // `consignment`, `vending_buffer`, `vending_machine`.
 type LocationType string

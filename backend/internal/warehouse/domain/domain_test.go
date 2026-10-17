@@ -66,15 +66,16 @@ func TestStandardLocations(t *testing.T) {
 		assert.True(t, l.IsActive)
 		assert.False(t, l.IsExternal())
 	}
-	assert.Equal(t, []string{"UTAMA-INB", "UTAMA-FG", "UTAMA-ECM", "UTAMA-RM", "UTAMA-GM", "UTAMA-RET"}, codes)
+	assert.Equal(t, []string{"UTAMA-INB", "UTAMA-FG", "UTAMA-ECM", "UTAMA-PTY", "UTAMA-RM", "UTAMA-GM", "UTAMA-RET"}, codes)
 	assert.Equal(t, []domain.LocationType{
-		domain.LocationInbound, domain.LocationFinishedGoods, domain.LocationEcommerce, domain.LocationRawMaterial,
+		domain.LocationInbound, domain.LocationFinishedGoods, domain.LocationEcommerce, domain.LocationPettyStock, domain.LocationRawMaterial,
 		domain.LocationGoodsMaterial, domain.LocationReturns,
 	}, types)
 	assert.True(t, locs[1].IsSellable, "FG Non-Ecommerce bisa dijual")
 	assert.True(t, locs[2].IsSellable, "E-commerce Stock bisa dijual")
 	assert.False(t, locs[0].IsSellable, "Inbound (karantina) tidak bisa dijual")
-	assert.Equal(t, "E-commerce Stock (Petty Stock)", locs[2].Name)
+	assert.Equal(t, "E-commerce Stock", locs[2].Name)
+	assert.Equal(t, "Petty Stock", locs[3].Name)
 	assert.True(t, apperr.HasCode(locs[0].CanDelete(), apperr.CodeInvalidStateTransition))
 }
 

@@ -71,7 +71,7 @@ func (w *Warehouse) set(in WarehouseInput, fields map[string]string) {
 }
 
 // standardLocations adalah lokasi yang dibuat otomatis untuk setiap gudang baru (PRD F1-114, BRD U-08).
-// E-commerce Stock dan Petty Stock adalah lokasi yang sama (Glosarium BRD); RM dan GM adalah lokasi di Gudang GM.
+// E-commerce Stock dan Petty Stock adalah lokasi terpisah (keputusan PO, PRD F1-114); RM dan GM adalah lokasi di Gudang GM.
 var standardLocations = []struct {
 	suffix string
 	name   string
@@ -79,7 +79,8 @@ var standardLocations = []struct {
 }{
 	{"INB", "Inbound", LocationInbound},
 	{"FG", "FG Non-Ecommerce", LocationFinishedGoods},
-	{"ECM", "E-commerce Stock (Petty Stock)", LocationEcommerce},
+	{"ECM", "E-commerce Stock", LocationEcommerce},
+	{"PTY", "Petty Stock", LocationPettyStock},
 	{"RM", "Gudang GM – RM", LocationRawMaterial},
 	{"GM", "Gudang GM – GM", LocationGoodsMaterial},
 	{"RET", "Gudang Retur", LocationReturns},
