@@ -1,5 +1,6 @@
-# Override staging: sumber daya kecil (total ± 1 GB) agar tidak berebut dengan production, plus Mailpit
-# untuk email mock (Technical Guideline 5.10, 14.1). Staging dapat dihentikan saat production butuh sumber daya.
+# Override staging: sumber daya kecil (total ± 1 GB, Runbook 8.1) agar tidak berebut dengan production, plus
+# Mailpit untuk email mock (Technical Guideline 5.10, 14.1). Staging dapat dihentikan saat production butuh
+# sumber daya. mem_limit = memswap_limit (tanpa swap); cpus adalah plafon.
 
 services:
   postgres:
@@ -8,13 +9,38 @@ services:
       - -c
       - shared_buffers=128MB
       - -c
+      - effective_cache_size=256MB
+      - -c
+      - work_mem=4MB
+      - -c
+      - maintenance_work_mem=64MB
+      - -c
       - max_connections=40
+      - -c
+      - max_parallel_workers_per_gather=0
+      - -c
+      - random_page_cost=1.1
+      - -c
+      - jit=off
+      - -c
+      - log_min_duration_statement=1000
     mem_limit: 512m
+    memswap_limit: 512m
+    cpus: 1.0
+
+  migrate:
+    environment:
+      GOMEMLIMIT: 160MiB
+    mem_limit: 192m
+    memswap_limit: 192m
+    cpus: 0.5
 
   api:
     environment:
       GOMEMLIMIT: 200MiB
     mem_limit: 256m
+    memswap_limit: 256m
+    cpus: 1.0
     networks:
       edge:
         aliases: [staging-api]
@@ -23,9 +49,13 @@ services:
     environment:
       GOMEMLIMIT: 160MiB
     mem_limit: 192m
+    memswap_limit: 192m
+    cpus: 0.5
 
   web:
     mem_limit: 64m
+    memswap_limit: 64m
+    cpus: 0.25
     networks:
       edge:
         aliases: [staging-web]
@@ -37,6 +67,8 @@ services:
       MP_MAX_MESSAGES: "2000"
     restart: unless-stopped
     mem_limit: 64m
+    memswap_limit: 64m
+    cpus: 0.25
     networks:
       internal:
         aliases: [mailpit]

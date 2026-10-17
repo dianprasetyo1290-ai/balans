@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Menjalankan backup-now setiap hari pukul BACKUP_HOUR_WIB (default 01) dan melapor ke monitor heartbeat.
-# Jika heartbeat tidak diterima, monitor eksternal mengirim alert "backup gagal" (Technical Guideline 13).
+# Menjalankan backup-now (database) lalu backup-files (folder filestore) setiap hari pukul BACKUP_HOUR_WIB
+# (default 01) dan melapor ke monitor heartbeat. Heartbeat sukses hanya dikirim jika keduanya berhasil; jika
+# heartbeat tidak diterima, monitor eksternal mengirim alert "backup gagal" (Technical Guideline 13).
 set -uo pipefail
 
 hour="${BACKUP_HOUR_WIB:-01}"
@@ -28,10 +29,12 @@ while true; do
   sleep "$wait_for"
 
   ping_heartbeat "/start"
-  if backup-now; then
+  ok=true
+  backup-now || { echo "backup-loop: BACKUP DATABASE GAGAL"; ok=false; }
+  backup-files || { echo "backup-loop: BACKUP FILE GAGAL"; ok=false; }
+  if $ok; then
     ping_heartbeat ""
   else
-    echo "backup-loop: BACKUP GAGAL"
     ping_heartbeat "/fail"
   fi
 done
