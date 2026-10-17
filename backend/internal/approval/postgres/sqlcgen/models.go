@@ -261,6 +261,46 @@ type CostLayerConsumption struct {
 	CreatedBy       uuid.UUID
 }
 
+type CreditNote struct {
+	ID                   uuid.UUID
+	Number               string
+	SalesReturnID        uuid.UUID
+	InvoiceID            uuid.NullUUID
+	PartyType            string
+	PartyID              uuid.UUID
+	PartyName            string
+	ChannelID            uuid.UUID
+	SubChannelID         uuid.UUID
+	SettlementMethod     string
+	IssueDate            clock.BusinessDate
+	Amount               decimal.Decimal
+	AppliedAmount        decimal.Decimal
+	RefundedAmount       decimal.Decimal
+	Status               string
+	DecisionNote         string
+	RefundDate           pgtype.Date
+	RefundAccountCode    string
+	RefundReference      string
+	RefundJournalEntryID uuid.NullUUID
+	CreatedAt            time.Time
+	CreatedBy            uuid.UUID
+	UpdatedAt            time.Time
+	UpdatedBy            uuid.UUID
+	Version              int32
+	DeletedAt            *time.Time
+	DeletedBy            uuid.NullUUID
+}
+
+type CreditNoteApplication struct {
+	ID           uuid.UUID
+	CreditNoteID uuid.UUID
+	InvoiceID    uuid.UUID
+	Amount       decimal.Decimal
+	AppliedDate  clock.BusinessDate
+	CreatedAt    time.Time
+	CreatedBy    uuid.UUID
+}
+
 type Customer struct {
 	ID                      uuid.UUID
 	Code                    string
@@ -1920,6 +1960,84 @@ type SalesOrderLine struct {
 	GrossAmount        decimal.Decimal
 	LineTotalAmount    decimal.Decimal
 	Note               string
+}
+
+type SalesReturn struct {
+	ID                   uuid.UUID
+	Number               pgtype.Text
+	SalesOrderID         uuid.UUID
+	InvoiceID            uuid.NullUUID
+	OrderType            string
+	ChannelID            uuid.UUID
+	SubChannelID         uuid.UUID
+	PartyType            string
+	PartyID              uuid.NullUUID
+	PartyName            string
+	SourceLocationID     uuid.UUID
+	ReturnDate           clock.BusinessDate
+	SettlementMethod     string
+	RequiresVerification bool
+	Note                 string
+	SendBackNote         string
+	VerifiedBy           uuid.NullUUID
+	VerifiedAt           *time.Time
+	VerifyNote           string
+	PickupRequired       bool
+	PickupUserID         uuid.NullUUID
+	PickupAssignedAt     *time.Time
+	PickedUpAt           *time.Time
+	PickupNote           string
+	PickupFileIds        []uuid.UUID
+	ReceivedBy           uuid.NullUUID
+	ReceivedAt           *time.Time
+	ReceiveNote          string
+	DocumentationFileIds []uuid.UUID
+	InboundID            uuid.NullUUID
+	InboundNumber        string
+	ReturnAmount         decimal.Decimal
+	CostAmount           decimal.Decimal
+	Status               string
+	CancelReason         string
+	PostedAt             *time.Time
+	JournalEntryID       uuid.NullUUID
+	CreatedAt            time.Time
+	CreatedBy            uuid.UUID
+	UpdatedAt            time.Time
+	UpdatedBy            uuid.UUID
+	Version              int32
+	DeletedAt            *time.Time
+	DeletedBy            uuid.NullUUID
+}
+
+type SalesReturnItem struct {
+	ID                uuid.UUID
+	SalesReturnID     uuid.UUID
+	SalesReturnLineID uuid.UUID
+	AllocationID      uuid.UUID
+	ProductID         uuid.UUID
+	BatchID           uuid.NullUUID
+	Qty               decimal.Decimal
+	UnitCost          decimal.Decimal
+	CostAmount        decimal.Decimal
+	PassedQty         decimal.Decimal
+	RejectedQty       decimal.Decimal
+	QcDone            bool
+}
+
+type SalesReturnLine struct {
+	ID               uuid.UUID
+	SalesReturnID    uuid.UUID
+	LineNo           int32
+	SalesOrderLineID uuid.UUID
+	ProductID        uuid.UUID
+	BatchID          uuid.NullUUID
+	Qty              decimal.Decimal
+	ReturnReasonID   uuid.UUID
+	UnitPriceAmount  decimal.Decimal
+	LineAmount       decimal.Decimal
+	OriginalUnitCost decimal.Decimal
+	CostAmount       decimal.Decimal
+	Note             string
 }
 
 type SalesShipment struct {

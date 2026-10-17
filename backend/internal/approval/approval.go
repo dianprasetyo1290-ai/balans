@@ -63,6 +63,7 @@ const (
 	SubjectPurchaseReturn            = domain.SubjectPurchaseReturn
 	SubjectPettyCashReplenishment    = domain.SubjectPettyCashReplenishment
 	SubjectFiscalPeriodReopen        = domain.SubjectFiscalPeriodReopen
+	SubjectSalesRefund               = domain.SubjectSalesRefund
 
 	// ConditionHasDisposal: dokumen memuat baris pemusnahan.
 	ConditionHasDisposal = domain.ConditionHasDisposal

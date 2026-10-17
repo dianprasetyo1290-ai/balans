@@ -17,6 +17,72 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
+// Defines values for CreditNoteAllowedActions.
+const (
+	CreditNoteAllowedActionsApply     CreditNoteAllowedActions = "apply"
+	CreditNoteAllowedActionsPayRefund CreditNoteAllowedActions = "pay_refund"
+	CreditNoteAllowedActionsPrint     CreditNoteAllowedActions = "print"
+)
+
+// Valid indicates whether the value is a known member of the CreditNoteAllowedActions enum.
+func (e CreditNoteAllowedActions) Valid() bool {
+	switch e {
+	case CreditNoteAllowedActionsApply:
+		return true
+	case CreditNoteAllowedActionsPayRefund:
+		return true
+	case CreditNoteAllowedActionsPrint:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for CreditNoteSettlement.
+const (
+	CreditNoteSettlementCreditNote CreditNoteSettlement = "credit_note"
+	CreditNoteSettlementRefund     CreditNoteSettlement = "refund"
+)
+
+// Valid indicates whether the value is a known member of the CreditNoteSettlement enum.
+func (e CreditNoteSettlement) Valid() bool {
+	switch e {
+	case CreditNoteSettlementCreditNote:
+		return true
+	case CreditNoteSettlementRefund:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for CreditNoteStatus.
+const (
+	CreditNoteStatusAwaitingPayment CreditNoteStatus = "awaiting_payment"
+	CreditNoteStatusCompleted       CreditNoteStatus = "completed"
+	CreditNoteStatusPaid            CreditNoteStatus = "paid"
+	CreditNoteStatusPendingApproval CreditNoteStatus = "pending_approval"
+	CreditNoteStatusPosted          CreditNoteStatus = "posted"
+)
+
+// Valid indicates whether the value is a known member of the CreditNoteStatus enum.
+func (e CreditNoteStatus) Valid() bool {
+	switch e {
+	case CreditNoteStatusAwaitingPayment:
+		return true
+	case CreditNoteStatusCompleted:
+		return true
+	case CreditNoteStatusPaid:
+		return true
+	case CreditNoteStatusPendingApproval:
+		return true
+	case CreditNoteStatusPosted:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for CustomerPaymentAllowedActions.
 const (
 	CustomerPaymentAllowedActionsCancel CustomerPaymentAllowedActions = "cancel"
@@ -307,43 +373,43 @@ func (e SalesChannelOptionKind) Valid() bool {
 
 // Defines values for SalesDocumentStatus.
 const (
-	AwaitingPayment SalesDocumentStatus = "awaiting_payment"
-	Cancelled       SalesDocumentStatus = "cancelled"
-	Completed       SalesDocumentStatus = "completed"
-	Draft           SalesDocumentStatus = "draft"
-	Expired         SalesDocumentStatus = "expired"
-	InProgress      SalesDocumentStatus = "in_progress"
-	InTransit       SalesDocumentStatus = "in_transit"
-	Paid            SalesDocumentStatus = "paid"
-	PartiallyPaid   SalesDocumentStatus = "partially_paid"
-	PendingApproval SalesDocumentStatus = "pending_approval"
-	Posted          SalesDocumentStatus = "posted"
+	SalesDocumentStatusAwaitingPayment SalesDocumentStatus = "awaiting_payment"
+	SalesDocumentStatusCancelled       SalesDocumentStatus = "cancelled"
+	SalesDocumentStatusCompleted       SalesDocumentStatus = "completed"
+	SalesDocumentStatusDraft           SalesDocumentStatus = "draft"
+	SalesDocumentStatusExpired         SalesDocumentStatus = "expired"
+	SalesDocumentStatusInProgress      SalesDocumentStatus = "in_progress"
+	SalesDocumentStatusInTransit       SalesDocumentStatus = "in_transit"
+	SalesDocumentStatusPaid            SalesDocumentStatus = "paid"
+	SalesDocumentStatusPartiallyPaid   SalesDocumentStatus = "partially_paid"
+	SalesDocumentStatusPendingApproval SalesDocumentStatus = "pending_approval"
+	SalesDocumentStatusPosted          SalesDocumentStatus = "posted"
 )
 
 // Valid indicates whether the value is a known member of the SalesDocumentStatus enum.
 func (e SalesDocumentStatus) Valid() bool {
 	switch e {
-	case AwaitingPayment:
+	case SalesDocumentStatusAwaitingPayment:
 		return true
-	case Cancelled:
+	case SalesDocumentStatusCancelled:
 		return true
-	case Completed:
+	case SalesDocumentStatusCompleted:
 		return true
-	case Draft:
+	case SalesDocumentStatusDraft:
 		return true
-	case Expired:
+	case SalesDocumentStatusExpired:
 		return true
-	case InProgress:
+	case SalesDocumentStatusInProgress:
 		return true
-	case InTransit:
+	case SalesDocumentStatusInTransit:
 		return true
-	case Paid:
+	case SalesDocumentStatusPaid:
 		return true
-	case PartiallyPaid:
+	case SalesDocumentStatusPartiallyPaid:
 		return true
-	case PendingApproval:
+	case SalesDocumentStatusPendingApproval:
 		return true
-	case Posted:
+	case SalesDocumentStatusPosted:
 		return true
 	default:
 		return false
@@ -397,25 +463,25 @@ func (e SalesOrderAllowedActions) Valid() bool {
 
 // Defines values for SalesOrderType.
 const (
-	B2b            SalesOrderType = "b2b"
-	Employee       SalesOrderType = "employee"
-	Marketplace    SalesOrderType = "marketplace"
-	ModernTrade    SalesOrderType = "modern_trade"
-	SocialCommerce SalesOrderType = "social_commerce"
+	SalesOrderTypeB2b            SalesOrderType = "b2b"
+	SalesOrderTypeEmployee       SalesOrderType = "employee"
+	SalesOrderTypeMarketplace    SalesOrderType = "marketplace"
+	SalesOrderTypeModernTrade    SalesOrderType = "modern_trade"
+	SalesOrderTypeSocialCommerce SalesOrderType = "social_commerce"
 )
 
 // Valid indicates whether the value is a known member of the SalesOrderType enum.
 func (e SalesOrderType) Valid() bool {
 	switch e {
-	case B2b:
+	case SalesOrderTypeB2b:
 		return true
-	case Employee:
+	case SalesOrderTypeEmployee:
 		return true
-	case Marketplace:
+	case SalesOrderTypeMarketplace:
 		return true
-	case ModernTrade:
+	case SalesOrderTypeModernTrade:
 		return true
-	case SocialCommerce:
+	case SalesOrderTypeSocialCommerce:
 		return true
 	default:
 		return false
@@ -458,10 +524,285 @@ func (e SalesPaymentMode) Valid() bool {
 	}
 }
 
+// Defines values for SalesReturnAllowedActions.
+const (
+	SalesReturnAllowedActionsAssignPickup SalesReturnAllowedActions = "assign_pickup"
+	SalesReturnAllowedActionsCancel       SalesReturnAllowedActions = "cancel"
+	SalesReturnAllowedActionsEdit         SalesReturnAllowedActions = "edit"
+	SalesReturnAllowedActionsReceive      SalesReturnAllowedActions = "receive"
+	SalesReturnAllowedActionsRecordPickup SalesReturnAllowedActions = "record_pickup"
+	SalesReturnAllowedActionsSendBack     SalesReturnAllowedActions = "send_back"
+	SalesReturnAllowedActionsSubmit       SalesReturnAllowedActions = "submit"
+	SalesReturnAllowedActionsVerify       SalesReturnAllowedActions = "verify"
+)
+
+// Valid indicates whether the value is a known member of the SalesReturnAllowedActions enum.
+func (e SalesReturnAllowedActions) Valid() bool {
+	switch e {
+	case SalesReturnAllowedActionsAssignPickup:
+		return true
+	case SalesReturnAllowedActionsCancel:
+		return true
+	case SalesReturnAllowedActionsEdit:
+		return true
+	case SalesReturnAllowedActionsReceive:
+		return true
+	case SalesReturnAllowedActionsRecordPickup:
+		return true
+	case SalesReturnAllowedActionsSendBack:
+		return true
+	case SalesReturnAllowedActionsSubmit:
+		return true
+	case SalesReturnAllowedActionsVerify:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for SalesReturnSettlement.
+const (
+	SalesReturnSettlementCreditNote  SalesReturnSettlement = "credit_note"
+	SalesReturnSettlementMarketplace SalesReturnSettlement = "marketplace"
+	SalesReturnSettlementRefund      SalesReturnSettlement = "refund"
+)
+
+// Valid indicates whether the value is a known member of the SalesReturnSettlement enum.
+func (e SalesReturnSettlement) Valid() bool {
+	switch e {
+	case SalesReturnSettlementCreditNote:
+		return true
+	case SalesReturnSettlementMarketplace:
+		return true
+	case SalesReturnSettlementRefund:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for SalesReturnStatus.
+const (
+	SalesReturnStatusCancelled  SalesReturnStatus = "cancelled"
+	SalesReturnStatusDraft      SalesReturnStatus = "draft"
+	SalesReturnStatusInProgress SalesReturnStatus = "in_progress"
+	SalesReturnStatusPosted     SalesReturnStatus = "posted"
+	SalesReturnStatusSubmitted  SalesReturnStatus = "submitted"
+	SalesReturnStatusVerified   SalesReturnStatus = "verified"
+)
+
+// Valid indicates whether the value is a known member of the SalesReturnStatus enum.
+func (e SalesReturnStatus) Valid() bool {
+	switch e {
+	case SalesReturnStatusCancelled:
+		return true
+	case SalesReturnStatusDraft:
+		return true
+	case SalesReturnStatusInProgress:
+		return true
+	case SalesReturnStatusPosted:
+		return true
+	case SalesReturnStatusSubmitted:
+		return true
+	case SalesReturnStatusVerified:
+		return true
+	default:
+		return false
+	}
+}
+
 // BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
 //
 // Example: 2026-10-19
 type BusinessDate = openapi_types.Date
+
+// CreditNote defines model for CreditNote.
+type CreditNote struct {
+	AllowedActions []CreditNoteAllowedActions `json:"allowedActions"`
+
+	// Amount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Amount       Money                   `json:"amount"`
+	Applications []CreditNoteApplication `json:"applications"`
+
+	// AppliedAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	AppliedAmount Money               `json:"appliedAmount"`
+	CreatedAt     time.Time           `json:"createdAt"`
+	DecisionNote  string              `json:"decisionNote"`
+	Id            openapi_types.UUID  `json:"id"`
+	InvoiceId     *openapi_types.UUID `json:"invoiceId,omitempty"`
+	InvoiceNumber *string             `json:"invoiceNumber,omitempty"`
+
+	// IssueDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	IssueDate BusinessDate `json:"issueDate"`
+	Number    string       `json:"number"`
+
+	// OpenInvoices Invoice terbuka pihak yang sama (pilihan alokasi saat saldo masih ada).
+	OpenInvoices []CreditNoteOpenInvoice `json:"openInvoices"`
+	PartyId      openapi_types.UUID      `json:"partyId"`
+	PartyName    string                  `json:"partyName"`
+
+	// PartyType Jenis pihak invoice/pembayaran.
+	PartyType            SalesPartyType      `json:"partyType"`
+	RefundAccountCode    string              `json:"refundAccountCode"`
+	RefundDate           *BusinessDate       `json:"refundDate,omitempty"`
+	RefundJournalEntryId *openapi_types.UUID `json:"refundJournalEntryId,omitempty"`
+	RefundReference      string              `json:"refundReference"`
+
+	// RefundedAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	RefundedAmount Money `json:"refundedAmount"`
+
+	// RemainingAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	RemainingAmount   Money                `json:"remainingAmount"`
+	SalesReturnId     openapi_types.UUID   `json:"salesReturnId"`
+	SalesReturnNumber string               `json:"salesReturnNumber"`
+	SettlementMethod  CreditNoteSettlement `json:"settlementMethod"`
+
+	// Status `posted` ada saldo, `completed` saldo habis teralokasi, refund: `pending_approval` → `awaiting_payment` → `paid`.
+	Status  CreditNoteStatus `json:"status"`
+	Version int              `json:"version"`
+}
+
+// CreditNoteAllowedActions defines model for CreditNote.AllowedActions.
+type CreditNoteAllowedActions string
+
+// CreditNoteAllocationInput defines model for CreditNoteAllocationInput.
+type CreditNoteAllocationInput struct {
+	// Amount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Amount    Money              `json:"amount"`
+	InvoiceId openapi_types.UUID `json:"invoiceId"`
+}
+
+// CreditNoteApplication defines model for CreditNoteApplication.
+type CreditNoteApplication struct {
+	// Amount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Amount Money `json:"amount"`
+
+	// AppliedDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	AppliedDate   BusinessDate       `json:"appliedDate"`
+	Id            openapi_types.UUID `json:"id"`
+	InvoiceId     openapi_types.UUID `json:"invoiceId"`
+	InvoiceNumber string             `json:"invoiceNumber"`
+}
+
+// CreditNoteApplyInput defines model for CreditNoteApplyInput.
+type CreditNoteApplyInput struct {
+	Allocations []CreditNoteAllocationInput `json:"allocations"`
+	Version     int                         `json:"version"`
+}
+
+// CreditNoteList defines model for CreditNoteList.
+type CreditNoteList struct {
+	Items      []CreditNoteSummary `json:"items"`
+	Page       int                 `json:"page"`
+	PageSize   int                 `json:"pageSize"`
+	TotalItems int64               `json:"totalItems"`
+	TotalPages int                 `json:"totalPages"`
+}
+
+// CreditNoteOpenInvoice defines model for CreditNoteOpenInvoice.
+type CreditNoteOpenInvoice struct {
+	// DueDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	DueDate BusinessDate       `json:"dueDate"`
+	Id      openapi_types.UUID `json:"id"`
+
+	// InvoiceDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	InvoiceDate BusinessDate `json:"invoiceDate"`
+	Number      string       `json:"number"`
+
+	// OutstandingAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	OutstandingAmount Money `json:"outstandingAmount"`
+
+	// TotalAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	TotalAmount Money `json:"totalAmount"`
+}
+
+// CreditNoteRefundInput defines model for CreditNoteRefundInput.
+type CreditNoteRefundInput struct {
+	// AccountCode Kode akun Kas & Bank sumber pembayaran.
+	AccountCode string `json:"accountCode"`
+
+	// PaymentDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	PaymentDate BusinessDate `json:"paymentDate"`
+	Reference   *string      `json:"reference,omitempty"`
+	Version     int          `json:"version"`
+}
+
+// CreditNoteSettlement defines model for CreditNoteSettlement.
+type CreditNoteSettlement string
+
+// CreditNoteStatus `posted` ada saldo, `completed` saldo habis teralokasi, refund: `pending_approval` → `awaiting_payment` → `paid`.
+type CreditNoteStatus string
+
+// CreditNoteSummary defines model for CreditNoteSummary.
+type CreditNoteSummary struct {
+	// Amount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Amount Money `json:"amount"`
+
+	// AppliedAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	AppliedAmount Money               `json:"appliedAmount"`
+	CreatedAt     time.Time           `json:"createdAt"`
+	Id            openapi_types.UUID  `json:"id"`
+	InvoiceId     *openapi_types.UUID `json:"invoiceId,omitempty"`
+	InvoiceNumber *string             `json:"invoiceNumber,omitempty"`
+
+	// IssueDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	IssueDate BusinessDate       `json:"issueDate"`
+	Number    string             `json:"number"`
+	PartyId   openapi_types.UUID `json:"partyId"`
+	PartyName string             `json:"partyName"`
+
+	// PartyType Jenis pihak invoice/pembayaran.
+	PartyType SalesPartyType `json:"partyType"`
+
+	// RefundedAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	RefundedAmount Money `json:"refundedAmount"`
+
+	// RemainingAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	RemainingAmount   Money                `json:"remainingAmount"`
+	SalesReturnId     openapi_types.UUID   `json:"salesReturnId"`
+	SalesReturnNumber string               `json:"salesReturnNumber"`
+	SettlementMethod  CreditNoteSettlement `json:"settlementMethod"`
+
+	// Status `posted` ada saldo, `completed` saldo habis teralokasi, refund: `pending_approval` → `awaiting_payment` → `paid`.
+	Status  CreditNoteStatus `json:"status"`
+	Version int              `json:"version"`
+}
 
 // CustomerPayment defines model for CustomerPayment.
 type CustomerPayment struct {
@@ -1419,6 +1760,409 @@ type SalesProductRef struct {
 // Example: 12.000
 type SalesQuantity = string
 
+// SalesReturn defines model for SalesReturn.
+type SalesReturn struct {
+	AllowedActions []SalesReturnAllowedActions `json:"allowedActions"`
+	CancelReason   string                      `json:"cancelReason"`
+
+	// CostAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	CostAmount         Money                     `json:"costAmount"`
+	CreatedAt          time.Time                 `json:"createdAt"`
+	CreatedByName      string                    `json:"createdByName"`
+	CreditNote         *SalesReturnCreditNoteRef `json:"creditNote,omitempty"`
+	DocumentationFiles []SalesReturnFile         `json:"documentationFiles"`
+	Id                 openapi_types.UUID        `json:"id"`
+	InboundId          *openapi_types.UUID       `json:"inboundId,omitempty"`
+	InboundNumber      *string                   `json:"inboundNumber,omitempty"`
+	InvoiceId          *openapi_types.UUID       `json:"invoiceId,omitempty"`
+	InvoiceNumber      *string                   `json:"invoiceNumber,omitempty"`
+	JournalEntryId     *openapi_types.UUID       `json:"journalEntryId,omitempty"`
+	Lines              []SalesReturnLine         `json:"lines"`
+	Note               string                    `json:"note"`
+	Number             *string                   `json:"number,omitempty"`
+
+	// OrderType Jenis pesanan (satu model Sales Order untuk semua channel): `modern_trade` MT beli putus, `b2b` B2B/corporate,
+	// `social_commerce` WhatsApp/Instagram, `marketplace` penjualan marketplace, `employee` penjualan karyawan.
+	OrderType            SalesOrderType      `json:"orderType"`
+	PartyName            string              `json:"partyName"`
+	PickedUpAt           *time.Time          `json:"pickedUpAt,omitempty"`
+	PickupAssignedAt     *time.Time          `json:"pickupAssignedAt,omitempty"`
+	PickupFiles          []SalesReturnFile   `json:"pickupFiles"`
+	PickupNote           string              `json:"pickupNote"`
+	PickupRequired       bool                `json:"pickupRequired"`
+	PickupUserId         *openapi_types.UUID `json:"pickupUserId,omitempty"`
+	PickupUserName       *string             `json:"pickupUserName,omitempty"`
+	PostedAt             *time.Time          `json:"postedAt,omitempty"`
+	ReceiveNote          string              `json:"receiveNote"`
+	ReceivedAt           *time.Time          `json:"receivedAt,omitempty"`
+	ReceivedByName       *string             `json:"receivedByName,omitempty"`
+	RequiresVerification bool                `json:"requiresVerification"`
+
+	// ReturnAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	ReturnAmount Money `json:"returnAmount"`
+
+	// ReturnDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	ReturnDate       BusinessDate       `json:"returnDate"`
+	SalesOrderId     openapi_types.UUID `json:"salesOrderId"`
+	SalesOrderNumber string             `json:"salesOrderNumber"`
+	SendBackNote     string             `json:"sendBackNote"`
+
+	// SettlementMethod `credit_note` nota kredit (mengurangi piutang invoice asal, sisanya untuk invoice berikutnya), `refund`
+	// dibayar kembali (approval Head F&A), `marketplace` mengurangi Piutang Marketplace 121x.
+	SettlementMethod SalesReturnSettlement `json:"settlementMethod"`
+
+	// Status Status Retur Penjualan (Desain Status Dokumen 5.5).
+	Status         SalesReturnStatus `json:"status"`
+	VerifiedAt     *time.Time        `json:"verifiedAt,omitempty"`
+	VerifiedByName *string           `json:"verifiedByName,omitempty"`
+	VerifyNote     string            `json:"verifyNote"`
+	Version        int               `json:"version"`
+}
+
+// SalesReturnAllowedActions defines model for SalesReturn.AllowedActions.
+type SalesReturnAllowedActions string
+
+// SalesReturnAssignPickupInput defines model for SalesReturnAssignPickupInput.
+type SalesReturnAssignPickupInput struct {
+	PickupUserId openapi_types.UUID `json:"pickupUserId"`
+	Version      int                `json:"version"`
+}
+
+// SalesReturnBatchOption defines model for SalesReturnBatchOption.
+type SalesReturnBatchOption struct {
+	Id     openapi_types.UUID `json:"id"`
+	Number string             `json:"number"`
+}
+
+// SalesReturnCreditNoteRef defines model for SalesReturnCreditNoteRef.
+type SalesReturnCreditNoteRef struct {
+	// Amount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Amount Money              `json:"amount"`
+	Id     openapi_types.UUID `json:"id"`
+	Number string             `json:"number"`
+
+	// RemainingAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	RemainingAmount  Money                `json:"remainingAmount"`
+	SettlementMethod CreditNoteSettlement `json:"settlementMethod"`
+
+	// Status `posted` ada saldo, `completed` saldo habis teralokasi, refund: `pending_approval` → `awaiting_payment` → `paid`.
+	Status CreditNoteStatus `json:"status"`
+}
+
+// SalesReturnFields defines model for SalesReturnFields.
+type SalesReturnFields struct {
+	Lines []SalesReturnLineInput `json:"lines"`
+	Note  *string                `json:"note,omitempty"`
+
+	// ReturnDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	ReturnDate BusinessDate `json:"returnDate"`
+
+	// SettlementMethod `credit_note` nota kredit (mengurangi piutang invoice asal, sisanya untuk invoice berikutnya), `refund`
+	// dibayar kembali (approval Head F&A), `marketplace` mengurangi Piutang Marketplace 121x.
+	SettlementMethod *SalesReturnSettlement `json:"settlementMethod,omitempty"`
+}
+
+// SalesReturnFile defines model for SalesReturnFile.
+type SalesReturnFile struct {
+	Id   openapi_types.UUID `json:"id"`
+	Name string             `json:"name"`
+}
+
+// SalesReturnInput defines model for SalesReturnInput.
+type SalesReturnInput struct {
+	Lines []SalesReturnLineInput `json:"lines"`
+	Note  *string                `json:"note,omitempty"`
+
+	// ReturnDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	ReturnDate   BusinessDate       `json:"returnDate"`
+	SalesOrderId openapi_types.UUID `json:"salesOrderId"`
+
+	// SettlementMethod `credit_note` nota kredit (mengurangi piutang invoice asal, sisanya untuk invoice berikutnya), `refund`
+	// dibayar kembali (approval Head F&A), `marketplace` mengurangi Piutang Marketplace 121x.
+	SettlementMethod *SalesReturnSettlement `json:"settlementMethod,omitempty"`
+}
+
+// SalesReturnLine defines model for SalesReturnLine.
+type SalesReturnLine struct {
+	BatchId     *openapi_types.UUID `json:"batchId,omitempty"`
+	BatchNumber *string             `json:"batchNumber,omitempty"`
+
+	// CostAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	CostAmount Money              `json:"costAmount"`
+	Id         openapi_types.UUID `json:"id"`
+
+	// LineAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	LineAmount Money  `json:"lineAmount"`
+	LineNo     int    `json:"lineNo"`
+	Note       string `json:"note"`
+
+	// PassedQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 12.000
+	PassedQty SalesQuantity   `json:"passedQty"`
+	Product   SalesProductRef `json:"product"`
+	QcDone    bool            `json:"qcDone"`
+
+	// Qty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 12.000
+	Qty SalesQuantity `json:"qty"`
+
+	// RejectedQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 12.000
+	RejectedQty      SalesQuantity        `json:"rejectedQty"`
+	ReturnReason     SalesReturnReasonRef `json:"returnReason"`
+	SalesOrderLineId openapi_types.UUID   `json:"salesOrderLineId"`
+	UnitCost         string               `json:"unitCost"`
+
+	// UnitPrice Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	UnitPrice Money `json:"unitPrice"`
+}
+
+// SalesReturnLineInput defines model for SalesReturnLineInput.
+type SalesReturnLineInput struct {
+	BatchId *openapi_types.UUID `json:"batchId,omitempty"`
+	Note    *string             `json:"note,omitempty"`
+
+	// Qty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 12.000
+	Qty              SalesQuantity      `json:"qty"`
+	ReturnReasonId   openapi_types.UUID `json:"returnReasonId"`
+	SalesOrderLineId openapi_types.UUID `json:"salesOrderLineId"`
+}
+
+// SalesReturnList defines model for SalesReturnList.
+type SalesReturnList struct {
+	Items      []SalesReturnSummary `json:"items"`
+	Page       int                  `json:"page"`
+	PageSize   int                  `json:"pageSize"`
+	TotalItems int64                `json:"totalItems"`
+	TotalPages int                  `json:"totalPages"`
+}
+
+// SalesReturnNoteInput defines model for SalesReturnNoteInput.
+type SalesReturnNoteInput struct {
+	Note    string `json:"note"`
+	Version int    `json:"version"`
+}
+
+// SalesReturnPickupInput defines model for SalesReturnPickupInput.
+type SalesReturnPickupInput struct {
+	Note         *string              `json:"note,omitempty"`
+	PhotoFileIds []openapi_types.UUID `json:"photoFileIds"`
+	Version      int                  `json:"version"`
+}
+
+// SalesReturnPickupUser defines model for SalesReturnPickupUser.
+type SalesReturnPickupUser struct {
+	Id   openapi_types.UUID `json:"id"`
+	Name string             `json:"name"`
+}
+
+// SalesReturnPickupUserList defines model for SalesReturnPickupUserList.
+type SalesReturnPickupUserList struct {
+	Items []SalesReturnPickupUser `json:"items"`
+}
+
+// SalesReturnReasonRef defines model for SalesReturnReasonRef.
+type SalesReturnReasonRef struct {
+	Code               string             `json:"code"`
+	DefaultDisposition *ReturnDisposition `json:"defaultDisposition,omitempty"`
+	Id                 openapi_types.UUID `json:"id"`
+	Name               string             `json:"name"`
+}
+
+// SalesReturnReceiveInput defines model for SalesReturnReceiveInput.
+type SalesReturnReceiveInput struct {
+	// DocumentationFileIds Foto barang dan form retur yang ditandatangani.
+	DocumentationFileIds []openapi_types.UUID `json:"documentationFileIds"`
+
+	// Lines Qty hasil cek ulang bila kurang dari qty retur (baris lain tetap).
+	Lines   *[]SalesReturnReceivedQty `json:"lines,omitempty"`
+	Note    *string                   `json:"note,omitempty"`
+	Version int                       `json:"version"`
+}
+
+// SalesReturnReceivedQty defines model for SalesReturnReceivedQty.
+type SalesReturnReceivedQty struct {
+	LineId openapi_types.UUID `json:"lineId"`
+
+	// Qty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 12.000
+	Qty SalesQuantity `json:"qty"`
+}
+
+// SalesReturnSettlement `credit_note` nota kredit (mengurangi piutang invoice asal, sisanya untuk invoice berikutnya), `refund`
+// dibayar kembali (approval Head F&A), `marketplace` mengurangi Piutang Marketplace 121x.
+type SalesReturnSettlement string
+
+// SalesReturnSource defines model for SalesReturnSource.
+type SalesReturnSource struct {
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate       `json:"businessDate"`
+	Id           openapi_types.UUID `json:"id"`
+	Number       string             `json:"number"`
+
+	// OrderType Jenis pesanan (satu model Sales Order untuk semua channel): `modern_trade` MT beli putus, `b2b` B2B/corporate,
+	// `social_commerce` WhatsApp/Instagram, `marketplace` penjualan marketplace, `employee` penjualan karyawan.
+	OrderType SalesOrderType `json:"orderType"`
+	PartyName string         `json:"partyName"`
+
+	// Status Status Sales Order, Proforma Invoice, Invoice, dan pembayaran pelanggan (Desain Status Dokumen 1).
+	Status SalesDocumentStatus `json:"status"`
+
+	// TotalAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	TotalAmount Money `json:"totalAmount"`
+}
+
+// SalesReturnSourceDetail defines model for SalesReturnSourceDetail.
+type SalesReturnSourceDetail struct {
+	InvoiceNumber *string               `json:"invoiceNumber,omitempty"`
+	Lines         []SalesReturnableLine `json:"lines"`
+	Order         SalesReturnSource     `json:"order"`
+
+	// RequiresVerification Retur dari mitra (MT/reseller) diverifikasi Logistik Leader sebelum barang diambil.
+	RequiresVerification bool `json:"requiresVerification"`
+}
+
+// SalesReturnSourceList defines model for SalesReturnSourceList.
+type SalesReturnSourceList struct {
+	Items []SalesReturnSource `json:"items"`
+}
+
+// SalesReturnStatus Status Retur Penjualan (Desain Status Dokumen 5.5).
+type SalesReturnStatus string
+
+// SalesReturnSummary defines model for SalesReturnSummary.
+type SalesReturnSummary struct {
+	// CostAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	CostAmount    Money               `json:"costAmount"`
+	CreatedAt     time.Time           `json:"createdAt"`
+	Id            openapi_types.UUID  `json:"id"`
+	InboundNumber *string             `json:"inboundNumber,omitempty"`
+	InvoiceId     *openapi_types.UUID `json:"invoiceId,omitempty"`
+	InvoiceNumber *string             `json:"invoiceNumber,omitempty"`
+	Number        *string             `json:"number,omitempty"`
+
+	// OrderType Jenis pesanan (satu model Sales Order untuk semua channel): `modern_trade` MT beli putus, `b2b` B2B/corporate,
+	// `social_commerce` WhatsApp/Instagram, `marketplace` penjualan marketplace, `employee` penjualan karyawan.
+	OrderType            SalesOrderType      `json:"orderType"`
+	PartyName            string              `json:"partyName"`
+	PickupRequired       bool                `json:"pickupRequired"`
+	PickupUserId         *openapi_types.UUID `json:"pickupUserId,omitempty"`
+	RequiresVerification bool                `json:"requiresVerification"`
+
+	// ReturnAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	ReturnAmount Money `json:"returnAmount"`
+
+	// ReturnDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	ReturnDate       BusinessDate       `json:"returnDate"`
+	SalesOrderId     openapi_types.UUID `json:"salesOrderId"`
+	SalesOrderNumber string             `json:"salesOrderNumber"`
+
+	// SettlementMethod `credit_note` nota kredit (mengurangi piutang invoice asal, sisanya untuk invoice berikutnya), `refund`
+	// dibayar kembali (approval Head F&A), `marketplace` mengurangi Piutang Marketplace 121x.
+	SettlementMethod SalesReturnSettlement `json:"settlementMethod"`
+
+	// Status Status Retur Penjualan (Desain Status Dokumen 5.5).
+	Status  SalesReturnStatus `json:"status"`
+	Version int               `json:"version"`
+}
+
+// SalesReturnUpdate defines model for SalesReturnUpdate.
+type SalesReturnUpdate struct {
+	Lines []SalesReturnLineInput `json:"lines"`
+	Note  *string                `json:"note,omitempty"`
+
+	// ReturnDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	ReturnDate BusinessDate `json:"returnDate"`
+
+	// SettlementMethod `credit_note` nota kredit (mengurangi piutang invoice asal, sisanya untuk invoice berikutnya), `refund`
+	// dibayar kembali (approval Head F&A), `marketplace` mengurangi Piutang Marketplace 121x.
+	SettlementMethod *SalesReturnSettlement `json:"settlementMethod,omitempty"`
+
+	// Version Versi terakhir yang dilihat user (optimistic locking).
+	Version int `json:"version"`
+}
+
+// SalesReturnVerifyInput defines model for SalesReturnVerifyInput.
+type SalesReturnVerifyInput struct {
+	Note           *string `json:"note,omitempty"`
+	PickupRequired bool    `json:"pickupRequired"`
+	Version        int     `json:"version"`
+}
+
+// SalesReturnableLine defines model for SalesReturnableLine.
+type SalesReturnableLine struct {
+	// AvailableQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 12.000
+	AvailableQty SalesQuantity            `json:"availableQty"`
+	Batches      []SalesReturnBatchOption `json:"batches"`
+	IsBundle     bool                     `json:"isBundle"`
+	LineNo       int                      `json:"lineNo"`
+
+	// OrderedQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 12.000
+	OrderedQty SalesQuantity   `json:"orderedQty"`
+	Product    SalesProductRef `json:"product"`
+
+	// ReturnedQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 12.000
+	ReturnedQty      SalesQuantity      `json:"returnedQty"`
+	SalesOrderLineId openapi_types.UUID `json:"salesOrderLineId"`
+
+	// ShippedQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 12.000
+	ShippedQty SalesQuantity `json:"shippedQty"`
+
+	// UnitCost HPP asal per unit (4 desimal).
+	UnitCost string `json:"unitCost"`
+
+	// UnitPrice Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	UnitPrice Money `json:"unitPrice"`
+}
+
 // SalesShareText defines model for SalesShareText.
 type SalesShareText struct {
 	Text string `json:"text"`
@@ -1496,6 +2240,29 @@ type DeleteReturnReasonParams struct {
 
 // UpdateReturnReasonParams defines parameters for UpdateReturnReason.
 type UpdateReturnReasonParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// ListCreditNotesParams defines parameters for ListCreditNotes.
+type ListCreditNotesParams struct {
+	Page             *Page                 `form:"page,omitempty" json:"page,omitempty"`
+	PageSize         *PageSize             `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+	Q                *Search               `form:"q,omitempty" json:"q,omitempty"`
+	Status           *[]CreditNoteStatus   `form:"status,omitempty" json:"status,omitempty"`
+	PartyType        *SalesPartyType       `form:"partyType,omitempty" json:"partyType,omitempty"`
+	PartyId          *openapi_types.UUID   `form:"partyId,omitempty" json:"partyId,omitempty"`
+	SettlementMethod *CreditNoteSettlement `form:"settlementMethod,omitempty" json:"settlementMethod,omitempty"`
+}
+
+// ApplyCreditNoteParams defines parameters for ApplyCreditNote.
+type ApplyCreditNoteParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// PayCreditNoteRefundParams defines parameters for PayCreditNoteRefund.
+type PayCreditNoteRefundParams struct {
 	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
 	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
 }
@@ -1614,11 +2381,89 @@ type GetReceivableAgingParams struct {
 	PartyType *SalesPartyType `form:"partyType,omitempty" json:"partyType,omitempty"`
 }
 
+// ListSalesReturnSourcesParams defines parameters for ListSalesReturnSources.
+type ListSalesReturnSourcesParams struct {
+	Q *Search `form:"q,omitempty" json:"q,omitempty"`
+}
+
+// ListSalesReturnsParams defines parameters for ListSalesReturns.
+type ListSalesReturnsParams struct {
+	Page         *Page                `form:"page,omitempty" json:"page,omitempty"`
+	PageSize     *PageSize            `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+	Q            *Search              `form:"q,omitempty" json:"q,omitempty"`
+	Status       *[]SalesReturnStatus `form:"status,omitempty" json:"status,omitempty"`
+	SalesOrderId *openapi_types.UUID  `form:"salesOrderId,omitempty" json:"salesOrderId,omitempty"`
+	PartyId      *openapi_types.UUID  `form:"partyId,omitempty" json:"partyId,omitempty"`
+
+	// AssignedToMe Hanya retur yang ditugaskan pickup ke user ini (Merchandiser).
+	AssignedToMe *bool `form:"assignedToMe,omitempty" json:"assignedToMe,omitempty"`
+}
+
+// CreateSalesReturnParams defines parameters for CreateSalesReturn.
+type CreateSalesReturnParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// UpdateSalesReturnParams defines parameters for UpdateSalesReturn.
+type UpdateSalesReturnParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// AssignSalesReturnPickupParams defines parameters for AssignSalesReturnPickup.
+type AssignSalesReturnPickupParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// CancelSalesReturnParams defines parameters for CancelSalesReturn.
+type CancelSalesReturnParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// RecordSalesReturnPickupParams defines parameters for RecordSalesReturnPickup.
+type RecordSalesReturnPickupParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// ReceiveSalesReturnParams defines parameters for ReceiveSalesReturn.
+type ReceiveSalesReturnParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// SendBackSalesReturnParams defines parameters for SendBackSalesReturn.
+type SendBackSalesReturnParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// SubmitSalesReturnParams defines parameters for SubmitSalesReturn.
+type SubmitSalesReturnParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// VerifySalesReturnParams defines parameters for VerifySalesReturn.
+type VerifySalesReturnParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
 // CreateReturnReasonJSONRequestBody defines body for CreateReturnReason for application/json ContentType.
 type CreateReturnReasonJSONRequestBody = ReturnReasonInput
 
 // UpdateReturnReasonJSONRequestBody defines body for UpdateReturnReason for application/json ContentType.
 type UpdateReturnReasonJSONRequestBody = ReturnReasonUpdate
+
+// ApplyCreditNoteJSONRequestBody defines body for ApplyCreditNote for application/json ContentType.
+type ApplyCreditNoteJSONRequestBody = CreditNoteApplyInput
+
+// PayCreditNoteRefundJSONRequestBody defines body for PayCreditNoteRefund for application/json ContentType.
+type PayCreditNoteRefundJSONRequestBody = CreditNoteRefundInput
 
 // CreateCustomerPaymentJSONRequestBody defines body for CreateCustomerPayment for application/json ContentType.
 type CreateCustomerPaymentJSONRequestBody = CustomerPaymentInput
@@ -1644,6 +2489,33 @@ type UploadSalesOrderPaymentProofJSONRequestBody = SalesPaymentProofInput
 // ConfirmProformaPaymentJSONRequestBody defines body for ConfirmProformaPayment for application/json ContentType.
 type ConfirmProformaPaymentJSONRequestBody = ProformaPaymentInput
 
+// CreateSalesReturnJSONRequestBody defines body for CreateSalesReturn for application/json ContentType.
+type CreateSalesReturnJSONRequestBody = SalesReturnInput
+
+// UpdateSalesReturnJSONRequestBody defines body for UpdateSalesReturn for application/json ContentType.
+type UpdateSalesReturnJSONRequestBody = SalesReturnUpdate
+
+// AssignSalesReturnPickupJSONRequestBody defines body for AssignSalesReturnPickup for application/json ContentType.
+type AssignSalesReturnPickupJSONRequestBody = SalesReturnAssignPickupInput
+
+// CancelSalesReturnJSONRequestBody defines body for CancelSalesReturn for application/json ContentType.
+type CancelSalesReturnJSONRequestBody = SalesCancelInput
+
+// RecordSalesReturnPickupJSONRequestBody defines body for RecordSalesReturnPickup for application/json ContentType.
+type RecordSalesReturnPickupJSONRequestBody = SalesReturnPickupInput
+
+// ReceiveSalesReturnJSONRequestBody defines body for ReceiveSalesReturn for application/json ContentType.
+type ReceiveSalesReturnJSONRequestBody = SalesReturnReceiveInput
+
+// SendBackSalesReturnJSONRequestBody defines body for SendBackSalesReturn for application/json ContentType.
+type SendBackSalesReturnJSONRequestBody = SalesReturnNoteInput
+
+// SubmitSalesReturnJSONRequestBody defines body for SubmitSalesReturn for application/json ContentType.
+type SubmitSalesReturnJSONRequestBody = VersionInput
+
+// VerifySalesReturnJSONRequestBody defines body for VerifySalesReturn for application/json ContentType.
+type VerifySalesReturnJSONRequestBody = SalesReturnVerifyInput
+
 // ReceiveMidtransWebhookJSONRequestBody defines body for ReceiveMidtransWebhook for application/json ContentType.
 type ReceiveMidtransWebhookJSONRequestBody = MidtransNotification
 
@@ -1667,6 +2539,18 @@ type ServerInterface interface {
 	// ListSalesChannelOptions Channel & sub-channel aktif untuk form pesanan
 	// (GET /api/v1/sales/channel-options)
 	ListSalesChannelOptions(w http.ResponseWriter, r *http.Request)
+	// ListCreditNotes Daftar Nota Kredit
+	// (GET /api/v1/sales/credit-notes)
+	ListCreditNotes(w http.ResponseWriter, r *http.Request, params ListCreditNotesParams)
+	// GetCreditNote Detail Nota Kredit beserta alokasi dan invoice terbuka pihak yang sama
+	// (GET /api/v1/sales/credit-notes/{id})
+	GetCreditNote(w http.ResponseWriter, r *http.Request, id Id)
+	// ApplyCreditNote Alokasikan saldo nota kredit ke invoice terbuka pihak yang sama (F&A)
+	// (POST /api/v1/sales/credit-notes/{id}/apply)
+	ApplyCreditNote(w http.ResponseWriter, r *http.Request, id Id, params ApplyCreditNoteParams)
+	// PayCreditNoteRefund Bayar refund yang sudah disetujui Head F&A (aksi ★ re-autentikasi; jurnal A-PB)
+	// (POST /api/v1/sales/credit-notes/{id}/pay-refund)
+	PayCreditNoteRefund(w http.ResponseWriter, r *http.Request, id Id, params PayCreditNoteRefundParams)
 	// ListCustomerPayments Daftar pembayaran pelanggan (Piutang Usaha)
 	// (GET /api/v1/sales/customer-payments)
 	ListCustomerPayments(w http.ResponseWriter, r *http.Request, params ListCustomerPaymentsParams)
@@ -1724,6 +2608,48 @@ type ServerInterface interface {
 	// GetReceivableAging Laporan Piutang — umur piutang per pelanggan/mitra
 	// (GET /api/v1/sales/receivable-aging)
 	GetReceivableAging(w http.ResponseWriter, r *http.Request, params GetReceivableAgingParams)
+	// ListSalesReturnPickupUsers Merchandiser aktif untuk penugasan pickup retur
+	// (GET /api/v1/sales/return-pickup-users)
+	ListSalesReturnPickupUsers(w http.ResponseWriter, r *http.Request)
+	// ListSalesReturnSources Cari Sales Order yang barangnya sudah dikirim untuk diretur (maks. 20)
+	// (GET /api/v1/sales/return-sources)
+	ListSalesReturnSources(w http.ResponseWriter, r *http.Request, params ListSalesReturnSourcesParams)
+	// GetSalesReturnSource Baris Sales Order yang bisa diretur (qty terkirim − qty retur lain, harga bersih, batch)
+	// (GET /api/v1/sales/return-sources/{id})
+	GetSalesReturnSource(w http.ResponseWriter, r *http.Request, id Id)
+	// ListSalesReturns Daftar Retur Penjualan (S-314, S-317)
+	// (GET /api/v1/sales/returns)
+	ListSalesReturns(w http.ResponseWriter, r *http.Request, params ListSalesReturnsParams)
+	// CreateSalesReturn Menyimpan draft Retur Penjualan dari baris Sales Order yang sudah dikirim
+	// (POST /api/v1/sales/returns)
+	CreateSalesReturn(w http.ResponseWriter, r *http.Request, params CreateSalesReturnParams)
+	// GetSalesReturn Detail Retur Penjualan
+	// (GET /api/v1/sales/returns/{id})
+	GetSalesReturn(w http.ResponseWriter, r *http.Request, id Id)
+	// UpdateSalesReturn Mengubah draft Retur Penjualan
+	// (PUT /api/v1/sales/returns/{id})
+	UpdateSalesReturn(w http.ResponseWriter, r *http.Request, id Id, params UpdateSalesReturnParams)
+	// AssignSalesReturnPickup Tugaskan Merchandiser untuk pickup (Fulfillment Leader)
+	// (POST /api/v1/sales/returns/{id}/assign-pickup)
+	AssignSalesReturnPickup(w http.ResponseWriter, r *http.Request, id Id, params AssignSalesReturnPickupParams)
+	// CancelSalesReturn Batalkan retur sebelum barang masuk Inbound
+	// (POST /api/v1/sales/returns/{id}/cancel)
+	CancelSalesReturn(w http.ResponseWriter, r *http.Request, id Id, params CancelSalesReturnParams)
+	// RecordSalesReturnPickup Catat pickup barang di lokasi partner (Merchandiser yang ditugaskan, foto wajib)
+	// (POST /api/v1/sales/returns/{id}/pickup)
+	RecordSalesReturnPickup(w http.ResponseWriter, r *http.Request, id Id, params RecordSalesReturnPickupParams)
+	// ReceiveSalesReturn Terima barang retur MT (cek ulang, foto & form retur) → Inbound
+	// (POST /api/v1/sales/returns/{id}/receive)
+	ReceiveSalesReturn(w http.ResponseWriter, r *http.Request, id Id, params ReceiveSalesReturnParams)
+	// SendBackSalesReturn Kembalikan retur ke Draft (tidak sesuai SOP retur, catatan wajib)
+	// (POST /api/v1/sales/returns/{id}/send-back)
+	SendBackSalesReturn(w http.ResponseWriter, r *http.Request, id Id, params SendBackSalesReturnParams)
+	// SubmitSalesReturn Ajukan retur (nomor RJ)
+	// (POST /api/v1/sales/returns/{id}/submit)
+	SubmitSalesReturn(w http.ResponseWriter, r *http.Request, id Id, params SubmitSalesReturnParams)
+	// VerifySalesReturn Verifikasi retur MT oleh Logistik Leader (tentukan pickup Merchandiser atau dikirim partner)
+	// (POST /api/v1/sales/returns/{id}/verify)
+	VerifySalesReturn(w http.ResponseWriter, r *http.Request, id Id, params VerifySalesReturnParams)
 	// ReceiveMidtransWebhook Notifikasi pembayaran Midtrans
 	// (POST /api/v1/webhooks/midtrans)
 	ReceiveMidtransWebhook(w http.ResponseWriter, r *http.Request)
@@ -1766,6 +2692,30 @@ func (_ Unimplemented) ListSalesCashBankAccounts(w http.ResponseWriter, r *http.
 // ListSalesChannelOptions Channel & sub-channel aktif untuk form pesanan
 // (GET /api/v1/sales/channel-options)
 func (_ Unimplemented) ListSalesChannelOptions(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListCreditNotes Daftar Nota Kredit
+// (GET /api/v1/sales/credit-notes)
+func (_ Unimplemented) ListCreditNotes(w http.ResponseWriter, r *http.Request, params ListCreditNotesParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetCreditNote Detail Nota Kredit beserta alokasi dan invoice terbuka pihak yang sama
+// (GET /api/v1/sales/credit-notes/{id})
+func (_ Unimplemented) GetCreditNote(w http.ResponseWriter, r *http.Request, id Id) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ApplyCreditNote Alokasikan saldo nota kredit ke invoice terbuka pihak yang sama (F&A)
+// (POST /api/v1/sales/credit-notes/{id}/apply)
+func (_ Unimplemented) ApplyCreditNote(w http.ResponseWriter, r *http.Request, id Id, params ApplyCreditNoteParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// PayCreditNoteRefund Bayar refund yang sudah disetujui Head F&A (aksi ★ re-autentikasi; jurnal A-PB)
+// (POST /api/v1/sales/credit-notes/{id}/pay-refund)
+func (_ Unimplemented) PayCreditNoteRefund(w http.ResponseWriter, r *http.Request, id Id, params PayCreditNoteRefundParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -1880,6 +2830,90 @@ func (_ Unimplemented) ConfirmProformaPayment(w http.ResponseWriter, r *http.Req
 // GetReceivableAging Laporan Piutang — umur piutang per pelanggan/mitra
 // (GET /api/v1/sales/receivable-aging)
 func (_ Unimplemented) GetReceivableAging(w http.ResponseWriter, r *http.Request, params GetReceivableAgingParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListSalesReturnPickupUsers Merchandiser aktif untuk penugasan pickup retur
+// (GET /api/v1/sales/return-pickup-users)
+func (_ Unimplemented) ListSalesReturnPickupUsers(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListSalesReturnSources Cari Sales Order yang barangnya sudah dikirim untuk diretur (maks. 20)
+// (GET /api/v1/sales/return-sources)
+func (_ Unimplemented) ListSalesReturnSources(w http.ResponseWriter, r *http.Request, params ListSalesReturnSourcesParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetSalesReturnSource Baris Sales Order yang bisa diretur (qty terkirim − qty retur lain, harga bersih, batch)
+// (GET /api/v1/sales/return-sources/{id})
+func (_ Unimplemented) GetSalesReturnSource(w http.ResponseWriter, r *http.Request, id Id) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListSalesReturns Daftar Retur Penjualan (S-314, S-317)
+// (GET /api/v1/sales/returns)
+func (_ Unimplemented) ListSalesReturns(w http.ResponseWriter, r *http.Request, params ListSalesReturnsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// CreateSalesReturn Menyimpan draft Retur Penjualan dari baris Sales Order yang sudah dikirim
+// (POST /api/v1/sales/returns)
+func (_ Unimplemented) CreateSalesReturn(w http.ResponseWriter, r *http.Request, params CreateSalesReturnParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetSalesReturn Detail Retur Penjualan
+// (GET /api/v1/sales/returns/{id})
+func (_ Unimplemented) GetSalesReturn(w http.ResponseWriter, r *http.Request, id Id) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// UpdateSalesReturn Mengubah draft Retur Penjualan
+// (PUT /api/v1/sales/returns/{id})
+func (_ Unimplemented) UpdateSalesReturn(w http.ResponseWriter, r *http.Request, id Id, params UpdateSalesReturnParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// AssignSalesReturnPickup Tugaskan Merchandiser untuk pickup (Fulfillment Leader)
+// (POST /api/v1/sales/returns/{id}/assign-pickup)
+func (_ Unimplemented) AssignSalesReturnPickup(w http.ResponseWriter, r *http.Request, id Id, params AssignSalesReturnPickupParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// CancelSalesReturn Batalkan retur sebelum barang masuk Inbound
+// (POST /api/v1/sales/returns/{id}/cancel)
+func (_ Unimplemented) CancelSalesReturn(w http.ResponseWriter, r *http.Request, id Id, params CancelSalesReturnParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// RecordSalesReturnPickup Catat pickup barang di lokasi partner (Merchandiser yang ditugaskan, foto wajib)
+// (POST /api/v1/sales/returns/{id}/pickup)
+func (_ Unimplemented) RecordSalesReturnPickup(w http.ResponseWriter, r *http.Request, id Id, params RecordSalesReturnPickupParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ReceiveSalesReturn Terima barang retur MT (cek ulang, foto & form retur) → Inbound
+// (POST /api/v1/sales/returns/{id}/receive)
+func (_ Unimplemented) ReceiveSalesReturn(w http.ResponseWriter, r *http.Request, id Id, params ReceiveSalesReturnParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// SendBackSalesReturn Kembalikan retur ke Draft (tidak sesuai SOP retur, catatan wajib)
+// (POST /api/v1/sales/returns/{id}/send-back)
+func (_ Unimplemented) SendBackSalesReturn(w http.ResponseWriter, r *http.Request, id Id, params SendBackSalesReturnParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// SubmitSalesReturn Ajukan retur (nomor RJ)
+// (POST /api/v1/sales/returns/{id}/submit)
+func (_ Unimplemented) SubmitSalesReturn(w http.ResponseWriter, r *http.Request, id Id, params SubmitSalesReturnParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// VerifySalesReturn Verifikasi retur MT oleh Logistik Leader (tentukan pickup Merchandiser atau dikirim partner)
+// (POST /api/v1/sales/returns/{id}/verify)
+func (_ Unimplemented) VerifySalesReturn(w http.ResponseWriter, r *http.Request, id Id, params VerifySalesReturnParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -2142,6 +3176,251 @@ func (siw *ServerInterfaceWrapper) ListSalesChannelOptions(w http.ResponseWriter
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.ListSalesChannelOptions(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListCreditNotes operation middleware
+func (siw *ServerInterfaceWrapper) ListCreditNotes(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListCreditNotesParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", r.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "page"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "pageSize", r.URL.Query(), &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "pageSize"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "q" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "q", r.URL.Query(), &params.Q, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "q"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "q", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "status" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "status", r.URL.Query(), &params.Status, runtime.BindQueryParameterOptions{Type: "array", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "status"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "status", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "partyType" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "partyType", r.URL.Query(), &params.PartyType, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "partyType"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "partyType", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "partyId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "partyId", r.URL.Query(), &params.PartyId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "partyId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "partyId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "settlementMethod" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "settlementMethod", r.URL.Query(), &params.SettlementMethod, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "settlementMethod"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "settlementMethod", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListCreditNotes(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetCreditNote operation middleware
+func (siw *ServerInterfaceWrapper) GetCreditNote(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetCreditNote(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ApplyCreditNote operation middleware
+func (siw *ServerInterfaceWrapper) ApplyCreditNote(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ApplyCreditNoteParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ApplyCreditNote(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PayCreditNoteRefund operation middleware
+func (siw *ServerInterfaceWrapper) PayCreditNoteRefund(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params PayCreditNoteRefundParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PayCreditNoteRefund(w, r, id, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -3270,6 +4549,693 @@ func (siw *ServerInterfaceWrapper) GetReceivableAging(w http.ResponseWriter, r *
 	handler.ServeHTTP(w, r)
 }
 
+// ListSalesReturnPickupUsers operation middleware
+func (siw *ServerInterfaceWrapper) ListSalesReturnPickupUsers(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListSalesReturnPickupUsers(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListSalesReturnSources operation middleware
+func (siw *ServerInterfaceWrapper) ListSalesReturnSources(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListSalesReturnSourcesParams
+
+	// ------------- Optional query parameter "q" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "q", r.URL.Query(), &params.Q, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "q"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "q", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListSalesReturnSources(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetSalesReturnSource operation middleware
+func (siw *ServerInterfaceWrapper) GetSalesReturnSource(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetSalesReturnSource(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListSalesReturns operation middleware
+func (siw *ServerInterfaceWrapper) ListSalesReturns(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListSalesReturnsParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", r.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "page"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "pageSize", r.URL.Query(), &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "pageSize"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "q" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "q", r.URL.Query(), &params.Q, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "q"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "q", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "status" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "status", r.URL.Query(), &params.Status, runtime.BindQueryParameterOptions{Type: "array", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "status"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "status", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "salesOrderId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "salesOrderId", r.URL.Query(), &params.SalesOrderId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "salesOrderId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "salesOrderId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "partyId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "partyId", r.URL.Query(), &params.PartyId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "partyId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "partyId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "assignedToMe" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "assignedToMe", r.URL.Query(), &params.AssignedToMe, runtime.BindQueryParameterOptions{Type: "boolean", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "assignedToMe"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "assignedToMe", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListSalesReturns(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateSalesReturn operation middleware
+func (siw *ServerInterfaceWrapper) CreateSalesReturn(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateSalesReturnParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateSalesReturn(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetSalesReturn operation middleware
+func (siw *ServerInterfaceWrapper) GetSalesReturn(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetSalesReturn(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateSalesReturn operation middleware
+func (siw *ServerInterfaceWrapper) UpdateSalesReturn(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params UpdateSalesReturnParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateSalesReturn(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// AssignSalesReturnPickup operation middleware
+func (siw *ServerInterfaceWrapper) AssignSalesReturnPickup(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params AssignSalesReturnPickupParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.AssignSalesReturnPickup(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CancelSalesReturn operation middleware
+func (siw *ServerInterfaceWrapper) CancelSalesReturn(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CancelSalesReturnParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CancelSalesReturn(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// RecordSalesReturnPickup operation middleware
+func (siw *ServerInterfaceWrapper) RecordSalesReturnPickup(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params RecordSalesReturnPickupParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.RecordSalesReturnPickup(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ReceiveSalesReturn operation middleware
+func (siw *ServerInterfaceWrapper) ReceiveSalesReturn(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ReceiveSalesReturnParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ReceiveSalesReturn(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// SendBackSalesReturn operation middleware
+func (siw *ServerInterfaceWrapper) SendBackSalesReturn(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params SendBackSalesReturnParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.SendBackSalesReturn(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// SubmitSalesReturn operation middleware
+func (siw *ServerInterfaceWrapper) SubmitSalesReturn(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params SubmitSalesReturnParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.SubmitSalesReturn(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// VerifySalesReturn operation middleware
+func (siw *ServerInterfaceWrapper) VerifySalesReturn(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params VerifySalesReturnParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.VerifySalesReturn(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // ReceiveMidtransWebhook operation middleware
 func (siw *ServerInterfaceWrapper) ReceiveMidtransWebhook(w http.ResponseWriter, r *http.Request) {
 
@@ -3474,6 +5440,60 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/api/v1/sales/receivable-aging", wrapper.GetReceivableAging)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/sales/return-sources", wrapper.ListSalesReturnSources)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/sales/return-sources/{id}", wrapper.GetSalesReturnSource)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/sales/return-pickup-users", wrapper.ListSalesReturnPickupUsers)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/sales/returns", wrapper.ListSalesReturns)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/sales/returns", wrapper.CreateSalesReturn)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/sales/returns/{id}", wrapper.GetSalesReturn)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/sales/returns/{id}", wrapper.UpdateSalesReturn)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/sales/returns/{id}/submit", wrapper.SubmitSalesReturn)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/sales/returns/{id}/send-back", wrapper.SendBackSalesReturn)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/sales/returns/{id}/verify", wrapper.VerifySalesReturn)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/sales/returns/{id}/assign-pickup", wrapper.AssignSalesReturnPickup)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/sales/returns/{id}/pickup", wrapper.RecordSalesReturnPickup)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/sales/returns/{id}/receive", wrapper.ReceiveSalesReturn)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/sales/returns/{id}/cancel", wrapper.CancelSalesReturn)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/sales/credit-notes", wrapper.ListCreditNotes)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/sales/credit-notes/{id}", wrapper.GetCreditNote)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/sales/credit-notes/{id}/apply", wrapper.ApplyCreditNote)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/sales/credit-notes/{id}/pay-refund", wrapper.PayCreditNoteRefund)
 	})
 
 	return r
@@ -3700,6 +5720,166 @@ type ListSalesChannelOptionsdefaultApplicationProblemPlusJSONResponse struct {
 }
 
 func (response ListSalesChannelOptionsdefaultApplicationProblemPlusJSONResponse) VisitListSalesChannelOptionsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListCreditNotesRequestObject struct {
+	Params ListCreditNotesParams
+}
+
+type ListCreditNotesResponseObject interface {
+	VisitListCreditNotesResponse(w http.ResponseWriter) error
+}
+
+type ListCreditNotes200JSONResponse CreditNoteList
+
+func (response ListCreditNotes200JSONResponse) VisitListCreditNotesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListCreditNotesdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListCreditNotesdefaultApplicationProblemPlusJSONResponse) VisitListCreditNotesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetCreditNoteRequestObject struct {
+	Id Id `json:"id"`
+}
+
+type GetCreditNoteResponseObject interface {
+	VisitGetCreditNoteResponse(w http.ResponseWriter) error
+}
+
+type GetCreditNote200JSONResponse CreditNote
+
+func (response GetCreditNote200JSONResponse) VisitGetCreditNoteResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetCreditNotedefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetCreditNotedefaultApplicationProblemPlusJSONResponse) VisitGetCreditNoteResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ApplyCreditNoteRequestObject struct {
+	Id     Id `json:"id"`
+	Params ApplyCreditNoteParams
+	Body   *ApplyCreditNoteJSONRequestBody
+}
+
+type ApplyCreditNoteResponseObject interface {
+	VisitApplyCreditNoteResponse(w http.ResponseWriter) error
+}
+
+type ApplyCreditNote200JSONResponse CreditNote
+
+func (response ApplyCreditNote200JSONResponse) VisitApplyCreditNoteResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ApplyCreditNotedefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ApplyCreditNotedefaultApplicationProblemPlusJSONResponse) VisitApplyCreditNoteResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PayCreditNoteRefundRequestObject struct {
+	Id     Id `json:"id"`
+	Params PayCreditNoteRefundParams
+	Body   *PayCreditNoteRefundJSONRequestBody
+}
+
+type PayCreditNoteRefundResponseObject interface {
+	VisitPayCreditNoteRefundResponse(w http.ResponseWriter) error
+}
+
+type PayCreditNoteRefund200JSONResponse CreditNote
+
+func (response PayCreditNoteRefund200JSONResponse) VisitPayCreditNoteRefundResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PayCreditNoteRefunddefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response PayCreditNoteRefunddefaultApplicationProblemPlusJSONResponse) VisitPayCreditNoteRefundResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
@@ -4466,6 +6646,568 @@ func (response GetReceivableAgingdefaultApplicationProblemPlusJSONResponse) Visi
 	return err
 }
 
+type ListSalesReturnPickupUsersRequestObject struct {
+}
+
+type ListSalesReturnPickupUsersResponseObject interface {
+	VisitListSalesReturnPickupUsersResponse(w http.ResponseWriter) error
+}
+
+type ListSalesReturnPickupUsers200JSONResponse SalesReturnPickupUserList
+
+func (response ListSalesReturnPickupUsers200JSONResponse) VisitListSalesReturnPickupUsersResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListSalesReturnPickupUsersdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListSalesReturnPickupUsersdefaultApplicationProblemPlusJSONResponse) VisitListSalesReturnPickupUsersResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListSalesReturnSourcesRequestObject struct {
+	Params ListSalesReturnSourcesParams
+}
+
+type ListSalesReturnSourcesResponseObject interface {
+	VisitListSalesReturnSourcesResponse(w http.ResponseWriter) error
+}
+
+type ListSalesReturnSources200JSONResponse SalesReturnSourceList
+
+func (response ListSalesReturnSources200JSONResponse) VisitListSalesReturnSourcesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListSalesReturnSourcesdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListSalesReturnSourcesdefaultApplicationProblemPlusJSONResponse) VisitListSalesReturnSourcesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetSalesReturnSourceRequestObject struct {
+	Id Id `json:"id"`
+}
+
+type GetSalesReturnSourceResponseObject interface {
+	VisitGetSalesReturnSourceResponse(w http.ResponseWriter) error
+}
+
+type GetSalesReturnSource200JSONResponse SalesReturnSourceDetail
+
+func (response GetSalesReturnSource200JSONResponse) VisitGetSalesReturnSourceResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetSalesReturnSourcedefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetSalesReturnSourcedefaultApplicationProblemPlusJSONResponse) VisitGetSalesReturnSourceResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListSalesReturnsRequestObject struct {
+	Params ListSalesReturnsParams
+}
+
+type ListSalesReturnsResponseObject interface {
+	VisitListSalesReturnsResponse(w http.ResponseWriter) error
+}
+
+type ListSalesReturns200JSONResponse SalesReturnList
+
+func (response ListSalesReturns200JSONResponse) VisitListSalesReturnsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListSalesReturnsdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListSalesReturnsdefaultApplicationProblemPlusJSONResponse) VisitListSalesReturnsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateSalesReturnRequestObject struct {
+	Params CreateSalesReturnParams
+	Body   *CreateSalesReturnJSONRequestBody
+}
+
+type CreateSalesReturnResponseObject interface {
+	VisitCreateSalesReturnResponse(w http.ResponseWriter) error
+}
+
+type CreateSalesReturn201JSONResponse SalesReturn
+
+func (response CreateSalesReturn201JSONResponse) VisitCreateSalesReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateSalesReturndefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response CreateSalesReturndefaultApplicationProblemPlusJSONResponse) VisitCreateSalesReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetSalesReturnRequestObject struct {
+	Id Id `json:"id"`
+}
+
+type GetSalesReturnResponseObject interface {
+	VisitGetSalesReturnResponse(w http.ResponseWriter) error
+}
+
+type GetSalesReturn200JSONResponse SalesReturn
+
+func (response GetSalesReturn200JSONResponse) VisitGetSalesReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetSalesReturndefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetSalesReturndefaultApplicationProblemPlusJSONResponse) VisitGetSalesReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateSalesReturnRequestObject struct {
+	Id     Id `json:"id"`
+	Params UpdateSalesReturnParams
+	Body   *UpdateSalesReturnJSONRequestBody
+}
+
+type UpdateSalesReturnResponseObject interface {
+	VisitUpdateSalesReturnResponse(w http.ResponseWriter) error
+}
+
+type UpdateSalesReturn200JSONResponse SalesReturn
+
+func (response UpdateSalesReturn200JSONResponse) VisitUpdateSalesReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateSalesReturndefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response UpdateSalesReturndefaultApplicationProblemPlusJSONResponse) VisitUpdateSalesReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type AssignSalesReturnPickupRequestObject struct {
+	Id     Id `json:"id"`
+	Params AssignSalesReturnPickupParams
+	Body   *AssignSalesReturnPickupJSONRequestBody
+}
+
+type AssignSalesReturnPickupResponseObject interface {
+	VisitAssignSalesReturnPickupResponse(w http.ResponseWriter) error
+}
+
+type AssignSalesReturnPickup200JSONResponse SalesReturn
+
+func (response AssignSalesReturnPickup200JSONResponse) VisitAssignSalesReturnPickupResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type AssignSalesReturnPickupdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response AssignSalesReturnPickupdefaultApplicationProblemPlusJSONResponse) VisitAssignSalesReturnPickupResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CancelSalesReturnRequestObject struct {
+	Id     Id `json:"id"`
+	Params CancelSalesReturnParams
+	Body   *CancelSalesReturnJSONRequestBody
+}
+
+type CancelSalesReturnResponseObject interface {
+	VisitCancelSalesReturnResponse(w http.ResponseWriter) error
+}
+
+type CancelSalesReturn200JSONResponse SalesReturn
+
+func (response CancelSalesReturn200JSONResponse) VisitCancelSalesReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CancelSalesReturndefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response CancelSalesReturndefaultApplicationProblemPlusJSONResponse) VisitCancelSalesReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RecordSalesReturnPickupRequestObject struct {
+	Id     Id `json:"id"`
+	Params RecordSalesReturnPickupParams
+	Body   *RecordSalesReturnPickupJSONRequestBody
+}
+
+type RecordSalesReturnPickupResponseObject interface {
+	VisitRecordSalesReturnPickupResponse(w http.ResponseWriter) error
+}
+
+type RecordSalesReturnPickup200JSONResponse SalesReturn
+
+func (response RecordSalesReturnPickup200JSONResponse) VisitRecordSalesReturnPickupResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RecordSalesReturnPickupdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response RecordSalesReturnPickupdefaultApplicationProblemPlusJSONResponse) VisitRecordSalesReturnPickupResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ReceiveSalesReturnRequestObject struct {
+	Id     Id `json:"id"`
+	Params ReceiveSalesReturnParams
+	Body   *ReceiveSalesReturnJSONRequestBody
+}
+
+type ReceiveSalesReturnResponseObject interface {
+	VisitReceiveSalesReturnResponse(w http.ResponseWriter) error
+}
+
+type ReceiveSalesReturn200JSONResponse SalesReturn
+
+func (response ReceiveSalesReturn200JSONResponse) VisitReceiveSalesReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ReceiveSalesReturndefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ReceiveSalesReturndefaultApplicationProblemPlusJSONResponse) VisitReceiveSalesReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SendBackSalesReturnRequestObject struct {
+	Id     Id `json:"id"`
+	Params SendBackSalesReturnParams
+	Body   *SendBackSalesReturnJSONRequestBody
+}
+
+type SendBackSalesReturnResponseObject interface {
+	VisitSendBackSalesReturnResponse(w http.ResponseWriter) error
+}
+
+type SendBackSalesReturn200JSONResponse SalesReturn
+
+func (response SendBackSalesReturn200JSONResponse) VisitSendBackSalesReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SendBackSalesReturndefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response SendBackSalesReturndefaultApplicationProblemPlusJSONResponse) VisitSendBackSalesReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SubmitSalesReturnRequestObject struct {
+	Id     Id `json:"id"`
+	Params SubmitSalesReturnParams
+	Body   *SubmitSalesReturnJSONRequestBody
+}
+
+type SubmitSalesReturnResponseObject interface {
+	VisitSubmitSalesReturnResponse(w http.ResponseWriter) error
+}
+
+type SubmitSalesReturn200JSONResponse SalesReturn
+
+func (response SubmitSalesReturn200JSONResponse) VisitSubmitSalesReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SubmitSalesReturndefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response SubmitSalesReturndefaultApplicationProblemPlusJSONResponse) VisitSubmitSalesReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type VerifySalesReturnRequestObject struct {
+	Id     Id `json:"id"`
+	Params VerifySalesReturnParams
+	Body   *VerifySalesReturnJSONRequestBody
+}
+
+type VerifySalesReturnResponseObject interface {
+	VisitVerifySalesReturnResponse(w http.ResponseWriter) error
+}
+
+type VerifySalesReturn200JSONResponse SalesReturn
+
+func (response VerifySalesReturn200JSONResponse) VisitVerifySalesReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type VerifySalesReturndefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response VerifySalesReturndefaultApplicationProblemPlusJSONResponse) VisitVerifySalesReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type ReceiveMidtransWebhookRequestObject struct {
 	Body *ReceiveMidtransWebhookJSONRequestBody
 }
@@ -4536,6 +7278,18 @@ type StrictServerInterface interface {
 	// ListSalesChannelOptions Channel & sub-channel aktif untuk form pesanan
 	// (GET /api/v1/sales/channel-options)
 	ListSalesChannelOptions(ctx context.Context, request ListSalesChannelOptionsRequestObject) (ListSalesChannelOptionsResponseObject, error)
+	// ListCreditNotes Daftar Nota Kredit
+	// (GET /api/v1/sales/credit-notes)
+	ListCreditNotes(ctx context.Context, request ListCreditNotesRequestObject) (ListCreditNotesResponseObject, error)
+	// GetCreditNote Detail Nota Kredit beserta alokasi dan invoice terbuka pihak yang sama
+	// (GET /api/v1/sales/credit-notes/{id})
+	GetCreditNote(ctx context.Context, request GetCreditNoteRequestObject) (GetCreditNoteResponseObject, error)
+	// ApplyCreditNote Alokasikan saldo nota kredit ke invoice terbuka pihak yang sama (F&A)
+	// (POST /api/v1/sales/credit-notes/{id}/apply)
+	ApplyCreditNote(ctx context.Context, request ApplyCreditNoteRequestObject) (ApplyCreditNoteResponseObject, error)
+	// PayCreditNoteRefund Bayar refund yang sudah disetujui Head F&A (aksi ★ re-autentikasi; jurnal A-PB)
+	// (POST /api/v1/sales/credit-notes/{id}/pay-refund)
+	PayCreditNoteRefund(ctx context.Context, request PayCreditNoteRefundRequestObject) (PayCreditNoteRefundResponseObject, error)
 	// ListCustomerPayments Daftar pembayaran pelanggan (Piutang Usaha)
 	// (GET /api/v1/sales/customer-payments)
 	ListCustomerPayments(ctx context.Context, request ListCustomerPaymentsRequestObject) (ListCustomerPaymentsResponseObject, error)
@@ -4593,6 +7347,48 @@ type StrictServerInterface interface {
 	// GetReceivableAging Laporan Piutang — umur piutang per pelanggan/mitra
 	// (GET /api/v1/sales/receivable-aging)
 	GetReceivableAging(ctx context.Context, request GetReceivableAgingRequestObject) (GetReceivableAgingResponseObject, error)
+	// ListSalesReturnPickupUsers Merchandiser aktif untuk penugasan pickup retur
+	// (GET /api/v1/sales/return-pickup-users)
+	ListSalesReturnPickupUsers(ctx context.Context, request ListSalesReturnPickupUsersRequestObject) (ListSalesReturnPickupUsersResponseObject, error)
+	// ListSalesReturnSources Cari Sales Order yang barangnya sudah dikirim untuk diretur (maks. 20)
+	// (GET /api/v1/sales/return-sources)
+	ListSalesReturnSources(ctx context.Context, request ListSalesReturnSourcesRequestObject) (ListSalesReturnSourcesResponseObject, error)
+	// GetSalesReturnSource Baris Sales Order yang bisa diretur (qty terkirim − qty retur lain, harga bersih, batch)
+	// (GET /api/v1/sales/return-sources/{id})
+	GetSalesReturnSource(ctx context.Context, request GetSalesReturnSourceRequestObject) (GetSalesReturnSourceResponseObject, error)
+	// ListSalesReturns Daftar Retur Penjualan (S-314, S-317)
+	// (GET /api/v1/sales/returns)
+	ListSalesReturns(ctx context.Context, request ListSalesReturnsRequestObject) (ListSalesReturnsResponseObject, error)
+	// CreateSalesReturn Menyimpan draft Retur Penjualan dari baris Sales Order yang sudah dikirim
+	// (POST /api/v1/sales/returns)
+	CreateSalesReturn(ctx context.Context, request CreateSalesReturnRequestObject) (CreateSalesReturnResponseObject, error)
+	// GetSalesReturn Detail Retur Penjualan
+	// (GET /api/v1/sales/returns/{id})
+	GetSalesReturn(ctx context.Context, request GetSalesReturnRequestObject) (GetSalesReturnResponseObject, error)
+	// UpdateSalesReturn Mengubah draft Retur Penjualan
+	// (PUT /api/v1/sales/returns/{id})
+	UpdateSalesReturn(ctx context.Context, request UpdateSalesReturnRequestObject) (UpdateSalesReturnResponseObject, error)
+	// AssignSalesReturnPickup Tugaskan Merchandiser untuk pickup (Fulfillment Leader)
+	// (POST /api/v1/sales/returns/{id}/assign-pickup)
+	AssignSalesReturnPickup(ctx context.Context, request AssignSalesReturnPickupRequestObject) (AssignSalesReturnPickupResponseObject, error)
+	// CancelSalesReturn Batalkan retur sebelum barang masuk Inbound
+	// (POST /api/v1/sales/returns/{id}/cancel)
+	CancelSalesReturn(ctx context.Context, request CancelSalesReturnRequestObject) (CancelSalesReturnResponseObject, error)
+	// RecordSalesReturnPickup Catat pickup barang di lokasi partner (Merchandiser yang ditugaskan, foto wajib)
+	// (POST /api/v1/sales/returns/{id}/pickup)
+	RecordSalesReturnPickup(ctx context.Context, request RecordSalesReturnPickupRequestObject) (RecordSalesReturnPickupResponseObject, error)
+	// ReceiveSalesReturn Terima barang retur MT (cek ulang, foto & form retur) → Inbound
+	// (POST /api/v1/sales/returns/{id}/receive)
+	ReceiveSalesReturn(ctx context.Context, request ReceiveSalesReturnRequestObject) (ReceiveSalesReturnResponseObject, error)
+	// SendBackSalesReturn Kembalikan retur ke Draft (tidak sesuai SOP retur, catatan wajib)
+	// (POST /api/v1/sales/returns/{id}/send-back)
+	SendBackSalesReturn(ctx context.Context, request SendBackSalesReturnRequestObject) (SendBackSalesReturnResponseObject, error)
+	// SubmitSalesReturn Ajukan retur (nomor RJ)
+	// (POST /api/v1/sales/returns/{id}/submit)
+	SubmitSalesReturn(ctx context.Context, request SubmitSalesReturnRequestObject) (SubmitSalesReturnResponseObject, error)
+	// VerifySalesReturn Verifikasi retur MT oleh Logistik Leader (tentukan pickup Merchandiser atau dikirim partner)
+	// (POST /api/v1/sales/returns/{id}/verify)
+	VerifySalesReturn(ctx context.Context, request VerifySalesReturnRequestObject) (VerifySalesReturnResponseObject, error)
 	// ReceiveMidtransWebhook Notifikasi pembayaran Midtrans
 	// (POST /api/v1/webhooks/midtrans)
 	ReceiveMidtransWebhook(ctx context.Context, request ReceiveMidtransWebhookRequestObject) (ReceiveMidtransWebhookResponseObject, error)
@@ -4798,6 +7594,126 @@ func (sh *strictHandler) ListSalesChannelOptions(w http.ResponseWriter, r *http.
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(ListSalesChannelOptionsResponseObject); ok {
 		if err := validResponse.VisitListSalesChannelOptionsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListCreditNotes operation middleware
+func (sh *strictHandler) ListCreditNotes(w http.ResponseWriter, r *http.Request, params ListCreditNotesParams) {
+	var request ListCreditNotesRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListCreditNotes(ctx, request.(ListCreditNotesRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListCreditNotes")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListCreditNotesResponseObject); ok {
+		if err := validResponse.VisitListCreditNotesResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetCreditNote operation middleware
+func (sh *strictHandler) GetCreditNote(w http.ResponseWriter, r *http.Request, id Id) {
+	var request GetCreditNoteRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetCreditNote(ctx, request.(GetCreditNoteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetCreditNote")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetCreditNoteResponseObject); ok {
+		if err := validResponse.VisitGetCreditNoteResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ApplyCreditNote operation middleware
+func (sh *strictHandler) ApplyCreditNote(w http.ResponseWriter, r *http.Request, id Id, params ApplyCreditNoteParams) {
+	var request ApplyCreditNoteRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body ApplyCreditNoteJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ApplyCreditNote(ctx, request.(ApplyCreditNoteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ApplyCreditNote")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ApplyCreditNoteResponseObject); ok {
+		if err := validResponse.VisitApplyCreditNoteResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PayCreditNoteRefund operation middleware
+func (sh *strictHandler) PayCreditNoteRefund(w http.ResponseWriter, r *http.Request, id Id, params PayCreditNoteRefundParams) {
+	var request PayCreditNoteRefundRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body PayCreditNoteRefundJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PayCreditNoteRefund(ctx, request.(PayCreditNoteRefundRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PayCreditNoteRefund")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PayCreditNoteRefundResponseObject); ok {
+		if err := validResponse.VisitPayCreditNoteRefundResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
@@ -5354,6 +8270,439 @@ func (sh *strictHandler) GetReceivableAging(w http.ResponseWriter, r *http.Reque
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(GetReceivableAgingResponseObject); ok {
 		if err := validResponse.VisitGetReceivableAgingResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListSalesReturnPickupUsers operation middleware
+func (sh *strictHandler) ListSalesReturnPickupUsers(w http.ResponseWriter, r *http.Request) {
+	var request ListSalesReturnPickupUsersRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListSalesReturnPickupUsers(ctx, request.(ListSalesReturnPickupUsersRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListSalesReturnPickupUsers")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListSalesReturnPickupUsersResponseObject); ok {
+		if err := validResponse.VisitListSalesReturnPickupUsersResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListSalesReturnSources operation middleware
+func (sh *strictHandler) ListSalesReturnSources(w http.ResponseWriter, r *http.Request, params ListSalesReturnSourcesParams) {
+	var request ListSalesReturnSourcesRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListSalesReturnSources(ctx, request.(ListSalesReturnSourcesRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListSalesReturnSources")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListSalesReturnSourcesResponseObject); ok {
+		if err := validResponse.VisitListSalesReturnSourcesResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetSalesReturnSource operation middleware
+func (sh *strictHandler) GetSalesReturnSource(w http.ResponseWriter, r *http.Request, id Id) {
+	var request GetSalesReturnSourceRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetSalesReturnSource(ctx, request.(GetSalesReturnSourceRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetSalesReturnSource")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetSalesReturnSourceResponseObject); ok {
+		if err := validResponse.VisitGetSalesReturnSourceResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListSalesReturns operation middleware
+func (sh *strictHandler) ListSalesReturns(w http.ResponseWriter, r *http.Request, params ListSalesReturnsParams) {
+	var request ListSalesReturnsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListSalesReturns(ctx, request.(ListSalesReturnsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListSalesReturns")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListSalesReturnsResponseObject); ok {
+		if err := validResponse.VisitListSalesReturnsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreateSalesReturn operation middleware
+func (sh *strictHandler) CreateSalesReturn(w http.ResponseWriter, r *http.Request, params CreateSalesReturnParams) {
+	var request CreateSalesReturnRequestObject
+
+	request.Params = params
+
+	var body CreateSalesReturnJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CreateSalesReturn(ctx, request.(CreateSalesReturnRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateSalesReturn")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreateSalesReturnResponseObject); ok {
+		if err := validResponse.VisitCreateSalesReturnResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetSalesReturn operation middleware
+func (sh *strictHandler) GetSalesReturn(w http.ResponseWriter, r *http.Request, id Id) {
+	var request GetSalesReturnRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetSalesReturn(ctx, request.(GetSalesReturnRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetSalesReturn")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetSalesReturnResponseObject); ok {
+		if err := validResponse.VisitGetSalesReturnResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateSalesReturn operation middleware
+func (sh *strictHandler) UpdateSalesReturn(w http.ResponseWriter, r *http.Request, id Id, params UpdateSalesReturnParams) {
+	var request UpdateSalesReturnRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body UpdateSalesReturnJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateSalesReturn(ctx, request.(UpdateSalesReturnRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateSalesReturn")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdateSalesReturnResponseObject); ok {
+		if err := validResponse.VisitUpdateSalesReturnResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// AssignSalesReturnPickup operation middleware
+func (sh *strictHandler) AssignSalesReturnPickup(w http.ResponseWriter, r *http.Request, id Id, params AssignSalesReturnPickupParams) {
+	var request AssignSalesReturnPickupRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body AssignSalesReturnPickupJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.AssignSalesReturnPickup(ctx, request.(AssignSalesReturnPickupRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "AssignSalesReturnPickup")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(AssignSalesReturnPickupResponseObject); ok {
+		if err := validResponse.VisitAssignSalesReturnPickupResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CancelSalesReturn operation middleware
+func (sh *strictHandler) CancelSalesReturn(w http.ResponseWriter, r *http.Request, id Id, params CancelSalesReturnParams) {
+	var request CancelSalesReturnRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body CancelSalesReturnJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CancelSalesReturn(ctx, request.(CancelSalesReturnRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CancelSalesReturn")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CancelSalesReturnResponseObject); ok {
+		if err := validResponse.VisitCancelSalesReturnResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// RecordSalesReturnPickup operation middleware
+func (sh *strictHandler) RecordSalesReturnPickup(w http.ResponseWriter, r *http.Request, id Id, params RecordSalesReturnPickupParams) {
+	var request RecordSalesReturnPickupRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body RecordSalesReturnPickupJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.RecordSalesReturnPickup(ctx, request.(RecordSalesReturnPickupRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RecordSalesReturnPickup")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(RecordSalesReturnPickupResponseObject); ok {
+		if err := validResponse.VisitRecordSalesReturnPickupResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ReceiveSalesReturn operation middleware
+func (sh *strictHandler) ReceiveSalesReturn(w http.ResponseWriter, r *http.Request, id Id, params ReceiveSalesReturnParams) {
+	var request ReceiveSalesReturnRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body ReceiveSalesReturnJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ReceiveSalesReturn(ctx, request.(ReceiveSalesReturnRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ReceiveSalesReturn")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ReceiveSalesReturnResponseObject); ok {
+		if err := validResponse.VisitReceiveSalesReturnResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// SendBackSalesReturn operation middleware
+func (sh *strictHandler) SendBackSalesReturn(w http.ResponseWriter, r *http.Request, id Id, params SendBackSalesReturnParams) {
+	var request SendBackSalesReturnRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body SendBackSalesReturnJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.SendBackSalesReturn(ctx, request.(SendBackSalesReturnRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "SendBackSalesReturn")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(SendBackSalesReturnResponseObject); ok {
+		if err := validResponse.VisitSendBackSalesReturnResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// SubmitSalesReturn operation middleware
+func (sh *strictHandler) SubmitSalesReturn(w http.ResponseWriter, r *http.Request, id Id, params SubmitSalesReturnParams) {
+	var request SubmitSalesReturnRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body SubmitSalesReturnJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.SubmitSalesReturn(ctx, request.(SubmitSalesReturnRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "SubmitSalesReturn")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(SubmitSalesReturnResponseObject); ok {
+		if err := validResponse.VisitSubmitSalesReturnResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// VerifySalesReturn operation middleware
+func (sh *strictHandler) VerifySalesReturn(w http.ResponseWriter, r *http.Request, id Id, params VerifySalesReturnParams) {
+	var request VerifySalesReturnRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body VerifySalesReturnJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.VerifySalesReturn(ctx, request.(VerifySalesReturnRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "VerifySalesReturn")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(VerifySalesReturnResponseObject); ok {
+		if err := validResponse.VisitVerifySalesReturnResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

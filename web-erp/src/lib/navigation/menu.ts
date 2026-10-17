@@ -395,7 +395,19 @@ export const MENU: MenuGroup[] = [
         permission: ["sales.invoice.read", "accounting.payment.read"],
         module: "sales",
       },
-      ...items("Retur Penjualan", "Nota Kredit", "Rekonsiliasi Konsinyasi"),
+      {
+        label: "Retur Penjualan",
+        to: "/sales/returns",
+        permission: "sales.sales_return.read",
+        module: "sales",
+      },
+      {
+        label: "Nota Kredit",
+        to: "/sales/credit-notes",
+        permission: ["sales.credit_note.read", "sales.sales_return.read"],
+        module: "sales",
+      },
+      ...items("Rekonsiliasi Konsinyasi"),
       {
         label: "Harga & Diskon",
         to: "/sales/pricing",

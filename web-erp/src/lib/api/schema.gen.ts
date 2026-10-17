@@ -467,6 +467,284 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/v1/sales/return-sources": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Cari Sales Order yang barangnya sudah dikirim untuk diretur (maks. 20) */
+    get: operations["listSalesReturnSources"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/return-sources/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Baris Sales Order yang bisa diretur (qty terkirim − qty retur lain, harga bersih, batch) */
+    get: operations["getSalesReturnSource"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/return-pickup-users": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Merchandiser aktif untuk penugasan pickup retur */
+    get: operations["listSalesReturnPickupUsers"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/returns": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Daftar Retur Penjualan (S-314, S-317) */
+    get: operations["listSalesReturns"]
+    put?: never
+    /** Menyimpan draft Retur Penjualan dari baris Sales Order yang sudah dikirim */
+    post: operations["createSalesReturn"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/returns/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail Retur Penjualan */
+    get: operations["getSalesReturn"]
+    /** Mengubah draft Retur Penjualan */
+    put: operations["updateSalesReturn"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/returns/{id}/submit": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Ajukan retur (nomor RJ)
+     * @description Retur MT/reseller (mitra) → Diajukan, menunggu verifikasi Logistik Leader. Retur pelanggan langsung dan
+     *     marketplace → barang diterima ke lokasi Inbound berstatus Karantina dan Inbound dibuat (Diproses).
+     */
+    post: operations["submitSalesReturn"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/returns/{id}/send-back": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Kembalikan retur ke Draft (tidak sesuai SOP retur, catatan wajib) */
+    post: operations["sendBackSalesReturn"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/returns/{id}/verify": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Verifikasi retur MT oleh Logistik Leader (tentukan pickup Merchandiser atau dikirim partner) */
+    post: operations["verifySalesReturn"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/returns/{id}/assign-pickup": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Tugaskan Merchandiser untuk pickup (Fulfillment Leader) */
+    post: operations["assignSalesReturnPickup"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/returns/{id}/pickup": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Catat pickup barang di lokasi partner (Merchandiser yang ditugaskan, foto wajib) */
+    post: operations["recordSalesReturnPickup"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/returns/{id}/receive": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Terima barang retur MT (cek ulang, foto & form retur) → Inbound */
+    post: operations["receiveSalesReturn"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/returns/{id}/cancel": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Batalkan retur sebelum barang masuk Inbound */
+    post: operations["cancelSalesReturn"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/credit-notes": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Daftar Nota Kredit */
+    get: operations["listCreditNotes"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/credit-notes/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail Nota Kredit beserta alokasi dan invoice terbuka pihak yang sama */
+    get: operations["getCreditNote"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/credit-notes/{id}/apply": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Alokasikan saldo nota kredit ke invoice terbuka pihak yang sama (F&A) */
+    post: operations["applyCreditNote"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/credit-notes/{id}/pay-refund": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Bayar refund yang sudah disetujui Head F&A (aksi ★ re-autentikasi; jurnal A-PB) */
+    post: operations["payCreditNoteRefund"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/v1/webhooks/biteship": {
     parameters: {
       query?: never
@@ -6226,6 +6504,318 @@ export interface components {
       rows: components["schemas"]["ReceivableAgingRow"][]
       totals: components["schemas"]["ReceivableAgingRow"]
     }
+    SalesReturnSource: {
+      /** Format: uuid */
+      id: string
+      number: string
+      orderType: components["schemas"]["SalesOrderType"]
+      partyName: string
+      businessDate: components["schemas"]["BusinessDate"]
+      status: components["schemas"]["SalesDocumentStatus"]
+      totalAmount: components["schemas"]["Money"]
+    }
+    SalesReturnSourceList: {
+      items: components["schemas"]["SalesReturnSource"][]
+    }
+    SalesReturnBatchOption: {
+      /** Format: uuid */
+      id: string
+      number: string
+    }
+    SalesReturnableLine: {
+      /** Format: uuid */
+      salesOrderLineId: string
+      lineNo: number
+      product: components["schemas"]["SalesProductRef"]
+      isBundle: boolean
+      orderedQty: components["schemas"]["SalesQuantity"]
+      shippedQty: components["schemas"]["SalesQuantity"]
+      returnedQty: components["schemas"]["SalesQuantity"]
+      availableQty: components["schemas"]["SalesQuantity"]
+      unitPrice: components["schemas"]["Money"]
+      /** @description HPP asal per unit (4 desimal). */
+      unitCost: string
+      batches: components["schemas"]["SalesReturnBatchOption"][]
+    }
+    SalesReturnSourceDetail: {
+      order: components["schemas"]["SalesReturnSource"]
+      invoiceNumber?: string | null
+      /** @description Retur dari mitra (MT/reseller) diverifikasi Logistik Leader sebelum barang diambil. */
+      requiresVerification: boolean
+      lines: components["schemas"]["SalesReturnableLine"][]
+    }
+    SalesReturnPickupUser: {
+      /** Format: uuid */
+      id: string
+      name: string
+    }
+    SalesReturnPickupUserList: {
+      items: components["schemas"]["SalesReturnPickupUser"][]
+    }
+    /**
+     * @description Status Retur Penjualan (Desain Status Dokumen 5.5).
+     * @enum {string}
+     */
+    SalesReturnStatus:
+      | "draft"
+      | "submitted"
+      | "verified"
+      | "in_progress"
+      | "posted"
+      | "cancelled"
+    /**
+     * @description `credit_note` nota kredit (mengurangi piutang invoice asal, sisanya untuk invoice berikutnya), `refund`
+     *     dibayar kembali (approval Head F&A), `marketplace` mengurangi Piutang Marketplace 121x.
+     * @enum {string}
+     */
+    SalesReturnSettlement: "credit_note" | "refund" | "marketplace"
+    SalesReturnSummary: {
+      /** Format: uuid */
+      id: string
+      number?: string | null
+      status: components["schemas"]["SalesReturnStatus"]
+      /** Format: uuid */
+      salesOrderId: string
+      salesOrderNumber: string
+      /** Format: uuid */
+      invoiceId?: string | null
+      invoiceNumber?: string | null
+      orderType: components["schemas"]["SalesOrderType"]
+      partyName: string
+      returnDate: components["schemas"]["BusinessDate"]
+      settlementMethod: components["schemas"]["SalesReturnSettlement"]
+      requiresVerification: boolean
+      pickupRequired: boolean
+      /** Format: uuid */
+      pickupUserId?: string | null
+      inboundNumber?: string | null
+      returnAmount: components["schemas"]["Money"]
+      costAmount: components["schemas"]["Money"]
+      /** Format: date-time */
+      createdAt: string
+      version: number
+    }
+    SalesReturnList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["SalesReturnSummary"][]
+    }
+    SalesReturnLineInput: {
+      /** Format: uuid */
+      salesOrderLineId: string
+      /** Format: uuid */
+      batchId?: string | null
+      qty: components["schemas"]["SalesQuantity"]
+      /** Format: uuid */
+      returnReasonId: string
+      note?: string
+    }
+    SalesReturnFields: {
+      returnDate: components["schemas"]["BusinessDate"]
+      settlementMethod?: components["schemas"]["SalesReturnSettlement"]
+      note?: string
+      lines: components["schemas"]["SalesReturnLineInput"][]
+    }
+    SalesReturnInput: {
+      /** Format: uuid */
+      salesOrderId: string
+    } & components["schemas"]["SalesReturnFields"]
+    SalesReturnFile: {
+      /** Format: uuid */
+      id: string
+      name: string
+    }
+    /** @enum {string} */
+    CreditNoteSettlement: "credit_note" | "refund"
+    /**
+     * @description `posted` ada saldo, `completed` saldo habis teralokasi, refund: `pending_approval` → `awaiting_payment` → `paid`.
+     * @enum {string}
+     */
+    CreditNoteStatus:
+      "posted" | "completed" | "pending_approval" | "awaiting_payment" | "paid"
+    SalesReturnCreditNoteRef: {
+      /** Format: uuid */
+      id: string
+      number: string
+      settlementMethod: components["schemas"]["CreditNoteSettlement"]
+      status: components["schemas"]["CreditNoteStatus"]
+      amount: components["schemas"]["Money"]
+      remainingAmount: components["schemas"]["Money"]
+    }
+    SalesReturnReasonRef: {
+      /** Format: uuid */
+      id: string
+      code: string
+      name: string
+      defaultDisposition?: components["schemas"]["ReturnDisposition"] | null
+    }
+    SalesReturnLine: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      /** Format: uuid */
+      salesOrderLineId: string
+      product: components["schemas"]["SalesProductRef"]
+      /** Format: uuid */
+      batchId?: string | null
+      batchNumber?: string | null
+      qty: components["schemas"]["SalesQuantity"]
+      returnReason: components["schemas"]["SalesReturnReasonRef"]
+      unitPrice: components["schemas"]["Money"]
+      lineAmount: components["schemas"]["Money"]
+      unitCost: string
+      costAmount: components["schemas"]["Money"]
+      note: string
+      passedQty: components["schemas"]["SalesQuantity"]
+      rejectedQty: components["schemas"]["SalesQuantity"]
+      qcDone: boolean
+    }
+    SalesReturn: components["schemas"]["SalesReturnSummary"] & {
+      note: string
+      sendBackNote: string
+      verifiedByName?: string | null
+      /** Format: date-time */
+      verifiedAt?: string | null
+      verifyNote: string
+      pickupUserName?: string | null
+      /** Format: date-time */
+      pickupAssignedAt?: string | null
+      /** Format: date-time */
+      pickedUpAt?: string | null
+      pickupNote: string
+      pickupFiles: components["schemas"]["SalesReturnFile"][]
+      receivedByName?: string | null
+      /** Format: date-time */
+      receivedAt?: string | null
+      receiveNote: string
+      documentationFiles: components["schemas"]["SalesReturnFile"][]
+      /** Format: uuid */
+      inboundId?: string | null
+      cancelReason: string
+      /** Format: date-time */
+      postedAt?: string | null
+      /** Format: uuid */
+      journalEntryId?: string | null
+      createdByName: string
+      creditNote?: components["schemas"]["SalesReturnCreditNoteRef"] | null
+      lines: components["schemas"]["SalesReturnLine"][]
+      allowedActions: (
+        | "edit"
+        | "submit"
+        | "cancel"
+        | "verify"
+        | "send_back"
+        | "assign_pickup"
+        | "record_pickup"
+        | "receive"
+      )[]
+    }
+    SalesReturnUpdate: components["schemas"]["SalesReturnFields"] &
+      components["schemas"]["VersionInput"]
+    SalesReturnNoteInput: {
+      version: number
+      note: string
+    }
+    SalesReturnVerifyInput: {
+      version: number
+      pickupRequired: boolean
+      note?: string
+    }
+    SalesReturnAssignPickupInput: {
+      version: number
+      /** Format: uuid */
+      pickupUserId: string
+    }
+    SalesReturnPickupInput: {
+      version: number
+      note?: string
+      photoFileIds: string[]
+    }
+    SalesReturnReceivedQty: {
+      /** Format: uuid */
+      lineId: string
+      qty: components["schemas"]["SalesQuantity"]
+    }
+    SalesReturnReceiveInput: {
+      version: number
+      note?: string
+      /** @description Foto barang dan form retur yang ditandatangani. */
+      documentationFileIds: string[]
+      /** @description Qty hasil cek ulang bila kurang dari qty retur (baris lain tetap). */
+      lines?: components["schemas"]["SalesReturnReceivedQty"][]
+    }
+    CreditNoteSummary: {
+      /** Format: uuid */
+      id: string
+      number: string
+      /** Format: uuid */
+      salesReturnId: string
+      salesReturnNumber: string
+      /** Format: uuid */
+      invoiceId?: string | null
+      invoiceNumber?: string | null
+      partyType: components["schemas"]["SalesPartyType"]
+      /** Format: uuid */
+      partyId: string
+      partyName: string
+      settlementMethod: components["schemas"]["CreditNoteSettlement"]
+      issueDate: components["schemas"]["BusinessDate"]
+      amount: components["schemas"]["Money"]
+      appliedAmount: components["schemas"]["Money"]
+      refundedAmount: components["schemas"]["Money"]
+      remainingAmount: components["schemas"]["Money"]
+      status: components["schemas"]["CreditNoteStatus"]
+      /** Format: date-time */
+      createdAt: string
+      version: number
+    }
+    CreditNoteList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["CreditNoteSummary"][]
+    }
+    CreditNoteApplication: {
+      /** Format: uuid */
+      id: string
+      /** Format: uuid */
+      invoiceId: string
+      invoiceNumber: string
+      amount: components["schemas"]["Money"]
+      appliedDate: components["schemas"]["BusinessDate"]
+    }
+    CreditNoteOpenInvoice: {
+      /** Format: uuid */
+      id: string
+      number: string
+      invoiceDate: components["schemas"]["BusinessDate"]
+      dueDate: components["schemas"]["BusinessDate"]
+      totalAmount: components["schemas"]["Money"]
+      outstandingAmount: components["schemas"]["Money"]
+    }
+    CreditNote: components["schemas"]["CreditNoteSummary"] & {
+      decisionNote: string
+      refundDate?: components["schemas"]["BusinessDate"] | null
+      refundAccountCode: string
+      refundReference: string
+      /** Format: uuid */
+      refundJournalEntryId?: string | null
+      applications: components["schemas"]["CreditNoteApplication"][]
+      /** @description Invoice terbuka pihak yang sama (pilihan alokasi saat saldo masih ada). */
+      openInvoices: components["schemas"]["CreditNoteOpenInvoice"][]
+      allowedActions: ("print" | "apply" | "pay_refund")[]
+    }
+    CreditNoteAllocationInput: {
+      /** Format: uuid */
+      invoiceId: string
+      amount: components["schemas"]["Money"]
+    }
+    CreditNoteApplyInput: {
+      version: number
+      allocations: components["schemas"]["CreditNoteAllocationInput"][]
+    }
+    CreditNoteRefundInput: {
+      version: number
+      paymentDate: components["schemas"]["BusinessDate"]
+      /** @description Kode akun Kas & Bank sumber pembayaran. */
+      accountCode: string
+      reference?: string
+    }
     /** @description Payload webhook status order Biteship (nama field milik Biteship). */
     BiteshipNotification: {
       /** @example order.status */
@@ -11888,6 +12478,506 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["ReceivableAgingReport"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listSalesReturnSources: {
+    parameters: {
+      query?: {
+        q?: components["parameters"]["Search"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Sales Order sumber retur */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SalesReturnSourceList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getSalesReturnSource: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Sumber retur */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SalesReturnSourceDetail"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listSalesReturnPickupUsers: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Merchandiser */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SalesReturnPickupUserList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listSalesReturns: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["SalesReturnStatus"][]
+        salesOrderId?: string
+        partyId?: string
+        /** @description Hanya retur yang ditugaskan pickup ke user ini (Merchandiser). */
+        assignedToMe?: boolean
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Retur terbaru lebih dulu */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SalesReturnList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createSalesReturn: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SalesReturnInput"]
+      }
+    }
+    responses: {
+      /** @description Draft dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SalesReturn"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getSalesReturn: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Retur Penjualan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SalesReturn"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateSalesReturn: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SalesReturnUpdate"]
+      }
+    }
+    responses: {
+      /** @description Draft diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SalesReturn"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  submitSalesReturn: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Diajukan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SalesReturn"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  sendBackSalesReturn: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SalesReturnNoteInput"]
+      }
+    }
+    responses: {
+      /** @description Kembali Draft */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SalesReturn"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  verifySalesReturn: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SalesReturnVerifyInput"]
+      }
+    }
+    responses: {
+      /** @description Terverifikasi */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SalesReturn"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  assignSalesReturnPickup: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SalesReturnAssignPickupInput"]
+      }
+    }
+    responses: {
+      /** @description Ditugaskan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SalesReturn"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  recordSalesReturnPickup: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SalesReturnPickupInput"]
+      }
+    }
+    responses: {
+      /** @description Pickup dicatat */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SalesReturn"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  receiveSalesReturn: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SalesReturnReceiveInput"]
+      }
+    }
+    responses: {
+      /** @description Diproses */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SalesReturn"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  cancelSalesReturn: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SalesCancelInput"]
+      }
+    }
+    responses: {
+      /** @description Dibatalkan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SalesReturn"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listCreditNotes: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["CreditNoteStatus"][]
+        partyType?: components["schemas"]["SalesPartyType"]
+        partyId?: string
+        settlementMethod?: components["schemas"]["CreditNoteSettlement"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Nota kredit terbaru lebih dulu */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CreditNoteList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getCreditNote: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Nota kredit */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CreditNote"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  applyCreditNote: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreditNoteApplyInput"]
+      }
+    }
+    responses: {
+      /** @description Dialokasikan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CreditNote"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  payCreditNoteRefund: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreditNoteRefundInput"]
+      }
+    }
+    responses: {
+      /** @description Refund dibayar */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CreditNote"]
         }
       }
       default: components["responses"]["Problem"]
