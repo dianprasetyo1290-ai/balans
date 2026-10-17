@@ -197,18 +197,26 @@ export const MENU: MenuGroup[] = [
     label: "Persediaan",
     icon: BoxesIcon,
     modules: ["inventory"],
-    items: items(
-      "Stok per Lokasi",
-      "Kartu Stok",
-      "Batch & Kedaluwarsa",
-      "Alokasi Batch (FEFO)",
-      "HPP per Batch",
-      "Pemakaian Internal",
-      "Repacking",
-      "Pemusnahan",
-      "Peringatan Stok Minimum",
-      "Peringatan Kedaluwarsa"
-    ),
+    items: [
+      ...[
+        { label: "Stok per Lokasi", to: "/inventory/stock" },
+        { label: "Kartu Stok", to: "/inventory/stock-card" },
+        { label: "Batch & Kedaluwarsa", to: "/inventory/batches" },
+        { label: "Alokasi Batch (FEFO)", to: "/inventory/batch-allocation" },
+        { label: "HPP per Batch", to: "/inventory/cost-layers" },
+      ].map((i) => ({
+        ...i,
+        permission: "inventory.stock.read",
+        module: "inventory",
+      })),
+      ...items(
+        "Pemakaian Internal",
+        "Repacking",
+        "Pemusnahan",
+        "Peringatan Stok Minimum",
+        "Peringatan Kedaluwarsa"
+      ),
+    ],
   },
   {
     label: "Logistik",
