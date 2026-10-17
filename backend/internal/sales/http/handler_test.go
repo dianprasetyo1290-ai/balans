@@ -30,7 +30,7 @@ func TestRegisterRoutesWebhookToRawHandler(t *testing.T) {
 	rs := httpx.NewResponder(slog.New(slog.NewTextHandler(io.Discard, nil)), nil)
 	rec := &receiver{}
 	r := chi.NewRouter()
-	saleshttp.Register(r, saleshttp.NewHandler(service.NewReturnReasonService(nil, nil, nil)), saleshttp.NewWebhookHandler(rec, rs), rs)
+	saleshttp.Register(r, saleshttp.NewHandler(service.NewReturnReasonService(nil, nil, nil), nil), saleshttp.NewWebhookHandler(rec, rs), rs)
 
 	body := `{"order_id":"SO-1",  "status_code":"200"}`
 	w := httptest.NewRecorder()

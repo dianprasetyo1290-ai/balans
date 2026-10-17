@@ -13,7 +13,7 @@ tags:
   - name: system
     description: Kesehatan proses dan informasi sistem
   - name: sales
-    description: Penjualan, alasan retur, dan webhook payment gateway
+    description: Penjualan (Sales Order semua channel, Proforma, Invoice NON-PKP, piutang & pembayaran pelanggan), alasan retur, webhook payment gateway (R1.3)
   - name: logistics
     description: Pengiriman, termasuk webhook kurir
   - name: identity
@@ -233,6 +233,551 @@ paths:
       responses:
         '204':
           description: Alasan retur dihapus
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/orders:
+    get:
+      operationId: listSalesOrders
+      tags:
+        - sales
+      summary: Daftar Sales Order semua channel (Sales Order, Modern Trade, Penjualan Marketplace, WA/IG, Karyawan)
+      description: |
+        Hanya jenis pesanan yang boleh dilihat user: marketplace butuh `sales.marketplace_order.read`, jenis lain
+        `sales.sales_order.read`.
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/Search'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/SalesDocumentStatus'
+        - name: orderType
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/SalesOrderType'
+        - name: channelId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: subChannelId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: dateFrom
+          in: query
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+        - name: dateTo
+          in: query
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+      responses:
+        '200':
+          description: Pesanan terbaru lebih dulu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesOrderList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createSalesOrder
+      tags:
+        - sales
+      summary: Menyimpan draft Sales Order, atau mencatat penjualan marketplace (S-301, S-306, S-307, S-308)
+      description: |
+        Harga satuan diambil resolver harga (harga khusus → promo → bertingkat → daftar harga channel/mitra/karyawan
+        → Harga Dasar) pada tanggal pesanan; aturan & versi disimpan per baris. Diskon manual per baris/dokumen
+        (persen atau nominal). NON-PKP: tanpa PPN. Marketplace (`orderType=marketplace`) langsung tercatat Diproses
+        dengan E-commerce Stock dialokasikan; nomor order marketplace unik per marketplace; harga baris boleh diisi
+        dari marketplace (`unitPrice`).
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesOrderInput'
+      responses:
+        '201':
+          description: Pesanan dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesOrder'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/orders/{id}:
+    get:
+      operationId: getSalesOrder
+      tags:
+        - sales
+      summary: Detail Sales Order beserta alokasi batch, Proforma, invoice, dan pengiriman
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Sales Order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesOrder'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      operationId: updateSalesOrder
+      tags:
+        - sales
+      summary: Mengubah draft Sales Order (jenis pesanan tetap; harga dihitung ulang)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesOrderUpdate'
+      responses:
+        '200':
+          description: Draft diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesOrder'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/orders/{id}/confirm:
+    post:
+      operationId: confirmSalesOrder
+      tags:
+        - sales
+      summary: Konfirmasi Sales Order
+      description: |
+        Harga dihitung ulang, nomor `SO/TAHUN/BULAN/NOMOR` diberikan, stok dialokasikan FEFO dari lokasi asal
+        (bundel dipecah ke komponen). Diskon di atas batas role → Menunggu Persetujuan (`sales_order_discount`, Head
+        Sales). Selain itu: prepaid → Proforma Invoice terbit (Menunggu Pembayaran); tempo → invoice terbit dan
+        jurnal A-05 (Diproses).
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Pesanan dikonfirmasi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesOrder'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/orders/{id}/cancel:
+    post:
+      operationId: cancelSalesOrder
+      tags:
+        - sales
+      summary: Batalkan Sales Order yang belum dikirim
+      description: |
+        Alasan wajib selain draft. Approval diskon dibatalkan, alokasi stok dilepas, Proforma dibatalkan, invoice
+        tempo tanpa pembayaran dibatalkan dengan jurnal balik A-05.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesCancelInput'
+      responses:
+        '200':
+          description: Pesanan dibatalkan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesOrder'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/orders/{id}/payment-proof:
+    post:
+      operationId: uploadSalesOrderPaymentProof
+      tags:
+        - sales
+      summary: Unggah bukti bayar pelanggan (pesanan Menunggu Pembayaran)
+      description: |
+        File diunggah dulu lewat `/api/v1/files` dengan `ownerType=sales.payment_proof` (JPG/PNG/WebP/PDF), lalu
+        ditautkan ke pesanan. F&A mengonfirmasi pembayaran di Proforma Invoice.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesPaymentProofInput'
+      responses:
+        '200':
+          description: Bukti bayar tercatat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesOrder'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/channel-options:
+    get:
+      operationId: listSalesChannelOptions
+      tags:
+        - sales
+      summary: Channel & sub-channel aktif untuk form pesanan
+      responses:
+        '200':
+          description: Channel dan sub-channel
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SalesChannelOption'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/location-options:
+    get:
+      operationId: listSalesLocationOptions
+      tags:
+        - sales
+      summary: Lokasi asal stok yang boleh dipakai jenis pesanan
+      parameters:
+        - name: orderType
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/SalesOrderType'
+      responses:
+        '200':
+          description: Lokasi aktif
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SalesLocationRef'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/cash-bank-accounts:
+    get:
+      operationId: listSalesCashBankAccounts
+      tags:
+        - sales
+      summary: Akun Kas & Bank (11xx) untuk konfirmasi pembayaran
+      responses:
+        '200':
+          description: Akun Kas & Bank aktif
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SalesAccountOption'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/proforma-invoices:
+    get:
+      operationId: listProformaInvoices
+      tags:
+        - sales
+      summary: Daftar Proforma Invoice
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Search'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/SalesDocumentStatus'
+      responses:
+        '200':
+          description: PI terbaru lebih dulu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProformaInvoiceList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/proforma-invoices/{id}:
+    get:
+      operationId: getProformaInvoice
+      tags:
+        - sales
+      summary: Detail Proforma Invoice beserta Sales Order (cetak PI)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Proforma Invoice
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProformaInvoiceDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/proforma-invoices/{id}/confirm-payment:
+    post:
+      operationId: confirmProformaPayment
+      tags:
+        - sales
+      summary: Konfirmasi pembayaran Proforma Invoice (F&A)
+      description: |
+        Invoice final `INV/…` terbit Lunas dengan jurnal A-05, pembayaran `BYR/…` tercatat dan dialokasikan ke
+        invoice (A-PB: Dr Kas/Bank, Cr Piutang Usaha), Sales Order menjadi Diproses (siap dikirim). PI yang lewat
+        masa berlaku ditolak.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProformaPaymentInput'
+      responses:
+        '200':
+          description: PI Lunas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProformaInvoiceDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/invoices:
+    get:
+      operationId: listSalesInvoices
+      tags:
+        - sales
+      summary: Daftar invoice (Penjualan › Invoice, Keuangan & Akuntansi › Piutang Usaha)
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/Search'
+        - name: status
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/SalesDocumentStatus'
+        - name: partyType
+          in: query
+          schema:
+            $ref: '#/components/schemas/SalesPartyType'
+        - name: partyId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: dateFrom
+          in: query
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+        - name: dateTo
+          in: query
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+        - name: overdue
+          in: query
+          description: Hanya invoice terbuka yang lewat jatuh tempo hari ini.
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Invoice terbaru lebih dulu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesInvoiceList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/invoices/{id}:
+    get:
+      operationId: getSalesInvoice
+      tags:
+        - sales
+      summary: Detail invoice beserta riwayat pembayaran (cetak invoice NON-PKP)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Invoice
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesInvoice'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/invoices/{id}/share-text:
+    get:
+      operationId: getSalesInvoiceShareText
+      tags:
+        - sales
+      summary: Teks invoice siap tempel ke WhatsApp
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Teks invoice
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesShareText'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/customer-payments:
+    get:
+      operationId: listCustomerPayments
+      tags:
+        - sales
+      summary: Daftar pembayaran pelanggan (Piutang Usaha)
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Search'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/SalesDocumentStatus'
+        - name: partyType
+          in: query
+          schema:
+            $ref: '#/components/schemas/SalesPartyType'
+        - name: partyId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: dateFrom
+          in: query
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+        - name: dateTo
+          in: query
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+      responses:
+        '200':
+          description: Pembayaran terbaru lebih dulu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerPaymentList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createCustomerPayment
+      tags:
+        - sales
+      summary: Catat pembayaran pelanggan (alokasi ke satu atau banyak invoice) ★
+      description: |
+        Pembayaran sebagian diperbolehkan; jumlah alokasi harus sama dengan nominal pembayaran. Nomor `BYR/…` dan
+        jurnal A-PB (Dr akun Kas & Bank, Cr Piutang Usaha 1201, pihak = pelanggan/mitra). Butuh
+        `accounting.payment.post` dan re-autentikasi 5 menit.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerPaymentInput'
+      responses:
+        '201':
+          description: Pembayaran diposting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerPayment'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/customer-payments/{id}:
+    get:
+      operationId: getCustomerPayment
+      tags:
+        - sales
+      summary: Detail pembayaran pelanggan
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Pembayaran
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerPayment'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/customer-payments/{id}/cancel:
+    post:
+      operationId: cancelCustomerPayment
+      tags:
+        - sales
+      summary: Batalkan pembayaran pelanggan ★ (jurnal A-PB dibalik, piutang invoice dikembalikan)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesCancelInput'
+      responses:
+        '200':
+          description: Pembayaran dibatalkan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerPayment'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/receivable-aging:
+    get:
+      operationId: getReceivableAging
+      tags:
+        - sales
+      summary: Laporan Piutang — umur piutang per pelanggan/mitra
+      parameters:
+        - name: asOf
+          in: query
+          description: Tanggal posisi (default hari ini).
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+        - name: partyType
+          in: query
+          schema:
+            $ref: '#/components/schemas/SalesPartyType'
+      responses:
+        '200':
+          description: Umur piutang
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReceivableAgingReport'
         default:
           $ref: '#/components/responses/Problem'
   /api/v1/webhooks/biteship:
@@ -7205,6 +7750,1117 @@ components:
       allOf:
         - $ref: '#/components/schemas/ReturnReasonFields'
         - $ref: '#/components/schemas/VersionInput'
+    SalesDocumentStatus:
+      type: string
+      description: Status Sales Order, Proforma Invoice, Invoice, dan pembayaran pelanggan (Desain Status Dokumen 1).
+      enum:
+        - draft
+        - pending_approval
+        - awaiting_payment
+        - partially_paid
+        - paid
+        - in_progress
+        - in_transit
+        - completed
+        - cancelled
+        - expired
+        - posted
+    SalesOrderType:
+      type: string
+      description: |
+        Jenis pesanan (satu model Sales Order untuk semua channel): `modern_trade` MT beli putus, `b2b` B2B/corporate,
+        `social_commerce` WhatsApp/Instagram, `marketplace` penjualan marketplace, `employee` penjualan karyawan.
+      enum:
+        - modern_trade
+        - b2b
+        - social_commerce
+        - marketplace
+        - employee
+    BusinessDate:
+      type: string
+      format: date
+      description: Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+      example: '2026-10-19'
+    Pagination:
+      type: object
+      description: Metadata pagination standar (Technical Guideline 8.2).
+      required:
+        - page
+        - pageSize
+        - totalItems
+        - totalPages
+      properties:
+        page:
+          type: integer
+          minimum: 1
+        pageSize:
+          type: integer
+          minimum: 1
+          maximum: 200
+        totalItems:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+    SalesPaymentMode:
+      type: string
+      description: '`prepaid` = Proforma Invoice lalu invoice lunas; `credit` = tempo (MT/B2B), invoice terbit saat konfirmasi.'
+      enum:
+        - prepaid
+        - credit
+    Money:
+      type: string
+      description: Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+      pattern: ^-?[0-9]{1,16}(\.[0-9]{1,2})?$
+      example: '1250000.00'
+    SalesOrderSummary:
+      type: object
+      required:
+        - id
+        - orderType
+        - channelId
+        - channelName
+        - subChannelId
+        - subChannelName
+        - partyName
+        - partyCode
+        - partyPhone
+        - externalOrderId
+        - clientPoNumber
+        - businessDate
+        - paymentMode
+        - totalAmount
+        - status
+        - createdAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+          nullable: true
+        orderType:
+          $ref: '#/components/schemas/SalesOrderType'
+        channelId:
+          type: string
+          format: uuid
+        channelName:
+          type: string
+        subChannelId:
+          type: string
+          format: uuid
+        subChannelName:
+          type: string
+        customerId:
+          type: string
+          format: uuid
+          nullable: true
+        partnerId:
+          type: string
+          format: uuid
+          nullable: true
+        partyName:
+          type: string
+        partyCode:
+          type: string
+        partyPhone:
+          type: string
+        externalOrderId:
+          type: string
+        clientPoNumber:
+          type: string
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        paymentMode:
+          $ref: '#/components/schemas/SalesPaymentMode'
+        totalAmount:
+          $ref: '#/components/schemas/Money'
+        status:
+          $ref: '#/components/schemas/SalesDocumentStatus'
+        createdAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    SalesOrderList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/SalesOrderSummary'
+    DiscountKind:
+      type: string
+      description: Bentuk diskon manual (MD-05) — persen dari dasar atau nominal rupiah.
+      enum:
+        - percent
+        - amount
+    SalesDiscount:
+      type: object
+      required:
+        - kind
+        - value
+      properties:
+        kind:
+          $ref: '#/components/schemas/DiscountKind'
+        value:
+          type: string
+          description: Persen (maks. 4 desimal) atau nominal rupiah.
+          example: '5'
+    SalesQuantity:
+      type: string
+      description: Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+      pattern: ^[0-9]{1,15}(\.[0-9]{1,3})?$
+      example: '12.000'
+    SalesOrderLineInput:
+      type: object
+      required:
+        - productId
+        - qty
+      properties:
+        productId:
+          type: string
+          format: uuid
+        qty:
+          $ref: '#/components/schemas/SalesQuantity'
+        discount:
+          $ref: '#/components/schemas/SalesDiscount'
+        unitPrice:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          nullable: true
+          description: Hanya marketplace (harga di marketplace); jenis lain memakai resolver harga.
+        note:
+          type: string
+          maxLength: 200
+    SalesOrderFields:
+      type: object
+      required:
+        - channelId
+        - subChannelId
+        - businessDate
+        - lines
+      properties:
+        channelId:
+          type: string
+          format: uuid
+        subChannelId:
+          type: string
+          format: uuid
+        customerId:
+          type: string
+          format: uuid
+          nullable: true
+        partnerId:
+          type: string
+          format: uuid
+          nullable: true
+        buyerName:
+          type: string
+          maxLength: 200
+          description: Nama pembeli marketplace.
+        externalOrderId:
+          type: string
+          maxLength: 80
+          description: Nomor order marketplace (unik per marketplace).
+        clientPoNumber:
+          type: string
+          maxLength: 200
+          description: Nomor PO klien MT/B2B.
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        sourceLocationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Lokasi asal stok; kosong untuk marketplace = E-commerce Stock satu-satunya.
+        paymentMode:
+          $ref: '#/components/schemas/SalesPaymentMode'
+        paymentTermDays:
+          type: integer
+          minimum: 0
+          maximum: 365
+        shipToName:
+          type: string
+          maxLength: 200
+        shipToPhone:
+          type: string
+          maxLength: 200
+        shipToAddress:
+          type: string
+          maxLength: 1000
+        documentDiscount:
+          $ref: '#/components/schemas/SalesDiscount'
+        shippingAmount:
+          $ref: '#/components/schemas/Money'
+        note:
+          type: string
+          maxLength: 1000
+        lines:
+          type: array
+          maxItems: 200
+          items:
+            $ref: '#/components/schemas/SalesOrderLineInput'
+    SalesOrderInput:
+      allOf:
+        - $ref: '#/components/schemas/SalesOrderFields'
+        - type: object
+          required:
+            - orderType
+          properties:
+            orderType:
+              $ref: '#/components/schemas/SalesOrderType'
+    SalesLocationRef:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - locationType
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        locationType:
+          type: string
+    SalesProductRef:
+      type: object
+      required:
+        - id
+        - sku
+        - name
+        - uom
+      properties:
+        id:
+          type: string
+          format: uuid
+        sku:
+          type: string
+        name:
+          type: string
+        uom:
+          type: string
+    SalesOrderLine:
+      type: object
+      required:
+        - id
+        - lineNo
+        - product
+        - isBundle
+        - qty
+        - unitPrice
+        - priceRule
+        - priceDescription
+        - discount
+        - grossAmount
+        - discountAmount
+        - lineTotalAmount
+        - shippedQty
+        - note
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        product:
+          $ref: '#/components/schemas/SalesProductRef'
+        isBundle:
+          type: boolean
+        qty:
+          $ref: '#/components/schemas/SalesQuantity'
+        unitPrice:
+          $ref: '#/components/schemas/Money'
+        priceRule:
+          type: string
+          description: Aturan harga (PriceRule) atau `marketplace_input`.
+        priceSourceId:
+          type: string
+          format: uuid
+          nullable: true
+        priceListId:
+          type: string
+          format: uuid
+          nullable: true
+        priceListVersionId:
+          type: string
+          format: uuid
+          nullable: true
+        priceDescription:
+          type: string
+        discount:
+          $ref: '#/components/schemas/SalesDiscount'
+        grossAmount:
+          $ref: '#/components/schemas/Money'
+        discountAmount:
+          $ref: '#/components/schemas/Money'
+        lineTotalAmount:
+          $ref: '#/components/schemas/Money'
+        shippedQty:
+          $ref: '#/components/schemas/SalesQuantity'
+        note:
+          type: string
+    SalesAllocationBatch:
+      type: object
+      required:
+        - qty
+      properties:
+        batchId:
+          type: string
+          format: uuid
+          nullable: true
+        batchNumber:
+          type: string
+          nullable: true
+        expiryDate:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
+        qty:
+          $ref: '#/components/schemas/SalesQuantity'
+    SalesOrderAllocation:
+      type: object
+      required:
+        - id
+        - lineId
+        - product
+        - location
+        - qty
+        - shippedQty
+        - released
+        - batches
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineId:
+          type: string
+          format: uuid
+        product:
+          $ref: '#/components/schemas/SalesProductRef'
+        location:
+          $ref: '#/components/schemas/SalesLocationRef'
+        qty:
+          $ref: '#/components/schemas/SalesQuantity'
+        shippedQty:
+          $ref: '#/components/schemas/SalesQuantity'
+        released:
+          type: boolean
+        batches:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesAllocationBatch'
+    SalesDocumentRef:
+      type: object
+      required:
+        - id
+        - number
+        - status
+        - amount
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        status:
+          $ref: '#/components/schemas/SalesDocumentStatus'
+        amount:
+          $ref: '#/components/schemas/Money'
+        validUntil:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
+        paidAmount:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          nullable: true
+    SalesShipment:
+      type: object
+      required:
+        - id
+        - sourceType
+        - sourceId
+        - sourceLabel
+        - businessDate
+        - costAmount
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        sourceType:
+          type: string
+        sourceId:
+          type: string
+          format: uuid
+        sourceLabel:
+          type: string
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        costAmount:
+          $ref: '#/components/schemas/Money'
+        createdAt:
+          type: string
+          format: date-time
+    SalesOrder:
+      allOf:
+        - $ref: '#/components/schemas/SalesOrderSummary'
+        - type: object
+          required:
+            - sourceLocation
+            - paymentTermDays
+            - shipToName
+            - shipToPhone
+            - shipToAddress
+            - grossAmount
+            - lineDiscountAmount
+            - documentDiscount
+            - documentDiscountAmount
+            - shippingAmount
+            - discountApprovalRequired
+            - note
+            - cancelReason
+            - createdByName
+            - lines
+            - allocations
+            - proformas
+            - invoices
+            - shipments
+            - allowedActions
+          properties:
+            sourceLocation:
+              $ref: '#/components/schemas/SalesLocationRef'
+            paymentTermDays:
+              type: integer
+            shipToName:
+              type: string
+            shipToPhone:
+              type: string
+            shipToAddress:
+              type: string
+            grossAmount:
+              $ref: '#/components/schemas/Money'
+            lineDiscountAmount:
+              $ref: '#/components/schemas/Money'
+            documentDiscount:
+              $ref: '#/components/schemas/SalesDiscount'
+            documentDiscountAmount:
+              $ref: '#/components/schemas/Money'
+            shippingAmount:
+              $ref: '#/components/schemas/Money'
+            discountApprovalRequired:
+              type: boolean
+            discountApprovedAt:
+              type: string
+              format: date-time
+              nullable: true
+            note:
+              type: string
+            cancelReason:
+              type: string
+            confirmedAt:
+              type: string
+              format: date-time
+              nullable: true
+            shippedAt:
+              type: string
+              format: date-time
+              nullable: true
+            deliveredAt:
+              type: string
+              format: date-time
+              nullable: true
+            paymentProofFileId:
+              type: string
+              format: uuid
+              nullable: true
+            paymentProofFileName:
+              type: string
+              nullable: true
+            createdByName:
+              type: string
+            lines:
+              type: array
+              items:
+                $ref: '#/components/schemas/SalesOrderLine'
+            allocations:
+              type: array
+              items:
+                $ref: '#/components/schemas/SalesOrderAllocation'
+            proformas:
+              type: array
+              items:
+                $ref: '#/components/schemas/SalesDocumentRef'
+            invoices:
+              type: array
+              items:
+                $ref: '#/components/schemas/SalesDocumentRef'
+            shipments:
+              type: array
+              items:
+                $ref: '#/components/schemas/SalesShipment'
+            allowedActions:
+              type: array
+              items:
+                type: string
+                enum:
+                  - edit
+                  - confirm
+                  - cancel
+                  - upload_payment_proof
+    SalesOrderUpdate:
+      allOf:
+        - $ref: '#/components/schemas/SalesOrderFields'
+        - $ref: '#/components/schemas/VersionInput'
+    SalesCancelInput:
+      type: object
+      required:
+        - version
+      properties:
+        version:
+          type: integer
+        reason:
+          type: string
+          maxLength: 400
+    SalesPaymentProofInput:
+      type: object
+      required:
+        - version
+        - fileId
+      properties:
+        version:
+          type: integer
+        fileId:
+          type: string
+          format: uuid
+    SalesChannelOption:
+      type: object
+      required:
+        - id
+        - kind
+        - code
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          enum:
+            - channel
+            - sub_channel
+        code:
+          type: string
+        name:
+          type: string
+        channelId:
+          type: string
+          format: uuid
+          nullable: true
+        partyType:
+          type: string
+        partyId:
+          type: string
+          format: uuid
+          nullable: true
+    SalesAccountOption:
+      type: object
+      required:
+        - id
+        - code
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+    ProformaInvoice:
+      type: object
+      required:
+        - id
+        - number
+        - salesOrderId
+        - salesOrderNumber
+        - partyName
+        - orderType
+        - amount
+        - issueDate
+        - validUntil
+        - status
+        - cancelReason
+        - allowedActions
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        salesOrderId:
+          type: string
+          format: uuid
+        salesOrderNumber:
+          type: string
+        partyName:
+          type: string
+        orderType:
+          $ref: '#/components/schemas/SalesOrderType'
+        amount:
+          $ref: '#/components/schemas/Money'
+        issueDate:
+          $ref: '#/components/schemas/BusinessDate'
+        validUntil:
+          $ref: '#/components/schemas/BusinessDate'
+        status:
+          $ref: '#/components/schemas/SalesDocumentStatus'
+        paidAt:
+          type: string
+          format: date-time
+          nullable: true
+        invoiceId:
+          type: string
+          format: uuid
+          nullable: true
+        cancelReason:
+          type: string
+        allowedActions:
+          type: array
+          items:
+            type: string
+            enum:
+              - confirm_payment
+              - print
+        version:
+          type: integer
+    ProformaInvoiceList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProformaInvoice'
+    ProformaInvoiceDetail:
+      allOf:
+        - $ref: '#/components/schemas/ProformaInvoice'
+        - type: object
+          required:
+            - salesOrder
+          properties:
+            salesOrder:
+              $ref: '#/components/schemas/SalesOrder'
+    CustomerPaymentMethod:
+      type: string
+      enum:
+        - bank_transfer
+        - cash
+    ProformaPaymentInput:
+      type: object
+      required:
+        - version
+        - method
+        - accountCode
+      properties:
+        version:
+          type: integer
+        paymentDate:
+          $ref: '#/components/schemas/BusinessDate'
+        method:
+          $ref: '#/components/schemas/CustomerPaymentMethod'
+        accountCode:
+          type: string
+          description: Kode akun Kas & Bank penerima (11xx).
+        reference:
+          type: string
+          maxLength: 200
+        proofFileId:
+          type: string
+          format: uuid
+          nullable: true
+    SalesPartyType:
+      type: string
+      description: Jenis pihak invoice/pembayaran.
+      enum:
+        - customer
+        - partner
+    SalesInvoiceSummary:
+      type: object
+      required:
+        - id
+        - number
+        - invoiceType
+        - salesOrderNumber
+        - partyType
+        - partyId
+        - partyCode
+        - partyName
+        - invoiceDate
+        - dueDate
+        - totalAmount
+        - paidAmount
+        - outstandingAmount
+        - daysOverdue
+        - status
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        invoiceType:
+          type: string
+        salesOrderId:
+          type: string
+          format: uuid
+          nullable: true
+        salesOrderNumber:
+          type: string
+        partyType:
+          $ref: '#/components/schemas/SalesPartyType'
+        partyId:
+          type: string
+          format: uuid
+        partyCode:
+          type: string
+        partyName:
+          type: string
+        invoiceDate:
+          $ref: '#/components/schemas/BusinessDate'
+        dueDate:
+          $ref: '#/components/schemas/BusinessDate'
+        totalAmount:
+          $ref: '#/components/schemas/Money'
+        paidAmount:
+          $ref: '#/components/schemas/Money'
+        outstandingAmount:
+          $ref: '#/components/schemas/Money'
+        daysOverdue:
+          type: integer
+        status:
+          $ref: '#/components/schemas/SalesDocumentStatus'
+        version:
+          type: integer
+    SalesInvoiceList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/SalesInvoiceSummary'
+    SalesInvoiceLine:
+      type: object
+      required:
+        - id
+        - lineNo
+        - description
+        - qty
+        - unitPrice
+        - discountAmount
+        - lineTotalAmount
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+        description:
+          type: string
+        qty:
+          $ref: '#/components/schemas/SalesQuantity'
+        unitPrice:
+          $ref: '#/components/schemas/Money'
+        discountAmount:
+          $ref: '#/components/schemas/Money'
+        lineTotalAmount:
+          $ref: '#/components/schemas/Money'
+    SalesInvoicePayment:
+      type: object
+      required:
+        - paymentId
+        - paymentNumber
+        - paymentDate
+        - status
+        - amount
+      properties:
+        paymentId:
+          type: string
+          format: uuid
+        paymentNumber:
+          type: string
+        paymentDate:
+          $ref: '#/components/schemas/BusinessDate'
+        status:
+          $ref: '#/components/schemas/SalesDocumentStatus'
+        amount:
+          $ref: '#/components/schemas/Money'
+    SalesInvoice:
+      allOf:
+        - $ref: '#/components/schemas/SalesInvoiceSummary'
+        - type: object
+          required:
+            - channelName
+            - subChannelName
+            - grossAmount
+            - discountAmount
+            - shippingAmount
+            - cancelReason
+            - shipToAddress
+            - lines
+            - payments
+            - allowedActions
+          properties:
+            channelName:
+              type: string
+            subChannelName:
+              type: string
+            orderType:
+              allOf:
+                - $ref: '#/components/schemas/SalesOrderType'
+              nullable: true
+            grossAmount:
+              $ref: '#/components/schemas/Money'
+            discountAmount:
+              $ref: '#/components/schemas/Money'
+            shippingAmount:
+              $ref: '#/components/schemas/Money'
+            cancelReason:
+              type: string
+            shipToAddress:
+              type: string
+            lines:
+              type: array
+              items:
+                $ref: '#/components/schemas/SalesInvoiceLine'
+            payments:
+              type: array
+              items:
+                $ref: '#/components/schemas/SalesInvoicePayment'
+            allowedActions:
+              type: array
+              items:
+                type: string
+                enum:
+                  - print
+                  - share_whatsapp
+                  - record_payment
+    SalesShareText:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+    CustomerPaymentAllocation:
+      type: object
+      required:
+        - invoiceId
+        - amount
+      properties:
+        invoiceId:
+          type: string
+          format: uuid
+        invoiceNumber:
+          type: string
+        amount:
+          $ref: '#/components/schemas/Money'
+    CustomerPayment:
+      type: object
+      required:
+        - id
+        - number
+        - partyType
+        - partyId
+        - partyName
+        - paymentDate
+        - amount
+        - method
+        - accountCode
+        - reference
+        - note
+        - status
+        - cancelReason
+        - allocations
+        - allowedActions
+        - createdAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        partyType:
+          $ref: '#/components/schemas/SalesPartyType'
+        partyId:
+          type: string
+          format: uuid
+        partyName:
+          type: string
+        paymentDate:
+          $ref: '#/components/schemas/BusinessDate'
+        amount:
+          $ref: '#/components/schemas/Money'
+        method:
+          $ref: '#/components/schemas/CustomerPaymentMethod'
+        accountCode:
+          type: string
+        reference:
+          type: string
+        proofFileId:
+          type: string
+          format: uuid
+          nullable: true
+        note:
+          type: string
+        status:
+          $ref: '#/components/schemas/SalesDocumentStatus'
+        cancelReason:
+          type: string
+        journalEntryId:
+          type: string
+          format: uuid
+          nullable: true
+        allocations:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerPaymentAllocation'
+        allowedActions:
+          type: array
+          items:
+            type: string
+            enum:
+              - cancel
+        createdAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    CustomerPaymentList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/CustomerPayment'
+    CustomerPaymentInput:
+      type: object
+      required:
+        - partyType
+        - partyId
+        - paymentDate
+        - amount
+        - method
+        - accountCode
+        - allocations
+      properties:
+        partyType:
+          $ref: '#/components/schemas/SalesPartyType'
+        partyId:
+          type: string
+          format: uuid
+        paymentDate:
+          $ref: '#/components/schemas/BusinessDate'
+        amount:
+          $ref: '#/components/schemas/Money'
+        method:
+          $ref: '#/components/schemas/CustomerPaymentMethod'
+        accountCode:
+          type: string
+        reference:
+          type: string
+          maxLength: 200
+        proofFileId:
+          type: string
+          format: uuid
+          nullable: true
+        note:
+          type: string
+          maxLength: 1000
+        allocations:
+          type: array
+          minItems: 1
+          maxItems: 200
+          items:
+            $ref: '#/components/schemas/CustomerPaymentAllocation'
+    ReceivableAgingRow:
+      type: object
+      required:
+        - partyType
+        - partyId
+        - partyName
+        - invoices
+        - current
+        - days1To30
+        - days31To60
+        - days61To90
+        - over90
+        - total
+      properties:
+        partyType:
+          $ref: '#/components/schemas/SalesPartyType'
+        partyId:
+          type: string
+          format: uuid
+        partyName:
+          type: string
+        invoices:
+          type: integer
+        current:
+          $ref: '#/components/schemas/Money'
+        days1To30:
+          $ref: '#/components/schemas/Money'
+        days31To60:
+          $ref: '#/components/schemas/Money'
+        days61To90:
+          $ref: '#/components/schemas/Money'
+        over90:
+          $ref: '#/components/schemas/Money'
+        total:
+          $ref: '#/components/schemas/Money'
+    ReceivableAgingReport:
+      type: object
+      required:
+        - asOf
+        - rows
+        - totals
+      properties:
+        asOf:
+          $ref: '#/components/schemas/BusinessDate'
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReceivableAgingRow'
+        totals:
+          $ref: '#/components/schemas/ReceivableAgingRow'
     BiteshipNotification:
       type: object
       description: Payload webhook status order Biteship (nama field milik Biteship).
@@ -7360,27 +9016,6 @@ components:
         mfaEnrollmentRequired:
           type: boolean
           description: Role user mewajibkan MFA tetapi MFA belum aktif; semua menu lain terkunci sampai MFA aktif.
-    Pagination:
-      type: object
-      description: Metadata pagination standar (Technical Guideline 8.2).
-      required:
-        - page
-        - pageSize
-        - totalItems
-        - totalPages
-      properties:
-        page:
-          type: integer
-          minimum: 1
-        pageSize:
-          type: integer
-          minimum: 1
-          maximum: 200
-        totalItems:
-          type: integer
-          format: int64
-        totalPages:
-          type: integer
     UserRoleAssignment:
       type: object
       required:
@@ -7647,11 +9282,6 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/AuditLog'
-    Money:
-      type: string
-      description: Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
-      pattern: ^-?[0-9]{1,16}(\.[0-9]{1,2})?$
-      example: '1250000.00'
     ApprovalStatus:
       type: string
       enum:
@@ -8030,11 +9660,6 @@ components:
           properties:
             version:
               type: integer
-    BusinessDate:
-      type: string
-      format: date
-      description: Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
-      example: '2026-10-19'
     ApprovalDelegationStatus:
       type: string
       enum:
@@ -13836,12 +15461,6 @@ components:
           description: HET bila harga berasal dari Harga Dasar & HET.
         description:
           type: string
-    DiscountKind:
-      type: string
-      description: Bentuk diskon manual (MD-05) — persen dari dasar atau nominal rupiah.
-      enum:
-        - percent
-        - amount
     DiscountValue:
       type: object
       required:
@@ -16191,12 +17810,6 @@ components:
       schema:
         type: string
         format: uuid
-    RefreshCookie:
-      name: balans_refresh
-      in: cookie
-      required: false
-      schema:
-        type: string
     Page:
       name: page
       in: query
@@ -16216,6 +17829,12 @@ components:
       name: sort
       in: query
       description: Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`.
+      schema:
+        type: string
+    RefreshCookie:
+      name: balans_refresh
+      in: cookie
+      required: false
       schema:
         type: string
     Version:
