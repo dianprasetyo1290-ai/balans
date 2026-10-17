@@ -42,7 +42,9 @@ func ReportUUIDParam(params map[string]string, key string) (*uuid.UUID, error) {
 }
 
 // MonthStart adalah tanggal 1 bulan berjalan.
-func MonthStart(d clock.BusinessDate) clock.BusinessDate { return clock.NewBusinessDate(d.Year(), d.Month(), 1) }
+func MonthStart(d clock.BusinessDate) clock.BusinessDate {
+	return clock.NewBusinessDate(d.Year(), d.Month(), 1)
+}
 
 func (s *ReportService) periodParams(params map[string]string) (clock.BusinessDate, clock.BusinessDate, error) {
 	today := clock.Today(s.Clock)

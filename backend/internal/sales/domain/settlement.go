@@ -60,7 +60,9 @@ type Settlement struct {
 }
 
 // Label adalah label tampilan, mis. "Settlement shopee PAYOUT-1".
-func (s Settlement) Label() string { return "Settlement " + s.MarketplaceCode + " " + s.PayoutReference }
+func (s Settlement) Label() string {
+	return "Settlement " + s.MarketplaceCode + " " + s.PayoutReference
+}
 
 // Aksi settlement.
 const (

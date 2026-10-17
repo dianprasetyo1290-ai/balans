@@ -151,7 +151,9 @@ type StatementView struct {
 	RefreshedAt *time.Time
 }
 
-func yearStart(d clock.BusinessDate) clock.BusinessDate { return clock.NewBusinessDate(d.Year(), time.January, 1) }
+func yearStart(d clock.BusinessDate) clock.BusinessDate {
+	return clock.NewBusinessDate(d.Year(), time.January, 1)
+}
 
 func (s *ReportService) movements(ctx context.Context, from, to clock.BusinessDate, d domain.Dimensions) ([]domain.Movement, map[uuid.UUID]domain.Account, error) {
 	accs, err := s.Store.ListAccounts(ctx, true)

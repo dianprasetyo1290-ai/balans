@@ -171,7 +171,6 @@ func byGroup(list []Movement, g Group) []Movement {
 	return out
 }
 
-func before(m Movement) money.Amount { return m.Before }
 func during(m Movement) money.Amount { return m.During }
 
 // BalanceSheet menyusun Neraca per akhir periode. Ekuitas ditambah laba (rugi) tahun berjalan (kelompok 4–7
@@ -194,7 +193,9 @@ func BalanceSheet(list []Movement, parent ParentLookup) Statement {
 	equity = append(equity, StatementRow{Kind: RowAccount, Code: "3202", Label: "Laba (Rugi) Tahun Berjalan (dihitung)", Level: 2, Amount: current.NetProfit})
 	totalEquity = totalEquity.Add(current.NetProfit)
 
-	rows := append(assets, StatementRow{Kind: RowTotal, Label: "TOTAL ASET", Amount: totalAssets})
+	rows := make([]StatementRow, 0, len(assets)+len(liabs)+len(equity)+4)
+	rows = append(rows, assets...)
+	rows = append(rows, StatementRow{Kind: RowTotal, Label: "TOTAL ASET", Amount: totalAssets})
 	rows = append(rows, liabs...)
 	rows = append(rows, StatementRow{Kind: RowSubtotal, Label: "Total Liabilitas", Amount: totalLiabs})
 	rows = append(rows, equity...)
@@ -215,7 +216,9 @@ func IncomeStatement(list []Movement, parent ParentLookup) Statement {
 	cogs, _ := section("HARGA POKOK PENJUALAN", byGroup(list, GroupCOGS), during, false, parent)
 	opex, _ := section("BEBAN OPERASIONAL", byGroup(list, GroupExpense), during, false, parent)
 	other, _ := section("PENDAPATAN & BEBAN LAIN-LAIN", byGroup(list, GroupOther), during, true, parent)
-	rows := append(rev, StatementRow{Kind: RowSubtotal, Label: "Pendapatan Bersih", Amount: pl.Revenue})
+	rows := make([]StatementRow, 0, len(rev)+len(cogs)+len(opex)+len(other)+8)
+	rows = append(rows, rev...)
+	rows = append(rows, StatementRow{Kind: RowSubtotal, Label: "Pendapatan Bersih", Amount: pl.Revenue})
 	rows = append(rows, cogs...)
 	rows = append(rows, StatementRow{Kind: RowSubtotal, Label: "Total HPP", Amount: pl.COGS},
 		StatementRow{Kind: RowTotal, Label: "LABA KOTOR", Amount: pl.GrossProfit})

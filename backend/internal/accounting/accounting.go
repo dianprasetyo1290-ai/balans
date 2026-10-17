@@ -270,10 +270,14 @@ type ReadModelRefresher = service.ReadModelRefresher
 
 // RegisterReadModel mendaftarkan refresher read model modul lain (mis. `sales.sales_lines`) ke job
 // accounting.refresh_read_models. Dipanggil saat wiring.
-func (m *Module) RegisterReadModel(name string, fn ReadModelRefresher) { m.reports.RegisterReadModel(name, fn) }
+func (m *Module) RegisterReadModel(name string, fn ReadModelRefresher) {
+	m.reports.RegisterReadModel(name, fn)
+}
 
 // RefreshReadModels me-refresh seluruh read model sekarang (job dan test); false = refresh lain sedang berjalan.
-func (m *Module) RefreshReadModels(ctx context.Context) (bool, error) { return m.reports.RefreshReadModels(ctx) }
+func (m *Module) RefreshReadModels(ctx context.Context) (bool, error) {
+	return m.reports.RefreshReadModels(ctx)
+}
 
 // ReadModelRefreshedAt mengembalikan waktu refresh terakhir read model (nil = belum pernah).
 func (m *Module) ReadModelRefreshedAt(ctx context.Context, name string) (*time.Time, error) {
@@ -306,7 +310,9 @@ func (m *Module) ExportDimensionReport(ctx context.Context, p map[string]string,
 }
 
 // ValidateTaxReportParams memeriksa parameter ekspor rekap pajak.
-func (m *Module) ValidateTaxReportParams(p map[string]string) error { return m.reports.ValidateTaxParams(p) }
+func (m *Module) ValidateTaxReportParams(p map[string]string) error {
+	return m.reports.ValidateTaxParams(p)
+}
 
 // ExportTaxReport mengalirkan rekap pajak per masa (params year).
 func (m *Module) ExportTaxReport(ctx context.Context, p map[string]string, emit func(tabular.Row) error) error {
