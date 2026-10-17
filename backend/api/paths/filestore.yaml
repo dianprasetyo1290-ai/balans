@@ -1,0 +1,198 @@
+files:
+  post:
+    operationId: createFileUpload
+    tags: [filestore]
+    summary: Meminta URL upload file (Technical Guideline 5.16)
+    description: |
+      Backend memeriksa permission tulis pemilik (`ownerType`), ukuran, dan tipe file lalu mengembalikan URL
+      upload bertanda tangan yang berlaku 15 menit. Browser mengirim isi file dengan `PUT uploadUrl`, lalu
+      mengirim `fileId` di request bisnis (mis. PKS mitra) yang memvalidasi dan menautkan file ke pemiliknya.
+      Ukuran berlebih ditolak `FILE_TOO_LARGE`, tipe lain `FILE_TYPE_NOT_ALLOWED`.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/FileUploadInput"
+    responses:
+      "201":
+        description: URL upload
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FileUploadTarget"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+file:
+  get:
+    operationId: getFile
+    tags: [filestore]
+    summary: Metadata file
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+    responses:
+      "200":
+        description: Metadata file
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FileObject"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+fileDownloadUrl:
+  get:
+    operationId: getFileDownloadUrl
+    tags: [filestore]
+    summary: URL unduhan bertanda tangan berumur 5 menit
+    description: |
+      File yang sudah ditautkan hanya bisa diunduh pemegang permission baca pemiliknya (mis.
+      `party.partner_agreement.read`); file yang belum ditautkan hanya oleh pengunggahnya.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+    responses:
+      "200":
+        description: URL unduhan
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FileDownloadTarget"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+fileContent:
+  put:
+    operationId: putFileContent
+    tags: [filestore]
+    summary: Mengunggah isi file ke URL bertanda tangan
+    description: |
+      Dipanggil browser dengan `uploadUrl` dari `createFileUpload`, tanpa header Authorization dan tanpa
+      Idempotency-Key (setara presigned PUT object storage). Ukuran harus sama dengan yang dideklarasikan dan
+      isi file harus sesuai tipenya.
+    security: []
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "#/components/parameters/FileExpires"
+      - $ref: "#/components/parameters/FileSignature"
+    requestBody:
+      required: true
+      content:
+        application/octet-stream:
+          schema:
+            type: string
+            format: binary
+    responses:
+      "204":
+        description: File tersimpan
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  get:
+    operationId: getFileContent
+    tags: [filestore]
+    summary: Mengunduh isi file dengan URL bertanda tangan
+    security: []
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "#/components/parameters/FileExpires"
+      - $ref: "#/components/parameters/FileSignature"
+    responses:
+      "200":
+        description: Isi file dengan Content-Type aslinya
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+components:
+  parameters:
+    FileExpires:
+      name: exp
+      in: query
+      required: true
+      description: Waktu kedaluwarsa URL (Unix detik).
+      schema:
+        type: integer
+        format: int64
+    FileSignature:
+      name: sig
+      in: query
+      required: true
+      schema:
+        type: string
+  schemas:
+    FileUploadInput:
+      type: object
+      required: [ownerType, fileName, contentType, sizeBytes]
+      properties:
+        ownerType:
+          type: string
+          description: Jenis pemilik file, mis. `partner_agreement` (PDF PKS).
+          example: partner_agreement
+        fileName:
+          type: string
+          minLength: 1
+          maxLength: 200
+        contentType:
+          type: string
+          example: application/pdf
+        sizeBytes:
+          type: integer
+          format: int64
+          minimum: 1
+    FileUploadTarget:
+      type: object
+      required: [fileId, uploadUrl, expiresAt, maxSizeBytes]
+      properties:
+        fileId:
+          type: string
+          format: uuid
+        uploadUrl:
+          type: string
+          description: URL relatif untuk `PUT` isi file.
+        expiresAt:
+          type: string
+          format: date-time
+        maxSizeBytes:
+          type: integer
+          format: int64
+    FileDownloadTarget:
+      type: object
+      required: [url, expiresAt]
+      properties:
+        url:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+    FileObject:
+      type: object
+      required: [id, fileName, contentType, sizeBytes, ownerType, status, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        fileName:
+          type: string
+        contentType:
+          type: string
+        sizeBytes:
+          type: integer
+          format: int64
+        ownerType:
+          type: string
+        ownerId:
+          type: string
+          format: uuid
+          nullable: true
+        status:
+          type: string
+          enum: [pending, uploaded]
+        uploadedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time

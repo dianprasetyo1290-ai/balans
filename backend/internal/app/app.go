@@ -16,6 +16,8 @@ import (
 	"balans/internal/audit"
 	"balans/internal/catalog"
 	"balans/internal/document"
+	"balans/internal/filestore"
+	"balans/internal/hris"
 	"balans/internal/identity"
 	"balans/internal/integration/mockconsole"
 	"balans/internal/integration/mockpayment"
@@ -23,6 +25,7 @@ import (
 	"balans/internal/integration/smtpmail"
 	"balans/internal/logistics"
 	"balans/internal/notification"
+	"balans/internal/party"
 	"balans/internal/platform/clock"
 	"balans/internal/platform/config"
 	"balans/internal/platform/db"
@@ -56,6 +59,10 @@ type App struct {
 	accounting  *accounting.Module
 	catalog     *catalog.Module
 	warehouse   *warehouse.Module
+	filestore   *filestore.Module
+	party       *party.Module
+	hris        *hris.Module
+	cipher      *pii.Cipher
 	modules     []module
 	console     *mockconsole.Console
 }
@@ -145,7 +152,7 @@ func (a *App) buildModules() error {
 		if mailer == nil {
 			return errors.New("modul identity membutuhkan modul notification untuk email undangan")
 		}
-		cipher, err := newCipher(cfg)
+		cipher, err := a.piiCipher()
 		if err != nil {
 			return err
 		}
@@ -197,6 +204,9 @@ func (a *App) buildModules() error {
 		a.warehouse = warehouse.New(warehouse.Deps{Pool: a.Pool, Tx: a.Tx, Clock: a.Clock, Responder: a.Responder, Audit: a.audit})
 		a.modules = append(a.modules, a.warehouse)
 		registerAuditEntities(a.audit, warehouse.AuditEntities())
+	}
+	if err := a.buildMasterData(); err != nil {
+		return err
 	}
 	if cfg.IsEnabled(sales.Name) {
 		if cfg.PaymentGateway != config.ProviderMock {
@@ -278,6 +288,77 @@ func (a *App) seedDevMasters(ctx context.Context) error {
 	}
 	return nil
 }
+
+// piiCipher membuat Cipher data pribadi sekali dan memakainya bersama (identity, party, hris, filestore).
+func (a *App) piiCipher() (*pii.Cipher, error) {
+	if a.cipher != nil {
+		return a.cipher, nil
+	}
+	c, err := newCipher(a.Config)
+	if err != nil {
+		return nil, err
+	}
+	a.cipher = c
+	return c, nil
+}
+
+// buildMasterData menyusun filestore, party, dan hris (R1.1). party (tingkat 0) membaca karyawan dari hris
+// (tingkat 1) lewat adapter yang dipasang setelah hris disusun.
+func (a *App) buildMasterData() error {
+	cfg := a.Config
+	if cfg.IsEnabled(filestore.Name) {
+		cipher, err := a.piiCipher()
+		if err != nil {
+			return err
+		}
+		a.filestore, err = filestore.New(filestore.Deps{
+			Pool: a.Pool, Tx: a.Tx, Clock: a.Clock, Log: a.Log, Responder: a.Responder, Dir: cfg.FilestoreDir,
+			// Tanda tangan URL file memakai kunci HMAC PII dengan awalan khusus agar terpisah dari hash data pribadi.
+			Sign: func(msg string) []byte { return cipher.Hash("filestore-url:" + msg) },
+		})
+		if err != nil {
+			return err
+		}
+		a.modules = append(a.modules, a.filestore)
+	}
+	if cfg.IsEnabled(party.Name) {
+		if a.identity == nil || a.filestore == nil {
+			return errors.New("modul party membutuhkan modul identity dan filestore")
+		}
+		cipher, err := a.piiCipher()
+		if err != nil {
+			return err
+		}
+		a.party = party.New(party.Deps{
+			Pool: a.Pool, Tx: a.Tx, Clock: a.Clock, Log: a.Log, Responder: a.Responder, Audit: a.audit, Cipher: cipher,
+			Users: partyUsers{identity: a.identity}, Files: a.filestore,
+		})
+		a.party.RegisterAuditEntities(a.audit)
+		a.filestore.RegisterOwner(filestore.OwnerPolicy{
+			OwnerType: party.FileOwnerAgreement, WritePermission: party.PermAgreementWrite,
+			ReadPermission: party.PermAgreementRead, ContentTypes: []string{filestore.TypePDF}, MaxBytes: maxAgreementFileBytes,
+		})
+		a.modules = append(a.modules, a.party)
+	}
+	if cfg.IsEnabled(hris.Name) {
+		cipher, err := a.piiCipher()
+		if err != nil {
+			return err
+		}
+		a.hris = hris.New(hris.Deps{
+			Pool: a.Pool, Tx: a.Tx, Clock: a.Clock, Log: a.Log, Responder: a.Responder, Audit: a.audit, Cipher: cipher,
+		})
+		a.hris.RegisterAuditEntities(a.audit)
+		a.modules = append(a.modules, a.hris)
+		if a.party != nil {
+			a.party.SetEmployees(partyEmployees{hris: a.hris})
+		}
+	}
+	return nil
+}
+
+// maxAgreementFileBytes adalah batas ukuran PDF PKS. Batas teknis upload, bukan nilai bisnis.
+const maxAgreementFileBytes = 10 << 20
 
 // newCipher membaca kunci PII. Di APP_ENV=local tanpa kunci dipakai kunci pengembangan deterministik;
 // config.Validate mewajibkan kunci asli di staging dan production.

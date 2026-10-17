@@ -159,7 +159,7 @@ Semua langkah di VPS dijalankan `deploy/scripts/deploy.sh <lingkungan> <tag>`. J
 | Data | Mekanisme | Retensi |
 |---|---|---|
 | Postgres | WAL-G: WAL kontinu (`archive_timeout=60` detik) + full backup harian 01.00 WIB oleh service `backup` | 14 harian; backup tanggal 1 ditandai permanen dan disimpan 12 bulan |
-| File aplikasi | Versioning bucket + replikasi ke bucket/provider lain (diatur di provider object storage) | Mengikuti retensi dokumen |
+| File aplikasi | Versioning bucket + replikasi ke bucket/provider lain (diatur di provider object storage). Selama adapter object storage belum dibangun, file modul `filestore` (PDF PKS) ada di volume `filestore-data` container api (`FILESTORE_DIR=/var/lib/balans/files`) dan wajib disalin ke object storage backup harian bersama database | Mengikuti retensi dokumen |
 | Konfigurasi | `deploy/` di repository; secret di password manager | — |
 
 Setiap backup harian mengirim heartbeat ke `BACKUP_HEARTBEAT_URL` (`/start`, sukses, atau `/fail`). Monitor heartbeat mengirim alert jika backup gagal atau tidak berjalan lebih dari 26 jam.

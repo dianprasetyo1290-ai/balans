@@ -20,11 +20,16 @@ import { Route as AppApprovalsRouteImport } from './routes/_app/approvals'
 import { Route as AppFinanceAccountsRouteImport } from './routes/_app/finance/accounts'
 import { Route as AppFinanceFiscalPeriodsRouteImport } from './routes/_app/finance/fiscal-periods'
 import { Route as AppFinanceGeneralLedgerRouteImport } from './routes/_app/finance/general-ledger'
+import { Route as AppHrisEmployeesRouteImport } from './routes/_app/hris/employees'
 import { Route as AppLogisticsProductLabelsRouteImport } from './routes/_app/logistics/product-labels'
 import { Route as AppMasterDataBundlesRouteImport } from './routes/_app/master-data/bundles'
 import { Route as AppMasterDataPackagingMaterialsRouteImport } from './routes/_app/master-data/packaging-materials'
 import { Route as AppMasterCampaignsRouteImport } from './routes/_app/master/campaigns'
 import { Route as AppMasterChannelsRouteImport } from './routes/_app/master/channels'
+import { Route as AppMasterCustomersRouteImport } from './routes/_app/master/customers'
+import { Route as AppMasterPartnerProductCodesRouteImport } from './routes/_app/master/partner-product-codes'
+import { Route as AppMasterPartnersRouteImport } from './routes/_app/master/partners'
+import { Route as AppMasterSuppliersRouteImport } from './routes/_app/master/suppliers'
 import { Route as AppSettingsApprovalPoliciesRouteImport } from './routes/_app/settings/approval-policies'
 import { Route as AppSettingsAuditLogsRouteImport } from './routes/_app/settings/audit-logs'
 import { Route as AppSettingsDocumentSequencesRouteImport } from './routes/_app/settings/document-sequences'
@@ -94,6 +99,11 @@ const AppFinanceGeneralLedgerRoute = AppFinanceGeneralLedgerRouteImport.update({
   path: '/finance/general-ledger',
   getParentRoute: () => AppRoute,
 } as any)
+const AppHrisEmployeesRoute = AppHrisEmployeesRouteImport.update({
+  id: '/hris/employees',
+  path: '/hris/employees',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppLogisticsProductLabelsRoute =
   AppLogisticsProductLabelsRouteImport.update({
     id: '/logistics/product-labels',
@@ -119,6 +129,27 @@ const AppMasterCampaignsRoute = AppMasterCampaignsRouteImport.update({
 const AppMasterChannelsRoute = AppMasterChannelsRouteImport.update({
   id: '/master/channels',
   path: '/master/channels',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMasterCustomersRoute = AppMasterCustomersRouteImport.update({
+  id: '/master/customers',
+  path: '/master/customers',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMasterPartnerProductCodesRoute =
+  AppMasterPartnerProductCodesRouteImport.update({
+    id: '/master/partner-product-codes',
+    path: '/master/partner-product-codes',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppMasterPartnersRoute = AppMasterPartnersRouteImport.update({
+  id: '/master/partners',
+  path: '/master/partners',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMasterSuppliersRoute = AppMasterSuppliersRouteImport.update({
+  id: '/master/suppliers',
+  path: '/master/suppliers',
   getParentRoute: () => AppRoute,
 } as any)
 const AppSettingsApprovalPoliciesRoute =
@@ -210,11 +241,16 @@ export interface FileRoutesByFullPath {
   '/finance/accounts': typeof AppFinanceAccountsRoute
   '/finance/fiscal-periods': typeof AppFinanceFiscalPeriodsRoute
   '/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
+  '/hris/employees': typeof AppHrisEmployeesRoute
   '/logistics/product-labels': typeof AppLogisticsProductLabelsRoute
   '/master-data/bundles': typeof AppMasterDataBundlesRoute
   '/master-data/packaging-materials': typeof AppMasterDataPackagingMaterialsRoute
   '/master/campaigns': typeof AppMasterCampaignsRoute
   '/master/channels': typeof AppMasterChannelsRoute
+  '/master/customers': typeof AppMasterCustomersRoute
+  '/master/partner-product-codes': typeof AppMasterPartnerProductCodesRoute
+  '/master/partners': typeof AppMasterPartnersRoute
+  '/master/suppliers': typeof AppMasterSuppliersRoute
   '/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/settings/audit-logs': typeof AppSettingsAuditLogsRoute
   '/settings/document-sequences': typeof AppSettingsDocumentSequencesRoute
@@ -241,11 +277,16 @@ export interface FileRoutesByTo {
   '/finance/accounts': typeof AppFinanceAccountsRoute
   '/finance/fiscal-periods': typeof AppFinanceFiscalPeriodsRoute
   '/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
+  '/hris/employees': typeof AppHrisEmployeesRoute
   '/logistics/product-labels': typeof AppLogisticsProductLabelsRoute
   '/master-data/bundles': typeof AppMasterDataBundlesRoute
   '/master-data/packaging-materials': typeof AppMasterDataPackagingMaterialsRoute
   '/master/campaigns': typeof AppMasterCampaignsRoute
   '/master/channels': typeof AppMasterChannelsRoute
+  '/master/customers': typeof AppMasterCustomersRoute
+  '/master/partner-product-codes': typeof AppMasterPartnerProductCodesRoute
+  '/master/partners': typeof AppMasterPartnersRoute
+  '/master/suppliers': typeof AppMasterSuppliersRoute
   '/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/settings/audit-logs': typeof AppSettingsAuditLogsRoute
   '/settings/document-sequences': typeof AppSettingsDocumentSequencesRoute
@@ -274,11 +315,16 @@ export interface FileRoutesById {
   '/_app/finance/accounts': typeof AppFinanceAccountsRoute
   '/_app/finance/fiscal-periods': typeof AppFinanceFiscalPeriodsRoute
   '/_app/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
+  '/_app/hris/employees': typeof AppHrisEmployeesRoute
   '/_app/logistics/product-labels': typeof AppLogisticsProductLabelsRoute
   '/_app/master-data/bundles': typeof AppMasterDataBundlesRoute
   '/_app/master-data/packaging-materials': typeof AppMasterDataPackagingMaterialsRoute
   '/_app/master/campaigns': typeof AppMasterCampaignsRoute
   '/_app/master/channels': typeof AppMasterChannelsRoute
+  '/_app/master/customers': typeof AppMasterCustomersRoute
+  '/_app/master/partner-product-codes': typeof AppMasterPartnerProductCodesRoute
+  '/_app/master/partners': typeof AppMasterPartnersRoute
+  '/_app/master/suppliers': typeof AppMasterSuppliersRoute
   '/_app/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/_app/settings/audit-logs': typeof AppSettingsAuditLogsRoute
   '/_app/settings/document-sequences': typeof AppSettingsDocumentSequencesRoute
@@ -307,11 +353,16 @@ export interface FileRouteTypes {
     | '/finance/accounts'
     | '/finance/fiscal-periods'
     | '/finance/general-ledger'
+    | '/hris/employees'
     | '/logistics/product-labels'
     | '/master-data/bundles'
     | '/master-data/packaging-materials'
     | '/master/campaigns'
     | '/master/channels'
+    | '/master/customers'
+    | '/master/partner-product-codes'
+    | '/master/partners'
+    | '/master/suppliers'
     | '/settings/approval-policies'
     | '/settings/audit-logs'
     | '/settings/document-sequences'
@@ -338,11 +389,16 @@ export interface FileRouteTypes {
     | '/finance/accounts'
     | '/finance/fiscal-periods'
     | '/finance/general-ledger'
+    | '/hris/employees'
     | '/logistics/product-labels'
     | '/master-data/bundles'
     | '/master-data/packaging-materials'
     | '/master/campaigns'
     | '/master/channels'
+    | '/master/customers'
+    | '/master/partner-product-codes'
+    | '/master/partners'
+    | '/master/suppliers'
     | '/settings/approval-policies'
     | '/settings/audit-logs'
     | '/settings/document-sequences'
@@ -370,11 +426,16 @@ export interface FileRouteTypes {
     | '/_app/finance/accounts'
     | '/_app/finance/fiscal-periods'
     | '/_app/finance/general-ledger'
+    | '/_app/hris/employees'
     | '/_app/logistics/product-labels'
     | '/_app/master-data/bundles'
     | '/_app/master-data/packaging-materials'
     | '/_app/master/campaigns'
     | '/_app/master/channels'
+    | '/_app/master/customers'
+    | '/_app/master/partner-product-codes'
+    | '/_app/master/partners'
+    | '/_app/master/suppliers'
     | '/_app/settings/approval-policies'
     | '/_app/settings/audit-logs'
     | '/_app/settings/document-sequences'
@@ -479,6 +540,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppFinanceGeneralLedgerRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/hris/employees': {
+      id: '/_app/hris/employees'
+      path: '/hris/employees'
+      fullPath: '/hris/employees'
+      preLoaderRoute: typeof AppHrisEmployeesRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/logistics/product-labels': {
       id: '/_app/logistics/product-labels'
       path: '/logistics/product-labels'
@@ -512,6 +580,34 @@ declare module '@tanstack/react-router' {
       path: '/master/channels'
       fullPath: '/master/channels'
       preLoaderRoute: typeof AppMasterChannelsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/master/customers': {
+      id: '/_app/master/customers'
+      path: '/master/customers'
+      fullPath: '/master/customers'
+      preLoaderRoute: typeof AppMasterCustomersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/master/partner-product-codes': {
+      id: '/_app/master/partner-product-codes'
+      path: '/master/partner-product-codes'
+      fullPath: '/master/partner-product-codes'
+      preLoaderRoute: typeof AppMasterPartnerProductCodesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/master/partners': {
+      id: '/_app/master/partners'
+      path: '/master/partners'
+      fullPath: '/master/partners'
+      preLoaderRoute: typeof AppMasterPartnersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/master/suppliers': {
+      id: '/_app/master/suppliers'
+      path: '/master/suppliers'
+      fullPath: '/master/suppliers'
+      preLoaderRoute: typeof AppMasterSuppliersRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/settings/approval-policies': {
@@ -621,11 +717,16 @@ interface AppRouteChildren {
   AppFinanceAccountsRoute: typeof AppFinanceAccountsRoute
   AppFinanceFiscalPeriodsRoute: typeof AppFinanceFiscalPeriodsRoute
   AppFinanceGeneralLedgerRoute: typeof AppFinanceGeneralLedgerRoute
+  AppHrisEmployeesRoute: typeof AppHrisEmployeesRoute
   AppLogisticsProductLabelsRoute: typeof AppLogisticsProductLabelsRoute
   AppMasterDataBundlesRoute: typeof AppMasterDataBundlesRoute
   AppMasterDataPackagingMaterialsRoute: typeof AppMasterDataPackagingMaterialsRoute
   AppMasterCampaignsRoute: typeof AppMasterCampaignsRoute
   AppMasterChannelsRoute: typeof AppMasterChannelsRoute
+  AppMasterCustomersRoute: typeof AppMasterCustomersRoute
+  AppMasterPartnerProductCodesRoute: typeof AppMasterPartnerProductCodesRoute
+  AppMasterPartnersRoute: typeof AppMasterPartnersRoute
+  AppMasterSuppliersRoute: typeof AppMasterSuppliersRoute
   AppSettingsApprovalPoliciesRoute: typeof AppSettingsApprovalPoliciesRoute
   AppSettingsAuditLogsRoute: typeof AppSettingsAuditLogsRoute
   AppSettingsDocumentSequencesRoute: typeof AppSettingsDocumentSequencesRoute
@@ -648,11 +749,16 @@ const AppRouteChildren: AppRouteChildren = {
   AppFinanceAccountsRoute: AppFinanceAccountsRoute,
   AppFinanceFiscalPeriodsRoute: AppFinanceFiscalPeriodsRoute,
   AppFinanceGeneralLedgerRoute: AppFinanceGeneralLedgerRoute,
+  AppHrisEmployeesRoute: AppHrisEmployeesRoute,
   AppLogisticsProductLabelsRoute: AppLogisticsProductLabelsRoute,
   AppMasterDataBundlesRoute: AppMasterDataBundlesRoute,
   AppMasterDataPackagingMaterialsRoute: AppMasterDataPackagingMaterialsRoute,
   AppMasterCampaignsRoute: AppMasterCampaignsRoute,
   AppMasterChannelsRoute: AppMasterChannelsRoute,
+  AppMasterCustomersRoute: AppMasterCustomersRoute,
+  AppMasterPartnerProductCodesRoute: AppMasterPartnerProductCodesRoute,
+  AppMasterPartnersRoute: AppMasterPartnersRoute,
+  AppMasterSuppliersRoute: AppMasterSuppliersRoute,
   AppSettingsApprovalPoliciesRoute: AppSettingsApprovalPoliciesRoute,
   AppSettingsAuditLogsRoute: AppSettingsAuditLogsRoute,
   AppSettingsDocumentSequencesRoute: AppSettingsDocumentSequencesRoute,

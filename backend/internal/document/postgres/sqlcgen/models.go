@@ -160,6 +160,50 @@ type Channel struct {
 	DeletedBy uuid.NullUUID
 }
 
+type Customer struct {
+	ID                      uuid.UUID
+	Code                    string
+	FullName                string
+	Phone                   string
+	PhoneNormalized         string
+	Email                   string
+	CustomerType            string
+	EmployeeID              uuid.NullUUID
+	MarketingConsentAt      *time.Time
+	MarketingConsentVersion string
+	Notes                   string
+	CreatedAt               time.Time
+	CreatedBy               uuid.UUID
+	UpdatedAt               time.Time
+	UpdatedBy               uuid.UUID
+	Version                 int32
+	DeletedAt               *time.Time
+	DeletedBy               uuid.NullUUID
+}
+
+type CustomerAddress struct {
+	ID            uuid.UUID
+	CustomerID    uuid.UUID
+	Label         string
+	RecipientName string
+	Phone         string
+	AddressLine   string
+	District      string
+	City          string
+	Province      string
+	PostalCode    string
+	Latitude      decimal.NullDecimal
+	Longitude     decimal.NullDecimal
+	IsDefault     bool
+	CreatedAt     time.Time
+	CreatedBy     uuid.UUID
+	UpdatedAt     time.Time
+	UpdatedBy     uuid.UUID
+	Version       int32
+	DeletedAt     *time.Time
+	DeletedBy     uuid.NullUUID
+}
+
 type Division struct {
 	ID        uuid.UUID
 	Code      string
@@ -180,6 +224,49 @@ type DocumentSequence struct {
 	LastNumber   int64
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
+}
+
+type Employee struct {
+	ID               uuid.UUID
+	EmployeeNumber   string
+	FullName         string
+	DivisionID       uuid.NullUUID
+	PositionTitle    string
+	EmploymentStatus string
+	JoinDate         clock.BusinessDate
+	ResignDate       pgtype.Date
+	ResignReason     string
+	WorkEmail        string
+	Phone            string
+	NikEnc           string
+	NikHash          []byte
+	CreatedAt        time.Time
+	CreatedBy        uuid.UUID
+	UpdatedAt        time.Time
+	UpdatedBy        uuid.UUID
+	Version          int32
+	DeletedAt        *time.Time
+	DeletedBy        uuid.NullUUID
+}
+
+type FileObject struct {
+	ID           uuid.UUID
+	ObjectKey    uuid.UUID
+	OriginalName string
+	ContentType  string
+	SizeBytes    int64
+	Sha256       []byte
+	OwnerType    string
+	OwnerID      uuid.NullUUID
+	Status       string
+	UploadedAt   *time.Time
+	CreatedAt    time.Time
+	CreatedBy    uuid.UUID
+	UpdatedAt    time.Time
+	UpdatedBy    uuid.UUID
+	Version      int32
+	DeletedAt    *time.Time
+	DeletedBy    uuid.NullUUID
 }
 
 type FiscalPeriod struct {
@@ -323,6 +410,85 @@ type NotificationEmail struct {
 	LastError pgtype.Text
 	CreatedAt time.Time
 	SentAt    *time.Time
+}
+
+type Partner struct {
+	ID                 uuid.UUID
+	Code               string
+	Name               string
+	PartnerType        string
+	NpwpEnc            string
+	Address            string
+	PicName            string
+	PicPhone           string
+	SalesUserID        uuid.NullUUID
+	MerchandiserUserID uuid.NullUUID
+	Notes              string
+	CreatedAt          time.Time
+	CreatedBy          uuid.UUID
+	UpdatedAt          time.Time
+	UpdatedBy          uuid.UUID
+	Version            int32
+	DeletedAt          *time.Time
+	DeletedBy          uuid.NullUUID
+}
+
+type PartnerAgreement struct {
+	ID                       uuid.UUID
+	PartnerID                uuid.UUID
+	AgreementNumber          string
+	AgreementType            string
+	ValidFrom                clock.BusinessDate
+	ValidTo                  clock.BusinessDate
+	FileObjectID             uuid.NullUUID
+	PriceListID              uuid.NullUUID
+	ConsignmentMarginPercent decimal.NullDecimal
+	PaymentTermDays          int32
+	LossBorneBy              string
+	PartnerDamageBorneBy     string
+	ProductDefectBorneBy     string
+	NearExpiryBorneBy        string
+	Notes                    string
+	CreatedAt                time.Time
+	CreatedBy                uuid.UUID
+	UpdatedAt                time.Time
+	UpdatedBy                uuid.UUID
+	Version                  int32
+	DeletedAt                *time.Time
+	DeletedBy                uuid.NullUUID
+}
+
+type PartnerProductCode struct {
+	ID          uuid.UUID
+	PartnerID   uuid.UUID
+	ProductID   uuid.UUID
+	ArticleCode string
+	Barcode     string
+	Description string
+	CreatedAt   time.Time
+	CreatedBy   uuid.UUID
+	UpdatedAt   time.Time
+	UpdatedBy   uuid.UUID
+	Version     int32
+	DeletedAt   *time.Time
+	DeletedBy   uuid.NullUUID
+}
+
+type PartyBankAccount struct {
+	ID               uuid.UUID
+	PartyType        string
+	PartyID          uuid.UUID
+	BankName         string
+	AccountNumberEnc string
+	AccountName      string
+	IsDefault        bool
+	CreatedAt        time.Time
+	CreatedBy        uuid.UUID
+	UpdatedAt        time.Time
+	UpdatedBy        uuid.UUID
+	Version          int32
+	DeletedAt        *time.Time
+	DeletedBy        uuid.NullUUID
 }
 
 type PasswordToken struct {
@@ -486,6 +652,29 @@ type SubChannel struct {
 	Version   int32
 	DeletedAt *time.Time
 	DeletedBy uuid.NullUUID
+}
+
+type Supplier struct {
+	ID                 uuid.UUID
+	Code               string
+	Name               string
+	SupplierType       string
+	IsBusinessEntity   bool
+	NpwpEnc            string
+	DefaultWithholding string
+	PaymentTermDays    int32
+	Address            string
+	Phone              string
+	Email              string
+	PicName            string
+	Notes              string
+	CreatedAt          time.Time
+	CreatedBy          uuid.UUID
+	UpdatedAt          time.Time
+	UpdatedBy          uuid.UUID
+	Version            int32
+	DeletedAt          *time.Time
+	DeletedBy          uuid.NullUUID
 }
 
 type User struct {

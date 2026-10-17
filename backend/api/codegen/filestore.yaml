@@ -1,0 +1,10 @@
+package: http
+generate:
+  chi-server: true
+  strict-server: true
+  models: true
+output: internal/filestore/http/api.gen.go
+output-options:
+  include-tags: [filestore]
+  # Isi file dialirkan langsung (streaming) oleh handler manual di content.go, bukan lewat strict server.
+  exclude-operation-ids: [putFileContent, getFileContent]

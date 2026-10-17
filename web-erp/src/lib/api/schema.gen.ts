@@ -1473,6 +1473,427 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/v1/customers": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Daftar pelanggan (MD-06)
+     * @description `q` mencari nama, kode, atau nomor HP (nomor dinormalisasi lebih dulu sehingga `0812…`, `62812…`, dan
+     *     `+62812…` sama). `phone` mencari persis satu nomor untuk cek duplikat sebelum membuat pelanggan.
+     */
+    get: operations["listCustomers"]
+    put?: never
+    /**
+     * Membuat pelanggan
+     * @description Nomor HP yang sudah dipakai pelanggan lain ditolak `VALIDATION_FAILED` pada field `phone`.
+     */
+    post: operations["createCustomer"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/customers/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    /** Detail pelanggan beserta alamat */
+    get: operations["getCustomer"]
+    /**
+     * Mengubah pelanggan (optimistic locking dengan `version`)
+     * @description Daftar `addresses` menggantikan seluruh alamat: alamat dengan `id` diubah, tanpa `id` ditambah, dan yang
+     *     tidak dikirim dihapus (soft delete).
+     */
+    put: operations["updateCustomer"]
+    post?: never
+    /**
+     * Menghapus pelanggan (soft delete)
+     * @description Pelanggan tetap tampil di dokumen lama; nomor HP-nya boleh dipakai pelanggan baru.
+     */
+    delete: operations["deleteCustomer"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/partners": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Daftar mitra MT, konsinyasi, dan B2B (MD-07) */
+    get: operations["listPartners"]
+    put?: never
+    /**
+     * Membuat mitra
+     * @description Kode mitra unik permanen dan tidak bisa dipakai ulang walau mitra dihapus (`DUPLICATE_CODE`).
+     */
+    post: operations["createPartner"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/partners/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    /** Detail mitra */
+    get: operations["getPartner"]
+    /**
+     * Mengubah mitra
+     * @description Kode tidak bisa diubah. `npwp` tidak dikirim = tidak berubah; string kosong = dihapus.
+     */
+    put: operations["updatePartner"]
+    post?: never
+    /** Menghapus mitra (soft delete) */
+    delete: operations["deletePartner"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/partners/{id}/agreements": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    /** Riwayat PKS mitra, terbaru lebih dulu */
+    get: operations["listPartnerAgreements"]
+    put?: never
+    /**
+     * Mencatat PKS baru (effective-dated)
+     * @description Periode PKS dengan jenis yang sama tidak boleh tumpang tindih (Technical Guideline 5.14). Perubahan
+     *     ketentuan dicatat sebagai PKS baru mulai tanggal berlakunya; PKS lama dipersingkat lewat `validTo`.
+     *     `fileId` adalah PDF PKS yang sudah diunggah lewat `POST /api/v1/files` dengan `ownerType=partner_agreement`.
+     */
+    post: operations["createPartnerAgreement"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/partner-agreements/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    /** Mengoreksi PKS */
+    put: operations["updatePartnerAgreement"]
+    post?: never
+    /** Menghapus PKS yang salah input (soft delete) */
+    delete: operations["deletePartnerAgreement"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/partner-product-codes": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Kode artikel & barcode retailer per SKU per mitra (MD-07) */
+    get: operations["listPartnerProductCodes"]
+    put?: never
+    /**
+     * Menambah kode produk mitra
+     * @description Satu produk hanya punya satu kode per mitra; kode artikel unik per mitra (`VALIDATION_FAILED`).
+     */
+    post: operations["createPartnerProductCode"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/partner-product-codes/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    get?: never
+    /** Mengubah kode artikel, barcode, atau keterangan */
+    put: operations["updatePartnerProductCode"]
+    post?: never
+    /** Menghapus kode produk mitra (soft delete) */
+    delete: operations["deletePartnerProductCode"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/suppliers": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Daftar pemasok & maklon (MD-08) */
+    get: operations["listSuppliers"]
+    put?: never
+    /**
+     * Membuat pemasok atau maklon
+     * @description Kode unik permanen (`DUPLICATE_CODE`). NPWP dan nomor rekening dienkripsi (NFR-04).
+     */
+    post: operations["createSupplier"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/suppliers/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    /** Detail pemasok; NPWP dan rekening ditampilkan tersamar */
+    get: operations["getSupplier"]
+    /**
+     * Mengubah pemasok
+     * @description Kode tidak bisa diubah. `npwp` tidak dikirim = tidak berubah. Rekening dengan `id` tanpa `accountNumber`
+     *     mempertahankan nomor lama; rekening yang tidak dikirim dihapus.
+     */
+    put: operations["updateSupplier"]
+    post?: never
+    /** Menghapus pemasok (soft delete) */
+    delete: operations["deleteSupplier"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/party/user-options": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Pengguna aktif untuk dipilih sebagai Sales atau Merchandiser mitra */
+    get: operations["listPartyUserOptions"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/employees": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Data karyawan dasar (HR-01)
+     * @description `q` mencari nomor karyawan atau nama. `nik` mencari persis lewat hash HMAC (NIK tidak pernah dicari
+     *     sebagai teks, Technical Guideline 6.7).
+     */
+    get: operations["listEmployees"]
+    put?: never
+    /**
+     * Menambah karyawan
+     * @description Nomor karyawan unik permanen (`DUPLICATE_CODE`); NIK dienkripsi AES-256-GCM.
+     */
+    post: operations["createEmployee"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/employees/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    /** Detail karyawan; NIK ditampilkan tersamar */
+    get: operations["getEmployee"]
+    /**
+     * Mengubah data karyawan
+     * @description Nomor karyawan tidak bisa diubah. `nik` tidak dikirim = tidak berubah; string kosong = dihapus.
+     */
+    put: operations["updateEmployee"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/employees/{id}/resign": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Mencatat resign karyawan
+     * @description Mulai tanggal resign karyawan tidak lagi aktif; pelanggan yang tertaut otomatis kehilangan harga karyawan
+     *     (HR-03). Tanggal boleh di masa depan (resign terjadwal).
+     */
+    post: operations["resignEmployee"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/employee-options": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Pilihan karyawan untuk ditautkan ke pelanggan
+     * @description Hanya nomor, nama, dan status (tanpa data pribadi). Terbuka untuk `hris.employee.read` atau
+     *     `party.customer.write` (CS menautkan pelanggan ke karyawan).
+     */
+    get: operations["listEmployeeOptions"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/files": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Meminta URL upload file (Technical Guideline 5.16)
+     * @description Backend memeriksa permission tulis pemilik (`ownerType`), ukuran, dan tipe file lalu mengembalikan URL
+     *     upload bertanda tangan yang berlaku 15 menit. Browser mengirim isi file dengan `PUT uploadUrl`, lalu
+     *     mengirim `fileId` di request bisnis (mis. PKS mitra) yang memvalidasi dan menautkan file ke pemiliknya.
+     *     Ukuran berlebih ditolak `FILE_TOO_LARGE`, tipe lain `FILE_TYPE_NOT_ALLOWED`.
+     */
+    post: operations["createFileUpload"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/files/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Metadata file */
+    get: operations["getFile"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/files/{id}/download-url": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * URL unduhan bertanda tangan berumur 5 menit
+     * @description File yang sudah ditautkan hanya bisa diunduh pemegang permission baca pemiliknya (mis.
+     *     `party.partner_agreement.read`); file yang belum ditautkan hanya oleh pengunggahnya.
+     */
+    get: operations["getFileDownloadUrl"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/file-content/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Mengunduh isi file dengan URL bertanda tangan */
+    get: operations["getFileContent"]
+    /**
+     * Mengunggah isi file ke URL bertanda tangan
+     * @description Dipanggil browser dengan `uploadUrl` dari `createFileUpload`, tanpa header Authorization dan tanpa
+     *     Idempotency-Key (setara presigned PUT object storage). Ukuran harus sama dengan yang dideklarasikan dan
+     *     isi file harus sesuai tipenya.
+     */
+    put: operations["putFileContent"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -2497,6 +2918,429 @@ export interface components {
       name: string
       isActive: boolean
     } & components["schemas"]["VersionInput"]
+    /** @enum {string} */
+    CustomerType: "retail" | "b2b" | "reseller" | "employee"
+    CustomerAddress: {
+      /** Format: uuid */
+      id: string
+      label: string
+      recipientName: string
+      phone: string
+      addressLine: string
+      district: string
+      city: string
+      province: string
+      postalCode: string
+      latitude?: string | null
+      longitude?: string | null
+      isDefault: boolean
+    }
+    Customer: {
+      /** Format: uuid */
+      id: string
+      /** @example PLG-000123 */
+      code: string
+      fullName: string
+      /** @example +6281234567890 */
+      phone: string
+      email: string
+      customerType: components["schemas"]["CustomerType"]
+      /** Format: uuid */
+      employeeId?: string | null
+      employeeName?: string | null
+      employeeNumber?: string | null
+      /** @description Status karyawan hari ini; `false` = karyawan sudah resign dan harga karyawan tidak berlaku. */
+      isEmployeeActive?: boolean | null
+      marketingConsent: boolean
+      /** Format: date-time */
+      marketingConsentAt?: string | null
+      marketingConsentVersion: string
+      notes: string
+      addresses: components["schemas"]["CustomerAddress"][]
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    CustomerList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["Customer"][]
+    }
+    CustomerAddressInput: {
+      /**
+       * Format: uuid
+       * @description Kosong = alamat baru.
+       */
+      id?: string
+      /** @example Rumah */
+      label?: string
+      recipientName: string
+      phone?: string
+      addressLine: string
+      district?: string
+      city: string
+      province?: string
+      postalCode?: string
+      /** @description Desimal derajat sebagai string, mis. `-6.200000`. */
+      latitude?: string | null
+      longitude?: string | null
+      isDefault: boolean
+    }
+    CustomerInput: {
+      fullName: string
+      /**
+       * @description Nomor WA/HP; `08…`, `628…`, dan `+628…` disimpan sebagai `+628…`.
+       * @example 0812-3456-7890
+       */
+      phone: string
+      email?: string
+      customerType: components["schemas"]["CustomerType"]
+      /**
+       * Format: uuid
+       * @description Wajib untuk tipe `employee`; karyawan harus aktif (HR-03).
+       */
+      employeeId?: string | null
+      /** @description Persetujuan menerima pesan pemasaran; waktu persetujuan dicatat server (NFR-04). */
+      marketingConsent: boolean
+      /** @description Versi teks persetujuan yang disetujui pelanggan. */
+      marketingConsentVersion?: string
+      notes?: string
+      addresses: components["schemas"]["CustomerAddressInput"][]
+    }
+    /** @enum {string} */
+    PartnerType: "modern_trade" | "consignment" | "b2b"
+    /** @enum {string} */
+    AgreementType: "consignment" | "modern_trade"
+    /** @enum {string} */
+    AgreementStatus: "scheduled" | "active" | "expired"
+    /**
+     * @description Pihak yang menanggung selisih rekonsiliasi konsinyasi (BRD U-02).
+     * @enum {string}
+     */
+    BorneBy: "partner" | "balans"
+    PartnerAgreement: {
+      /** Format: uuid */
+      id: string
+      /** Format: uuid */
+      partnerId: string
+      agreementNumber: string
+      agreementType: components["schemas"]["AgreementType"]
+      validFrom: components["schemas"]["BusinessDate"]
+      validTo: components["schemas"]["BusinessDate"]
+      status: components["schemas"]["AgreementStatus"]
+      /** Format: uuid */
+      fileId?: string | null
+      fileName?: string | null
+      /** Format: uuid */
+      priceListId?: string | null
+      consignmentMarginPercent?: string | null
+      paymentTermDays: number
+      lossBorneBy: components["schemas"]["BorneBy"]
+      partnerDamageBorneBy: components["schemas"]["BorneBy"]
+      productDefectBorneBy: components["schemas"]["BorneBy"]
+      nearExpiryBorneBy: components["schemas"]["BorneBy"]
+      notes: string
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    Partner: {
+      /** Format: uuid */
+      id: string
+      code: string
+      name: string
+      partnerType: components["schemas"]["PartnerType"]
+      hasNpwp: boolean
+      /** @example •••••••••••5678 */
+      npwpMasked?: string | null
+      address: string
+      picName: string
+      picPhone: string
+      /** Format: uuid */
+      salesUserId?: string | null
+      salesUserName?: string | null
+      /** Format: uuid */
+      merchandiserUserId?: string | null
+      merchandiserUserName?: string | null
+      notes: string
+      /** @description PKS yang berlaku hari ini (detail dan daftar). */
+      activeAgreements?: components["schemas"]["PartnerAgreement"][]
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    PartnerList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["Partner"][]
+    }
+    PartnerInput: {
+      /** @description Disimpan huruf besar; diabaikan saat update. */
+      code: string
+      name: string
+      partnerType: components["schemas"]["PartnerType"]
+      /** @description 15 atau 16 digit; tanda baca diabaikan. */
+      npwp?: string | null
+      address?: string
+      picName?: string
+      picPhone?: string
+      /** Format: uuid */
+      salesUserId?: string | null
+      /**
+       * Format: uuid
+       * @description Merchandiser yang ditugaskan; membatasi akses stock count partner (MD-07).
+       */
+      merchandiserUserId?: string | null
+      notes?: string
+    }
+    PartnerAgreementInput: {
+      /**
+       * Format: uuid
+       * @description Diisi dari path saat membuat; diabaikan saat update.
+       */
+      partnerId?: string
+      agreementNumber: string
+      agreementType: components["schemas"]["AgreementType"]
+      validFrom: components["schemas"]["BusinessDate"]
+      validTo: components["schemas"]["BusinessDate"]
+      /**
+       * Format: uuid
+       * @description PDF PKS hasil upload.
+       */
+      fileId?: string | null
+      /**
+       * Format: uuid
+       * @description Daftar harga konsinyasi/MT (modul pricing, R1.1).
+       */
+      priceListId?: string | null
+      /** @description Margin/komisi mitra dari harga jual, persen desimal, mis. `25.0000`. */
+      consignmentMarginPercent?: string | null
+      paymentTermDays: number
+      lossBorneBy?: components["schemas"]["BorneBy"]
+      partnerDamageBorneBy?: components["schemas"]["BorneBy"]
+      productDefectBorneBy?: components["schemas"]["BorneBy"]
+      nearExpiryBorneBy?: components["schemas"]["BorneBy"]
+      notes?: string
+    }
+    PartnerProductCode: {
+      /** Format: uuid */
+      id: string
+      /** Format: uuid */
+      partnerId: string
+      partnerCode: string
+      partnerName: string
+      /** Format: uuid */
+      productId: string
+      productSku?: string | null
+      productName?: string | null
+      articleCode: string
+      barcode: string
+      description: string
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    PartnerProductCodeList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["PartnerProductCode"][]
+    }
+    PartnerProductCodeUpdate: {
+      articleCode: string
+      barcode?: string
+      description?: string
+    }
+    PartnerProductCodeInput: components["schemas"]["PartnerProductCodeUpdate"] & {
+      /** Format: uuid */
+      partnerId: string
+      /**
+       * Format: uuid
+       * @description Produk di modul catalog.
+       */
+      productId: string
+    }
+    /**
+     * @description `toll_manufacturer` = maklon.
+     * @enum {string}
+     */
+    SupplierType: "supplier" | "toll_manufacturer"
+    /**
+     * @description PPh yang dipotong default saat membayar tagihan pemasok.
+     * @enum {string}
+     */
+    WithholdingType: "none" | "pph23" | "pph21" | "pph4_2"
+    SupplierBankAccount: {
+      /** Format: uuid */
+      id: string
+      bankName: string
+      /** @example ••••••7890 */
+      accountNumberMasked: string
+      accountName: string
+      isDefault: boolean
+    }
+    Supplier: {
+      /** Format: uuid */
+      id: string
+      code: string
+      name: string
+      supplierType: components["schemas"]["SupplierType"]
+      isBusinessEntity: boolean
+      hasNpwp: boolean
+      npwpMasked?: string | null
+      defaultWithholding: components["schemas"]["WithholdingType"]
+      paymentTermDays: number
+      address: string
+      phone: string
+      email: string
+      picName: string
+      notes: string
+      bankAccounts: components["schemas"]["SupplierBankAccount"][]
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    SupplierList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["Supplier"][]
+    }
+    SupplierBankAccountInput: {
+      /**
+       * Format: uuid
+       * @description Kosong = rekening baru.
+       */
+      id?: string
+      bankName: string
+      /** @description Wajib untuk rekening baru; kosong pada rekening lama = nomor tidak berubah. */
+      accountNumber?: string
+      accountName: string
+      isDefault: boolean
+    }
+    SupplierInput: {
+      code: string
+      name: string
+      supplierType: components["schemas"]["SupplierType"]
+      /** @description Badan usaha (PT/CV) atau perorangan. */
+      isBusinessEntity: boolean
+      npwp?: string | null
+      defaultWithholding: components["schemas"]["WithholdingType"]
+      paymentTermDays: number
+      address?: string
+      phone?: string
+      email?: string
+      picName?: string
+      notes?: string
+      bankAccounts: components["schemas"]["SupplierBankAccountInput"][]
+    }
+    PartyUserOption: {
+      /** Format: uuid */
+      id: string
+      fullName: string
+      email: string
+    }
+    /**
+     * @description `resigned` juga untuk resign terjadwal; lihat `isActive` untuk status hari ini.
+     * @enum {string}
+     */
+    EmploymentStatus: "active" | "resigned"
+    Employee: {
+      /** Format: uuid */
+      id: string
+      employeeNumber: string
+      fullName: string
+      /** Format: uuid */
+      divisionId?: string | null
+      positionTitle: string
+      employmentStatus: components["schemas"]["EmploymentStatus"]
+      /** @description Aktif pada hari ini (WIB). */
+      isActive: boolean
+      joinDate: components["schemas"]["BusinessDate"]
+      resignDate?: components["schemas"]["BusinessDate"] | null
+      resignReason: string
+      workEmail: string
+      phone: string
+      hasNik: boolean
+      nikMasked?: string | null
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    EmployeeList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["Employee"][]
+    }
+    EmployeeInput: {
+      /** @description Disimpan huruf besar; diabaikan saat update. */
+      employeeNumber: string
+      fullName: string
+      /** Format: uuid */
+      divisionId?: string | null
+      positionTitle: string
+      joinDate: components["schemas"]["BusinessDate"]
+      workEmail?: string
+      phone?: string
+      /** @description 16 digit NIK KTP. */
+      nik?: string | null
+    }
+    EmployeeResignInput: {
+      resignDate: components["schemas"]["BusinessDate"]
+      reason: string
+      version: number
+    }
+    EmployeeOption: {
+      /** Format: uuid */
+      id: string
+      employeeNumber: string
+      fullName: string
+      isActive: boolean
+    }
+    FileUploadInput: {
+      /**
+       * @description Jenis pemilik file, mis. `partner_agreement` (PDF PKS).
+       * @example partner_agreement
+       */
+      ownerType: string
+      fileName: string
+      /** @example application/pdf */
+      contentType: string
+      /** Format: int64 */
+      sizeBytes: number
+    }
+    FileUploadTarget: {
+      /** Format: uuid */
+      fileId: string
+      /** @description URL relatif untuk `PUT` isi file. */
+      uploadUrl: string
+      /** Format: date-time */
+      expiresAt: string
+      /** Format: int64 */
+      maxSizeBytes: number
+    }
+    FileObject: {
+      /** Format: uuid */
+      id: string
+      fileName: string
+      contentType: string
+      /** Format: int64 */
+      sizeBytes: number
+      ownerType: string
+      /** Format: uuid */
+      ownerId?: string | null
+      /** @enum {string} */
+      status: "pending" | "uploaded"
+      /** Format: date-time */
+      uploadedAt?: string | null
+      /** Format: date-time */
+      createdAt: string
+    }
+    FileDownloadTarget: {
+      url: string
+      /** Format: date-time */
+      expiresAt: string
+    }
   }
   responses: {
     /** @description Error standar (problem+json) */
@@ -2522,6 +3366,11 @@ export interface components {
     /** @description Versi terakhir yang dilihat user (optimistic locking). */
     Version: number
     IncludeInactive: boolean
+    /** @description Versi terakhir yang dilihat user (optimistic locking). */
+    PartyVersion: number
+    /** @description Waktu kedaluwarsa URL (Unix detik). */
+    FileExpires: number
+    FileSignature: string
   }
   requestBodies: never
   headers: never
@@ -5287,6 +6136,961 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["Location"]
         }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listCustomers: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
+        sort?: components["parameters"]["Sort"]
+        q?: components["parameters"]["Search"]
+        phone?: string
+        customerType?: components["schemas"]["CustomerType"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar pelanggan; field sort yang diizinkan `code`, `fullName`, `createdAt` */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CustomerList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createCustomer: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CustomerInput"]
+      }
+    }
+    responses: {
+      /** @description Pelanggan dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Customer"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getCustomer: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Pelanggan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Customer"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateCustomer: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CustomerInput"] &
+          components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Pelanggan diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Customer"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  deleteCustomer: {
+    parameters: {
+      query: {
+        /** @description Versi terakhir yang dilihat user (optimistic locking). */
+        version: components["parameters"]["PartyVersion"]
+      }
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Pelanggan dihapus */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listPartners: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
+        sort?: components["parameters"]["Sort"]
+        q?: components["parameters"]["Search"]
+        partnerType?: components["schemas"]["PartnerType"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar mitra; field sort yang diizinkan `code`, `name`, `createdAt` */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PartnerList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createPartner: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PartnerInput"]
+      }
+    }
+    responses: {
+      /** @description Mitra dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Partner"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getPartner: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Mitra */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Partner"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updatePartner: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PartnerInput"] &
+          components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Mitra diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Partner"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  deletePartner: {
+    parameters: {
+      query: {
+        /** @description Versi terakhir yang dilihat user (optimistic locking). */
+        version: components["parameters"]["PartyVersion"]
+      }
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Mitra dihapus */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listPartnerAgreements: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description PKS mitra */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PartnerAgreement"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createPartnerAgreement: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PartnerAgreementInput"]
+      }
+    }
+    responses: {
+      /** @description PKS dicatat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PartnerAgreement"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updatePartnerAgreement: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PartnerAgreementInput"] &
+          components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description PKS diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PartnerAgreement"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  deletePartnerAgreement: {
+    parameters: {
+      query: {
+        /** @description Versi terakhir yang dilihat user (optimistic locking). */
+        version: components["parameters"]["PartyVersion"]
+      }
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description PKS dihapus */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listPartnerProductCodes: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        partnerId?: string
+        productId?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Kode produk mitra, urut mitra lalu kode artikel */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PartnerProductCodeList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createPartnerProductCode: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PartnerProductCodeInput"]
+      }
+    }
+    responses: {
+      /** @description Kode dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PartnerProductCode"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updatePartnerProductCode: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PartnerProductCodeUpdate"] &
+          components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Kode diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PartnerProductCode"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  deletePartnerProductCode: {
+    parameters: {
+      query: {
+        /** @description Versi terakhir yang dilihat user (optimistic locking). */
+        version: components["parameters"]["PartyVersion"]
+      }
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Kode dihapus */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listSuppliers: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
+        sort?: components["parameters"]["Sort"]
+        q?: components["parameters"]["Search"]
+        supplierType?: components["schemas"]["SupplierType"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar pemasok; field sort yang diizinkan `code`, `name`, `createdAt` */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SupplierList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createSupplier: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SupplierInput"]
+      }
+    }
+    responses: {
+      /** @description Pemasok dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Supplier"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getSupplier: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Pemasok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Supplier"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateSupplier: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SupplierInput"] &
+          components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Pemasok diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Supplier"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  deleteSupplier: {
+    parameters: {
+      query: {
+        /** @description Versi terakhir yang dilihat user (optimistic locking). */
+        version: components["parameters"]["PartyVersion"]
+      }
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Pemasok dihapus */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listPartyUserOptions: {
+    parameters: {
+      query?: {
+        q?: components["parameters"]["Search"]
+        /** @description Batasi ke pemegang role, mis. `merchandiser` atau `sales_mt`. */
+        role?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Maksimal 20 pengguna */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PartyUserOption"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listEmployees: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
+        sort?: components["parameters"]["Sort"]
+        q?: components["parameters"]["Search"]
+        nik?: string
+        status?: components["schemas"]["EmploymentStatus"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar karyawan; field sort yang diizinkan `employeeNumber`, `fullName`, `joinDate` */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["EmployeeList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createEmployee: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["EmployeeInput"]
+      }
+    }
+    responses: {
+      /** @description Karyawan dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Employee"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getEmployee: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Karyawan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Employee"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateEmployee: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["EmployeeInput"] &
+          components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Karyawan diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Employee"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  resignEmployee: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["EmployeeResignInput"]
+      }
+    }
+    responses: {
+      /** @description Resign tercatat */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Employee"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listEmployeeOptions: {
+    parameters: {
+      query?: {
+        q?: components["parameters"]["Search"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Maksimal 20 karyawan aktif */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["EmployeeOption"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createFileUpload: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["FileUploadInput"]
+      }
+    }
+    responses: {
+      /** @description URL upload */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["FileUploadTarget"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getFile: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Metadata file */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["FileObject"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getFileDownloadUrl: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description URL unduhan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["FileDownloadTarget"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getFileContent: {
+    parameters: {
+      query: {
+        /** @description Waktu kedaluwarsa URL (Unix detik). */
+        exp: components["parameters"]["FileExpires"]
+        sig: components["parameters"]["FileSignature"]
+      }
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Isi file dengan Content-Type aslinya */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/octet-stream": string
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  putFileContent: {
+    parameters: {
+      query: {
+        /** @description Waktu kedaluwarsa URL (Unix detik). */
+        exp: components["parameters"]["FileExpires"]
+        sig: components["parameters"]["FileSignature"]
+      }
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/octet-stream": string
+      }
+    }
+    responses: {
+      /** @description File tersimpan */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       default: components["responses"]["Problem"]
     }

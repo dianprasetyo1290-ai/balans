@@ -1,0 +1,1146 @@
+customers:
+  get:
+    operationId: listCustomers
+    tags: [party]
+    summary: Daftar pelanggan (MD-06)
+    description: |
+      `q` mencari nama, kode, atau nomor HP (nomor dinormalisasi lebih dulu sehingga `0812…`, `62812…`, dan
+      `+62812…` sama). `phone` mencari persis satu nomor untuk cek duplikat sebelum membuat pelanggan.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - $ref: "../components/common.yaml#/parameters/Sort"
+      - $ref: "../components/common.yaml#/parameters/Search"
+      - name: phone
+        in: query
+        schema:
+          type: string
+      - name: customerType
+        in: query
+        schema:
+          $ref: "#/components/schemas/CustomerType"
+    responses:
+      "200":
+        description: Daftar pelanggan; field sort yang diizinkan `code`, `fullName`, `createdAt`
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CustomerList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createCustomer
+    tags: [party]
+    summary: Membuat pelanggan
+    description: Nomor HP yang sudah dipakai pelanggan lain ditolak `VALIDATION_FAILED` pada field `phone`.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CustomerInput"
+    responses:
+      "201":
+        description: Pelanggan dibuat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Customer"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+customer:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  get:
+    operationId: getCustomer
+    tags: [party]
+    summary: Detail pelanggan beserta alamat
+    responses:
+      "200":
+        description: Pelanggan
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Customer"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  put:
+    operationId: updateCustomer
+    tags: [party]
+    summary: Mengubah pelanggan (optimistic locking dengan `version`)
+    description: |
+      Daftar `addresses` menggantikan seluruh alamat: alamat dengan `id` diubah, tanpa `id` ditambah, dan yang
+      tidak dikirim dihapus (soft delete).
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/CustomerInput"
+              - $ref: "../components/common.yaml#/VersionInput"
+    responses:
+      "200":
+        description: Pelanggan diperbarui
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Customer"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  delete:
+    operationId: deleteCustomer
+    tags: [party]
+    summary: Menghapus pelanggan (soft delete)
+    description: Pelanggan tetap tampil di dokumen lama; nomor HP-nya boleh dipakai pelanggan baru.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+      - $ref: "#/components/parameters/PartyVersion"
+    responses:
+      "204":
+        description: Pelanggan dihapus
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+partners:
+  get:
+    operationId: listPartners
+    tags: [party]
+    summary: Daftar mitra MT, konsinyasi, dan B2B (MD-07)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - $ref: "../components/common.yaml#/parameters/Sort"
+      - $ref: "../components/common.yaml#/parameters/Search"
+      - name: partnerType
+        in: query
+        schema:
+          $ref: "#/components/schemas/PartnerType"
+    responses:
+      "200":
+        description: Daftar mitra; field sort yang diizinkan `code`, `name`, `createdAt`
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PartnerList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createPartner
+    tags: [party]
+    summary: Membuat mitra
+    description: Kode mitra unik permanen dan tidak bisa dipakai ulang walau mitra dihapus (`DUPLICATE_CODE`).
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PartnerInput"
+    responses:
+      "201":
+        description: Mitra dibuat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Partner"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+partner:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  get:
+    operationId: getPartner
+    tags: [party]
+    summary: Detail mitra
+    responses:
+      "200":
+        description: Mitra
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Partner"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  put:
+    operationId: updatePartner
+    tags: [party]
+    summary: Mengubah mitra
+    description: Kode tidak bisa diubah. `npwp` tidak dikirim = tidak berubah; string kosong = dihapus.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/PartnerInput"
+              - $ref: "../components/common.yaml#/VersionInput"
+    responses:
+      "200":
+        description: Mitra diperbarui
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Partner"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  delete:
+    operationId: deletePartner
+    tags: [party]
+    summary: Menghapus mitra (soft delete)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+      - $ref: "#/components/parameters/PartyVersion"
+    responses:
+      "204":
+        description: Mitra dihapus
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+partnerAgreements:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  get:
+    operationId: listPartnerAgreements
+    tags: [party]
+    summary: Riwayat PKS mitra, terbaru lebih dulu
+    responses:
+      "200":
+        description: PKS mitra
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/PartnerAgreement"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createPartnerAgreement
+    tags: [party]
+    summary: Mencatat PKS baru (effective-dated)
+    description: |
+      Periode PKS dengan jenis yang sama tidak boleh tumpang tindih (Technical Guideline 5.14). Perubahan
+      ketentuan dicatat sebagai PKS baru mulai tanggal berlakunya; PKS lama dipersingkat lewat `validTo`.
+      `fileId` adalah PDF PKS yang sudah diunggah lewat `POST /api/v1/files` dengan `ownerType=partner_agreement`.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PartnerAgreementInput"
+    responses:
+      "201":
+        description: PKS dicatat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PartnerAgreement"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+partnerAgreement:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  put:
+    operationId: updatePartnerAgreement
+    tags: [party]
+    summary: Mengoreksi PKS
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/PartnerAgreementInput"
+              - $ref: "../components/common.yaml#/VersionInput"
+    responses:
+      "200":
+        description: PKS diperbarui
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PartnerAgreement"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  delete:
+    operationId: deletePartnerAgreement
+    tags: [party]
+    summary: Menghapus PKS yang salah input (soft delete)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+      - $ref: "#/components/parameters/PartyVersion"
+    responses:
+      "204":
+        description: PKS dihapus
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+partnerProductCodes:
+  get:
+    operationId: listPartnerProductCodes
+    tags: [party]
+    summary: Kode artikel & barcode retailer per SKU per mitra (MD-07)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - $ref: "../components/common.yaml#/parameters/Search"
+      - name: partnerId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: productId
+        in: query
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Kode produk mitra, urut mitra lalu kode artikel
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PartnerProductCodeList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createPartnerProductCode
+    tags: [party]
+    summary: Menambah kode produk mitra
+    description: Satu produk hanya punya satu kode per mitra; kode artikel unik per mitra (`VALIDATION_FAILED`).
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PartnerProductCodeInput"
+    responses:
+      "201":
+        description: Kode dibuat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PartnerProductCode"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+partnerProductCode:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  put:
+    operationId: updatePartnerProductCode
+    tags: [party]
+    summary: Mengubah kode artikel, barcode, atau keterangan
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/PartnerProductCodeUpdate"
+              - $ref: "../components/common.yaml#/VersionInput"
+    responses:
+      "200":
+        description: Kode diperbarui
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PartnerProductCode"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  delete:
+    operationId: deletePartnerProductCode
+    tags: [party]
+    summary: Menghapus kode produk mitra (soft delete)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+      - $ref: "#/components/parameters/PartyVersion"
+    responses:
+      "204":
+        description: Kode dihapus
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+suppliers:
+  get:
+    operationId: listSuppliers
+    tags: [party]
+    summary: Daftar pemasok & maklon (MD-08)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - $ref: "../components/common.yaml#/parameters/Sort"
+      - $ref: "../components/common.yaml#/parameters/Search"
+      - name: supplierType
+        in: query
+        schema:
+          $ref: "#/components/schemas/SupplierType"
+    responses:
+      "200":
+        description: Daftar pemasok; field sort yang diizinkan `code`, `name`, `createdAt`
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SupplierList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createSupplier
+    tags: [party]
+    summary: Membuat pemasok atau maklon
+    description: Kode unik permanen (`DUPLICATE_CODE`). NPWP dan nomor rekening dienkripsi (NFR-04).
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/SupplierInput"
+    responses:
+      "201":
+        description: Pemasok dibuat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Supplier"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+supplier:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  get:
+    operationId: getSupplier
+    tags: [party]
+    summary: Detail pemasok; NPWP dan rekening ditampilkan tersamar
+    responses:
+      "200":
+        description: Pemasok
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Supplier"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  put:
+    operationId: updateSupplier
+    tags: [party]
+    summary: Mengubah pemasok
+    description: |
+      Kode tidak bisa diubah. `npwp` tidak dikirim = tidak berubah. Rekening dengan `id` tanpa `accountNumber`
+      mempertahankan nomor lama; rekening yang tidak dikirim dihapus.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/SupplierInput"
+              - $ref: "../components/common.yaml#/VersionInput"
+    responses:
+      "200":
+        description: Pemasok diperbarui
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Supplier"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  delete:
+    operationId: deleteSupplier
+    tags: [party]
+    summary: Menghapus pemasok (soft delete)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+      - $ref: "#/components/parameters/PartyVersion"
+    responses:
+      "204":
+        description: Pemasok dihapus
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+partyUserOptions:
+  get:
+    operationId: listPartyUserOptions
+    tags: [party]
+    summary: Pengguna aktif untuk dipilih sebagai Sales atau Merchandiser mitra
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Search"
+      - name: role
+        in: query
+        description: Batasi ke pemegang role, mis. `merchandiser` atau `sales_mt`.
+        schema:
+          type: string
+    responses:
+      "200":
+        description: Maksimal 20 pengguna
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/PartyUserOption"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+components:
+  parameters:
+    PartyVersion:
+      name: version
+      in: query
+      required: true
+      description: Versi terakhir yang dilihat user (optimistic locking).
+      schema:
+        type: integer
+  schemas:
+    CustomerType:
+      type: string
+      enum: [retail, b2b, reseller, employee]
+    CustomerAddressInput:
+      type: object
+      required: [recipientName, addressLine, city, isDefault]
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Kosong = alamat baru.
+        label:
+          type: string
+          maxLength: 40
+          example: Rumah
+        recipientName:
+          type: string
+          minLength: 1
+          maxLength: 120
+        phone:
+          type: string
+          maxLength: 20
+        addressLine:
+          type: string
+          minLength: 1
+          maxLength: 500
+        district:
+          type: string
+          maxLength: 80
+        city:
+          type: string
+          minLength: 1
+          maxLength: 80
+        province:
+          type: string
+          maxLength: 80
+        postalCode:
+          type: string
+          maxLength: 10
+        latitude:
+          type: string
+          nullable: true
+          description: Desimal derajat sebagai string, mis. `-6.200000`.
+        longitude:
+          type: string
+          nullable: true
+        isDefault:
+          type: boolean
+    CustomerAddress:
+      type: object
+      required: [id, label, recipientName, phone, addressLine, district, city, province, postalCode, isDefault]
+      properties:
+        id:
+          type: string
+          format: uuid
+        label:
+          type: string
+        recipientName:
+          type: string
+        phone:
+          type: string
+        addressLine:
+          type: string
+        district:
+          type: string
+        city:
+          type: string
+        province:
+          type: string
+        postalCode:
+          type: string
+        latitude:
+          type: string
+          nullable: true
+        longitude:
+          type: string
+          nullable: true
+        isDefault:
+          type: boolean
+    CustomerInput:
+      type: object
+      required: [fullName, phone, customerType, marketingConsent, addresses]
+      properties:
+        fullName:
+          type: string
+          minLength: 1
+          maxLength: 120
+        phone:
+          type: string
+          description: Nomor WA/HP; `08…`, `628…`, dan `+628…` disimpan sebagai `+628…`.
+          example: "0812-3456-7890"
+        email:
+          type: string
+          maxLength: 120
+        customerType:
+          $ref: "#/components/schemas/CustomerType"
+        employeeId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Wajib untuk tipe `employee`; karyawan harus aktif (HR-03).
+        marketingConsent:
+          type: boolean
+          description: Persetujuan menerima pesan pemasaran; waktu persetujuan dicatat server (NFR-04).
+        marketingConsentVersion:
+          type: string
+          maxLength: 40
+          description: Versi teks persetujuan yang disetujui pelanggan.
+        notes:
+          type: string
+          maxLength: 1000
+        addresses:
+          type: array
+          maxItems: 20
+          items:
+            $ref: "#/components/schemas/CustomerAddressInput"
+    Customer:
+      type: object
+      required:
+        [id, code, fullName, phone, email, customerType, marketingConsent, marketingConsentVersion, notes, addresses,
+         createdAt, updatedAt, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: PLG-000123
+        fullName:
+          type: string
+        phone:
+          type: string
+          example: "+6281234567890"
+        email:
+          type: string
+        customerType:
+          $ref: "#/components/schemas/CustomerType"
+        employeeId:
+          type: string
+          format: uuid
+          nullable: true
+        employeeName:
+          type: string
+          nullable: true
+        employeeNumber:
+          type: string
+          nullable: true
+        isEmployeeActive:
+          type: boolean
+          nullable: true
+          description: Status karyawan hari ini; `false` = karyawan sudah resign dan harga karyawan tidak berlaku.
+        marketingConsent:
+          type: boolean
+        marketingConsentAt:
+          type: string
+          format: date-time
+          nullable: true
+        marketingConsentVersion:
+          type: string
+        notes:
+          type: string
+        addresses:
+          type: array
+          items:
+            $ref: "#/components/schemas/CustomerAddress"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    CustomerList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/Customer"
+    PartnerType:
+      type: string
+      enum: [modern_trade, consignment, b2b]
+    PartnerInput:
+      type: object
+      required: [code, name, partnerType]
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 30
+          pattern: "^[A-Za-z0-9][A-Za-z0-9-]*$"
+          description: Disimpan huruf besar; diabaikan saat update.
+        name:
+          type: string
+          minLength: 1
+          maxLength: 160
+        partnerType:
+          $ref: "#/components/schemas/PartnerType"
+        npwp:
+          type: string
+          nullable: true
+          description: 15 atau 16 digit; tanda baca diabaikan.
+        address:
+          type: string
+          maxLength: 500
+        picName:
+          type: string
+          maxLength: 120
+        picPhone:
+          type: string
+          maxLength: 20
+        salesUserId:
+          type: string
+          format: uuid
+          nullable: true
+        merchandiserUserId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Merchandiser yang ditugaskan; membatasi akses stock count partner (MD-07).
+        notes:
+          type: string
+          maxLength: 1000
+    Partner:
+      type: object
+      required: [id, code, name, partnerType, hasNpwp, address, picName, picPhone, notes, createdAt, updatedAt, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        partnerType:
+          $ref: "#/components/schemas/PartnerType"
+        hasNpwp:
+          type: boolean
+        npwpMasked:
+          type: string
+          nullable: true
+          example: "•••••••••••5678"
+        address:
+          type: string
+        picName:
+          type: string
+        picPhone:
+          type: string
+        salesUserId:
+          type: string
+          format: uuid
+          nullable: true
+        salesUserName:
+          type: string
+          nullable: true
+        merchandiserUserId:
+          type: string
+          format: uuid
+          nullable: true
+        merchandiserUserName:
+          type: string
+          nullable: true
+        notes:
+          type: string
+        activeAgreements:
+          type: array
+          description: PKS yang berlaku hari ini (detail dan daftar).
+          items:
+            $ref: "#/components/schemas/PartnerAgreement"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    PartnerList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/Partner"
+    AgreementType:
+      type: string
+      enum: [consignment, modern_trade]
+    BorneBy:
+      type: string
+      enum: [partner, balans]
+      description: Pihak yang menanggung selisih rekonsiliasi konsinyasi (BRD U-02).
+    AgreementStatus:
+      type: string
+      enum: [scheduled, active, expired]
+    PartnerAgreementInput:
+      type: object
+      required: [agreementNumber, agreementType, validFrom, validTo, paymentTermDays]
+      properties:
+        partnerId:
+          type: string
+          format: uuid
+          description: Diisi dari path saat membuat; diabaikan saat update.
+        agreementNumber:
+          type: string
+          minLength: 1
+          maxLength: 60
+        agreementType:
+          $ref: "#/components/schemas/AgreementType"
+        validFrom:
+          $ref: "../components/common.yaml#/BusinessDate"
+        validTo:
+          $ref: "../components/common.yaml#/BusinessDate"
+        fileId:
+          type: string
+          format: uuid
+          nullable: true
+          description: PDF PKS hasil upload.
+        priceListId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Daftar harga konsinyasi/MT (modul pricing, R1.1).
+        consignmentMarginPercent:
+          type: string
+          nullable: true
+          description: Margin/komisi mitra dari harga jual, persen desimal, mis. `25.0000`.
+        paymentTermDays:
+          type: integer
+          minimum: 0
+          maximum: 365
+        lossBorneBy:
+          $ref: "#/components/schemas/BorneBy"
+        partnerDamageBorneBy:
+          $ref: "#/components/schemas/BorneBy"
+        productDefectBorneBy:
+          $ref: "#/components/schemas/BorneBy"
+        nearExpiryBorneBy:
+          $ref: "#/components/schemas/BorneBy"
+        notes:
+          type: string
+          maxLength: 1000
+    PartnerAgreement:
+      type: object
+      required:
+        [id, partnerId, agreementNumber, agreementType, validFrom, validTo, status, paymentTermDays, lossBorneBy,
+         partnerDamageBorneBy, productDefectBorneBy, nearExpiryBorneBy, notes, createdAt, updatedAt, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        partnerId:
+          type: string
+          format: uuid
+        agreementNumber:
+          type: string
+        agreementType:
+          $ref: "#/components/schemas/AgreementType"
+        validFrom:
+          $ref: "../components/common.yaml#/BusinessDate"
+        validTo:
+          $ref: "../components/common.yaml#/BusinessDate"
+        status:
+          $ref: "#/components/schemas/AgreementStatus"
+        fileId:
+          type: string
+          format: uuid
+          nullable: true
+        fileName:
+          type: string
+          nullable: true
+        priceListId:
+          type: string
+          format: uuid
+          nullable: true
+        consignmentMarginPercent:
+          type: string
+          nullable: true
+        paymentTermDays:
+          type: integer
+        lossBorneBy:
+          $ref: "#/components/schemas/BorneBy"
+        partnerDamageBorneBy:
+          $ref: "#/components/schemas/BorneBy"
+        productDefectBorneBy:
+          $ref: "#/components/schemas/BorneBy"
+        nearExpiryBorneBy:
+          $ref: "#/components/schemas/BorneBy"
+        notes:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    PartnerProductCodeUpdate:
+      type: object
+      required: [articleCode]
+      properties:
+        articleCode:
+          type: string
+          minLength: 1
+          maxLength: 40
+        barcode:
+          type: string
+          maxLength: 40
+        description:
+          type: string
+          maxLength: 200
+    PartnerProductCodeInput:
+      allOf:
+        - $ref: "#/components/schemas/PartnerProductCodeUpdate"
+        - type: object
+          required: [partnerId, productId]
+          properties:
+            partnerId:
+              type: string
+              format: uuid
+            productId:
+              type: string
+              format: uuid
+              description: Produk di modul catalog.
+    PartnerProductCode:
+      type: object
+      required:
+        [id, partnerId, partnerCode, partnerName, productId, articleCode, barcode, description, createdAt, updatedAt,
+         version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        partnerId:
+          type: string
+          format: uuid
+        partnerCode:
+          type: string
+        partnerName:
+          type: string
+        productId:
+          type: string
+          format: uuid
+        productSku:
+          type: string
+          nullable: true
+        productName:
+          type: string
+          nullable: true
+        articleCode:
+          type: string
+        barcode:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    PartnerProductCodeList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/PartnerProductCode"
+    SupplierType:
+      type: string
+      enum: [supplier, toll_manufacturer]
+      description: "`toll_manufacturer` = maklon."
+    WithholdingType:
+      type: string
+      enum: [none, pph23, pph21, pph4_2]
+      description: PPh yang dipotong default saat membayar tagihan pemasok.
+    SupplierBankAccountInput:
+      type: object
+      required: [bankName, accountName, isDefault]
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Kosong = rekening baru.
+        bankName:
+          type: string
+          minLength: 1
+          maxLength: 80
+        accountNumber:
+          type: string
+          description: Wajib untuk rekening baru; kosong pada rekening lama = nomor tidak berubah.
+        accountName:
+          type: string
+          minLength: 1
+          maxLength: 120
+        isDefault:
+          type: boolean
+    SupplierBankAccount:
+      type: object
+      required: [id, bankName, accountNumberMasked, accountName, isDefault]
+      properties:
+        id:
+          type: string
+          format: uuid
+        bankName:
+          type: string
+        accountNumberMasked:
+          type: string
+          example: "••••••7890"
+        accountName:
+          type: string
+        isDefault:
+          type: boolean
+    SupplierInput:
+      type: object
+      required: [code, name, supplierType, isBusinessEntity, defaultWithholding, paymentTermDays, bankAccounts]
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 30
+          pattern: "^[A-Za-z0-9][A-Za-z0-9-]*$"
+        name:
+          type: string
+          minLength: 1
+          maxLength: 160
+        supplierType:
+          $ref: "#/components/schemas/SupplierType"
+        isBusinessEntity:
+          type: boolean
+          description: Badan usaha (PT/CV) atau perorangan.
+        npwp:
+          type: string
+          nullable: true
+        defaultWithholding:
+          $ref: "#/components/schemas/WithholdingType"
+        paymentTermDays:
+          type: integer
+          minimum: 0
+          maximum: 365
+        address:
+          type: string
+          maxLength: 500
+        phone:
+          type: string
+          maxLength: 20
+        email:
+          type: string
+          maxLength: 120
+        picName:
+          type: string
+          maxLength: 120
+        notes:
+          type: string
+          maxLength: 1000
+        bankAccounts:
+          type: array
+          maxItems: 5
+          items:
+            $ref: "#/components/schemas/SupplierBankAccountInput"
+    Supplier:
+      type: object
+      required:
+        [id, code, name, supplierType, isBusinessEntity, hasNpwp, defaultWithholding, paymentTermDays, address, phone,
+         email, picName, notes, bankAccounts, createdAt, updatedAt, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        supplierType:
+          $ref: "#/components/schemas/SupplierType"
+        isBusinessEntity:
+          type: boolean
+        hasNpwp:
+          type: boolean
+        npwpMasked:
+          type: string
+          nullable: true
+        defaultWithholding:
+          $ref: "#/components/schemas/WithholdingType"
+        paymentTermDays:
+          type: integer
+        address:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        picName:
+          type: string
+        notes:
+          type: string
+        bankAccounts:
+          type: array
+          items:
+            $ref: "#/components/schemas/SupplierBankAccount"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    SupplierList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/Supplier"
+    PartyUserOption:
+      type: object
+      required: [id, fullName, email]
+      properties:
+        id:
+          type: string
+          format: uuid
+        fullName:
+          type: string
+        email:
+          type: string

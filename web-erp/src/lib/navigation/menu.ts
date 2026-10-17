@@ -91,19 +91,46 @@ export const MENU: MenuGroup[] = [
       },
       ...items(
         "Daftar Harga",
-        "Aturan Harga",
-        "Pelanggan",
-        "Mitra Konsinyasi",
-        "Reseller",
-        "Pemasok & Maklon"
+        "Aturan Harga"
       ),
+      {
+        label: "Pelanggan",
+        to: "/master/customers",
+        permission: "party.customer.read",
+        module: "party",
+      },
+      {
+        label: "Mitra Konsinyasi",
+        to: "/master/partners",
+        permission: "party.partner.read",
+        module: "party",
+      },
+      {
+        label: "Kode Produk Mitra",
+        to: "/master/partner-product-codes",
+        permission: "party.partner_product_code.read",
+        module: "party",
+      },
+      { label: "Reseller" },
+      {
+        label: "Pemasok & Maklon",
+        to: "/master/suppliers",
+        permission: "party.supplier.read",
+        module: "party",
+      },
       {
         label: "Gudang & Lokasi",
         to: "/master-data/warehouses",
         permission: "warehouse.warehouse.read",
         module: "warehouse",
       },
-      ...items("Karyawan", "Alasan Retur", "Jenis Biaya"),
+      {
+        label: "Karyawan",
+        to: "/hris/employees",
+        permission: "hris.employee.read",
+        module: "hris",
+      },
+      ...items("Alasan Retur", "Jenis Biaya"),
       {
         label: "Kampanye",
         to: "/master/campaigns",
@@ -289,21 +316,28 @@ export const MENU: MenuGroup[] = [
     label: "SDM (HRIS)",
     icon: UsersIcon,
     modules: ["hris", "payroll"],
-    items: items(
-      "Data Karyawan",
-      "Struktur Organisasi",
-      "Jabatan & Kontrak",
-      "Absensi",
-      "Jadwal & Shift",
-      "Cuti & Izin",
-      "Lembur",
-      "Reimbursement",
-      "Payroll",
-      "BPJS",
-      "PPh 21",
-      "Slip Gaji",
-      "Self-Service"
-    ),
+    items: [
+      {
+        label: "Data Karyawan",
+        to: "/hris/employees",
+        permission: "hris.employee.read",
+        module: "hris",
+      },
+      ...items(
+        "Struktur Organisasi",
+        "Jabatan & Kontrak",
+        "Absensi",
+        "Jadwal & Shift",
+        "Cuti & Izin",
+        "Lembur",
+        "Reimbursement",
+        "Payroll",
+        "BPJS",
+        "PPh 21",
+        "Slip Gaji",
+        "Self-Service"
+      ),
+    ],
   },
   {
     label: "Keuangan & Akuntansi",

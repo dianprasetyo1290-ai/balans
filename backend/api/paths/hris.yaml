@@ -1,0 +1,262 @@
+employees:
+  get:
+    operationId: listEmployees
+    tags: [hris]
+    summary: Data karyawan dasar (HR-01)
+    description: |
+      `q` mencari nomor karyawan atau nama. `nik` mencari persis lewat hash HMAC (NIK tidak pernah dicari
+      sebagai teks, Technical Guideline 6.7).
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - $ref: "../components/common.yaml#/parameters/Sort"
+      - $ref: "../components/common.yaml#/parameters/Search"
+      - name: nik
+        in: query
+        schema:
+          type: string
+      - name: status
+        in: query
+        schema:
+          $ref: "#/components/schemas/EmploymentStatus"
+    responses:
+      "200":
+        description: Daftar karyawan; field sort yang diizinkan `employeeNumber`, `fullName`, `joinDate`
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmployeeList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createEmployee
+    tags: [hris]
+    summary: Menambah karyawan
+    description: Nomor karyawan unik permanen (`DUPLICATE_CODE`); NIK dienkripsi AES-256-GCM.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/EmployeeInput"
+    responses:
+      "201":
+        description: Karyawan dibuat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Employee"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+employee:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  get:
+    operationId: getEmployee
+    tags: [hris]
+    summary: Detail karyawan; NIK ditampilkan tersamar
+    responses:
+      "200":
+        description: Karyawan
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Employee"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  put:
+    operationId: updateEmployee
+    tags: [hris]
+    summary: Mengubah data karyawan
+    description: Nomor karyawan tidak bisa diubah. `nik` tidak dikirim = tidak berubah; string kosong = dihapus.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/EmployeeInput"
+              - $ref: "../components/common.yaml#/VersionInput"
+    responses:
+      "200":
+        description: Karyawan diperbarui
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Employee"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+employeeResign:
+  post:
+    operationId: resignEmployee
+    tags: [hris]
+    summary: Mencatat resign karyawan
+    description: |
+      Mulai tanggal resign karyawan tidak lagi aktif; pelanggan yang tertaut otomatis kehilangan harga karyawan
+      (HR-03). Tanggal boleh di masa depan (resign terjadwal).
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/EmployeeResignInput"
+    responses:
+      "200":
+        description: Resign tercatat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Employee"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+employeeOptions:
+  get:
+    operationId: listEmployeeOptions
+    tags: [hris]
+    summary: Pilihan karyawan untuk ditautkan ke pelanggan
+    description: |
+      Hanya nomor, nama, dan status (tanpa data pribadi). Terbuka untuk `hris.employee.read` atau
+      `party.customer.write` (CS menautkan pelanggan ke karyawan).
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Search"
+    responses:
+      "200":
+        description: Maksimal 20 karyawan aktif
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/EmployeeOption"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+components:
+  schemas:
+    EmploymentStatus:
+      type: string
+      enum: [active, resigned]
+      description: "`resigned` juga untuk resign terjadwal; lihat `isActive` untuk status hari ini."
+    EmployeeInput:
+      type: object
+      required: [employeeNumber, fullName, positionTitle, joinDate]
+      properties:
+        employeeNumber:
+          type: string
+          minLength: 1
+          maxLength: 30
+          description: Disimpan huruf besar; diabaikan saat update.
+        fullName:
+          type: string
+          minLength: 1
+          maxLength: 120
+        divisionId:
+          type: string
+          format: uuid
+          nullable: true
+        positionTitle:
+          type: string
+          minLength: 1
+          maxLength: 80
+        joinDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        workEmail:
+          type: string
+          maxLength: 120
+        phone:
+          type: string
+          maxLength: 20
+        nik:
+          type: string
+          nullable: true
+          description: 16 digit NIK KTP.
+    Employee:
+      type: object
+      required:
+        [id, employeeNumber, fullName, positionTitle, employmentStatus, isActive, joinDate, resignReason, workEmail,
+         phone, hasNik, createdAt, updatedAt, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        employeeNumber:
+          type: string
+        fullName:
+          type: string
+        divisionId:
+          type: string
+          format: uuid
+          nullable: true
+        positionTitle:
+          type: string
+        employmentStatus:
+          $ref: "#/components/schemas/EmploymentStatus"
+        isActive:
+          type: boolean
+          description: Aktif pada hari ini (WIB).
+        joinDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        resignDate:
+          allOf:
+            - $ref: "../components/common.yaml#/BusinessDate"
+          nullable: true
+        resignReason:
+          type: string
+        workEmail:
+          type: string
+        phone:
+          type: string
+        hasNik:
+          type: boolean
+        nikMasked:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    EmployeeList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/Employee"
+    EmployeeResignInput:
+      type: object
+      required: [resignDate, reason, version]
+      properties:
+        resignDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 500
+        version:
+          type: integer
+    EmployeeOption:
+      type: object
+      required: [id, employeeNumber, fullName, isActive]
+      properties:
+        id:
+          type: string
+          format: uuid
+        employeeNumber:
+          type: string
+        fullName:
+          type: string
+        isActive:
+          type: boolean
