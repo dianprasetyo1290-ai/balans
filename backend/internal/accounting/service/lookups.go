@@ -62,3 +62,30 @@ func (s *Service) PostableAccounts(ctx context.Context, codePrefix string) ([]do
 	}
 	return out, nil
 }
+
+// SalesChannels mengembalikan channel dan sub-channel aktif untuk pilihan channel dokumen penjualan. Tidak
+// memeriksa permission.
+func (s *Service) SalesChannels(ctx context.Context) ([]domain.DimensionValue, error) {
+	channels, err := s.Store.ListDimensions(ctx, domain.KindChannel, postgres.DimensionFilter{})
+	if err != nil {
+		return nil, err
+	}
+	subs, err := s.Store.ListDimensions(ctx, domain.KindSubChannel, postgres.DimensionFilter{})
+	if err != nil {
+		return nil, err
+	}
+	return append(channels, subs...), nil
+}
+
+// DimensionLabels mengembalikan jenis, kode, dan nama dimensi (termasuk nonaktif/terhapus) untuk tampilan dokumen.
+func (s *Service) DimensionLabels(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID]domain.DimensionValue, error) {
+	names, err := s.Store.DimensionNames(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+	out := make(map[uuid.UUID]domain.DimensionValue, len(names))
+	for id, n := range names {
+		out[id] = domain.DimensionValue{ID: id, Kind: n.Kind, Code: n.Code, Name: n.Name}
+	}
+	return out, nil
+}

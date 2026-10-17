@@ -53,16 +53,18 @@ func (h *WebhookHandler) ReceiveMidtransWebhook(w http.ResponseWriter, r *http.R
 	h.rs.JSON(w, r, http.StatusOK, WebhookAck{Received: true, Duplicate: duplicate})
 }
 
-// SalesHandler mengimplementasikan StrictServerInterface untuk endpoint JSON biasa (master alasan retur).
+// SalesHandler mengimplementasikan StrictServerInterface untuk endpoint JSON biasa (master alasan retur, dokumen
+// penjualan, piutang).
 type SalesHandler struct {
 	reasons *service.ReturnReasonService
+	docs    *service.DocumentService
 }
 
 var _ StrictServerInterface = (*SalesHandler)(nil)
 
 // NewHandler membuat handler.
-func NewHandler(reasons *service.ReturnReasonService) *SalesHandler {
-	return &SalesHandler{reasons: reasons}
+func NewHandler(reasons *service.ReturnReasonService, docs *service.DocumentService) *SalesHandler {
+	return &SalesHandler{reasons: reasons, docs: docs}
 }
 
 // errWebhookRoute: webhook tidak pernah dirutekan lewat handler strict (lihat router).

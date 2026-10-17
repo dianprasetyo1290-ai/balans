@@ -198,6 +198,26 @@ func (m *Module) ExpenseTypeByCode(ctx context.Context, code string) (ExpenseTyp
 // DimensionValue adalah satu nilai master dimensi (channel, sub-channel, divisi, kampanye).
 type DimensionValue = domain.DimensionValue
 
+// Jenis master dimensi.
+const (
+	KindChannel    = domain.KindChannel
+	KindSubChannel = domain.KindSubChannel
+	KindDivision   = domain.KindDivision
+	KindCampaign   = domain.KindCampaign
+)
+
+// SalesChannels mengembalikan channel dan sub-channel aktif (DimensionValue.Kind membedakan; sub-channel membawa
+// ChannelID dan pihak pemiliknya) untuk dokumen penjualan. Tidak memeriksa permission.
+func (m *Module) SalesChannels(ctx context.Context) ([]DimensionValue, error) {
+	return m.svc.SalesChannels(ctx)
+}
+
+// DimensionLabels mengembalikan jenis, kode, dan nama dimensi (termasuk nonaktif/terhapus) untuk tampilan dan
+// pemetaan dokumen modul lain.
+func (m *Module) DimensionLabels(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID]DimensionValue, error) {
+	return m.svc.DimensionLabels(ctx, ids)
+}
+
 // AccountColumns adalah kolom template impor/ekspor Chart of Accounts (S-125).
 func AccountColumns() []tabular.Column { return service.AccountColumns }
 
