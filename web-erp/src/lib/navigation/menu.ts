@@ -69,7 +69,7 @@ export const MENU: MenuGroup[] = [
   {
     label: "Data Master",
     icon: DatabaseIcon,
-    modules: ["catalog", "pricing", "party", "warehouse", "hris"],
+    modules: ["catalog", "pricing", "party", "warehouse", "hris", "accounting"],
     items: [
       ...items(
         "Produk",
@@ -84,9 +84,20 @@ export const MENU: MenuGroup[] = [
         "Gudang & Lokasi",
         "Karyawan",
         "Alasan Retur",
-        "Jenis Biaya",
-        "Kampanye"
+        "Jenis Biaya"
       ),
+      {
+        label: "Kampanye",
+        to: "/master/campaigns",
+        permission: "accounting.dimension.read",
+        module: "accounting",
+      },
+      {
+        label: "Channel & Divisi",
+        to: "/master/channels",
+        permission: "accounting.dimension.read",
+        module: "accounting",
+      },
     ],
   },
   {
@@ -278,11 +289,26 @@ export const MENU: MenuGroup[] = [
     icon: LandmarkIcon,
     modules: ["accounting", "tax"],
     items: [
+      ...items("Ringkasan Keuangan"),
+      {
+        label: "Chart of Accounts",
+        to: "/finance/accounts",
+        permission: "accounting.account.read",
+        module: "accounting",
+      },
+      {
+        label: "Jurnal Umum",
+        to: "/finance/journals",
+        permission: "accounting.journal.read",
+        module: "accounting",
+      },
+      {
+        label: "Buku Besar",
+        to: "/finance/general-ledger",
+        permission: "accounting.journal.read",
+        module: "accounting",
+      },
       ...items(
-        "Ringkasan Keuangan",
-        "Chart of Accounts",
-        "Jurnal Umum",
-        "Buku Besar",
         "Piutang Usaha",
         "Utang Usaha",
         "Kas & Bank",
@@ -291,14 +317,14 @@ export const MENU: MenuGroup[] = [
         "Biaya Operasional"
       ),
       { label: "Anggaran Biaya", optional: "U-13" },
-      ...items(
-        "Pajak & Bukti Potong",
-        "Aset Tetap",
-        "Penyusutan",
-        "Tutup Buku",
-        "Saldo Awal",
-        "Laporan Keuangan"
-      ),
+      ...items("Pajak & Bukti Potong", "Aset Tetap", "Penyusutan"),
+      {
+        label: "Periode Akuntansi",
+        to: "/finance/fiscal-periods",
+        permission: "accounting.fiscal_period.read",
+        module: "accounting",
+      },
+      ...items("Tutup Buku", "Saldo Awal", "Laporan Keuangan"),
     ],
   },
   {
@@ -367,12 +393,14 @@ export const MENU: MenuGroup[] = [
         permission: "approval.policy.read",
         module: "approval",
       },
-      ...items(
-        "Notifikasi",
-        "Nomor Dokumen",
-        "Template Dokumen",
-        "Preferensi Sistem"
-      ),
+      ...items("Notifikasi"),
+      {
+        label: "Nomor Dokumen",
+        to: "/settings/document-sequences",
+        permission: "document.sequence.read",
+        module: "document",
+      },
+      ...items("Template Dokumen", "Preferensi Sistem"),
       {
         label: "Riwayat Perubahan",
         to: "/settings/audit-logs",

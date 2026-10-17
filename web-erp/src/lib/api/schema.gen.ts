@@ -894,6 +894,391 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/v1/accounts": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Chart of Accounts urut kode
+     * @description Butuh `accounting.account.read`. Tanpa `includeInactive` hanya akun aktif.
+     */
+    get: operations["listAccounts"]
+    put?: never
+    /**
+     * Menambah akun COA (S-126)
+     * @description Kode 4 digit, digit pertama = kelompok 1–7, unik permanen (`DUPLICATE_CODE`, termasuk akun yang sudah dihapus).
+     *     Induk harus akun judul (tidak bisa diposting) dalam kelompok yang sama.
+     */
+    post: operations["createAccount"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/accounts/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail akun */
+    get: operations["getAccount"]
+    /**
+     * Mengubah akun
+     * @description Kode tidak berubah. Saldo normal akun yang sudah dipakai jurnal tidak bisa diubah; akun terpakai tidak bisa
+     *     dijadikan akun induk; akun yang punya sub-akun harus tetap akun induk.
+     */
+    put: operations["updateAccount"]
+    post?: never
+    /**
+     * Menghapus akun yang belum dipakai (soft delete)
+     * @description Akun yang sudah dipakai jurnal atau posting rule, atau masih punya sub-akun, ditolak `INVALID_STATE_TRANSITION`.
+     */
+    delete: operations["deleteAccount"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/channels": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Master channel (dimensi C) */
+    get: operations["listChannels"]
+    put?: never
+    /** Menambah channel */
+    post: operations["createChannel"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/channels/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Mengubah channel (kode tetap) */
+    put: operations["updateChannel"]
+    post?: never
+    /** Menghapus channel yang belum dipakai jurnal dan tanpa sub-channel */
+    delete: operations["deleteChannel"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sub-channels": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Master sub-channel (dimensi S) */
+    get: operations["listSubChannels"]
+    put?: never
+    /** Menambah sub-channel */
+    post: operations["createSubChannel"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sub-channels/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Mengubah sub-channel (kode dan channel tetap) */
+    put: operations["updateSubChannel"]
+    post?: never
+    /** Menghapus sub-channel yang belum dipakai jurnal */
+    delete: operations["deleteSubChannel"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/divisions": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Master divisi (dimensi D) */
+    get: operations["listDivisions"]
+    put?: never
+    /** Menambah divisi */
+    post: operations["createDivision"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/divisions/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Mengubah divisi (kode tetap) */
+    put: operations["updateDivision"]
+    post?: never
+    /** Menghapus divisi yang belum dipakai jurnal */
+    delete: operations["deleteDivision"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/campaigns": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Data Master › Kampanye (dimensi K) */
+    get: operations["listCampaigns"]
+    put?: never
+    /**
+     * Menambah kampanye
+     * @description Kode `KMP-YYYYMM-SINGKATAN` unik permanen; periode berlaku wajib.
+     */
+    post: operations["createCampaign"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/campaigns/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Mengubah kampanye (kode tetap) */
+    put: operations["updateCampaign"]
+    post?: never
+    /** Menghapus kampanye yang belum dipakai jurnal */
+    delete: operations["deleteCampaign"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/fiscal-periods": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Periode akuntansi bulanan (ACC-08) */
+    get: operations["listFiscalPeriods"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/fiscal-periods/ensure": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Membuat periode bulan berjalan dan bulan berikutnya bila belum ada
+     * @description Periode juga dibuat otomatis oleh job harian `accounting.ensure_fiscal_periods` dan saat jurnal pertama
+     *     diposting di bulan tersebut. Butuh `accounting.fiscal_period.write`.
+     */
+    post: operations["ensureFiscalPeriods"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/posting-rules": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Posting rule jurnal otomatis dan pemetaan akun yang berlaku hari ini (S-130) */
+    get: operations["listPostingRules"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/journal-entries": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Daftar jurnal (manual, otomatis, Balik Jurnal) */
+    get: operations["listJournalEntries"]
+    put?: never
+    /**
+     * Menyimpan draft Jurnal Umum (S-127)
+     * @description Akun harus bisa diposting manual (akun kontrol hanya diisi jurnal otomatis). Tanggal di periode tertutup
+     *     ditolak `PERIOD_LOCKED`. Balance dan dimensi wajib diperiksa saat posting.
+     */
+    post: operations["createJournalEntry"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/journal-entries/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail jurnal beserta baris dan aksi yang diizinkan */
+    get: operations["getJournalEntry"]
+    /**
+     * Mengubah draft Jurnal Umum
+     * @description Jurnal yang sudah diposting tidak bisa diubah (`INVALID_STATE_TRANSITION`, ACC-13).
+     */
+    put: operations["updateJournalEntry"]
+    post?: never
+    /**
+     * Menghapus draft Jurnal Umum
+     * @description Jurnal yang sudah diposting tidak bisa dihapus (`INVALID_STATE_TRANSITION`, ACC-13).
+     */
+    delete: operations["deleteJournalEntry"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/journal-entries/{id}/post": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Memposting draft Jurnal Umum
+     * @description Jurnal harus balance, di periode terbuka (`PERIOD_LOCKED`), dan dimensi wajib terisi (pendapatan: channel +
+     *     sub-channel; HPP/beban/lain-lain: divisi). Nomor `JV/TAHUN/BULAN/NOMOR` diberikan saat posting.
+     */
+    post: operations["postJournalEntry"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/journal-entries/{id}/reverse": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Balik Jurnal (S-128)
+     * @description Membuat dan memposting JV pembalik (debit/kredit ditukar) yang mereferensikan jurnal asal. Jurnal asal tetap
+     *     tidak berubah. Satu jurnal hanya bisa dibalik sekali; jurnal otomatis dibalik lewat pembatalan dokumen sumber.
+     */
+    post: operations["reverseJournalEntry"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/general-ledger": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Buku Besar per akun dengan saldo berjalan
+     * @description Hanya jurnal yang sudah diposting. Saldo mengikuti saldo normal akun. Rentang paling panjang 2 tahun.
+     *     Butuh `accounting.journal.read` atau `accounting.report.read`.
+     */
+    get: operations["getGeneralLedger"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/document-sequences": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Pengaturan › Nomor Dokumen — nomor terakhir per kode dokumen
+     * @description Format `KODE/TAHUN/BULAN/NOMOR` dengan nomor urut 5 digit yang reset setiap tahun (U-15). Nomor diberikan
+     *     saat dokumen diajukan atau diposting di dalam transaksi bisnis, sehingga tidak loncat. Butuh
+     *     `document.sequence.read`. Tanpa `year` dipakai tahun berjalan (WIB).
+     */
+    get: operations["listDocumentSequences"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -1512,6 +1897,284 @@ export interface components {
     LocationList: components["schemas"]["Pagination"] & {
       items: components["schemas"]["Location"][]
     }
+    /** @enum {string} */
+    NormalBalance: "debit" | "credit"
+    Account: {
+      /** Format: uuid */
+      id: string
+      /** @example 1111 */
+      code: string
+      name: string
+      group: number
+      groupLabel: string
+      normalBalance: components["schemas"]["NormalBalance"]
+      /** Format: uuid */
+      parentId?: string | null
+      /** @description false = akun induk (judul), tidak bisa diposting. */
+      isPostable: boolean
+      /** @description Boleh dipakai di Jurnal Umum manual. Akun kontrol hanya diisi jurnal otomatis. */
+      allowManualPosting: boolean
+      isActive: boolean
+      description: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    AccountFields: {
+      name: string
+      normalBalance: components["schemas"]["NormalBalance"]
+      /** Format: uuid */
+      parentId?: string | null
+      isPostable: boolean
+      allowManualPosting: boolean
+      isActive: boolean
+      description?: string
+    }
+    AccountInput: components["schemas"]["AccountFields"] & {
+      code: string
+    }
+    AccountUpdate: components["schemas"]["AccountFields"] &
+      components["schemas"]["VersionInput"]
+    /** @enum {string} */
+    DimensionKind: "channel" | "sub_channel" | "division" | "campaign"
+    /** @description Master dimensi jurnal. Field channel/pihak hanya untuk sub-channel; periode/anggaran hanya kampanye. */
+    Dimension: {
+      /** Format: uuid */
+      id: string
+      kind: components["schemas"]["DimensionKind"]
+      code: string
+      name: string
+      /** Format: uuid */
+      channelId?: string | null
+      partyType?: string | null
+      /** Format: uuid */
+      partyId?: string | null
+      validFrom?: components["schemas"]["BusinessDate"] | null
+      validTo?: components["schemas"]["BusinessDate"] | null
+      budgetAmount?: components["schemas"]["Money"] | null
+      description?: string | null
+      isActive: boolean
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    DimensionInput: {
+      code: string
+      name: string
+      isActive: boolean
+    }
+    DimensionUpdate: {
+      name: string
+      isActive: boolean
+      version: number
+    }
+    SubChannelFields: {
+      name: string
+      partyType?: string | null
+      /** Format: uuid */
+      partyId?: string | null
+      isActive: boolean
+    }
+    SubChannelInput: components["schemas"]["SubChannelFields"] & {
+      /** Format: uuid */
+      channelId: string
+      code: string
+    }
+    SubChannelUpdate: components["schemas"]["SubChannelFields"] &
+      components["schemas"]["VersionInput"]
+    CampaignFields: {
+      name: string
+      validFrom: components["schemas"]["BusinessDate"]
+      validTo: components["schemas"]["BusinessDate"]
+      budgetAmount?: components["schemas"]["Money"] | null
+      description?: string
+      isActive: boolean
+    }
+    CampaignInput: components["schemas"]["CampaignFields"] & {
+      /** @example KMP-202701-RAMADAN */
+      code: string
+    }
+    CampaignUpdate: components["schemas"]["CampaignFields"] &
+      components["schemas"]["VersionInput"]
+    /** @enum {string} */
+    FiscalPeriodStatus: "open" | "closed"
+    FiscalPeriod: {
+      /** Format: uuid */
+      id: string
+      year: number
+      month: number
+      /** @example Okt 2026 */
+      label: string
+      status: components["schemas"]["FiscalPeriodStatus"]
+      startDate: components["schemas"]["BusinessDate"]
+      endDate: components["schemas"]["BusinessDate"]
+      /** Format: date-time */
+      closedAt?: string | null
+      reopenedCount: number
+      version: number
+    }
+    PostingRuleAccount: {
+      amountKey: string
+      side: components["schemas"]["NormalBalance"]
+      /** @description `fixed` = akun tetap; selain itu akun dipilih dokumen sumber (akun di sini = default). */
+      resolver: string
+      accountCode: string
+      accountName: string
+    }
+    PostingRule: {
+      /** @example A-01 */
+      code: string
+      name: string
+      description: string
+      requiredDimensions: components["schemas"]["DimensionKind"][]
+      release: string
+      isActive: boolean
+      accounts: components["schemas"]["PostingRuleAccount"][]
+    }
+    /** @enum {string} */
+    JournalStatus: "draft" | "posted"
+    /** @enum {string} */
+    JournalEntryType: "manual" | "automatic" | "reversal"
+    JournalEntrySummary: {
+      /** Format: uuid */
+      id: string
+      /** @description Nomor JV, diisi saat posting. */
+      number?: string | null
+      businessDate: components["schemas"]["BusinessDate"]
+      entryType: components["schemas"]["JournalEntryType"]
+      sourceType: string
+      /** Format: uuid */
+      sourceId: string
+      sourceLabel: string
+      postingRuleCode?: string | null
+      description: string
+      status: components["schemas"]["JournalStatus"]
+      totalAmount: components["schemas"]["Money"]
+      /** Format: uuid */
+      reversalOfId?: string | null
+      reversalOfNumber?: string | null
+      /** Format: uuid */
+      reversedById?: string | null
+      reversedByNumber?: string | null
+      /** Format: date-time */
+      postedAt?: string | null
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    JournalEntryList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["JournalEntrySummary"][]
+    }
+    ManualJournalLineInput: {
+      /** Format: uuid */
+      accountId: string
+      debit: components["schemas"]["Money"]
+      credit: components["schemas"]["Money"]
+      /** Format: uuid */
+      channelId?: string | null
+      /** Format: uuid */
+      subChannelId?: string | null
+      /** Format: uuid */
+      divisionId?: string | null
+      /** Format: uuid */
+      campaignId?: string | null
+      memo?: string
+    }
+    ManualJournalFields: {
+      businessDate: components["schemas"]["BusinessDate"]
+      description: string
+      lines: components["schemas"]["ManualJournalLineInput"][]
+    }
+    DimensionRef: {
+      /** Format: uuid */
+      id: string
+      code: string
+      name: string
+    }
+    JournalLine: {
+      lineNo: number
+      /** Format: uuid */
+      accountId: string
+      accountCode: string
+      accountName: string
+      debit: components["schemas"]["Money"]
+      credit: components["schemas"]["Money"]
+      channel?: components["schemas"]["DimensionRef"] | null
+      subChannel?: components["schemas"]["DimensionRef"] | null
+      division?: components["schemas"]["DimensionRef"] | null
+      campaign?: components["schemas"]["DimensionRef"] | null
+      partyType?: string | null
+      /** Format: uuid */
+      partyId?: string | null
+      amountKey?: string | null
+      memo: string
+    }
+    JournalEntry: components["schemas"]["JournalEntrySummary"] & {
+      lines: components["schemas"]["JournalLine"][]
+      totalDebit: components["schemas"]["Money"]
+      totalCredit: components["schemas"]["Money"]
+      allowedActions: ("edit" | "delete" | "post" | "reverse")[]
+    }
+    ManualJournalUpdate: components["schemas"]["ManualJournalFields"] &
+      components["schemas"]["VersionInput"]
+    JournalReverseInput: {
+      version: number
+      businessDate: components["schemas"]["BusinessDate"]
+      reason: string
+    }
+    GeneralLedgerLine: {
+      /** Format: uuid */
+      entryId: string
+      number?: string | null
+      businessDate: components["schemas"]["BusinessDate"]
+      entryType: components["schemas"]["JournalEntryType"]
+      sourceType: string
+      sourceLabel: string
+      description: string
+      lineNo: number
+      debit: components["schemas"]["Money"]
+      credit: components["schemas"]["Money"]
+      balance: components["schemas"]["Money"]
+      memo: string
+      channel?: components["schemas"]["DimensionRef"] | null
+      subChannel?: components["schemas"]["DimensionRef"] | null
+      division?: components["schemas"]["DimensionRef"] | null
+      campaign?: components["schemas"]["DimensionRef"] | null
+    }
+    GeneralLedger: components["schemas"]["Pagination"] & {
+      account: components["schemas"]["Account"]
+      dateFrom: components["schemas"]["BusinessDate"]
+      dateTo: components["schemas"]["BusinessDate"]
+      openingBalance: components["schemas"]["Money"]
+      periodDebit: components["schemas"]["Money"]
+      periodCredit: components["schemas"]["Money"]
+      closingBalance: components["schemas"]["Money"]
+      items: components["schemas"]["GeneralLedgerLine"][]
+    }
+    DocumentSequence: {
+      /** @example JV */
+      documentType: string
+      /** @example Jurnal */
+      label: string
+      /** @description Saat nomor diberikan, mis. `Posting` atau `Submit`. */
+      assignedAt: string
+      year: number
+      /**
+       * Format: int64
+       * @description Nomor urut terakhir yang terpakai; 0 = belum ada dokumen pada tahun ini.
+       */
+      lastNumber: number
+      /** Format: date-time */
+      lastIssuedAt?: string | null
+      /** @description Contoh nomor berikutnya, mis. `JV/2026/10/00013`. */
+      example: string
+    }
+    DocumentSequenceList: {
+      year: number
+      items: components["schemas"]["DocumentSequence"][]
+    }
   }
   responses: {
     /** @description Error standar (problem+json) */
@@ -1534,6 +2197,9 @@ export interface components {
     Sort: string
     Search: string
     Id: string
+    /** @description Versi terakhir yang dilihat user (optimistic locking). */
+    Version: number
+    IncludeInactive: boolean
   }
   requestBodies: never
   headers: never
@@ -3011,6 +3677,892 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["Location"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listAccounts: {
+    parameters: {
+      query?: {
+        includeInactive?: boolean
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Akun COA */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Account"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createAccount: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AccountInput"]
+      }
+    }
+    responses: {
+      /** @description Akun dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Account"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getAccount: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Akun */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Account"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateAccount: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AccountUpdate"]
+      }
+    }
+    responses: {
+      /** @description Akun diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Account"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  deleteAccount: {
+    parameters: {
+      query: {
+        /** @description Versi terakhir yang dilihat user (optimistic locking). */
+        version: components["parameters"]["Version"]
+      }
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Akun dihapus */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listChannels: {
+    parameters: {
+      query?: {
+        includeInactive?: components["parameters"]["IncludeInactive"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Channel */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Dimension"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createChannel: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DimensionInput"]
+      }
+    }
+    responses: {
+      /** @description Channel dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Dimension"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateChannel: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DimensionUpdate"]
+      }
+    }
+    responses: {
+      /** @description Channel diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Dimension"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  deleteChannel: {
+    parameters: {
+      query: {
+        /** @description Versi terakhir yang dilihat user (optimistic locking). */
+        version: components["parameters"]["Version"]
+      }
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Channel dihapus */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listSubChannels: {
+    parameters: {
+      query?: {
+        includeInactive?: components["parameters"]["IncludeInactive"]
+        channelId?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Sub-channel */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Dimension"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createSubChannel: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SubChannelInput"]
+      }
+    }
+    responses: {
+      /** @description Sub-channel dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Dimension"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateSubChannel: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SubChannelUpdate"]
+      }
+    }
+    responses: {
+      /** @description Sub-channel diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Dimension"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  deleteSubChannel: {
+    parameters: {
+      query: {
+        /** @description Versi terakhir yang dilihat user (optimistic locking). */
+        version: components["parameters"]["Version"]
+      }
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Sub-channel dihapus */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listDivisions: {
+    parameters: {
+      query?: {
+        includeInactive?: components["parameters"]["IncludeInactive"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Divisi */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Dimension"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createDivision: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DimensionInput"]
+      }
+    }
+    responses: {
+      /** @description Divisi dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Dimension"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateDivision: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DimensionUpdate"]
+      }
+    }
+    responses: {
+      /** @description Divisi diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Dimension"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  deleteDivision: {
+    parameters: {
+      query: {
+        /** @description Versi terakhir yang dilihat user (optimistic locking). */
+        version: components["parameters"]["Version"]
+      }
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Divisi dihapus */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listCampaigns: {
+    parameters: {
+      query?: {
+        includeInactive?: components["parameters"]["IncludeInactive"]
+        q?: components["parameters"]["Search"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Kampanye, terbaru lebih dulu */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Dimension"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createCampaign: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CampaignInput"]
+      }
+    }
+    responses: {
+      /** @description Kampanye dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Dimension"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateCampaign: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CampaignUpdate"]
+      }
+    }
+    responses: {
+      /** @description Kampanye diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Dimension"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  deleteCampaign: {
+    parameters: {
+      query: {
+        /** @description Versi terakhir yang dilihat user (optimistic locking). */
+        version: components["parameters"]["Version"]
+      }
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Kampanye dihapus */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listFiscalPeriods: {
+    parameters: {
+      query?: {
+        year?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Periode terbaru lebih dulu */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["FiscalPeriod"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  ensureFiscalPeriods: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Jumlah periode yang dibuat */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": {
+            created: number
+          }
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listPostingRules: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Posting rule urut kode */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PostingRule"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listJournalEntries: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["JournalStatus"]
+        entryType?: components["schemas"]["JournalEntryType"]
+        dateFrom?: components["schemas"]["BusinessDate"]
+        dateTo?: components["schemas"]["BusinessDate"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Jurnal terbaru lebih dulu; draft tanpa nomor di atas */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["JournalEntryList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createJournalEntry: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ManualJournalFields"]
+      }
+    }
+    responses: {
+      /** @description Draft dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["JournalEntry"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getJournalEntry: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Jurnal */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["JournalEntry"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateJournalEntry: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ManualJournalUpdate"]
+      }
+    }
+    responses: {
+      /** @description Draft diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["JournalEntry"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  deleteJournalEntry: {
+    parameters: {
+      query: {
+        /** @description Versi terakhir yang dilihat user (optimistic locking). */
+        version: components["parameters"]["Version"]
+      }
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Draft dihapus */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  postJournalEntry: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Jurnal diposting */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["JournalEntry"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  reverseJournalEntry: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["JournalReverseInput"]
+      }
+    }
+    responses: {
+      /** @description Jurnal pembalik */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["JournalEntry"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getGeneralLedger: {
+    parameters: {
+      query: {
+        accountId: string
+        dateFrom: components["schemas"]["BusinessDate"]
+        dateTo: components["schemas"]["BusinessDate"]
+        channelId?: string
+        subChannelId?: string
+        divisionId?: string
+        campaignId?: string
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Buku Besar */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["GeneralLedger"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listDocumentSequences: {
+    parameters: {
+      query?: {
+        year?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Semua kode dokumen beserta nomor terakhir pada tahun tersebut */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DocumentSequenceList"]
         }
       }
       default: components["responses"]["Problem"]

@@ -17,11 +17,21 @@ import { Route as MfaSetupRouteImport } from './routes/mfa-setup'
 import { Route as SetPasswordRouteImport } from './routes/set-password'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppApprovalsRouteImport } from './routes/_app/approvals'
+import { Route as AppFinanceAccountsRouteImport } from './routes/_app/finance/accounts'
+import { Route as AppFinanceFiscalPeriodsRouteImport } from './routes/_app/finance/fiscal-periods'
+import { Route as AppFinanceGeneralLedgerRouteImport } from './routes/_app/finance/general-ledger'
+import { Route as AppMasterCampaignsRouteImport } from './routes/_app/master/campaigns'
+import { Route as AppMasterChannelsRouteImport } from './routes/_app/master/channels'
 import { Route as AppSettingsApprovalPoliciesRouteImport } from './routes/_app/settings/approval-policies'
 import { Route as AppSettingsAuditLogsRouteImport } from './routes/_app/settings/audit-logs'
+import { Route as AppSettingsDocumentSequencesRouteImport } from './routes/_app/settings/document-sequences'
 import { Route as AppSettingsRolesRouteImport } from './routes/_app/settings/roles'
 import { Route as AppSettingsUsersRouteImport } from './routes/_app/settings/users'
 import { Route as AppSystemAboutRouteImport } from './routes/_app/system/about'
+import { Route as AppFinanceJournalsIndexRouteImport } from './routes/_app/finance/journals/index'
+import { Route as AppFinanceJournalsNewRouteImport } from './routes/_app/finance/journals/new'
+import { Route as AppFinanceJournalsIdIndexRouteImport } from './routes/_app/finance/journals/$id.index'
+import { Route as AppFinanceJournalsIdEditRouteImport } from './routes/_app/finance/journals/$id.edit'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
@@ -62,6 +72,31 @@ const AppApprovalsRoute = AppApprovalsRouteImport.update({
   path: '/approvals',
   getParentRoute: () => AppRoute,
 } as any)
+const AppFinanceAccountsRoute = AppFinanceAccountsRouteImport.update({
+  id: '/finance/accounts',
+  path: '/finance/accounts',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFinanceFiscalPeriodsRoute = AppFinanceFiscalPeriodsRouteImport.update({
+  id: '/finance/fiscal-periods',
+  path: '/finance/fiscal-periods',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFinanceGeneralLedgerRoute = AppFinanceGeneralLedgerRouteImport.update({
+  id: '/finance/general-ledger',
+  path: '/finance/general-ledger',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMasterCampaignsRoute = AppMasterCampaignsRouteImport.update({
+  id: '/master/campaigns',
+  path: '/master/campaigns',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMasterChannelsRoute = AppMasterChannelsRouteImport.update({
+  id: '/master/channels',
+  path: '/master/channels',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppSettingsApprovalPoliciesRoute =
   AppSettingsApprovalPoliciesRouteImport.update({
     id: '/settings/approval-policies',
@@ -73,6 +108,12 @@ const AppSettingsAuditLogsRoute = AppSettingsAuditLogsRouteImport.update({
   path: '/settings/audit-logs',
   getParentRoute: () => AppRoute,
 } as any)
+const AppSettingsDocumentSequencesRoute =
+  AppSettingsDocumentSequencesRouteImport.update({
+    id: '/settings/document-sequences',
+    path: '/settings/document-sequences',
+    getParentRoute: () => AppRoute,
+  } as any)
 const AppSettingsRolesRoute = AppSettingsRolesRouteImport.update({
   id: '/settings/roles',
   path: '/settings/roles',
@@ -88,6 +129,28 @@ const AppSystemAboutRoute = AppSystemAboutRouteImport.update({
   path: '/system/about',
   getParentRoute: () => AppRoute,
 } as any)
+const AppFinanceJournalsIndexRoute = AppFinanceJournalsIndexRouteImport.update({
+  id: '/finance/journals/',
+  path: '/finance/journals/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFinanceJournalsNewRoute = AppFinanceJournalsNewRouteImport.update({
+  id: '/finance/journals/new',
+  path: '/finance/journals/new',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFinanceJournalsIdIndexRoute =
+  AppFinanceJournalsIdIndexRouteImport.update({
+    id: '/finance/journals/$id/',
+    path: '/finance/journals/$id/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppFinanceJournalsIdEditRoute =
+  AppFinanceJournalsIdEditRouteImport.update({
+    id: '/finance/journals/$id/edit',
+    path: '/finance/journals/$id/edit',
+    getParentRoute: () => AppRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
@@ -97,11 +160,21 @@ export interface FileRoutesByFullPath {
   '/mfa-setup': typeof MfaSetupRoute
   '/set-password': typeof SetPasswordRoute
   '/approvals': typeof AppApprovalsRoute
+  '/finance/accounts': typeof AppFinanceAccountsRoute
+  '/finance/fiscal-periods': typeof AppFinanceFiscalPeriodsRoute
+  '/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
+  '/master/campaigns': typeof AppMasterCampaignsRoute
+  '/master/channels': typeof AppMasterChannelsRoute
   '/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/settings/audit-logs': typeof AppSettingsAuditLogsRoute
+  '/settings/document-sequences': typeof AppSettingsDocumentSequencesRoute
   '/settings/roles': typeof AppSettingsRolesRoute
   '/settings/users': typeof AppSettingsUsersRoute
   '/system/about': typeof AppSystemAboutRoute
+  '/finance/journals/new': typeof AppFinanceJournalsNewRoute
+  '/finance/journals/': typeof AppFinanceJournalsIndexRoute
+  '/finance/journals/$id/edit': typeof AppFinanceJournalsIdEditRoute
+  '/finance/journals/$id/': typeof AppFinanceJournalsIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/forbidden': typeof ForbiddenRoute
@@ -111,11 +184,21 @@ export interface FileRoutesByTo {
   '/set-password': typeof SetPasswordRoute
   '/approvals': typeof AppApprovalsRoute
   '/': typeof AppIndexRoute
+  '/finance/accounts': typeof AppFinanceAccountsRoute
+  '/finance/fiscal-periods': typeof AppFinanceFiscalPeriodsRoute
+  '/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
+  '/master/campaigns': typeof AppMasterCampaignsRoute
+  '/master/channels': typeof AppMasterChannelsRoute
   '/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/settings/audit-logs': typeof AppSettingsAuditLogsRoute
+  '/settings/document-sequences': typeof AppSettingsDocumentSequencesRoute
   '/settings/roles': typeof AppSettingsRolesRoute
   '/settings/users': typeof AppSettingsUsersRoute
   '/system/about': typeof AppSystemAboutRoute
+  '/finance/journals/new': typeof AppFinanceJournalsNewRoute
+  '/finance/journals': typeof AppFinanceJournalsIndexRoute
+  '/finance/journals/$id/edit': typeof AppFinanceJournalsIdEditRoute
+  '/finance/journals/$id': typeof AppFinanceJournalsIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -127,11 +210,21 @@ export interface FileRoutesById {
   '/set-password': typeof SetPasswordRoute
   '/_app/approvals': typeof AppApprovalsRoute
   '/_app/': typeof AppIndexRoute
+  '/_app/finance/accounts': typeof AppFinanceAccountsRoute
+  '/_app/finance/fiscal-periods': typeof AppFinanceFiscalPeriodsRoute
+  '/_app/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
+  '/_app/master/campaigns': typeof AppMasterCampaignsRoute
+  '/_app/master/channels': typeof AppMasterChannelsRoute
   '/_app/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/_app/settings/audit-logs': typeof AppSettingsAuditLogsRoute
+  '/_app/settings/document-sequences': typeof AppSettingsDocumentSequencesRoute
   '/_app/settings/roles': typeof AppSettingsRolesRoute
   '/_app/settings/users': typeof AppSettingsUsersRoute
   '/_app/system/about': typeof AppSystemAboutRoute
+  '/_app/finance/journals/new': typeof AppFinanceJournalsNewRoute
+  '/_app/finance/journals/': typeof AppFinanceJournalsIndexRoute
+  '/_app/finance/journals/$id/edit': typeof AppFinanceJournalsIdEditRoute
+  '/_app/finance/journals/$id/': typeof AppFinanceJournalsIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -143,11 +236,21 @@ export interface FileRouteTypes {
     | '/mfa-setup'
     | '/set-password'
     | '/approvals'
+    | '/finance/accounts'
+    | '/finance/fiscal-periods'
+    | '/finance/general-ledger'
+    | '/master/campaigns'
+    | '/master/channels'
     | '/settings/approval-policies'
     | '/settings/audit-logs'
+    | '/settings/document-sequences'
     | '/settings/roles'
     | '/settings/users'
     | '/system/about'
+    | '/finance/journals/new'
+    | '/finance/journals/'
+    | '/finance/journals/$id/edit'
+    | '/finance/journals/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/forbidden'
@@ -157,11 +260,21 @@ export interface FileRouteTypes {
     | '/set-password'
     | '/approvals'
     | '/'
+    | '/finance/accounts'
+    | '/finance/fiscal-periods'
+    | '/finance/general-ledger'
+    | '/master/campaigns'
+    | '/master/channels'
     | '/settings/approval-policies'
     | '/settings/audit-logs'
+    | '/settings/document-sequences'
     | '/settings/roles'
     | '/settings/users'
     | '/system/about'
+    | '/finance/journals/new'
+    | '/finance/journals'
+    | '/finance/journals/$id/edit'
+    | '/finance/journals/$id'
   id:
     | '__root__'
     | '/_app'
@@ -172,11 +285,21 @@ export interface FileRouteTypes {
     | '/set-password'
     | '/_app/approvals'
     | '/_app/'
+    | '/_app/finance/accounts'
+    | '/_app/finance/fiscal-periods'
+    | '/_app/finance/general-ledger'
+    | '/_app/master/campaigns'
+    | '/_app/master/channels'
     | '/_app/settings/approval-policies'
     | '/_app/settings/audit-logs'
+    | '/_app/settings/document-sequences'
     | '/_app/settings/roles'
     | '/_app/settings/users'
     | '/_app/system/about'
+    | '/_app/finance/journals/new'
+    | '/_app/finance/journals/'
+    | '/_app/finance/journals/$id/edit'
+    | '/_app/finance/journals/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -246,6 +369,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppApprovalsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/finance/accounts': {
+      id: '/_app/finance/accounts'
+      path: '/finance/accounts'
+      fullPath: '/finance/accounts'
+      preLoaderRoute: typeof AppFinanceAccountsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/finance/fiscal-periods': {
+      id: '/_app/finance/fiscal-periods'
+      path: '/finance/fiscal-periods'
+      fullPath: '/finance/fiscal-periods'
+      preLoaderRoute: typeof AppFinanceFiscalPeriodsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/finance/general-ledger': {
+      id: '/_app/finance/general-ledger'
+      path: '/finance/general-ledger'
+      fullPath: '/finance/general-ledger'
+      preLoaderRoute: typeof AppFinanceGeneralLedgerRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/master/campaigns': {
+      id: '/_app/master/campaigns'
+      path: '/master/campaigns'
+      fullPath: '/master/campaigns'
+      preLoaderRoute: typeof AppMasterCampaignsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/master/channels': {
+      id: '/_app/master/channels'
+      path: '/master/channels'
+      fullPath: '/master/channels'
+      preLoaderRoute: typeof AppMasterChannelsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/settings/approval-policies': {
       id: '/_app/settings/approval-policies'
       path: '/settings/approval-policies'
@@ -258,6 +416,13 @@ declare module '@tanstack/react-router' {
       path: '/settings/audit-logs'
       fullPath: '/settings/audit-logs'
       preLoaderRoute: typeof AppSettingsAuditLogsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/settings/document-sequences': {
+      id: '/_app/settings/document-sequences'
+      path: '/settings/document-sequences'
+      fullPath: '/settings/document-sequences'
+      preLoaderRoute: typeof AppSettingsDocumentSequencesRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/settings/roles': {
@@ -281,27 +446,75 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSystemAboutRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/finance/journals/': {
+      id: '/_app/finance/journals/'
+      path: '/finance/journals'
+      fullPath: '/finance/journals/'
+      preLoaderRoute: typeof AppFinanceJournalsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/finance/journals/new': {
+      id: '/_app/finance/journals/new'
+      path: '/finance/journals/new'
+      fullPath: '/finance/journals/new'
+      preLoaderRoute: typeof AppFinanceJournalsNewRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/finance/journals/$id/': {
+      id: '/_app/finance/journals/$id/'
+      path: '/finance/journals/$id'
+      fullPath: '/finance/journals/$id/'
+      preLoaderRoute: typeof AppFinanceJournalsIdIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/finance/journals/$id/edit': {
+      id: '/_app/finance/journals/$id/edit'
+      path: '/finance/journals/$id/edit'
+      fullPath: '/finance/journals/$id/edit'
+      preLoaderRoute: typeof AppFinanceJournalsIdEditRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
   AppApprovalsRoute: typeof AppApprovalsRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppFinanceAccountsRoute: typeof AppFinanceAccountsRoute
+  AppFinanceFiscalPeriodsRoute: typeof AppFinanceFiscalPeriodsRoute
+  AppFinanceGeneralLedgerRoute: typeof AppFinanceGeneralLedgerRoute
+  AppMasterCampaignsRoute: typeof AppMasterCampaignsRoute
+  AppMasterChannelsRoute: typeof AppMasterChannelsRoute
   AppSettingsApprovalPoliciesRoute: typeof AppSettingsApprovalPoliciesRoute
   AppSettingsAuditLogsRoute: typeof AppSettingsAuditLogsRoute
+  AppSettingsDocumentSequencesRoute: typeof AppSettingsDocumentSequencesRoute
   AppSettingsRolesRoute: typeof AppSettingsRolesRoute
   AppSettingsUsersRoute: typeof AppSettingsUsersRoute
   AppSystemAboutRoute: typeof AppSystemAboutRoute
+  AppFinanceJournalsNewRoute: typeof AppFinanceJournalsNewRoute
+  AppFinanceJournalsIndexRoute: typeof AppFinanceJournalsIndexRoute
+  AppFinanceJournalsIdEditRoute: typeof AppFinanceJournalsIdEditRoute
+  AppFinanceJournalsIdIndexRoute: typeof AppFinanceJournalsIdIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppApprovalsRoute: AppApprovalsRoute,
   AppIndexRoute: AppIndexRoute,
+  AppFinanceAccountsRoute: AppFinanceAccountsRoute,
+  AppFinanceFiscalPeriodsRoute: AppFinanceFiscalPeriodsRoute,
+  AppFinanceGeneralLedgerRoute: AppFinanceGeneralLedgerRoute,
+  AppMasterCampaignsRoute: AppMasterCampaignsRoute,
+  AppMasterChannelsRoute: AppMasterChannelsRoute,
   AppSettingsApprovalPoliciesRoute: AppSettingsApprovalPoliciesRoute,
   AppSettingsAuditLogsRoute: AppSettingsAuditLogsRoute,
+  AppSettingsDocumentSequencesRoute: AppSettingsDocumentSequencesRoute,
   AppSettingsRolesRoute: AppSettingsRolesRoute,
   AppSettingsUsersRoute: AppSettingsUsersRoute,
   AppSystemAboutRoute: AppSystemAboutRoute,
+  AppFinanceJournalsNewRoute: AppFinanceJournalsNewRoute,
+  AppFinanceJournalsIndexRoute: AppFinanceJournalsIndexRoute,
+  AppFinanceJournalsIdEditRoute: AppFinanceJournalsIdEditRoute,
+  AppFinanceJournalsIdIndexRoute: AppFinanceJournalsIdIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
