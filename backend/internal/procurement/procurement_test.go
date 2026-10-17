@@ -205,6 +205,18 @@ func (s stockMasters) Products(_ context.Context, ids []uuid.UUID) (map[uuid.UUI
 	return out, nil
 }
 
+func (s stockMasters) FindLocations(_ context.Context, q warehouse.LocationQuery) ([]warehouse.Location, error) {
+	out := []warehouse.Location{}
+	for id, l := range s.m.locations {
+		for _, t := range q.Types {
+			if string(t) == l.Type {
+				out = append(out, warehouse.Location{ID: id, Code: l.Code, Name: l.Name, Type: t, IsActive: true})
+			}
+		}
+	}
+	return out, nil
+}
+
 func (s stockMasters) Locations(_ context.Context, ids []uuid.UUID) (map[uuid.UUID]warehouse.Location, error) {
 	out := map[uuid.UUID]warehouse.Location{}
 	for _, id := range ids {
