@@ -47,6 +47,17 @@ export type MenuGroup = {
   items: MenuItem[]
 }
 
+/** Permission impor/ekspor master (S-125); salah satu cukup untuk membuka Import/Export Excel. */
+const DATA_EXCHANGE_PERMISSIONS = [
+  "catalog.product",
+  "party.customer",
+  "party.supplier",
+  "party.partner_product_code",
+  "hris.employee",
+  "accounting.account",
+  "warehouse.location",
+].flatMap((r) => [`${r}.import`, `${r}.export`])
+
 const items = (...labels: string[]): MenuItem[] =>
   labels.map((label) => ({ label }))
 
@@ -442,14 +453,21 @@ export const MENU: MenuGroup[] = [
     label: "Integrasi",
     icon: PlugIcon,
     modules: ["sales", "logistics", "vending", "notification", "dataexchange"],
-    items: items(
-      "Midtrans",
-      "Biteship",
-      "Marketplace",
-      "Mesin Vending",
-      "WhatsApp Business",
-      "Import/Export Excel"
-    ),
+    items: [
+      ...items(
+        "Midtrans",
+        "Biteship",
+        "Marketplace",
+        "Mesin Vending",
+        "WhatsApp Business"
+      ),
+      {
+        label: "Import/Export Excel",
+        to: "/integrations/data-exchange",
+        module: "dataexchange",
+        permission: DATA_EXCHANGE_PERMISSIONS,
+      },
+    ],
   },
   {
     label: "Pengaturan",

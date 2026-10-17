@@ -308,6 +308,22 @@ type ExpenseType struct {
 	DeletedBy        uuid.NullUUID
 }
 
+type ExportJob struct {
+	ID          uuid.UUID
+	Kind        string
+	Status      string
+	TotalRows   int32
+	FileID      uuid.NullUUID
+	FileName    string
+	Message     string
+	CompletedAt *time.Time
+	CreatedAt   time.Time
+	CreatedBy   uuid.UUID
+	UpdatedAt   time.Time
+	UpdatedBy   uuid.UUID
+	Version     int32
+}
+
 type FileObject struct {
 	ID           uuid.UUID
 	ObjectKey    uuid.UUID
@@ -354,6 +370,37 @@ type IdempotencyKey struct {
 	ResponseBody  []byte
 	CreatedAt     time.Time
 	ExpiresAt     time.Time
+}
+
+type ImportJob struct {
+	ID            uuid.UUID
+	Kind          string
+	FileID        uuid.UUID
+	FileName      string
+	FileSha256    []byte
+	Status        string
+	TotalRows     int32
+	ProcessedRows int32
+	ValidRows     int32
+	ErrorRows     int32
+	CommittedRows int32
+	ErrorFileID   uuid.NullUUID
+	Message       string
+	ValidatedAt   *time.Time
+	CompletedAt   *time.Time
+	CreatedAt     time.Time
+	CreatedBy     uuid.UUID
+	UpdatedAt     time.Time
+	UpdatedBy     uuid.UUID
+	Version       int32
+}
+
+type ImportJobRow struct {
+	JobID      uuid.UUID
+	RowNumber  int32
+	IsValid    bool
+	CellValues []byte
+	Errors     []byte
 }
 
 type JournalEntry struct {

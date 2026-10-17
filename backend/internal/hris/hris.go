@@ -19,6 +19,7 @@ import (
 	"balans/internal/platform/clock"
 	"balans/internal/platform/db"
 	"balans/internal/platform/httpx"
+	"balans/internal/platform/tabular"
 )
 
 // Name adalah nama modul di ENABLED_MODULES.
@@ -87,4 +88,31 @@ func (m *Module) IsActiveEmployee(ctx context.Context, id uuid.UUID, on clock.Bu
 // EmployeesByID mengembalikan karyawan (termasuk yang terhapus) untuk ditampilkan modul lain.
 func (m *Module) EmployeesByID(ctx context.Context, ids []uuid.UUID) ([]Employee, error) {
 	return m.svc.ByIDs(ctx, ids)
+}
+
+// DivisionRef adalah divisi dari master dimensi accounting.
+type DivisionRef = service.DivisionRef
+
+// Divisions membaca master divisi untuk impor/ekspor karyawan.
+type Divisions = service.Divisions
+
+// SetDivisions memasang pembaca divisi (modul accounting) saat wiring.
+func (m *Module) SetDivisions(d Divisions) { m.svc.Divisions = d }
+
+// EmployeeColumns adalah kolom template impor/ekspor karyawan (S-125).
+func EmployeeColumns() []tabular.Column { return service.EmployeeColumns }
+
+// ImportEmployeeRow membuat atau memperbarui karyawan (kunci nomor karyawan) dari satu baris Excel.
+func (m *Module) ImportEmployeeRow(ctx context.Context, row tabular.Row) error {
+	return m.svc.ImportEmployeeRow(ctx, row)
+}
+
+// ExportEmployees mengalirkan karyawan sebagai baris Excel (NIK tersamar).
+func (m *Module) ExportEmployees(ctx context.Context, emit func(tabular.Row) error) error {
+	return m.svc.ExportEmployees(ctx, emit)
+}
+
+// EmployeeIDByNumber mencari karyawan dari nomor karyawan tanpa cek permission (impor pelanggan).
+func (m *Module) EmployeeIDByNumber(ctx context.Context, number string) (uuid.UUID, bool, error) {
+	return m.svc.EmployeeIDByNumber(ctx, number)
 }

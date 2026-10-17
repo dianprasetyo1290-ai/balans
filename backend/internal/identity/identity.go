@@ -18,6 +18,7 @@ import (
 	identityhttp "balans/internal/identity/http"
 	"balans/internal/identity/postgres"
 	"balans/internal/identity/service"
+	"balans/internal/platform/actor"
 	"balans/internal/platform/clock"
 	"balans/internal/platform/db"
 	"balans/internal/platform/httpx"
@@ -142,6 +143,11 @@ func (m *Module) UserByID(ctx context.Context, id uuid.UUID) (User, error) {
 // SearchActiveUsers mencari user aktif berdasarkan nama atau email.
 func (m *Module) SearchActiveUsers(ctx context.Context, q string, limit int) ([]User, error) {
 	return m.admin.SearchActiveUsers(ctx, q, limit)
+}
+
+// ActorFor menyusun actor dengan permission terbaru user untuk proses latar atas nama user (job impor/ekspor).
+func (m *Module) ActorFor(ctx context.Context, userID uuid.UUID) (actor.Actor, error) {
+	return m.auth.ActorFor(ctx, userID)
 }
 
 // RoleName mengembalikan nama role untuk ditampilkan.

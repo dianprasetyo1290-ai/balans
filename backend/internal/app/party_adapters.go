@@ -100,3 +100,8 @@ func (p partyEmployees) Employees(ctx context.Context, ids []uuid.UUID, on clock
 func (p partyEmployees) IsActiveEmployee(ctx context.Context, id uuid.UUID, on clock.BusinessDate) (bool, error) {
 	return p.hris.IsActiveEmployee(ctx, id, on)
 }
+
+// EmployeeIDByNumber dipakai impor pelanggan untuk menautkan pelanggan ke karyawan dari nomor karyawan.
+func (p partyEmployees) EmployeeIDByNumber(ctx context.Context, number string) (uuid.UUID, bool, error) {
+	return p.hris.EmployeeIDByNumber(ctx, number)
+}

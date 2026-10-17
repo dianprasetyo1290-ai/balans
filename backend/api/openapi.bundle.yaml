@@ -40,6 +40,8 @@ tags:
     description: Data karyawan dasar (R1.1)
   - name: filestore
     description: Upload dan unduhan file bertanda tangan (R1.1)
+  - name: dataexchange
+    description: Impor/ekspor Excel master data (R1.1)
 paths:
   /healthz:
     get:
@@ -3600,6 +3602,267 @@ paths:
               schema:
                 type: string
                 format: binary
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/data-exchange/kinds:
+    get:
+      operationId: listDataExchangeKinds
+      tags:
+        - dataexchange
+      summary: Jenis data yang boleh diimpor/diekspor user (MD-10, INT-02)
+      description: |
+        Hanya jenis data dengan permission `<kind>.import` atau `<kind>.export` milik user. `uploadOwnerType`
+        dipakai sebagai `ownerType` saat meminta URL upload file (`POST /api/v1/files`).
+      responses:
+        '200':
+          description: Jenis data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataExchangeKindList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/data-exchange/kinds/{kind}/template:
+    get:
+      operationId: getDataExchangeTemplate
+      tags:
+        - dataexchange
+      summary: Mengunduh template impor (xlsx) yang dihasilkan dari definisi kolom
+      description: |
+        Template berisi sheet data (header oranye bertanda `*` wajib, abu-abu opsional, dropdown untuk kolom
+        pilihan) dan sheet Petunjuk berisi format, aturan, serta contoh baris. Butuh `<kind>.import`.
+      parameters:
+        - $ref: '#/components/parameters/DataExchangeKindPath'
+      responses:
+        '200':
+          description: File template
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/import-jobs:
+    get:
+      operationId: listImportJobs
+      tags:
+        - dataexchange
+      summary: Riwayat impor (jenis data yang boleh diimpor user)
+      parameters:
+        - $ref: '#/components/parameters/DataExchangeKindQuery'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Riwayat impor, terbaru dulu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJobList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createImportJob
+      tags:
+        - dataexchange
+      summary: Memulai impor dari file xlsx yang sudah diunggah
+      description: |
+        File diunggah dulu lewat `POST /api/v1/files` dengan `ownerType` dari `listDataExchangeKinds`. Pemeriksaan
+        per baris berjalan sebagai job `dataexchange.import` (antrean bulk); pantau progress lewat `getImportJob`.
+        File yang sama (SHA-256) untuk jenis data yang sama ditolak `IMPORT_ALREADY_PROCESSED`, kecuali job
+        sebelumnya gagal atau dibatalkan.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportJobInput'
+      responses:
+        '202':
+          description: Job impor dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJob'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/import-jobs/{id}:
+    get:
+      operationId: getImportJob
+      tags:
+        - dataexchange
+      summary: Status, progress, dan ringkasan job impor
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Job impor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJob'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/import-jobs/{id}/rows:
+    get:
+      operationId: listImportJobRows
+      tags:
+        - dataexchange
+      summary: Preview baris hasil pemeriksaan
+      description: Data pribadi (NPWP, nomor rekening, NIK) ditampilkan tersamar.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - name: valid
+          in: query
+          description: true = hanya baris valid, false = hanya baris error, kosong = semua.
+          schema:
+            type: boolean
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Baris preview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJobRowList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/import-jobs/{id}/commit:
+    post:
+      operationId: commitImportJob
+      tags:
+        - dataexchange
+      summary: Menyimpan baris valid
+      description: |
+        Hanya untuk status `validated` dengan minimal satu baris valid. Penyimpanan berjalan sebagai job; master
+        data disimpan dalam satu transaksi (gagal satu baris = tidak ada yang tersimpan, TG 5.15).
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '202':
+          description: Penyimpanan dijadwalkan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJob'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/import-jobs/{id}/cancel:
+    post:
+      operationId: cancelImportJob
+      tags:
+        - dataexchange
+      summary: Membatalkan impor yang menunggu konfirmasi
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Impor dibatalkan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJob'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/import-jobs/{id}/error-file:
+    get:
+      operationId: getImportJobErrorFile
+      tags:
+        - dataexchange
+      summary: URL unduhan file baris error (xlsx dengan kolom Keterangan Error)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: URL unduhan berumur 5 menit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataExchangeFileLink'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/export-jobs:
+    get:
+      operationId: listExportJobs
+      tags:
+        - dataexchange
+      summary: Riwayat ekspor (jenis data yang boleh diekspor user)
+      parameters:
+        - $ref: '#/components/parameters/DataExchangeKindQuery'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Riwayat ekspor, terbaru dulu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportJobList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createExportJob
+      tags:
+        - dataexchange
+      summary: Memulai ekspor ke xlsx
+      description: |
+        File dibuat job `dataexchange.export` (antrean bulk) dengan kolom yang sama dengan template impor, lalu
+        user mendapat notifikasi berisi tautan unduhan. Butuh `<kind>.export`.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExportJobInput'
+      responses:
+        '202':
+          description: Job ekspor dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportJob'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/export-jobs/{id}:
+    get:
+      operationId: getExportJob
+      tags:
+        - dataexchange
+      summary: Status job ekspor
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Job ekspor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportJob'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/export-jobs/{id}/download-url:
+    get:
+      operationId: getExportJobDownloadUrl
+      tags:
+        - dataexchange
+      summary: URL unduhan file ekspor
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: URL unduhan berumur 5 menit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataExchangeFileLink'
         default:
           $ref: '#/components/responses/Problem'
 components:
@@ -7756,6 +8019,300 @@ components:
         expiresAt:
           type: string
           format: date-time
+    DataExchangeColumn:
+      type: object
+      required:
+        - key
+        - header
+        - required
+        - columnType
+        - options
+      properties:
+        key:
+          type: string
+          description: Nama field (dipakai di `values` dan `errors[].column` preview).
+        header:
+          type: string
+        required:
+          type: boolean
+        columnType:
+          type: string
+          enum:
+            - text
+            - integer
+            - decimal
+            - date
+            - choice
+            - bool
+        options:
+          type: array
+          items:
+            type: string
+        sensitive:
+          type: boolean
+    DataExchangeKind:
+      type: object
+      required:
+        - kind
+        - label
+        - canImport
+        - canExport
+        - uploadOwnerType
+        - columns
+      properties:
+        kind:
+          type: string
+          example: catalog.product
+        label:
+          type: string
+          example: Produk
+        canImport:
+          type: boolean
+        canExport:
+          type: boolean
+        uploadOwnerType:
+          type: string
+          example: import.catalog.product
+        maxFileBytes:
+          type: integer
+          format: int64
+        columns:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataExchangeColumn'
+    DataExchangeKindList:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataExchangeKind'
+    ImportJob:
+      type: object
+      required:
+        - id
+        - kind
+        - kindLabel
+        - fileName
+        - status
+        - totalRows
+        - processedRows
+        - validRows
+        - errorRows
+        - committedRows
+        - progress
+        - message
+        - allowedActions
+        - createdBy
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        kind:
+          type: string
+        kindLabel:
+          type: string
+        fileName:
+          type: string
+        status:
+          type: string
+          enum:
+            - uploaded
+            - validating
+            - validated
+            - committing
+            - completed
+            - failed
+            - cancelled
+        totalRows:
+          type: integer
+        processedRows:
+          type: integer
+        validRows:
+          type: integer
+        errorRows:
+          type: integer
+        committedRows:
+          type: integer
+        progress:
+          type: integer
+          minimum: 0
+          maximum: 100
+        message:
+          type: string
+          description: Alasan gagal untuk status `failed`.
+        allowedActions:
+          type: array
+          items:
+            type: string
+            enum:
+              - commit
+              - cancel
+              - download_errors
+        validatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdBy:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ImportJobList:
+      type: object
+      required:
+        - items
+        - pagination
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImportJob'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    ImportJobInput:
+      type: object
+      required:
+        - kind
+        - fileId
+      properties:
+        kind:
+          type: string
+        fileId:
+          type: string
+          format: uuid
+    ImportJobRowError:
+      type: object
+      required:
+        - message
+      properties:
+        column:
+          type: string
+          description: Key kolom; kosong = error baris.
+        message:
+          type: string
+    ImportJobRow:
+      type: object
+      required:
+        - rowNumber
+        - isValid
+        - values
+        - errors
+      properties:
+        rowNumber:
+          type: integer
+          description: Nomor baris di Excel (header = 1).
+        isValid:
+          type: boolean
+        values:
+          type: object
+          additionalProperties:
+            type: string
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImportJobRowError'
+    ImportJobRowList:
+      type: object
+      required:
+        - items
+        - pagination
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImportJobRow'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    DataExchangeFileLink:
+      type: object
+      required:
+        - url
+        - expiresAt
+      properties:
+        url:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+    ExportJob:
+      type: object
+      required:
+        - id
+        - kind
+        - kindLabel
+        - status
+        - totalRows
+        - fileName
+        - message
+        - createdBy
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        kind:
+          type: string
+        kindLabel:
+          type: string
+        status:
+          type: string
+          enum:
+            - queued
+            - running
+            - completed
+            - failed
+        totalRows:
+          type: integer
+        fileName:
+          type: string
+        message:
+          type: string
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdBy:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ExportJobList:
+      type: object
+      required:
+        - items
+        - pagination
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExportJob'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    ExportJobInput:
+      type: object
+      required:
+        - kind
+      properties:
+        kind:
+          type: string
   parameters:
     Search:
       name: q
@@ -7836,6 +8393,18 @@ components:
       name: sig
       in: query
       required: true
+      schema:
+        type: string
+    DataExchangeKindPath:
+      name: kind
+      in: path
+      required: true
+      description: Jenis data = resource permission, mis. `catalog.product`.
+      schema:
+        type: string
+    DataExchangeKindQuery:
+      name: kind
+      in: query
       schema:
         type: string
   responses:
