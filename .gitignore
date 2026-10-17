@@ -3,6 +3,8 @@ node_modules/
 dist/
 *.exe
 /backend/bin/
+# File lokal modul filestore (FILESTORE_DIR default ./data/files)
+/backend/data/
 coverage*.out
 
 # Hasil test

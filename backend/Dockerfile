@@ -13,9 +13,12 @@ ARG COMMIT=unknown
 RUN mkdir -p /out && go build \
       -ldflags "-s -w -X balans/internal/platform/config.Version=${VERSION} -X balans/internal/platform/config.Commit=${COMMIT}" \
       -o /out/ ./cmd/...
+# Folder file modul filestore dimiliki nonroot agar volume baru mewarisi pemiliknya.
+RUN mkdir -p /files
 
 FROM gcr.io/distroless/static-debian12:nonroot
 COPY --from=build /out/ /app/
+COPY --from=build --chown=65532:65532 /files /var/lib/balans/files
 USER nonroot:nonroot
 ENV PATH=/app
 EXPOSE 8080

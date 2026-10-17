@@ -66,6 +66,9 @@ type Config struct {
 	// DevSkipMFA mematikan kewajiban MFA untuk pengembangan lokal. Ditolak di luar APP_ENV=local.
 	DevSkipMFA bool
 
+	// FilestoreDir adalah folder penyimpanan file modul filestore (disk lokal sampai adapter S3 dibangun).
+	FilestoreDir string
+
 	ShutdownTimeout time.Duration
 }
 
@@ -116,6 +119,7 @@ func load(getenv func(string) string) (Config, error) {
 		PIIHashKey:            env("PII_HASH_KEY", ""),
 		InitialAdminEmail:     env("INITIAL_ADMIN_EMAIL", ""),
 		DevSkipMFA:            env("DEV_SKIP_MFA", "") == "true",
+		FilestoreDir:          env("FILESTORE_DIR", "./data/files"),
 		ShutdownTimeout:       shutdown,
 	}
 	if err := cfg.Validate(); err != nil {

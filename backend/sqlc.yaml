@@ -74,3 +74,21 @@ sql:
       go:
         <<: *go
         out: internal/approval/postgres/sqlcgen
+  - <<: *pkg
+    queries: internal/filestore/postgres/queries
+    gen:
+      go:
+        <<: *go
+        out: internal/filestore/postgres/sqlcgen
+  - <<: *pkg
+    queries: internal/party/postgres/queries
+    gen:
+      go:
+        <<: *go
+        out: internal/party/postgres/sqlcgen
+  - <<: *pkg
+    queries: internal/hris/postgres/queries
+    gen:
+      go:
+        <<: *go
+        out: internal/hris/postgres/sqlcgen

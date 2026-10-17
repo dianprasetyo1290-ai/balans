@@ -28,6 +28,12 @@ tags:
     description: Master produk, packaging, material, bundling (R1.1)
   - name: warehouse
     description: Gudang dan lokasi stok (R1.1)
+  - name: party
+    description: Pelanggan, mitra & PKS, kode produk mitra, pemasok & maklon (R1.1)
+  - name: hris
+    description: Data karyawan dasar (R1.1)
+  - name: filestore
+    description: Upload dan unduhan file bertanda tangan (R1.1)
 paths:
   /healthz:
     $ref: "./paths/system.yaml#/healthz"
@@ -123,6 +129,44 @@ paths:
     $ref: "./paths/warehouse.yaml#/warehouses"
   /api/v1/locations:
     $ref: "./paths/warehouse.yaml#/locations"
+  /api/v1/customers:
+    $ref: "./paths/party.yaml#/customers"
+  /api/v1/customers/{id}:
+    $ref: "./paths/party.yaml#/customer"
+  /api/v1/partners:
+    $ref: "./paths/party.yaml#/partners"
+  /api/v1/partners/{id}:
+    $ref: "./paths/party.yaml#/partner"
+  /api/v1/partners/{id}/agreements:
+    $ref: "./paths/party.yaml#/partnerAgreements"
+  /api/v1/partner-agreements/{id}:
+    $ref: "./paths/party.yaml#/partnerAgreement"
+  /api/v1/partner-product-codes:
+    $ref: "./paths/party.yaml#/partnerProductCodes"
+  /api/v1/partner-product-codes/{id}:
+    $ref: "./paths/party.yaml#/partnerProductCode"
+  /api/v1/suppliers:
+    $ref: "./paths/party.yaml#/suppliers"
+  /api/v1/suppliers/{id}:
+    $ref: "./paths/party.yaml#/supplier"
+  /api/v1/party/user-options:
+    $ref: "./paths/party.yaml#/partyUserOptions"
+  /api/v1/employees:
+    $ref: "./paths/hris.yaml#/employees"
+  /api/v1/employees/{id}:
+    $ref: "./paths/hris.yaml#/employee"
+  /api/v1/employees/{id}/resign:
+    $ref: "./paths/hris.yaml#/employeeResign"
+  /api/v1/employee-options:
+    $ref: "./paths/hris.yaml#/employeeOptions"
+  /api/v1/files:
+    $ref: "./paths/filestore.yaml#/files"
+  /api/v1/files/{id}:
+    $ref: "./paths/filestore.yaml#/file"
+  /api/v1/files/{id}/download-url:
+    $ref: "./paths/filestore.yaml#/fileDownloadUrl"
+  /api/v1/file-content/{id}:
+    $ref: "./paths/filestore.yaml#/fileContent"
 components:
   securitySchemes:
     bearerAuth:

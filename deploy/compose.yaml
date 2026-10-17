@@ -48,6 +48,9 @@ services:
   api:
     <<: *backend
     command: ["api"]
+    volumes:
+      # File modul filestore (PDF PKS, dll.) di disk lokal sampai adapter object storage dibangun.
+      - filestore-data:/var/lib/balans/files
     healthcheck:
       test: ["CMD", "healthcheck"]
       interval: 15s
@@ -82,3 +85,4 @@ networks:
 
 volumes:
   postgres-data: {}
+  filestore-data: {}
