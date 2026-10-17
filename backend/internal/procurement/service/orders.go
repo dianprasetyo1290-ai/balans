@@ -565,7 +565,34 @@ func (s *Service) decideOrder(ctx context.Context, id uuid.UUID, approve bool) e
 	if err != nil {
 		return err
 	}
-	return s.Store.SaveOrder(ctx, o, version, actor.UserID(ctx), false)
+	if err := s.Store.SaveOrder(ctx, o, version, actor.UserID(ctx), false); err != nil {
+		return err
+	}
+	if approve {
+		return s.notifyLateETA(ctx, o)
+	}
+	return nil
+}
+
+// notifyLateETA mengirim notifikasi ETA langsung bila PO disetujui setelah job harian H-1 lewat, yaitu tanggal
+// kirim diharapkan hari ini atau besok.
+func (s *Service) notifyLateETA(ctx context.Context, o domain.PurchaseOrder) error {
+	if o.ExpectedDate.After(s.today().AddDays(1)) {
+		return nil
+	}
+	leaders, err := s.Users.UsersWithRole(ctx, RoleLogisticsLeader)
+	if err != nil || len(leaders) == 0 {
+		return err
+	}
+	ok, err := s.Store.MarkETANotified(ctx, o.ID, s.Clock.Now())
+	if err != nil || !ok {
+		return err
+	}
+	v, err := s.orderView(ctx, o)
+	if err != nil {
+		return err
+	}
+	return s.sendETA(ctx, v, leaders)
 }
 
 // OnOrderApproved menandai PO Disetujui setelah level terakhir menyetujui; PO bisa diterima dan dibayar uang muka.

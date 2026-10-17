@@ -688,15 +688,30 @@ func TestTollManufacturingAndETA(t *testing.T) {
 	assert.Equal(t, 1, decided.TotalLevels)
 	assert.Equal(t, "approved", decided.Status)
 
-	// ETA H-1: PO disetujui yang tiba besok diberitahukan sekali ke Logistik Leader (in-app + email).
+	// PO disetujui setelah job harian untuk besok lewat langsung diberitahukan ke Logistik Leader.
+	assert.Equal(t, 1, h.notificationCount(h.leader, "procurement.eta"))
 	n, err := m.NotifyETA(context.Background())
 	require.NoError(t, err)
-	assert.Equal(t, 1, n)
+	assert.Equal(t, 0, n, "PO yang sudah diberi notifikasi tidak dikirim ulang")
+
+	// ETA H-1 lewat job: PO tiba lusa disetujui hari ini, job besok pagi mengirim notifikasi in-app + email sekali.
+	later := body("toll_manufacturing", maklon, tube, &rmLoc)
+	later["expectedDate"] = plusDays(2)
+	var po purchaseOrder
+	require.Equal(t, http.StatusCreated, h.call(h.purchasing, http.MethodPost, "/api/v1/purchase-orders", later, &po))
+	require.Equal(t, http.StatusOK, h.call(h.purchasing, http.MethodPost, "/api/v1/purchase-orders/"+po.ID.String()+"/submit",
+		map[string]any{"version": po.Version}, &po))
+	h.approve(h.hfa, "purchase_order", po.ID)
 	assert.Equal(t, 1, h.notificationCount(h.leader, "procurement.eta"))
+	h.clock.Advance(24 * time.Hour)
+	n, err = m.NotifyETA(context.Background())
+	require.NoError(t, err)
+	assert.Equal(t, 1, n)
+	assert.Equal(t, 2, h.notificationCount(h.leader, "procurement.eta"))
 	var emails int
 	require.NoError(t, h.pool.QueryRow(context.Background(),
 		`SELECT count(*) FROM notification_emails WHERE recipient = $1 AND body_text LIKE '%FG-WHEY1KG%'`, h.leader.Email).Scan(&emails))
-	assert.Equal(t, 1, emails)
+	assert.Equal(t, 2, emails)
 	n, err = m.NotifyETA(context.Background())
 	require.NoError(t, err)
 	assert.Equal(t, 0, n, "idempotent")

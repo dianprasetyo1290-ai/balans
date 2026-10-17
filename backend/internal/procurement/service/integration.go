@@ -235,7 +235,11 @@ func etaDetail(v OrderView) []string {
 }
 
 func (s *Service) sendETA(ctx context.Context, v OrderView, leaders []UserRef) error {
-	title := fmt.Sprintf("Barang tiba besok: %s", v.Number)
+	when := "besok"
+	if !v.ExpectedDate.After(s.today()) {
+		when = "hari ini"
+	}
+	title := fmt.Sprintf("Barang tiba %s: %s", when, v.Number)
 	detail := etaDetail(v)
 	body := fmt.Sprintf("%s · %s · %d baris · tiba %s", v.Type.Label(), v.SupplierName, len(v.Lines), v.ExpectedDate.String())
 	ids := make([]uuid.UUID, len(leaders))
