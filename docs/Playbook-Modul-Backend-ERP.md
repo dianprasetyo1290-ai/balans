@@ -21,7 +21,12 @@ backend/internal/<modul>/
 
 - Migrasi goose di `backend/migrations/<YYYYMMDDHHMMSS>_<nama>.sql` dengan `-- +goose Up/Down`. ID `uuid DEFAULT uuidv7()`, uang `numeric(18,2)`, qty `numeric(18,3)`, HPP `numeric(18,4)`, persen `numeric(9,4)`, tanggal bisnis `date`.
 - Kolom standar master/dokumen: `created_at, created_by, updated_at, updated_by, version, deleted_at, deleted_by` (TG 6.2). Constraint bernama `pk_/uq_/fk_/ck_/ex_<tabel>_...`; FK wajib punya index.
-- Soft delete: list/dropdown memfilter `deleted_at IS NULL`; kode bisnis unik permanen (unique tanpa filter deleted); restore oleh Admin + audit.
+- Soft delete: list/dropdown memfilter `deleted_at IS NULL`; kode bisnis unik permanen (unique tanpa filter deleted); restore oleh Admin + audit. Pola siap pakai (contoh: `backend/internal/catalog`, `backend/internal/warehouse`):
+  - Entity menyematkan `softdelete.Mark` (`balans/internal/platform/softdelete`): `Delete(at, by)`, `Restore()`, `EnsureActive()` (tolak ubah data terhapus).
+  - Query list `WHERE (deleted_at IS NOT NULL) = sqlc.arg('deleted')::boolean` → param API `deleted=true` menampilkan daftar *Dihapus*; query get-by-ID **tidak** memfilter agar dokumen lama tetap bisa menampilkan datanya. Satu query `Set<X>Deleted` (`deleted_at = sqlc.narg(...)`) dipakai untuk hapus dan pulihkan.
+  - Service: hapus `actor.Require(ctx, PermWrite)`; pulihkan `softdelete.RequireRestore(ctx, PermWrite)` (role Admin Sistem + permission tulis); audit `ActionDelete`/`ActionRestore` dengan `Before/After: {"deletedAt": ...}`. `allowedActions` berisi `restore` jika `softdelete.CanRestore`.
+  - Endpoint: `DELETE /x/{id}` (204) dan `POST /x/{id}/restore`. Dropdown modul lain hanya mengambil data aktif dan belum dihapus.
+- Daftarkan permission baca entitas untuk tab Riwayat: fungsi `AuditEntities()` di root package modul, lalu `registerAuditEntities(a.audit, <modul>.AuditEntities())` di `app.go`.
 - Effective-dated (harga, PKS, tarif): `valid_from`/`valid_to` + `EXCLUDE USING gist` (extension `btree_gist` sudah dibuat).
 - Query sqlc di `postgres/queries/*.sql`; daftarkan paket di `backend/sqlc.yaml` (pola `<<: *pkg`). Override tipe sudah ada: uuid, timestamptz (`time.Time`/`*time.Time`), numeric (`decimal.Decimal`/`decimal.NullDecimal`), date (`clock.BusinessDate`). Gunakan cast eksplisit `sqlc.arg('x')::timestamptz` bila tipe ambigu.
 - Generate: `bash scripts/generate.sh` (bundle OpenAPI, oapi-codegen, sqlc via Docker `sqlc/sqlc:1.30.0`, lint config, tipe TS). Setelah itu jalankan `cd web-erp && npx prettier --write src/lib/api/schema.gen.ts`.
@@ -64,7 +69,7 @@ func (s *Service) Create(ctx context.Context, in domain.XInput) (domain.X, error
 
 - Fitur di `src/features/<modul>/{api,components}`; route di `src/routes/_app/...` (TanStack file route, `validateSearch` zod untuk filter/halaman di URL). `routeTree.gen.ts` dibangkitkan `pnpm exec vite build`.
 - API client: `api.GET/POST` dari `@/lib/api/client` + `unwrap`, `queryOptions`, mutasi dengan `useIdempotentMutation` (header `Idempotency-Key`). Error: `parseProblem` → field error ke form, selain itu `showErrorDialog`.
-- Komponen: `DataTable`, `StatusBadge`, `ConfirmDialog`, `LoadingButton`, `MoneyInput`, `DateInput`, `QuantityInput`, `Textarea`, `UserPicker` (approval). Dialog form: render isi form hanya saat terbuka (`{open ? <Form/> : null}`) dan inisialisasi state di `useState`, JANGAN setState di `useEffect` (lint `react-hooks/set-state-in-effect`).
+- Komponen: `DataTable`, `StatusBadge`, `ConfirmDialog`, `LoadingButton`, `MoneyInput`, `DateInput`, `QuantityInput`, `Textarea`, `UserPicker` (approval), `PageTabs` (tab di URL), `RecordStatusBadge` (Aktif/Nonaktif/Dihapus), `Barcode` (SVG EAN-13/Code 128), `ProductPicker` (catalog), dan `EntityHistory` (`src/features/audit/components/entity-history.tsx`) untuk tab **Riwayat** di halaman detail. Dialog form: render isi form hanya saat terbuka (`{open ? <Form/> : null}`) dan inisialisasi state di `useState`, JANGAN setState di `useEffect` (lint `react-hooks/set-state-in-effect`).
 - Menu: `src/lib/navigation/menu.ts` — isi `to`, `permission`, dan `module` pada item yang sudah dibangun; label persis Naming Convention.
 - Format: `formatRupiah`, `formatDate`, `formatDateTime`; uang dikirim sebagai string desimal.
 - HP: tabel bergulir horizontal; aksi utama di HP minimal 44 px; uji 3 lebar.

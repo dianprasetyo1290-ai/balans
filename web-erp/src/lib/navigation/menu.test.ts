@@ -84,6 +84,33 @@ describe("menu", () => {
     ).not.toContain("Jurnal Umum")
   })
 
+  it("menampilkan Data Master dan Label Produk sesuai modul catalog/warehouse", () => {
+    const perms = [
+      "catalog.product.read",
+      "warehouse.warehouse.read",
+      "logistics.label.post",
+    ]
+    const group = (modules: string[], label: string, p = perms) =>
+      visibleMenu(modules, [], p)
+        .find((g) => g.label === label)
+        ?.items.map((i) => i.label)
+    expect(group(["catalog", "warehouse"], "Data Master")).toEqual([
+      "Produk",
+      "Packaging & Material",
+      "Bundling",
+      "Gudang & Lokasi",
+    ])
+    expect(group(["warehouse"], "Data Master")).toEqual(["Gudang & Lokasi"])
+    expect(group(["catalog"], "Logistik")).toEqual(["Label Produk"])
+    expect(
+      group(["catalog"], "Logistik", ["logistics.label.read"]),
+      "salah satu permission cukup"
+    ).toEqual(["Label Produk"])
+    expect(group(["catalog"], "Logistik", ["catalog.product.read"])).toBe(
+      undefined
+    )
+  })
+
   it("menyembunyikan halaman yang permission-nya tidak dimiliki user", () => {
     const labels = visibleMenu([], [], ["identity.user.read"]).flatMap((g) =>
       g.items.map((i) => i.label)

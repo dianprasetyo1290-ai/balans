@@ -254,6 +254,26 @@ type JournalLine struct {
 	CreatedBy      uuid.UUID
 }
 
+type Location struct {
+	ID                uuid.UUID
+	Code              string
+	Name              string
+	WarehouseID       uuid.NullUUID
+	LocationType      string
+	ExternalPartyType pgtype.Text
+	ExternalPartyID   uuid.NullUUID
+	IsSellable        bool
+	IsStandard        bool
+	IsActive          bool
+	CreatedAt         time.Time
+	CreatedBy         uuid.UUID
+	UpdatedAt         time.Time
+	UpdatedBy         uuid.UUID
+	Version           int32
+	DeletedAt         *time.Time
+	DeletedBy         uuid.NullUUID
+}
+
 type LoginAttempt struct {
 	ID        uuid.UUID
 	EmailHash []byte
@@ -356,6 +376,62 @@ type PostingRuleAccount struct {
 	Version         int32
 }
 
+type Product struct {
+	ID             uuid.UUID
+	Sku            string
+	Name           string
+	Variant        string
+	ProductType    string
+	PackagingType  pgtype.Text
+	Uom            string
+	ShelfLifeDays  pgtype.Int4
+	HasBatch       bool
+	IsBundle       bool
+	CategoryID     uuid.NullUUID
+	MinStockQty    decimal.NullDecimal
+	UnitsPerCarton pgtype.Int4
+	IsActive       bool
+	CreatedAt      time.Time
+	CreatedBy      uuid.UUID
+	UpdatedAt      time.Time
+	UpdatedBy      uuid.UUID
+	Version        int32
+	DeletedAt      *time.Time
+	DeletedBy      uuid.NullUUID
+}
+
+type ProductBarcode struct {
+	ID        uuid.UUID
+	ProductID uuid.UUID
+	Barcode   string
+	Symbology string
+	IsPrimary bool
+	CreatedAt time.Time
+	CreatedBy uuid.UUID
+}
+
+type ProductBundleComponent struct {
+	ID                 uuid.UUID
+	BundleProductID    uuid.UUID
+	ComponentProductID uuid.UUID
+	Qty                decimal.Decimal
+	CreatedAt          time.Time
+	CreatedBy          uuid.UUID
+}
+
+type ProductCategory struct {
+	ID        uuid.UUID
+	Code      string
+	Name      string
+	CreatedAt time.Time
+	CreatedBy uuid.UUID
+	UpdatedAt time.Time
+	UpdatedBy uuid.UUID
+	Version   int32
+	DeletedAt *time.Time
+	DeletedBy uuid.NullUUID
+}
+
 type Role struct {
 	ID               uuid.UUID
 	Code             string
@@ -441,6 +517,21 @@ type UserRole struct {
 	ScopePartnerID  uuid.NullUUID
 	CreatedAt       time.Time
 	CreatedBy       uuid.UUID
+}
+
+type Warehouse struct {
+	ID        uuid.UUID
+	Code      string
+	Name      string
+	Address   string
+	IsActive  bool
+	CreatedAt time.Time
+	CreatedBy uuid.UUID
+	UpdatedAt time.Time
+	UpdatedBy uuid.UUID
+	Version   int32
+	DeletedAt *time.Time
+	DeletedBy uuid.NullUUID
 }
 
 type WebhookEvent struct {

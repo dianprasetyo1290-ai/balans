@@ -20,6 +20,9 @@ import { Route as AppApprovalsRouteImport } from './routes/_app/approvals'
 import { Route as AppFinanceAccountsRouteImport } from './routes/_app/finance/accounts'
 import { Route as AppFinanceFiscalPeriodsRouteImport } from './routes/_app/finance/fiscal-periods'
 import { Route as AppFinanceGeneralLedgerRouteImport } from './routes/_app/finance/general-ledger'
+import { Route as AppLogisticsProductLabelsRouteImport } from './routes/_app/logistics/product-labels'
+import { Route as AppMasterDataBundlesRouteImport } from './routes/_app/master-data/bundles'
+import { Route as AppMasterDataPackagingMaterialsRouteImport } from './routes/_app/master-data/packaging-materials'
 import { Route as AppMasterCampaignsRouteImport } from './routes/_app/master/campaigns'
 import { Route as AppMasterChannelsRouteImport } from './routes/_app/master/channels'
 import { Route as AppSettingsApprovalPoliciesRouteImport } from './routes/_app/settings/approval-policies'
@@ -30,6 +33,10 @@ import { Route as AppSettingsUsersRouteImport } from './routes/_app/settings/use
 import { Route as AppSystemAboutRouteImport } from './routes/_app/system/about'
 import { Route as AppFinanceJournalsIndexRouteImport } from './routes/_app/finance/journals/index'
 import { Route as AppFinanceJournalsNewRouteImport } from './routes/_app/finance/journals/new'
+import { Route as AppMasterDataProductsIndexRouteImport } from './routes/_app/master-data/products/index'
+import { Route as AppMasterDataProductsIdRouteImport } from './routes/_app/master-data/products/$id'
+import { Route as AppMasterDataWarehousesIndexRouteImport } from './routes/_app/master-data/warehouses/index'
+import { Route as AppMasterDataWarehousesIdRouteImport } from './routes/_app/master-data/warehouses/$id'
 import { Route as AppFinanceJournalsIdIndexRouteImport } from './routes/_app/finance/journals/$id.index'
 import { Route as AppFinanceJournalsIdEditRouteImport } from './routes/_app/finance/journals/$id.edit'
 
@@ -87,6 +94,23 @@ const AppFinanceGeneralLedgerRoute = AppFinanceGeneralLedgerRouteImport.update({
   path: '/finance/general-ledger',
   getParentRoute: () => AppRoute,
 } as any)
+const AppLogisticsProductLabelsRoute =
+  AppLogisticsProductLabelsRouteImport.update({
+    id: '/logistics/product-labels',
+    path: '/logistics/product-labels',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppMasterDataBundlesRoute = AppMasterDataBundlesRouteImport.update({
+  id: '/master-data/bundles',
+  path: '/master-data/bundles',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMasterDataPackagingMaterialsRoute =
+  AppMasterDataPackagingMaterialsRouteImport.update({
+    id: '/master-data/packaging-materials',
+    path: '/master-data/packaging-materials',
+    getParentRoute: () => AppRoute,
+  } as any)
 const AppMasterCampaignsRoute = AppMasterCampaignsRouteImport.update({
   id: '/master/campaigns',
   path: '/master/campaigns',
@@ -139,6 +163,29 @@ const AppFinanceJournalsNewRoute = AppFinanceJournalsNewRouteImport.update({
   path: '/finance/journals/new',
   getParentRoute: () => AppRoute,
 } as any)
+const AppMasterDataProductsIndexRoute =
+  AppMasterDataProductsIndexRouteImport.update({
+    id: '/master-data/products/',
+    path: '/master-data/products/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppMasterDataProductsIdRoute = AppMasterDataProductsIdRouteImport.update({
+  id: '/master-data/products/$id',
+  path: '/master-data/products/$id',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMasterDataWarehousesIndexRoute =
+  AppMasterDataWarehousesIndexRouteImport.update({
+    id: '/master-data/warehouses/',
+    path: '/master-data/warehouses/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppMasterDataWarehousesIdRoute =
+  AppMasterDataWarehousesIdRouteImport.update({
+    id: '/master-data/warehouses/$id',
+    path: '/master-data/warehouses/$id',
+    getParentRoute: () => AppRoute,
+  } as any)
 const AppFinanceJournalsIdIndexRoute =
   AppFinanceJournalsIdIndexRouteImport.update({
     id: '/finance/journals/$id/',
@@ -163,6 +210,9 @@ export interface FileRoutesByFullPath {
   '/finance/accounts': typeof AppFinanceAccountsRoute
   '/finance/fiscal-periods': typeof AppFinanceFiscalPeriodsRoute
   '/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
+  '/logistics/product-labels': typeof AppLogisticsProductLabelsRoute
+  '/master-data/bundles': typeof AppMasterDataBundlesRoute
+  '/master-data/packaging-materials': typeof AppMasterDataPackagingMaterialsRoute
   '/master/campaigns': typeof AppMasterCampaignsRoute
   '/master/channels': typeof AppMasterChannelsRoute
   '/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
@@ -172,7 +222,11 @@ export interface FileRoutesByFullPath {
   '/settings/users': typeof AppSettingsUsersRoute
   '/system/about': typeof AppSystemAboutRoute
   '/finance/journals/new': typeof AppFinanceJournalsNewRoute
+  '/master-data/products/$id': typeof AppMasterDataProductsIdRoute
+  '/master-data/warehouses/$id': typeof AppMasterDataWarehousesIdRoute
   '/finance/journals/': typeof AppFinanceJournalsIndexRoute
+  '/master-data/products/': typeof AppMasterDataProductsIndexRoute
+  '/master-data/warehouses/': typeof AppMasterDataWarehousesIndexRoute
   '/finance/journals/$id/edit': typeof AppFinanceJournalsIdEditRoute
   '/finance/journals/$id/': typeof AppFinanceJournalsIdIndexRoute
 }
@@ -187,6 +241,9 @@ export interface FileRoutesByTo {
   '/finance/accounts': typeof AppFinanceAccountsRoute
   '/finance/fiscal-periods': typeof AppFinanceFiscalPeriodsRoute
   '/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
+  '/logistics/product-labels': typeof AppLogisticsProductLabelsRoute
+  '/master-data/bundles': typeof AppMasterDataBundlesRoute
+  '/master-data/packaging-materials': typeof AppMasterDataPackagingMaterialsRoute
   '/master/campaigns': typeof AppMasterCampaignsRoute
   '/master/channels': typeof AppMasterChannelsRoute
   '/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
@@ -196,7 +253,11 @@ export interface FileRoutesByTo {
   '/settings/users': typeof AppSettingsUsersRoute
   '/system/about': typeof AppSystemAboutRoute
   '/finance/journals/new': typeof AppFinanceJournalsNewRoute
+  '/master-data/products/$id': typeof AppMasterDataProductsIdRoute
+  '/master-data/warehouses/$id': typeof AppMasterDataWarehousesIdRoute
   '/finance/journals': typeof AppFinanceJournalsIndexRoute
+  '/master-data/products': typeof AppMasterDataProductsIndexRoute
+  '/master-data/warehouses': typeof AppMasterDataWarehousesIndexRoute
   '/finance/journals/$id/edit': typeof AppFinanceJournalsIdEditRoute
   '/finance/journals/$id': typeof AppFinanceJournalsIdIndexRoute
 }
@@ -213,6 +274,9 @@ export interface FileRoutesById {
   '/_app/finance/accounts': typeof AppFinanceAccountsRoute
   '/_app/finance/fiscal-periods': typeof AppFinanceFiscalPeriodsRoute
   '/_app/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
+  '/_app/logistics/product-labels': typeof AppLogisticsProductLabelsRoute
+  '/_app/master-data/bundles': typeof AppMasterDataBundlesRoute
+  '/_app/master-data/packaging-materials': typeof AppMasterDataPackagingMaterialsRoute
   '/_app/master/campaigns': typeof AppMasterCampaignsRoute
   '/_app/master/channels': typeof AppMasterChannelsRoute
   '/_app/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
@@ -222,7 +286,11 @@ export interface FileRoutesById {
   '/_app/settings/users': typeof AppSettingsUsersRoute
   '/_app/system/about': typeof AppSystemAboutRoute
   '/_app/finance/journals/new': typeof AppFinanceJournalsNewRoute
+  '/_app/master-data/products/$id': typeof AppMasterDataProductsIdRoute
+  '/_app/master-data/warehouses/$id': typeof AppMasterDataWarehousesIdRoute
   '/_app/finance/journals/': typeof AppFinanceJournalsIndexRoute
+  '/_app/master-data/products/': typeof AppMasterDataProductsIndexRoute
+  '/_app/master-data/warehouses/': typeof AppMasterDataWarehousesIndexRoute
   '/_app/finance/journals/$id/edit': typeof AppFinanceJournalsIdEditRoute
   '/_app/finance/journals/$id/': typeof AppFinanceJournalsIdIndexRoute
 }
@@ -239,6 +307,9 @@ export interface FileRouteTypes {
     | '/finance/accounts'
     | '/finance/fiscal-periods'
     | '/finance/general-ledger'
+    | '/logistics/product-labels'
+    | '/master-data/bundles'
+    | '/master-data/packaging-materials'
     | '/master/campaigns'
     | '/master/channels'
     | '/settings/approval-policies'
@@ -248,7 +319,11 @@ export interface FileRouteTypes {
     | '/settings/users'
     | '/system/about'
     | '/finance/journals/new'
+    | '/master-data/products/$id'
+    | '/master-data/warehouses/$id'
     | '/finance/journals/'
+    | '/master-data/products/'
+    | '/master-data/warehouses/'
     | '/finance/journals/$id/edit'
     | '/finance/journals/$id/'
   fileRoutesByTo: FileRoutesByTo
@@ -263,6 +338,9 @@ export interface FileRouteTypes {
     | '/finance/accounts'
     | '/finance/fiscal-periods'
     | '/finance/general-ledger'
+    | '/logistics/product-labels'
+    | '/master-data/bundles'
+    | '/master-data/packaging-materials'
     | '/master/campaigns'
     | '/master/channels'
     | '/settings/approval-policies'
@@ -272,7 +350,11 @@ export interface FileRouteTypes {
     | '/settings/users'
     | '/system/about'
     | '/finance/journals/new'
+    | '/master-data/products/$id'
+    | '/master-data/warehouses/$id'
     | '/finance/journals'
+    | '/master-data/products'
+    | '/master-data/warehouses'
     | '/finance/journals/$id/edit'
     | '/finance/journals/$id'
   id:
@@ -288,6 +370,9 @@ export interface FileRouteTypes {
     | '/_app/finance/accounts'
     | '/_app/finance/fiscal-periods'
     | '/_app/finance/general-ledger'
+    | '/_app/logistics/product-labels'
+    | '/_app/master-data/bundles'
+    | '/_app/master-data/packaging-materials'
     | '/_app/master/campaigns'
     | '/_app/master/channels'
     | '/_app/settings/approval-policies'
@@ -297,7 +382,11 @@ export interface FileRouteTypes {
     | '/_app/settings/users'
     | '/_app/system/about'
     | '/_app/finance/journals/new'
+    | '/_app/master-data/products/$id'
+    | '/_app/master-data/warehouses/$id'
     | '/_app/finance/journals/'
+    | '/_app/master-data/products/'
+    | '/_app/master-data/warehouses/'
     | '/_app/finance/journals/$id/edit'
     | '/_app/finance/journals/$id/'
   fileRoutesById: FileRoutesById
@@ -390,6 +479,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppFinanceGeneralLedgerRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/logistics/product-labels': {
+      id: '/_app/logistics/product-labels'
+      path: '/logistics/product-labels'
+      fullPath: '/logistics/product-labels'
+      preLoaderRoute: typeof AppLogisticsProductLabelsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/master-data/bundles': {
+      id: '/_app/master-data/bundles'
+      path: '/master-data/bundles'
+      fullPath: '/master-data/bundles'
+      preLoaderRoute: typeof AppMasterDataBundlesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/master-data/packaging-materials': {
+      id: '/_app/master-data/packaging-materials'
+      path: '/master-data/packaging-materials'
+      fullPath: '/master-data/packaging-materials'
+      preLoaderRoute: typeof AppMasterDataPackagingMaterialsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/master/campaigns': {
       id: '/_app/master/campaigns'
       path: '/master/campaigns'
@@ -460,6 +570,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppFinanceJournalsNewRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/master-data/products/': {
+      id: '/_app/master-data/products/'
+      path: '/master-data/products'
+      fullPath: '/master-data/products/'
+      preLoaderRoute: typeof AppMasterDataProductsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/master-data/products/$id': {
+      id: '/_app/master-data/products/$id'
+      path: '/master-data/products/$id'
+      fullPath: '/master-data/products/$id'
+      preLoaderRoute: typeof AppMasterDataProductsIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/master-data/warehouses/': {
+      id: '/_app/master-data/warehouses/'
+      path: '/master-data/warehouses'
+      fullPath: '/master-data/warehouses/'
+      preLoaderRoute: typeof AppMasterDataWarehousesIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/master-data/warehouses/$id': {
+      id: '/_app/master-data/warehouses/$id'
+      path: '/master-data/warehouses/$id'
+      fullPath: '/master-data/warehouses/$id'
+      preLoaderRoute: typeof AppMasterDataWarehousesIdRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/finance/journals/$id/': {
       id: '/_app/finance/journals/$id/'
       path: '/finance/journals/$id'
@@ -483,6 +621,9 @@ interface AppRouteChildren {
   AppFinanceAccountsRoute: typeof AppFinanceAccountsRoute
   AppFinanceFiscalPeriodsRoute: typeof AppFinanceFiscalPeriodsRoute
   AppFinanceGeneralLedgerRoute: typeof AppFinanceGeneralLedgerRoute
+  AppLogisticsProductLabelsRoute: typeof AppLogisticsProductLabelsRoute
+  AppMasterDataBundlesRoute: typeof AppMasterDataBundlesRoute
+  AppMasterDataPackagingMaterialsRoute: typeof AppMasterDataPackagingMaterialsRoute
   AppMasterCampaignsRoute: typeof AppMasterCampaignsRoute
   AppMasterChannelsRoute: typeof AppMasterChannelsRoute
   AppSettingsApprovalPoliciesRoute: typeof AppSettingsApprovalPoliciesRoute
@@ -492,7 +633,11 @@ interface AppRouteChildren {
   AppSettingsUsersRoute: typeof AppSettingsUsersRoute
   AppSystemAboutRoute: typeof AppSystemAboutRoute
   AppFinanceJournalsNewRoute: typeof AppFinanceJournalsNewRoute
+  AppMasterDataProductsIdRoute: typeof AppMasterDataProductsIdRoute
+  AppMasterDataWarehousesIdRoute: typeof AppMasterDataWarehousesIdRoute
   AppFinanceJournalsIndexRoute: typeof AppFinanceJournalsIndexRoute
+  AppMasterDataProductsIndexRoute: typeof AppMasterDataProductsIndexRoute
+  AppMasterDataWarehousesIndexRoute: typeof AppMasterDataWarehousesIndexRoute
   AppFinanceJournalsIdEditRoute: typeof AppFinanceJournalsIdEditRoute
   AppFinanceJournalsIdIndexRoute: typeof AppFinanceJournalsIdIndexRoute
 }
@@ -503,6 +648,9 @@ const AppRouteChildren: AppRouteChildren = {
   AppFinanceAccountsRoute: AppFinanceAccountsRoute,
   AppFinanceFiscalPeriodsRoute: AppFinanceFiscalPeriodsRoute,
   AppFinanceGeneralLedgerRoute: AppFinanceGeneralLedgerRoute,
+  AppLogisticsProductLabelsRoute: AppLogisticsProductLabelsRoute,
+  AppMasterDataBundlesRoute: AppMasterDataBundlesRoute,
+  AppMasterDataPackagingMaterialsRoute: AppMasterDataPackagingMaterialsRoute,
   AppMasterCampaignsRoute: AppMasterCampaignsRoute,
   AppMasterChannelsRoute: AppMasterChannelsRoute,
   AppSettingsApprovalPoliciesRoute: AppSettingsApprovalPoliciesRoute,
@@ -512,7 +660,11 @@ const AppRouteChildren: AppRouteChildren = {
   AppSettingsUsersRoute: AppSettingsUsersRoute,
   AppSystemAboutRoute: AppSystemAboutRoute,
   AppFinanceJournalsNewRoute: AppFinanceJournalsNewRoute,
+  AppMasterDataProductsIdRoute: AppMasterDataProductsIdRoute,
+  AppMasterDataWarehousesIdRoute: AppMasterDataWarehousesIdRoute,
   AppFinanceJournalsIndexRoute: AppFinanceJournalsIndexRoute,
+  AppMasterDataProductsIndexRoute: AppMasterDataProductsIndexRoute,
+  AppMasterDataWarehousesIndexRoute: AppMasterDataWarehousesIndexRoute,
   AppFinanceJournalsIdEditRoute: AppFinanceJournalsIdEditRoute,
   AppFinanceJournalsIdIndexRoute: AppFinanceJournalsIdIndexRoute,
 }

@@ -121,10 +121,24 @@ paths:
     $ref: "./paths/notification.yaml#/notificationRead"
   /api/v1/products:
     $ref: "./paths/catalog.yaml#/products"
+  /api/v1/products/lookup:
+    $ref: "./paths/catalog.yaml#/productLookup"
   /api/v1/products/{id}:
     $ref: "./paths/catalog.yaml#/product"
+  /api/v1/products/{id}/restore:
+    $ref: "./paths/catalog.yaml#/productRestore"
+  /api/v1/product-categories:
+    $ref: "./paths/catalog.yaml#/productCategories"
+  /api/v1/product-categories/{id}:
+    $ref: "./paths/catalog.yaml#/productCategory"
+  /api/v1/product-categories/{id}/restore:
+    $ref: "./paths/catalog.yaml#/productCategoryRestore"
   /api/v1/warehouses:
     $ref: "./paths/warehouse.yaml#/warehouses"
+  /api/v1/warehouses/{id}:
+    $ref: "./paths/warehouse.yaml#/warehouse"
+  /api/v1/warehouses/{id}/restore:
+    $ref: "./paths/warehouse.yaml#/warehouseRestore"
   /api/v1/locations:
     $ref: "./paths/warehouse.yaml#/locations"
   /api/v1/accounts:
@@ -165,6 +179,10 @@ paths:
     $ref: "./paths/accounting.yaml#/generalLedger"
   /api/v1/document-sequences:
     $ref: "./paths/document.yaml#/documentSequences"
+  /api/v1/locations/{id}:
+    $ref: "./paths/warehouse.yaml#/location"
+  /api/v1/locations/{id}/restore:
+    $ref: "./paths/warehouse.yaml#/locationRestore"
 components:
   securitySchemes:
     bearerAuth:

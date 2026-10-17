@@ -45,6 +45,14 @@ func TestDiffCreateAndDelete(t *testing.T) {
 	deleted, err := domain.Entry{Before: product{SKU: "BLN-002"}}.Diff()
 	require.NoError(t, err)
 	assert.Equal(t, domain.Change{From: "BLN-002"}, deleted["sku"])
+
+	// Field null di sisi yang ada dan tidak ada di sisi lain bukan perubahan.
+	empty, err := domain.Entry{After: map[string]any{"sku": "BLN-003", "shelfLifeDays": nil}}.Diff()
+	require.NoError(t, err)
+	assert.NotContains(t, empty, "shelfLifeDays")
+	cleared, err := domain.Entry{Before: map[string]any{"minStockQty": "5"}, After: map[string]any{"minStockQty": nil}}.Diff()
+	require.NoError(t, err)
+	assert.Equal(t, domain.Change{From: "5"}, cleared["minStockQty"])
 }
 
 func TestDiffMasksSensitiveFields(t *testing.T) {

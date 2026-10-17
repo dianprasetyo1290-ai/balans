@@ -27,7 +27,15 @@ export const AUDIT_ACTION_LABELS: Record<AuditLog["action"], string> = {
   export: "Diekspor",
 }
 
-const ENTITY_LABELS: Record<string, string> = { user: "Pengguna", role: "Role" }
+const ENTITY_LABELS: Record<string, string> = {
+  user: "Pengguna",
+  role: "Role",
+  approval_policy: "Kebijakan persetujuan",
+  product: "Produk",
+  product_category: "Kategori produk",
+  warehouse: "Gudang",
+  location: "Lokasi stok",
+}
 
 function formatValue(v: unknown): string {
   if (v === null || v === undefined) {
@@ -39,11 +47,30 @@ function formatValue(v: unknown): string {
   if (Array.isArray(v)) {
     return v.length ? v.join(", ") : "—"
   }
+  if (typeof v === "string" && /^\d{4}-\d{2}-\d{2}T/.test(v)) {
+    return formatDateTime(v)
+  }
   return typeof v === "object" ? JSON.stringify(v) : String(v)
 }
 
-/** Daftar perubahan per field; dipakai juga tab Riwayat di halaman detail dokumen. */
-export function AuditChanges({ log }: { log: AuditLog }) {
+/**
+ * Daftar perubahan per field; dipakai juga tab Riwayat di halaman detail dokumen. `fieldLabels` mengganti nama
+ * field API (camelCase) dengan label Bahasa Indonesia.
+ */
+export function AuditChanges({
+  log,
+  fieldLabels = {},
+  valueLabels = {},
+}: {
+  log: AuditLog
+  fieldLabels?: Record<string, string>
+  /** Label nilai enum per field, mis. `{ productType: { finished_good: "Produk Jadi" } }`. */
+  valueLabels?: Record<string, Record<string, string>>
+}) {
+  const show = (field: string, v: unknown) =>
+    typeof v === "string" && valueLabels[field]?.[v]
+      ? valueLabels[field][v]
+      : formatValue(v)
   const entries = Object.entries(log.changes)
   if (entries.length === 0) {
     return log.note ? (
@@ -56,8 +83,8 @@ export function AuditChanges({ log }: { log: AuditLog }) {
     <ul className="flex flex-col gap-0.5 text-xs">
       {entries.map(([field, c]) => (
         <li key={field}>
-          <span className="font-medium">{field}</span>: {formatValue(c.from)} →{" "}
-          {formatValue(c.to)}
+          <span className="font-medium">{fieldLabels[field] ?? field}</span>:{" "}
+          {show(field, c.from)} → {show(field, c.to)}
         </li>
       ))}
       {log.note ? <li className="text-muted-foreground">{log.note}</li> : null}

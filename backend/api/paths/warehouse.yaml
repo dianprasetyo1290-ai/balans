@@ -3,13 +3,23 @@ warehouses:
     operationId: listWarehouses
     tags: [warehouse]
     summary: Daftar gudang fisik
+    description: Gudang yang dihapus tidak tampil kecuali `deleted=true` (hanya gudang terhapus).
     parameters:
       - $ref: "../components/common.yaml#/parameters/Page"
       - $ref: "../components/common.yaml#/parameters/PageSize"
+      - $ref: "../components/common.yaml#/parameters/Sort"
       - $ref: "../components/common.yaml#/parameters/Search"
+      - name: isActive
+        in: query
+        schema:
+          type: boolean
+      - name: deleted
+        in: query
+        schema:
+          type: boolean
     responses:
       "200":
-        description: Daftar gudang
+        description: Daftar gudang; field sort yang diizinkan `code`, `name`, `createdAt`
         content:
           application/json:
             schema:
@@ -19,8 +29,10 @@ warehouses:
   post:
     operationId: createWarehouse
     tags: [warehouse]
-    summary: Membuat gudang fisik beserta lokasi standarnya (WMS-01)
-    description: Lokasi Inbound, FG Non-Ecommerce, E-commerce Stock, Gudang Material, dan Gudang Retur dibuat otomatis (U-08).
+    summary: Membuat gudang fisik beserta lokasi standarnya (MD-09, F1-114)
+    description: |
+      Lokasi Inbound, FG Non-Ecommerce, E-commerce Stock (Petty Stock), RM, GM (Gudang GM), dan Gudang Retur dibuat
+      otomatis dengan kode `<kode gudang>-INB/FG/ECM/RM/GM/RET` (U-08). Kode gudang unik permanen.
     parameters:
       - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
     requestBody:
@@ -38,6 +50,72 @@ warehouses:
               $ref: "#/components/schemas/Warehouse"
       default:
         $ref: "../components/common.yaml#/responses/Problem"
+warehouse:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  get:
+    operationId: getWarehouse
+    tags: [warehouse]
+    summary: Detail gudang (gudang terhapus tetap bisa dibuka untuk dokumen lama)
+    responses:
+      "200":
+        description: Detail gudang
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Warehouse"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  put:
+    operationId: updateWarehouse
+    tags: [warehouse]
+    summary: Mengubah nama, alamat, atau status aktif gudang
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/WarehouseUpdate"
+    responses:
+      "200":
+        description: Gudang diubah
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Warehouse"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  delete:
+    operationId: deleteWarehouse
+    tags: [warehouse]
+    summary: Menghapus gudang beserta lokasinya (soft delete)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    responses:
+      "204":
+        description: Gudang dihapus
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+warehouseRestore:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  post:
+    operationId: restoreWarehouse
+    tags: [warehouse]
+    summary: Memulihkan gudang beserta lokasi yang ikut terhapus (hanya Admin Sistem)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    responses:
+      "200":
+        description: Gudang dipulihkan
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Warehouse"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
 locations:
   get:
     operationId: listLocations
@@ -46,6 +124,7 @@ locations:
     parameters:
       - $ref: "../components/common.yaml#/parameters/Page"
       - $ref: "../components/common.yaml#/parameters/PageSize"
+      - $ref: "../components/common.yaml#/parameters/Sort"
       - $ref: "../components/common.yaml#/parameters/Search"
       - name: warehouseId
         in: query
@@ -54,11 +133,36 @@ locations:
           format: uuid
       - name: locationType
         in: query
+        description: Bisa lebih dari satu.
         schema:
-          $ref: "#/components/schemas/LocationType"
+          type: array
+          items:
+            $ref: "#/components/schemas/LocationType"
+      - name: external
+        in: query
+        description: "`true` hanya lokasi eksternal, `false` hanya lokasi di dalam gudang."
+        schema:
+          type: boolean
+      - name: externalPartyType
+        in: query
+        schema:
+          $ref: "#/components/schemas/ExternalPartyType"
+      - name: externalPartyId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: isActive
+        in: query
+        schema:
+          type: boolean
+      - name: deleted
+        in: query
+        schema:
+          type: boolean
     responses:
       "200":
-        description: Daftar lokasi
+        description: Daftar lokasi; field sort yang diizinkan `code`, `name`, `createdAt`
         content:
           application/json:
             schema:
@@ -69,6 +173,10 @@ locations:
     operationId: createLocation
     tags: [warehouse]
     summary: Membuat lokasi (termasuk lokasi eksternal maklon, konsinyasi, buffer vending, mesin)
+    description: |
+      Lokasi internal wajib `warehouseId`. Lokasi eksternal wajib `externalPartyType` + `externalPartyId` (maklon =
+      `supplier`, konsinyasi = `partner`, buffer vending = `partner`/`vending_machine`, mesin = `vending_machine`);
+      satu lokasi per jenis per pihak.
     parameters:
       - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
     requestBody:
@@ -86,19 +194,91 @@ locations:
               $ref: "#/components/schemas/Location"
       default:
         $ref: "../components/common.yaml#/responses/Problem"
+location:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  get:
+    operationId: getLocation
+    tags: [warehouse]
+    summary: Detail lokasi (lokasi terhapus tetap bisa dibuka untuk dokumen lama)
+    responses:
+      "200":
+        description: Detail lokasi
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Location"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  put:
+    operationId: updateLocation
+    tags: [warehouse]
+    summary: Mengubah nama atau status aktif lokasi
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/LocationUpdate"
+    responses:
+      "200":
+        description: Lokasi diubah
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Location"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  delete:
+    operationId: deleteLocation
+    tags: [warehouse]
+    summary: Menghapus lokasi tambahan (soft delete); lokasi standar ikut gudangnya
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    responses:
+      "204":
+        description: Lokasi dihapus
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+locationRestore:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  post:
+    operationId: restoreLocation
+    tags: [warehouse]
+    summary: Memulihkan lokasi yang dihapus (hanya Admin Sistem)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    responses:
+      "200":
+        description: Lokasi dipulihkan
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Location"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
 components:
   schemas:
     LocationType:
       type: string
+      description: |
+        Di dalam gudang: `inbound`, `finished_goods` (FG Non-Ecommerce), `ecommerce` (E-commerce Stock / Petty Stock),
+        `raw_material` (RM), `goods_material` (GM), `returns`, `event`. Eksternal: `toll_manufacturer` (maklon),
+        `consignment`, `vending_buffer`, `vending_machine`.
       enum: [inbound, finished_goods, ecommerce, raw_material, goods_material, returns, event, toll_manufacturer, consignment, vending_buffer, vending_machine]
-    WarehouseInput:
+    ExternalPartyType:
+      type: string
+      enum: [supplier, partner, vending_machine]
+    RecordAction:
+      type: string
+      enum: [update, delete, restore]
+    WarehouseFields:
       type: object
-      required: [code, name, address]
+      required: [name, isActive]
       properties:
-        code:
-          type: string
-          minLength: 1
-          maxLength: 20
         name:
           type: string
           minLength: 1
@@ -106,16 +286,53 @@ components:
         address:
           type: string
           maxLength: 500
-    Warehouse:
+        isActive:
+          type: boolean
+    WarehouseInput:
       allOf:
-        - $ref: "#/components/schemas/WarehouseInput"
-        - $ref: "../components/common.yaml#/AuditFields"
+        - $ref: "#/components/schemas/WarehouseFields"
         - type: object
-          required: [id]
+          required: [code]
           properties:
-            id:
+            code:
               type: string
-              format: uuid
+              minLength: 1
+              maxLength: 20
+    WarehouseUpdate:
+      allOf:
+        - $ref: "#/components/schemas/WarehouseFields"
+        - $ref: "../components/common.yaml#/VersionInput"
+    Warehouse:
+      type: object
+      required: [id, code, name, address, isActive, createdAt, updatedAt, version, allowedActions]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        address:
+          type: string
+        isActive:
+          type: boolean
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+        allowedActions:
+          type: array
+          items:
+            $ref: "#/components/schemas/RecordAction"
     WarehouseList:
       allOf:
         - $ref: "../components/common.yaml#/Pagination"
@@ -128,7 +345,7 @@ components:
                 $ref: "#/components/schemas/Warehouse"
     LocationInput:
       type: object
-      required: [code, name, locationType]
+      required: [code, name, locationType, isActive]
       properties:
         code:
           type: string
@@ -143,28 +360,88 @@ components:
         warehouseId:
           type: string
           format: uuid
+          nullable: true
           description: Wajib untuk lokasi internal; kosong untuk lokasi eksternal.
         externalPartyType:
-          type: string
-          enum: [supplier, partner, vending_machine]
+          allOf:
+            - $ref: "#/components/schemas/ExternalPartyType"
+          nullable: true
         externalPartyId:
           type: string
           format: uuid
-    Location:
+          nullable: true
+          description: ID pemasok/maklon, mitra, atau mesin vending di modul pemiliknya.
+        isActive:
+          type: boolean
+    LocationUpdate:
       allOf:
-        - $ref: "#/components/schemas/LocationInput"
-        - $ref: "../components/common.yaml#/AuditFields"
         - type: object
-          required: [id, isSellable, isActive]
+          required: [name, isActive]
           properties:
-            id:
+            name:
               type: string
-              format: uuid
-            isSellable:
-              type: boolean
-              description: Stok di lokasi ini bisa dialokasikan ke penjualan.
+              minLength: 1
+              maxLength: 120
             isActive:
               type: boolean
+        - $ref: "../components/common.yaml#/VersionInput"
+    Location:
+      type: object
+      required: [id, code, name, locationType, locationTypeLabel, isExternal, isSellable, isStandard, isActive,
+        createdAt, updatedAt, version, allowedActions]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        locationType:
+          $ref: "#/components/schemas/LocationType"
+        locationTypeLabel:
+          type: string
+        warehouseId:
+          type: string
+          format: uuid
+          nullable: true
+        warehouseName:
+          type: string
+          nullable: true
+        externalPartyType:
+          allOf:
+            - $ref: "#/components/schemas/ExternalPartyType"
+          nullable: true
+        externalPartyId:
+          type: string
+          format: uuid
+          nullable: true
+        isExternal:
+          type: boolean
+        isSellable:
+          type: boolean
+          description: Stok di lokasi ini bisa dialokasikan ke penjualan.
+        isStandard:
+          type: boolean
+          description: Lokasi standar dibuat otomatis bersama gudang dan ikut terhapus/dipulihkan bersama gudang.
+        isActive:
+          type: boolean
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+        allowedActions:
+          type: array
+          items:
+            $ref: "#/components/schemas/RecordAction"
     LocationList:
       allOf:
         - $ref: "../components/common.yaml#/Pagination"

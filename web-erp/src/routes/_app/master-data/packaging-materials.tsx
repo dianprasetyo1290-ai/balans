@@ -1,0 +1,23 @@
+import { createFileRoute } from "@tanstack/react-router"
+
+import { productListSearchSchema } from "@/features/catalog/components/product-list-search"
+import { ProductsPage } from "@/features/catalog/components/products-page"
+
+export const Route = createFileRoute("/_app/master-data/packaging-materials")({
+  validateSearch: productListSearchSchema,
+  component: PackagingMaterialsPage,
+})
+
+function PackagingMaterialsPage() {
+  const search = Route.useSearch()
+  const navigate = Route.useNavigate()
+  return (
+    <ProductsPage
+      kind="material"
+      search={search}
+      onSearchChange={(patch) =>
+        void navigate({ search: (s) => ({ ...s, ...patch }) })
+      }
+    />
+  )
+}

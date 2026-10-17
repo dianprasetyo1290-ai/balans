@@ -104,6 +104,10 @@ func (e Entry) Diff() (map[string]Change, error) {
 		if hasFrom && hasTo && jsonEqual(from, to) {
 			continue
 		}
+		// Field kosong yang tidak ada di sisi lain (mis. field null saat create) bukan perubahan.
+		if from == nil && to == nil {
+			continue
+		}
 		if isMasked(k, masked) {
 			c := Change{}
 			if hasFrom && from != nil {
