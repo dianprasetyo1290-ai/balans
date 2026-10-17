@@ -47,6 +47,7 @@ type store interface {
 	EnsureBatch(ctx context.Context, b domain.Batch, actorID uuid.UUID) (domain.Batch, bool, error)
 	GetBatch(ctx context.Context, id uuid.UUID) (domain.Batch, error)
 	BatchesByIDs(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID]domain.Batch, error)
+	LocationFlows(ctx context.Context, q postgres.LocationFlowQuery) ([]domain.LocationFlow, error)
 	ListBatches(ctx context.Context, f postgres.BatchFilter, page paging.Page) (paging.Result[postgres.BatchSummary], error)
 
 	InsertPosting(ctx context.Context, src domain.Source, actorID uuid.UUID) (uuid.UUID, error)
@@ -74,6 +75,7 @@ type store interface {
 	InsertReservation(ctx context.Context, r postgres.NewReservation, actorID uuid.UUID) (uuid.UUID, error)
 	AddReservationUsage(ctx context.Context, id uuid.UUID, consumed, released decimal.Decimal, actorID uuid.UUID) error
 	ExpiredReservationSources(ctx context.Context, now time.Time, limit int32) ([]postgres.ReservationSource, error)
+	StockValues(ctx context.Context, asOf clock.BusinessDate) ([]postgres.StockValue, error)
 
 	documentStore
 }
@@ -122,3 +124,9 @@ func New(d Deps) *Service {
 }
 
 func (s *Service) today() clock.BusinessDate { return clock.Today(s.Clock) }
+
+// StockValues mengembalikan qty & nilai persediaan per produk & lokasi s.d. tanggal tanpa cek permission
+// (rekonsiliasi cut-over di modul accounting).
+func (s *Service) StockValues(ctx context.Context, asOf clock.BusinessDate) ([]postgres.StockValue, error) {
+	return s.Store.StockValues(ctx, asOf)
+}

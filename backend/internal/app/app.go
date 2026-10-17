@@ -198,9 +198,13 @@ func (a *App) buildModules() error {
 		if a.document == nil {
 			return errors.New("modul accounting membutuhkan modul document untuk nomor jurnal JV")
 		}
+		cipher, err := a.piiCipher()
+		if err != nil {
+			return err
+		}
 		a.accounting = accounting.New(accounting.Deps{
 			Pool: a.Pool, Tx: a.Tx, Clock: a.Clock, Log: a.Log, Responder: a.Responder, Audit: a.audit,
-			Numberer: journalNumberer{documents: a.document},
+			Numberer: journalNumberer{documents: a.document}, Cipher: cipher,
 		})
 		a.modules = append(a.modules, a.accounting)
 		registerAccountingAuditEntities(a.audit)
@@ -240,10 +244,12 @@ func (a *App) buildModules() error {
 	if err != nil {
 		return err
 	}
+	a.wireSalesReturns(mailer)
 	if gateway != nil {
 		console.Payments = gateway
 	}
 	a.connectReports()
+	a.connectFinance(mailer)
 	if cfg.IsEnabled(logistics.Name) {
 		if cfg.ShipmentProvider != config.ProviderMock {
 			return providerNotAvailable("SHIPMENT_PROVIDER", cfg.ShipmentProvider)
@@ -255,6 +261,8 @@ func (a *App) buildModules() error {
 		a.modules = append(a.modules, logistics.New(logistics.Deps{Provider: provider, Inbox: inbox, Responder: a.Responder, Log: a.Log}))
 		console.Shipments = provider
 	}
+
+	a.connectAccountingClose()
 
 	if cfg.MockActive() && cfg.Env != config.EnvProduction && (console.Email != nil || console.Payments != nil || console.Shipments != nil) {
 		a.console = mockconsole.New(console)

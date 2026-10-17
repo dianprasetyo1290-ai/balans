@@ -35,7 +35,7 @@ const (
 
 type reportStore interface {
 	RefreshStockReadModel(ctx context.Context) error
-	StockValues(ctx context.Context, f postgres.StockReportFilter) ([]postgres.StockValueRow, error)
+	StockValueRows(ctx context.Context, f postgres.StockReportFilter) ([]postgres.StockValueRow, error)
 	MovementSummary(ctx context.Context, f postgres.StockReportFilter, from, to clock.BusinessDate) ([]postgres.MovementSummaryRow, error)
 	UsageReport(ctx context.Context, f postgres.UsageReportFilter) ([]postgres.UsageReportRow, error)
 	ReturnReport(ctx context.Context, from, to clock.BusinessDate) ([]postgres.ReturnReportRow, error)
@@ -179,7 +179,7 @@ func (s *Service) StockPositionReport(ctx context.Context, f StockReportFilter) 
 	if ok, err := s.resolveLocationType(ctx, &f); err != nil || !ok {
 		return out, err
 	}
-	rows, err := rs.StockValues(ctx, f.StockReportFilter)
+	rows, err := rs.StockValueRows(ctx, f.StockReportFilter)
 	if err != nil {
 		return StockPosition{}, err
 	}

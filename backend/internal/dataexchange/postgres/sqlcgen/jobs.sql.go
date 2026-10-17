@@ -160,6 +160,45 @@ func (q *Queries) GetImportJob(ctx context.Context, id uuid.UUID) (ImportJob, er
 	return i, err
 }
 
+const getImportJobBySHA = `-- name: GetImportJobBySHA :one
+SELECT id, kind, file_id, file_name, file_sha256, status, total_rows, processed_rows, valid_rows, error_rows, committed_rows, error_file_id, message, validated_at, completed_at, created_at, created_by, updated_at, updated_by, version FROM import_jobs
+WHERE kind = $1 AND file_sha256 = $2 AND status NOT IN ('failed', 'cancelled')
+`
+
+type GetImportJobBySHAParams struct {
+	Kind       string
+	FileSha256 []byte
+}
+
+// Job impor aktif (bukan gagal/dibatalkan) untuk file yang sama per jenis data (cmd/cutover idempotent per file).
+func (q *Queries) GetImportJobBySHA(ctx context.Context, arg GetImportJobBySHAParams) (ImportJob, error) {
+	row := q.db.QueryRow(ctx, getImportJobBySHA, arg.Kind, arg.FileSha256)
+	var i ImportJob
+	err := row.Scan(
+		&i.ID,
+		&i.Kind,
+		&i.FileID,
+		&i.FileName,
+		&i.FileSha256,
+		&i.Status,
+		&i.TotalRows,
+		&i.ProcessedRows,
+		&i.ValidRows,
+		&i.ErrorRows,
+		&i.CommittedRows,
+		&i.ErrorFileID,
+		&i.Message,
+		&i.ValidatedAt,
+		&i.CompletedAt,
+		&i.CreatedAt,
+		&i.CreatedBy,
+		&i.UpdatedAt,
+		&i.UpdatedBy,
+		&i.Version,
+	)
+	return i, err
+}
+
 const getImportJobForUpdate = `-- name: GetImportJobForUpdate :one
 SELECT id, kind, file_id, file_name, file_sha256, status, total_rows, processed_rows, valid_rows, error_rows, committed_rows, error_file_id, message, validated_at, completed_at, created_at, created_by, updated_at, updated_by, version FROM import_jobs WHERE id = $1 FOR UPDATE
 `
@@ -227,13 +266,14 @@ func (q *Queries) InsertExportJob(ctx context.Context, arg InsertExportJobParams
 }
 
 const insertImportJob = `-- name: InsertImportJob :one
-INSERT INTO import_jobs (kind, file_id, file_name, file_sha256, created_by, updated_by)
-VALUES ($1, $2, $3, $4,
-        $5, $5)
+INSERT INTO import_jobs (id, kind, file_id, file_name, file_sha256, created_by, updated_by)
+VALUES (coalesce($1::uuid, uuidv7()), $2, $3, $4,
+        $5, $6, $6)
 RETURNING id, kind, file_id, file_name, file_sha256, status, total_rows, processed_rows, valid_rows, error_rows, committed_rows, error_file_id, message, validated_at, completed_at, created_at, created_by, updated_at, updated_by, version
 `
 
 type InsertImportJobParams struct {
+	ID         uuid.NullUUID
 	Kind       string
 	FileID     uuid.UUID
 	FileName   string
@@ -243,6 +283,7 @@ type InsertImportJobParams struct {
 
 func (q *Queries) InsertImportJob(ctx context.Context, arg InsertImportJobParams) (ImportJob, error) {
 	row := q.db.QueryRow(ctx, insertImportJob,
+		arg.ID,
 		arg.Kind,
 		arg.FileID,
 		arg.FileName,

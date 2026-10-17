@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
+import { Link } from "@tanstack/react-router"
 
 import { LoadingArea } from "@/components/common/loading-area"
 import { PageTabs } from "@/components/common/page-tabs"
@@ -126,6 +127,18 @@ export function FinancialStatementsPage({
         exportPermission="accounting.report.read"
         exportParams={{ kind, ...period }}
         readModels={[...RM.gl]}
+        actions={
+          <Link
+            to="/finance/reports"
+            search={{
+              year: Number(period.dateTo.slice(0, 4)),
+              month: Number(period.dateTo.slice(5, 7)),
+            }}
+            className="self-center text-sm underline-offset-2 hover:underline"
+          >
+            Neraca Saldo
+          </Link>
+        }
       />
       <PageTabs
         label="Jenis laporan keuangan"

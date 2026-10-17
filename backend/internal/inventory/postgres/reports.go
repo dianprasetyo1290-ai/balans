@@ -62,8 +62,8 @@ type StockReportFilter struct {
 
 func toDatePtr(d pgtype.Date) *clock.BusinessDate { return datePtr(d) }
 
-// StockValues membaca posisi & nilai stok dari rm_stock_values.
-func (s *Store) StockValues(ctx context.Context, f StockReportFilter) ([]StockValueRow, error) {
+// StockValueRows membaca posisi & nilai stok dari rm_stock_values.
+func (s *Store) StockValueRows(ctx context.Context, f StockReportFilter) ([]StockValueRow, error) {
 	rows, err := s.q(ctx).StockPositionReport(ctx, sqlcgen.StockPositionReportParams{
 		LocationIds: locs(f.LocationIDs), ProductID: nullUUID(f.ProductID), BatchID: nullUUID(f.BatchID),
 	})

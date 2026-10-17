@@ -33,12 +33,13 @@ func (s *Service) CreateExport(ctx context.Context, kind string, params map[stri
 	if err != nil {
 		return domain.ExportJob{}, err
 	}
-	if pe, ok := exp.(ParamExporter); ok {
-		if err := pe.ValidateParams(params); err != nil {
+	if len(params) > 20 {
+		return domain.ExportJob{}, apperr.Validation(map[string]string{"params": "Parameter ekspor terlalu banyak"})
+	}
+	if v, ok := exp.(ParamsValidator); ok {
+		if err := v.ValidateParams(ctx, params); err != nil {
 			return domain.ExportJob{}, err
 		}
-	} else {
-		params = nil
 	}
 	var job domain.ExportJob
 	err = s.Tx.WithTx(ctx, func(ctx context.Context) error {
@@ -111,7 +112,7 @@ func (s *Service) RunExport(ctx context.Context, id uuid.UUID) error {
 	if !a.Has(spec.ExportPermission()) {
 		return s.failExport(ctx, j, "Pengguna tidak lagi memiliki akses ekspor "+spec.Label+".")
 	}
-	ctx = actor.With(ctx, a)
+	ctx = context.WithValue(actor.With(ctx, a), exportParamsCtx{}, j.Params)
 	j.Status = domain.ExportRunning
 	if j, err = s.Store.SaveExportJob(ctx, j, s.now(), j.CreatedBy); err != nil {
 		return err
@@ -120,12 +121,7 @@ func (s *Service) RunExport(ctx context.Context, id uuid.UUID) error {
 	if err != nil {
 		return err
 	}
-	emit := func(r tabular.Row) error { return w.Write(r, "") }
-	if pe, ok := exp.(ParamExporter); ok {
-		err = pe.ExportWith(ctx, j.Params, emit)
-	} else {
-		err = exp.Export(ctx, emit)
-	}
+	err = exp.Export(ctx, func(r tabular.Row) error { return w.Write(r, "") })
 	if err != nil {
 		err = errors.Join(err, w.Discard())
 		if appErr := apperr.As(err); appErr.Code != apperr.CodeInternal {

@@ -58,6 +58,7 @@ func (h *WebhookHandler) ReceiveMidtransWebhook(w http.ResponseWriter, r *http.R
 type SalesHandler struct {
 	reasons *service.ReturnReasonService
 	docs    *service.DocumentService
+	returns *service.ReturnService
 }
 
 var _ StrictServerInterface = (*SalesHandler)(nil)

@@ -106,7 +106,7 @@ describe("label status", () => {
       "Menunggu Penyelesaian"
     )
     expect(statusLabel("submitted").label).toBe("Diajukan")
-    expect(Object.keys(STATUS_LABELS)).toHaveLength(21)
+    expect(Object.keys(STATUS_LABELS)).toHaveLength(22)
   })
 
   it("menampilkan kode yang belum terdaftar apa adanya", () => {

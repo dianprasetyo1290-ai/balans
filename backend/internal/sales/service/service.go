@@ -219,6 +219,11 @@ type Deps struct {
 	Numberer  Numberer
 	Files     Files
 	Users     Users
+	// Konsinyasi (S-303 – S-305): lokasi mitra, transfer & stock count (warehouse), PKS (party), mutasi stok
+	// lokasi (inventory). Nil = fitur konsinyasi menolak dengan PROVIDER_UNAVAILABLE.
+	Consignment ConsignmentStock
+	Agreements  Agreements
+	Flows       StockFlows
 	// ProformaValidDays adalah masa berlaku Proforma Invoice; 0 = 14 hari (BRD 5.4).
 	ProformaValidDays int
 	// BaseURL adalah URL ERP untuk tautan invoice di teks WhatsApp.

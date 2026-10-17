@@ -309,7 +309,8 @@ func (m *Module) Receipt(ctx context.Context, id uuid.UUID) (GoodsReceipt, error
 }
 
 // OpenPayables mengembalikan utang pemasok yang masih terbuka (tagihan positif, nota debit negatif) urut jatuh
-// tempo, untuk alokasi pembayaran R1.4. Tidak memeriksa permission.
+// tempo, untuk alokasi pembayaran R1.4. supplierID uuid.Nil = semua pemasok (maks. 500, kandidat rekonsiliasi
+// bank). Tidak memeriksa permission.
 func (m *Module) OpenPayables(ctx context.Context, supplierID uuid.UUID) ([]Payable, error) {
 	return m.svc.OpenPayables(ctx, supplierID)
 }

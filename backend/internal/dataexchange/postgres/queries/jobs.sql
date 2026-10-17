@@ -1,7 +1,7 @@
 -- name: InsertImportJob :one
-INSERT INTO import_jobs (kind, file_id, file_name, file_sha256, created_by, updated_by)
-VALUES (sqlc.arg('kind'), sqlc.arg('file_id'), sqlc.arg('file_name'), sqlc.arg('file_sha256'),
-        sqlc.arg('actor_id'), sqlc.arg('actor_id'))
+INSERT INTO import_jobs (id, kind, file_id, file_name, file_sha256, created_by, updated_by)
+VALUES (coalesce(sqlc.narg('id')::uuid, uuidv7()), sqlc.arg('kind'), sqlc.arg('file_id'), sqlc.arg('file_name'),
+        sqlc.arg('file_sha256'), sqlc.arg('actor_id'), sqlc.arg('actor_id'))
 RETURNING *;
 
 -- name: GetImportJob :one
@@ -92,3 +92,8 @@ SET status = sqlc.arg('status'), total_rows = sqlc.arg('total_rows'), file_id = 
     file_name = sqlc.arg('file_name'), message = sqlc.arg('message'), completed_at = sqlc.narg('completed_at'),
     updated_at = sqlc.arg('now')::timestamptz, updated_by = sqlc.arg('actor_id'), version = version + 1
 WHERE id = sqlc.arg('id') AND version = sqlc.arg('version');
+
+-- name: GetImportJobBySHA :one
+-- Job impor aktif (bukan gagal/dibatalkan) untuk file yang sama per jenis data (cmd/cutover idempotent per file).
+SELECT * FROM import_jobs
+WHERE kind = sqlc.arg('kind') AND file_sha256 = sqlc.arg('file_sha256') AND status NOT IN ('failed', 'cancelled');

@@ -342,6 +342,16 @@ type Sheet struct {
 	Rows []tabular.Row
 }
 
+// SheetNames mengembalikan nama sheet file xlsx.
+func SheetNames(r io.Reader) (names []string, err error) {
+	f, err := excelize.OpenReader(r)
+	if err != nil {
+		return nil, invalidFile()
+	}
+	defer func() { err = errors.Join(err, f.Close()) }()
+	return f.GetSheetList(), nil
+}
+
 func pickSheet(f *excelize.File, name string) (string, error) {
 	sheets := f.GetSheetList()
 	for _, s := range sheets {

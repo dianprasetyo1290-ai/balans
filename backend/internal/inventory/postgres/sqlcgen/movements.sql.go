@@ -298,3 +298,44 @@ func (q *Queries) StockCardSummary(ctx context.Context, arg StockCardSummaryPara
 	)
 	return i, err
 }
+
+const stockValuesAsOf = `-- name: StockValuesAsOf :many
+SELECT product_id, location_id, coalesce(sum(qty), 0)::numeric AS qty, coalesce(sum(cost_amount), 0)::numeric AS value_amount
+FROM stock_movements
+WHERE business_date <= $1::date
+GROUP BY product_id, location_id
+HAVING sum(qty) <> 0 OR sum(cost_amount) <> 0
+`
+
+type StockValuesAsOfRow struct {
+	ProductID   uuid.UUID
+	LocationID  uuid.UUID
+	Qty         decimal.Decimal
+	ValueAmount decimal.Decimal
+}
+
+// Nilai persediaan (Σ cost_amount bertanda) per produk & lokasi s.d. tanggal (rekonsiliasi cut-over).
+func (q *Queries) StockValuesAsOf(ctx context.Context, asOf clock.BusinessDate) ([]StockValuesAsOfRow, error) {
+	rows, err := q.db.Query(ctx, stockValuesAsOf, asOf)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []StockValuesAsOfRow
+	for rows.Next() {
+		var i StockValuesAsOfRow
+		if err := rows.Scan(
+			&i.ProductID,
+			&i.LocationID,
+			&i.Qty,
+			&i.ValueAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

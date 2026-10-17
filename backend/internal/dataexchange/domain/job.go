@@ -127,20 +127,20 @@ const (
 
 // ExportJob adalah permintaan ekspor yang menghasilkan file xlsx di filestore.
 type ExportJob struct {
-	ID          uuid.UUID
-	Kind        string
+	ID   uuid.UUID
+	Kind string
+	// Params adalah parameter ekspor laporan (periode, akun, dimensi); kosong untuk master data.
+	Params      map[string]string
 	Status      ExportStatus
 	TotalRows   int
 	FileID      *uuid.UUID
 	FileName    string
 	Message     string
 	CompletedAt *time.Time
-	// Params adalah parameter ekspor laporan (periode, filter); kosong untuk ekspor master.
-	Params    map[string]string
-	CreatedBy uuid.UUID
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	Version   int
+	CreatedBy   uuid.UUID
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	Version     int
 }
 
 // Spec adalah definisi satu jenis data impor/ekspor.
@@ -151,10 +151,10 @@ type Spec struct {
 	// Sheet adalah nama sheet data di template (mis. `Produk`).
 	Sheet   string
 	Columns []tabular.Column
-	// Resource opsional: resource permission bila berbeda dari Kind (mis. impor settlement per marketplace
-	// `settlement.shopee` memakai `accounting.settlement`).
+	// Resource adalah resource permission bila berbeda dari Kind, mis. `dataexchange.transaction` untuk jenis
+	// data transaksi (saldo awal, jurnal, laporan); kosong = Kind.
 	Resource string
-	// ExportPerm opsional: permission ekspor penuh (mis. laporan `accounting.report.read`) menggantikan
+	// ExportPerm opsional: permission ekspor penuh (mis. laporan operasional `inventory.stock.read`) menggantikan
 	// `<resource>.export`.
 	ExportPerm string
 }

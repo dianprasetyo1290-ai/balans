@@ -31,7 +31,7 @@ tags:
   - name: inventory
     description: Ledger stok, batch, HPP FIFO, saran FEFO (R1.2)
   - name: accounting
-    description: COA, dimensi, jenis biaya, periode, posting rule, Jurnal Umum, Buku Besar (R1.1)
+    description: COA, dimensi, jenis biaya, periode, posting rule, Jurnal Umum, Buku Besar (R1.1); aset tetap, Neraca Saldo, tutup buku, saldo awal (R1.4)
   - name: document
     description: Penomoran dokumen (R1.1)
   - name: party
@@ -1004,6 +1004,832 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MarketplaceReceivableList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/return-sources:
+    get:
+      operationId: listSalesReturnSources
+      tags:
+        - sales
+      summary: Cari Sales Order yang barangnya sudah dikirim untuk diretur (maks. 20)
+      parameters:
+        - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: Sales Order sumber retur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReturnSourceList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/return-sources/{id}:
+    get:
+      operationId: getSalesReturnSource
+      tags:
+        - sales
+      summary: Baris Sales Order yang bisa diretur (qty terkirim − qty retur lain, harga bersih, batch)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Sumber retur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReturnSourceDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/return-pickup-users:
+    get:
+      operationId: listSalesReturnPickupUsers
+      tags:
+        - sales
+      summary: Merchandiser aktif untuk penugasan pickup retur
+      responses:
+        '200':
+          description: Merchandiser
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReturnPickupUserList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/returns:
+    get:
+      operationId: listSalesReturns
+      tags:
+        - sales
+      summary: Daftar Retur Penjualan (S-314, S-317)
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Search'
+        - name: status
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/SalesReturnStatus'
+        - name: salesOrderId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: partyId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: assignedToMe
+          in: query
+          description: Hanya retur yang ditugaskan pickup ke user ini (Merchandiser).
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Retur terbaru lebih dulu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReturnList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createSalesReturn
+      tags:
+        - sales
+      summary: Menyimpan draft Retur Penjualan dari baris Sales Order yang sudah dikirim
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesReturnInput'
+      responses:
+        '201':
+          description: Draft dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReturn'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/returns/{id}:
+    get:
+      operationId: getSalesReturn
+      tags:
+        - sales
+      summary: Detail Retur Penjualan
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Retur Penjualan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReturn'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      operationId: updateSalesReturn
+      tags:
+        - sales
+      summary: Mengubah draft Retur Penjualan
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesReturnUpdate'
+      responses:
+        '200':
+          description: Draft diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReturn'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/returns/{id}/submit:
+    post:
+      operationId: submitSalesReturn
+      tags:
+        - sales
+      summary: Ajukan retur (nomor RJ)
+      description: |
+        Retur MT/reseller (mitra) → Diajukan, menunggu verifikasi Logistik Leader. Retur pelanggan langsung dan
+        marketplace → barang diterima ke lokasi Inbound berstatus Karantina dan Inbound dibuat (Diproses).
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Diajukan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReturn'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/returns/{id}/send-back:
+    post:
+      operationId: sendBackSalesReturn
+      tags:
+        - sales
+      summary: Kembalikan retur ke Draft (tidak sesuai SOP retur, catatan wajib)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesReturnNoteInput'
+      responses:
+        '200':
+          description: Kembali Draft
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReturn'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/returns/{id}/verify:
+    post:
+      operationId: verifySalesReturn
+      tags:
+        - sales
+      summary: Verifikasi retur MT oleh Logistik Leader (tentukan pickup Merchandiser atau dikirim partner)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesReturnVerifyInput'
+      responses:
+        '200':
+          description: Terverifikasi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReturn'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/returns/{id}/assign-pickup:
+    post:
+      operationId: assignSalesReturnPickup
+      tags:
+        - sales
+      summary: Tugaskan Merchandiser untuk pickup (Fulfillment Leader)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesReturnAssignPickupInput'
+      responses:
+        '200':
+          description: Ditugaskan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReturn'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/returns/{id}/pickup:
+    post:
+      operationId: recordSalesReturnPickup
+      tags:
+        - sales
+      summary: Catat pickup barang di lokasi partner (Merchandiser yang ditugaskan, foto wajib)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesReturnPickupInput'
+      responses:
+        '200':
+          description: Pickup dicatat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReturn'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/returns/{id}/receive:
+    post:
+      operationId: receiveSalesReturn
+      tags:
+        - sales
+      summary: Terima barang retur MT (cek ulang, foto & form retur) → Inbound
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesReturnReceiveInput'
+      responses:
+        '200':
+          description: Diproses
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReturn'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/returns/{id}/cancel:
+    post:
+      operationId: cancelSalesReturn
+      tags:
+        - sales
+      summary: Batalkan retur sebelum barang masuk Inbound
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesCancelInput'
+      responses:
+        '200':
+          description: Dibatalkan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReturn'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/credit-notes:
+    get:
+      operationId: listCreditNotes
+      tags:
+        - sales
+      summary: Daftar Nota Kredit
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Search'
+        - name: status
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/CreditNoteStatus'
+        - name: partyType
+          in: query
+          schema:
+            $ref: '#/components/schemas/SalesPartyType'
+        - name: partyId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: settlementMethod
+          in: query
+          schema:
+            $ref: '#/components/schemas/CreditNoteSettlement'
+      responses:
+        '200':
+          description: Nota kredit terbaru lebih dulu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditNoteList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/credit-notes/{id}:
+    get:
+      operationId: getCreditNote
+      tags:
+        - sales
+      summary: Detail Nota Kredit beserta alokasi dan invoice terbuka pihak yang sama
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Nota kredit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditNote'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/credit-notes/{id}/apply:
+    post:
+      operationId: applyCreditNote
+      tags:
+        - sales
+      summary: Alokasikan saldo nota kredit ke invoice terbuka pihak yang sama (F&A)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditNoteApplyInput'
+      responses:
+        '200':
+          description: Dialokasikan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditNote'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/credit-notes/{id}/pay-refund:
+    post:
+      operationId: payCreditNoteRefund
+      tags:
+        - sales
+      summary: Bayar refund yang sudah disetujui Head F&A (aksi ★ re-autentikasi; jurnal A-PB)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditNoteRefundInput'
+      responses:
+        '200':
+          description: Refund dibayar
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditNote'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/consignment-deliveries:
+    get:
+      operationId: listConsignmentDeliveries
+      tags:
+        - sales
+      summary: Daftar pengiriman konsinyasi & buffer vending (Penjualan › Konsinyasi, S-303)
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Search'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/ConsignmentDeliveryStatus'
+        - name: deliveryType
+          in: query
+          schema:
+            $ref: '#/components/schemas/ConsignmentDeliveryType'
+        - name: partnerId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Pengiriman terbaru lebih dulu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentDeliveryList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createConsignmentDelivery
+      tags:
+        - sales
+      summary: Menyimpan draft pengiriman konsinyasi / buffer vending
+      description: |
+        Hanya bila mitra punya PKS konsinyasi berlaku pada tanggal kirim (`party.RequireActiveAgreement`). Tujuan =
+        lokasi konsinyasi (atau buffer vending) milik mitra; lokasi asal FG Non-Ecommerce.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsignmentDeliveryInput'
+      responses:
+        '201':
+          description: Draft pengiriman
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentDelivery'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/consignment-deliveries/{id}:
+    get:
+      operationId: getConsignmentDelivery
+      tags:
+        - sales
+      summary: Detail pengiriman konsinyasi
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Pengiriman
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentDelivery'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      operationId: updateConsignmentDelivery
+      tags:
+        - sales
+      summary: Mengubah draft pengiriman konsinyasi
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsignmentDeliveryUpdate'
+      responses:
+        '200':
+          description: Pengiriman
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentDelivery'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/consignment-deliveries/{id}/ship:
+    post:
+      operationId: shipConsignmentDelivery
+      tags:
+        - sales
+      summary: Kirim barang titipan (nomor DO, Transfer Stok, jurnal A-07 / A-24)
+      description: |
+        Logistik (`logistics.delivery_order.post`). PKS diperiksa ulang; stok FEFO pindah ke lokasi mitra berstatus
+        Dalam Pengiriman; jurnal A-07 (Dr 1312 Cr 1311) atau A-24 (Dr 1313 Cr 1311) sebesar nilai FIFO dengan dimensi
+        channel konsinyasi/vending + sub-channel mitra.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Pengiriman Dalam Pengiriman
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentDelivery'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/consignment-deliveries/{id}/receive:
+    post:
+      operationId: receiveConsignmentDelivery
+      tags:
+        - sales
+      summary: Barang titipan diterima mitra (stok Tersedia di lokasi mitra)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Pengiriman Selesai
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentDelivery'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/consignment-deliveries/{id}/cancel:
+    post:
+      operationId: cancelConsignmentDelivery
+      tags:
+        - sales
+      summary: Batalkan draft pengiriman konsinyasi
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesCancelInput'
+      responses:
+        '200':
+          description: Pengiriman dibatalkan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentDelivery'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/consignment-reconciliations:
+    get:
+      operationId: listConsignmentReconciliations
+      tags:
+        - sales
+      summary: Daftar Rekonsiliasi Konsinyasi (S-304)
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Search'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/ConsignmentReconciliationStatus'
+        - name: partnerId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Cut-off terbaru lebih dulu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentReconciliationList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createConsignmentReconciliation
+      tags:
+        - sales
+      summary: Menyimpan draft rekonsiliasi (mitra, cut-off, stock count lokasi mitra)
+      description: |
+        Stock count harus berjenis konsinyasi, Selesai, di lokasi konsinyasi mitra, dan bertanggal paling jauh 7 hari
+        dari cut-off. Satu rekonsiliasi terbuka per mitra.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsignmentReconciliationInput'
+      responses:
+        '201':
+          description: Draft rekonsiliasi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentReconciliation'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/consignment-reconciliations/{id}:
+    get:
+      operationId: getConsignmentReconciliation
+      tags:
+        - sales
+      summary: Detail rekonsiliasi (dan data cetak Berita Acara Rekonsiliasi)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Rekonsiliasi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentReconciliation'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      operationId: updateConsignmentReconciliationDraft
+      tags:
+        - sales
+      summary: Mengubah draft rekonsiliasi
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsignmentReconciliationDraftUpdate'
+      responses:
+        '200':
+          description: Rekonsiliasi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentReconciliation'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/consignment-reconciliations/{id}/start:
+    post:
+      operationId: startConsignmentReconciliation
+      tags:
+        - sales
+      summary: Mulai rekonsiliasi (nomor KSN; hitung stok awal, kiriman, tarikan, sisa fisik, terjual sistem)
+      description: |
+        PKS konsinyasi berlaku pada cut-off disalin (harga, termin, ketentuan selisih). Periode = hari setelah cut-off
+        rekonsiliasi Diposting sebelumnya (atau tanggal 1 bulan cut-off) s.d. cut-off. Terjual sistem = stok awal +
+        kiriman − tarikan − sisa fisik. Harga konsinyasi dari resolver harga (daftar harga PKS).
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Rekonsiliasi Diproses
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentReconciliation'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/consignment-reconciliations/{id}/entries:
+    put:
+      operationId: updateConsignmentReconciliation
+      tags:
+        - sales
+      summary: Isi laporan penjualan mitra per SKU, penyebab selisih, file laporan mitra & BA bertanda tangan
+      description: |
+        File diunggah lewat `/api/v1/files` dengan `ownerType=sales.consignment_partner_report` (laporan mitra) atau
+        `sales.consignment_ba` (BA bertanda tangan). Ditanggung oleh dihitung dari ketentuan selisih PKS.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsignmentReconciliationUpdate'
+      responses:
+        '200':
+          description: Rekonsiliasi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentReconciliation'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/consignment-reconciliations/{id}/submit:
+    post:
+      operationId: submitConsignmentReconciliation
+      tags:
+        - sales
+      summary: Ajukan Berita Acara Rekonsiliasi ke approval (Sales MT → Head Finance & Accounting)
+      description: |
+        Wajib BA bertanda tangan, sisa fisik ≤ saldo sistem, dan penyebab untuk setiap selisih. Disetujui level
+        terakhir → stok terjual & selisih keluar dari lokasi mitra, invoice konsinyasi (A-08) dan invoice selisih yang
+        ditagih ke mitra (A-23), selisih ditanggung Balans ke Beban Kehilangan Persediaan (A-23), status Diposting.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Menunggu Persetujuan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentReconciliation'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/consignment-reconciliations/{id}/revise:
+    post:
+      operationId: reviseConsignmentReconciliation
+      tags:
+        - sales
+      summary: Revisi rekonsiliasi yang ditolak
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Rekonsiliasi Diproses
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentReconciliation'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/consignment-reconciliations/{id}/cancel:
+    post:
+      operationId: cancelConsignmentReconciliation
+      tags:
+        - sales
+      summary: Batalkan rekonsiliasi Draft/Diproses
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesCancelInput'
+      responses:
+        '200':
+          description: Rekonsiliasi dibatalkan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentReconciliation'
         default:
           $ref: '#/components/responses/Problem'
   /api/v1/webhooks/biteship:
@@ -3411,6 +4237,1920 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReadModelStatus'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/cash-bank-accounts:
+    get:
+      operationId: listCashBankAccounts
+      tags:
+        - accounting
+      summary: Kas & Bank › Rekening
+      description: Butuh `accounting.payment.read` (atau hak baca rekonsiliasi, kas kecil, pajak, verifikasi biaya untuk dropdown). Nomor rekening tersamar.
+      parameters:
+        - name: includeInactive
+          in: query
+          schema:
+            type: boolean
+            default: false
+        - name: deleted
+          in: query
+          schema:
+            type: boolean
+            default: false
+          description: Daftar Dihapus
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CashBankAccount'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createCashBankAccount
+      tags:
+        - accounting
+      summary: Menambah rekening kas/bank
+      description: Akun GL wajib akun Kas & Bank 11xx yang bisa diposting (bukan 1102 Kas Kecil); satu akun hanya untuk satu rekening. Nomor rekening disimpan terenkripsi.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CashBankAccountInput'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashBankAccount'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/cash-bank-accounts/{id}:
+    get:
+      operationId: getCashBankAccount
+      tags:
+        - accounting
+      summary: Detail rekening (nomor rekening lengkap)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashBankAccount'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      operationId: updateCashBankAccount
+      tags:
+        - accounting
+      summary: Mengubah rekening
+      description: Akun GL tidak bisa diganti setelah rekening dipakai transaksi.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CashBankAccountUpdate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashBankAccount'
+        default:
+          $ref: '#/components/responses/Problem'
+    delete:
+      operationId: deleteCashBankAccount
+      tags:
+        - accounting
+      summary: Menghapus rekening (soft delete)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/Version'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '204':
+          description: Rekening dihapus
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/cash-bank-accounts/{id}/restore:
+    post:
+      operationId: restoreCashBankAccount
+      tags:
+        - accounting
+      summary: Memulihkan rekening terhapus (Admin Sistem)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '204':
+          description: Rekening dipulihkan
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/cash-bank-accounts/{id}/mutations:
+    get:
+      operationId: listCashBankMutations
+      tags:
+        - accounting
+      summary: Mutasi rekening dengan saldo berjalan
+      description: 'Baris jurnal akun GL rekening (semua sumber: pembayaran, kas kecil, pajak, jurnal umum) urut tanggal; `balance` = saldo awal + kumulatif.'
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - name: dateFrom
+          in: query
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+          required: true
+        - name: dateTo
+          in: query
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+          required: true
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankMutationList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/cash-payments:
+    get:
+      operationId: listCashPayments
+      tags:
+        - accounting
+      summary: Kas & Bank › Pembayaran masuk/keluar
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Search'
+        - name: bankAccountId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: direction
+          in: query
+          schema:
+            $ref: '#/components/schemas/PaymentDirection'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/CashPaymentStatus'
+        - name: dateFrom
+          in: query
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+        - name: dateTo
+          in: query
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashPaymentList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createCashPayment
+      tags:
+        - accounting
+      summary: Menyimpan draft pembayaran manual
+      description: Akun lawan wajib akun yang boleh dipakai jurnal manual (bukan akun kontrol piutang/utang).
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CashPaymentInput'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashPayment'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/cash-payments/{id}:
+    get:
+      operationId: getCashPayment
+      tags:
+        - accounting
+      summary: Detail pembayaran
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashPayment'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      operationId: updateCashPayment
+      tags:
+        - accounting
+      summary: Mengubah draft pembayaran
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CashPaymentUpdate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashPayment'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/cash-payments/{id}/post:
+    post:
+      operationId: postCashPayment
+      tags:
+        - accounting
+      summary: Posting pembayaran (nomor BYR, jurnal A-PB)
+      description: Pembayaran keluar butuh re-autentikasi `accounting.payment.post` (★, `AUTH_REAUTH_REQUIRED`).
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashPayment'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/cash-payments/{id}/cancel:
+    post:
+      operationId: cancelCashPayment
+      tags:
+        - accounting
+      summary: Membatalkan pembayaran
+      description: Draft dibatalkan biasa; pembayaran manual Diposting yang belum direkonsiliasi dibatalkan dengan jurnal pembalik.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinanceCancelInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashPayment'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/bank-statements:
+    get:
+      operationId: listBankStatements
+      tags:
+        - accounting
+      summary: Rekonsiliasi Bank › File mutasi
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - name: bankAccountId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankStatementList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: importBankStatement
+      tags:
+        - accounting
+      summary: Impor file mutasi rekening (CSV/Excel)
+      description: Unggah file lebih dulu ke filestore dengan ownerType `bank_statement`. Kolom dikenali dari judul umum (Tanggal, Keterangan, Referensi, Debit/Kredit atau Nominal + D/K, Saldo). Pencocokan otomatis dijalankan setelah impor. Butuh `accounting.bank_reconciliation.import`.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BankStatementImportInput'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankStatementDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/bank-statements/{id}:
+    get:
+      operationId: getBankStatement
+      tags:
+        - accounting
+      summary: Detail file mutasi beserta baris dan usulan
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankStatementDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/bank-statements/{id}/auto-match:
+    post:
+      operationId: autoMatchBankStatement
+      tags:
+        - accounting
+      summary: Jalankan ulang pencocokan otomatis
+      description: 'Aturan berurutan: referensi persis → nominal + tanggal (±3 hari) → manual. Usulan lama baris belum direkonsiliasi diganti.'
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankStatementDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/bank-statements/{id}/confirm-suggestions:
+    post:
+      operationId: confirmBankStatementSuggestions
+      tags:
+        - accounting
+      summary: Konfirmasi semua usulan pencocokan
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankConfirmResult'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/bank-statement-lines/{id}/candidates:
+    get:
+      operationId: listBankStatementLineCandidates
+      tags:
+        - accounting
+      summary: Calon pasangan manual satu baris mutasi
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BankMatchCandidate'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/bank-statement-lines/{id}/confirm:
+    post:
+      operationId: confirmBankStatementLine
+      tags:
+        - accounting
+      summary: Konfirmasi usulan satu baris
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankStatementLine'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/bank-statement-lines/{id}/match:
+    post:
+      operationId: matchBankStatementLine
+      tags:
+        - accounting
+      summary: Cocokkan manual
+      description: Isi `journalLineId` (baris jurnal akun rekening, nominal sama) atau `source` + `documentId` (dokumen terbuka penyedia kandidat; pembayaran BYR dibuat otomatis).
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BankLineMatchInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankStatementLine'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/bank-statement-lines/{id}/create-entry:
+    post:
+      operationId: createBankStatementLineEntry
+      tags:
+        - accounting
+      summary: Buat jurnal dari baris tak cocok
+      description: Membuat pembayaran Diposting (A-PB) ke akun lawan (mis. 7202 Beban Bank, 7101 Pendapatan Lain-lain) lalu menandai baris direkonsiliasi.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BankLineEntryInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankStatementLine'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/bank-statement-lines/{id}/unmatch:
+    post:
+      operationId: unmatchBankStatementLine
+      tags:
+        - accounting
+      summary: Lepas pencocokan
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankStatementLine'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/expense-claims/options:
+    get:
+      operationId: getExpenseClaimOptions
+      tags:
+        - accounting
+      summary: Pilihan form pengajuan (divisi, kampanye, jenis biaya)
+      description: Butuh `accounting.expense_claim.read` saja agar semua divisi bisa mengajukan.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseClaimOptions'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/expense-claims:
+    get:
+      operationId: listExpenseClaims
+      tags:
+        - accounting
+      summary: Biaya Operasional › Pengajuan biaya
+      description: Pengaju tanpa hak verifikasi/approve hanya melihat pengajuannya sendiri.
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Search'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/ExpenseClaimStatus'
+        - name: divisionId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: dateFrom
+          in: query
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+        - name: dateTo
+          in: query
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseClaimList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createExpenseClaim
+      tags:
+        - accounting
+      summary: Menyimpan draft pengajuan biaya
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseClaimInput'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseClaimDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/expense-claims/{id}:
+    get:
+      operationId: getExpenseClaim
+      tags:
+        - accounting
+      summary: Detail pengajuan biaya
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseClaimDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      operationId: updateExpenseClaim
+      tags:
+        - accounting
+      summary: Mengubah draft (hanya pengaju)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseClaimUpdate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseClaimDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/expense-claims/{id}/submit:
+    post:
+      operationId: submitExpenseClaim
+      tags:
+        - accounting
+      summary: Ajukan (nomor EXP, approval `expense_claim`)
+      description: Bukti wajib untuk jenis biaya yang mewajibkan; kampanye wajib untuk jenis biaya bertanda kampanye. Approval berjenjang per nominal & divisi.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseClaimDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/expense-claims/{id}/revise:
+    post:
+      operationId: reviseExpenseClaim
+      tags:
+        - accounting
+      summary: Revisi pengajuan ditolak menjadi draft
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseClaimDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/expense-claims/{id}/cancel:
+    post:
+      operationId: cancelExpenseClaim
+      tags:
+        - accounting
+      summary: Batalkan draft/pengajuan ditolak
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinanceCancelInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseClaimDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/expense-claims/{id}/verify-preview:
+    post:
+      operationId: previewExpenseClaimVerification
+      tags:
+        - accounting
+      summary: Pratinjau PPh verifikasi F&A
+      description: Menghitung PPh per jenis + objek pajak dengan tarif berlaku hari ini tanpa menyimpan. Butuh `accounting.expense_claim.post`.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseClaimVerifyInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseClaimVerifyPreview'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/expense-claims/{id}/verify:
+    post:
+      operationId: verifyExpenseClaim
+      tags:
+        - accounting
+      summary: Verifikasi F&A (bukti + PPh, jurnal A-15)
+      description: 'Pengajuan Disetujui → Menunggu Pembayaran. Jurnal A-15: Dr beban jenis biaya / Cr 2103 Utang Biaya + utang PPh; data bukti potong dicatat.'
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseClaimVerifyInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseClaimDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/expense-claims/{id}/pay:
+    post:
+      operationId: payExpenseClaim
+      tags:
+        - accounting
+      summary: Bayar pengajuan (BYR, A-PB Dr 2103 / Cr bank)
+      description: Butuh re-autentikasi `accounting.payment.post` (★).
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseClaimPayInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseClaimDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/petty-cash-funds:
+    get:
+      operationId: listPettyCashFunds
+      tags:
+        - accounting
+      summary: Kas Kecil › Dana kas kecil (rekap saldo)
+      parameters:
+        - name: includeInactive
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PettyCashFundList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createPettyCashFund
+      tags:
+        - accounting
+      summary: Menambah dana kas kecil
+      description: Saldo awal nol; diisi lewat pengisian kembali.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PettyCashFundInput'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PettyCashFund'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/petty-cash-funds/{id}:
+    put:
+      operationId: updatePettyCashFund
+      tags:
+        - accounting
+      summary: Mengubah dana kas kecil
+      description: Plafon tidak boleh di bawah saldo.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PettyCashFundUpdate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PettyCashFund'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/petty-cash-transactions:
+    get:
+      operationId: listPettyCashTransactions
+      tags:
+        - accounting
+      summary: Kas Kecil › Transaksi
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - name: fundId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: type
+          in: query
+          schema:
+            $ref: '#/components/schemas/PettyCashType'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/PettyCashStatus'
+        - name: dateFrom
+          in: query
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+        - name: dateTo
+          in: query
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PettyCashTransactionList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createPettyCashTransaction
+      tags:
+        - accounting
+      summary: Menyimpan draft pengeluaran/pengisian kembali
+      description: Divisi kosong = divisi dana; nominal pengisian kosong = plafon − saldo.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PettyCashTransactionInput'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PettyCashTransaction'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/petty-cash-transactions/{id}:
+    get:
+      operationId: getPettyCashTransaction
+      tags:
+        - accounting
+      summary: Detail transaksi kas kecil
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PettyCashTransaction'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      operationId: updatePettyCashTransaction
+      tags:
+        - accounting
+      summary: Mengubah draft transaksi kas kecil
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PettyCashTransactionUpdate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PettyCashTransaction'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/petty-cash-transactions/{id}/submit:
+    post:
+      operationId: submitPettyCashTransaction
+      tags:
+        - accounting
+      summary: Ajukan pengisian kembali (approval `petty_cash_replenishment`)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PettyCashTransaction'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/petty-cash-transactions/{id}/revise:
+    post:
+      operationId: revisePettyCashTransaction
+      tags:
+        - accounting
+      summary: Revisi pengisian ditolak menjadi draft
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PettyCashTransaction'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/petty-cash-transactions/{id}/cancel:
+    post:
+      operationId: cancelPettyCashTransaction
+      tags:
+        - accounting
+      summary: Batalkan transaksi kas kecil yang belum diposting
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinanceCancelInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PettyCashTransaction'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/petty-cash-transactions/{id}/post:
+    post:
+      operationId: postPettyCashTransaction
+      tags:
+        - accounting
+      summary: Posting transaksi kas kecil
+      description: 'Pengeluaran: bukti wajib, maks. per transaksi, saldo cukup, jurnal A-17. Pengisian kembali (sudah disetujui): rekening sumber wajib, re-autentikasi, jurnal A-16.'
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PettyCashPostInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PettyCashTransaction'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/withholding-tax-rates:
+    get:
+      operationId: listTaxRates
+      tags:
+        - accounting
+      summary: Pajak & Bukti Potong › Tarif (effective-dated)
+      parameters:
+        - name: taxType
+          in: query
+          schema:
+            $ref: '#/components/schemas/TaxType'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaxRate'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createTaxRate
+      tags:
+        - accounting
+      summary: Menambah versi tarif
+      description: Versi terakhir objek pajak yang sama ditutup sehari sebelum tanggal berlaku versi baru.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaxRateInput'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxRate'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/withholding-slips:
+    get:
+      operationId: listWithholdingSlips
+      tags:
+        - accounting
+      summary: Rekap bukti potong satu masa
+      parameters:
+        - name: year
+          in: query
+          schema:
+            type: integer
+          required: true
+        - name: month
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+          required: true
+        - name: taxType
+          in: query
+          schema:
+            $ref: '#/components/schemas/TaxType'
+        - name: includeCancelled
+          in: query
+          schema:
+            type: boolean
+            default: false
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WithholdingSlipList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/withholding-slips/summary:
+    get:
+      operationId: listWithholdingSummary
+      tags:
+        - accounting
+      summary: Ringkasan utang PPh potong per masa setahun
+      parameters:
+        - name: year
+          in: query
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WithholdingSummaryRow'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/withholding-slips/{id}/slip-number:
+    put:
+      operationId: setWithholdingSlipNumber
+      tags:
+        - accounting
+      summary: Catat nomor bukti potong dari Coretax
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WithholdingSlipNumberInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WithholdingSlip'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/withholding-slips/export:
+    post:
+      operationId: exportWithholdingRecap
+      tags:
+        - accounting
+      summary: Ekspor rekap bukti potong (Excel) untuk Coretax
+      description: Sheet per jenis PPh; mengembalikan tautan unduhan bertanda tangan (5 menit). Butuh `accounting.withholding.export`.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WithholdingExportInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinanceDownloadLink'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/tax-deposits:
+    get:
+      operationId: listTaxDeposits
+      tags:
+        - accounting
+      summary: Penyetoran pajak setahun
+      parameters:
+        - name: year
+          in: query
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaxDeposit'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createTaxDeposit
+      tags:
+        - accounting
+      summary: Setor pajak satu jenis satu masa (A-29)
+      description: Nominal = PPh dipotong belum disetor (atau PPh Final masa itu). Re-autentikasi (★) karena dana keluar.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaxDepositInput'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxDeposit'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/final-tax:
+    get:
+      operationId: getFinalTaxSummary
+      tags:
+        - accounting
+      summary: 'PPh Final UMKM: omzet bulanan, perhitungan, batas Rp4,8 M'
+      parameters:
+        - name: year
+          in: query
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinalTaxSummary'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/final-tax/settings:
+    post:
+      operationId: createFinalTaxSetting
+      tags:
+        - accounting
+      summary: Aktifkan/nonaktifkan PPh Final UMKM mulai tanggal tertentu
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinalTaxSettingInput'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinalTaxSetting'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/final-tax/runs:
+    post:
+      operationId: runFinalTax
+      tags:
+        - accounting
+      summary: Hitung PPh Final satu masa (A-30)
+      description: Masa harus sudah berakhir dan PPh Final aktif. Omzet bruto = kredit − debit akun pendapatan 4xxx masa itu.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinalTaxRunInput'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinalTaxRun'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/trial-balance:
+    get:
+      operationId: getTrialBalance
+      tags:
+        - accounting
+      summary: Neraca Saldo per rentang & dimensi (ACC-18)
+      description: |
+        Hanya jurnal terposting. Saldo awal = sebelum `dateFrom`. Butuh `accounting.report.read` atau
+        `accounting.journal.read`. Drill-down ke Buku Besar per akun dengan filter yang sama.
+      parameters:
+        - name: dateFrom
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+        - name: dateTo
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/BusinessDate'
+        - name: channelId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: subChannelId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: divisionId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: campaignId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Neraca Saldo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrialBalance'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/fixed-asset-classes:
+    get:
+      operationId: listFixedAssetClasses
+      tags:
+        - accounting
+      summary: Kelas aset tetap (umur manfaat & akun A-31)
+      description: Permission `accounting.fixed_asset.read`.
+      parameters:
+        - $ref: '#/components/parameters/IncludeInactive'
+      responses:
+        '200':
+          description: Daftar kelas aset
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FixedAssetClass'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createFixedAssetClass
+      tags:
+        - accounting
+      summary: Menambah kelas aset
+      description: Permission `accounting.fixed_asset.write`. Akun aset bersaldo debit, akun akumulasi bersaldo kredit (1xxx).
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FixedAssetClassCreate'
+      responses:
+        '201':
+          description: Kelas dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FixedAssetClass'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/fixed-asset-classes/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    put:
+      operationId: updateFixedAssetClass
+      tags:
+        - accounting
+      summary: Mengubah kelas aset
+      description: Umur manfaat baru dipakai aset yang dibuat setelahnya.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FixedAssetClassUpdate'
+      responses:
+        '200':
+          description: Kelas diubah
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FixedAssetClass'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/fixed-assets:
+    get:
+      operationId: listFixedAssets
+      tags:
+        - accounting
+      summary: Register Aset Tetap (ACC-21)
+      description: Permission `accounting.fixed_asset.read` atau `accounting.report.read`.
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Search'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/FixedAssetStatus'
+        - name: classId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Daftar aset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FixedAssetList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createFixedAsset
+      tags:
+        - accounting
+      summary: Menambah aset tetap (Draft)
+      description: |
+        Aset pembelian (`purchase`) wajib akun pembayaran dan dijurnal A-31 saat diaktifkan. Aset saldo awal
+        (`opening`) membutuhkan tanggal cut-over di Saldo Awal; nilainya masuk GL lewat A-36.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FixedAssetCreate'
+      responses:
+        '201':
+          description: Aset dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FixedAssetDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/fixed-assets/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      operationId: getFixedAsset
+      tags:
+        - accounting
+      summary: Detail aset beserta riwayat penyusutan
+      responses:
+        '200':
+          description: Detail aset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FixedAssetDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      operationId: updateFixedAsset
+      tags:
+        - accounting
+      summary: Mengubah aset Draft
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FixedAssetUpdate'
+      responses:
+        '200':
+          description: Aset diubah
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FixedAssetDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+    delete:
+      operationId: deleteFixedAsset
+      tags:
+        - accounting
+      summary: Menghapus aset Draft
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/Version'
+      responses:
+        '204':
+          description: Aset dihapus
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/fixed-assets/{id}/activate:
+    post:
+      operationId: activateFixedAsset
+      tags:
+        - accounting
+      summary: Mengaktifkan aset (jurnal A-31 perolehan untuk aset pembelian)
+      description: Permission `accounting.fixed_asset.post`. Tanggal perolehan harus di periode terbuka (`PERIOD_LOCKED`).
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Aset aktif
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FixedAssetDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/fixed-assets/{id}/dispose:
+    post:
+      operationId: disposeFixedAsset
+      tags:
+        - accounting
+      summary: Melepas aset (dijual/dihapusbukukan, jurnal A-31 pelepasan)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FixedAssetDisposeInput'
+      responses:
+        '200':
+          description: Aset dilepas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FixedAssetDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/depreciation-runs:
+    get:
+      operationId: listDepreciationRuns
+      tags:
+        - accounting
+      summary: Riwayat penyusutan per periode
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Daftar run penyusutan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepreciationRunList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: runDepreciation
+      tags:
+        - accounting
+      summary: Menjalankan penyusutan satu periode (A-31)
+      description: |
+        Sama dengan job `accounting.depreciate` (tanggal 1 pukul 01.00 WIB untuk bulan sebelumnya). Idempotent per
+        aset per periode; periode harus terbuka. Permission `accounting.fixed_asset.post`.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepreciationRunInput'
+      responses:
+        '200':
+          description: Hasil penyusutan periode
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepreciationRunDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/depreciation-runs/{id}:
+    get:
+      operationId: getDepreciationRun
+      tags:
+        - accounting
+      summary: Detail penyusutan per aset satu periode
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Detail run
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepreciationRunDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/fiscal-periods/{id}/close-checklist:
+    get:
+      operationId: getCloseChecklist
+      tags:
+        - accounting
+      summary: Checklist Tutup Buku 9 langkah satu periode (BRD 5.15)
+      description: Termasuk hasil pemeriksaan otomatis, hal yang menahan tutup periode, dan riwayat buka kembali.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Checklist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CloseChecklist'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/fiscal-periods/{id}/close-checklist/{stepCode}:
+    put:
+      operationId: updateCloseChecklistStep
+      tags:
+        - accounting
+      summary: Mengubah status, PIC, atau catatan satu langkah
+      description: |
+        Permission `accounting.fiscal_period.write` atau `.post`. Selesai butuh pemeriksaan otomatis lolos; Tidak Berlaku
+        wajib catatan; langkah 9 selesai saat Tutup Periode.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - name: stepCode
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/CloseStepCode'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CloseChecklistStepInput'
+      responses:
+        '200':
+          description: Checklist terbaru
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CloseChecklist'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/fiscal-periods/{id}/close:
+    post:
+      operationId: closeFiscalPeriod
+      tags:
+        - accounting
+      summary: Tutup Periode (★ re-autentikasi)
+      description: |
+        Permission `accounting.fiscal_period.post` dan re-autentikasi 5 menit terakhir (`AUTH_REAUTH_REQUIRED`).
+        Advisory lock per periode; periode sebelumnya harus Ditutup; langkah 1–8 selesai; neraca saldo balance.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Periode ditutup
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CloseChecklist'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/fiscal-periods/{id}/reopen:
+    post:
+      operationId: requestFiscalPeriodReopen
+      tags:
+        - accounting
+      summary: Ajukan Buka Kembali periode (★ re-autentikasi, approval Head F&A → Direksi)
+      description: |
+        Permission `accounting.fiscal_period.reopen` dan re-autentikasi. Periode menjadi Menunggu Persetujuan (tetap
+        terkunci) sampai approval `fiscal_period_reopen` diputuskan.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FiscalPeriodReopenInput'
+      responses:
+        '200':
+          description: Permintaan diajukan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CloseChecklist'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/opening-balance:
+    get:
+      operationId: getOpeningBalance
+      tags:
+        - accounting
+      summary: Saldo Awal — tanggal cut-over dan Neraca Saldo Awal (A-36)
+      responses:
+        '200':
+          description: Saldo awal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpeningBalance'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      operationId: saveOpeningBalanceSet
+      tags:
+        - accounting
+      summary: Mengisi tanggal cut-over (akhir bulan)
+      description: Permission `accounting.journal.write`; hanya selama saldo awal Draft.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OpeningBalanceSetInput'
+      responses:
+        '200':
+          description: Saldo awal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpeningBalance'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/opening-balance/lines:
+    post:
+      operationId: saveOpeningBalanceLine
+      tags:
+        - accounting
+      summary: Mengisi saldo awal satu akun neraca (akun yang sama diganti)
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OpeningBalanceLineInput'
+      responses:
+        '200':
+          description: Saldo awal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpeningBalance'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/opening-balance/lines/{id}:
+    delete:
+      operationId: deleteOpeningBalanceLine
+      tags:
+        - accounting
+      summary: Menghapus saldo awal satu akun
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Saldo awal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpeningBalance'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/opening-balance/post:
+    post:
+      operationId: postOpeningBalance
+      tags:
+        - accounting
+      summary: Memposting saldo awal sebagai jurnal A-36 (selisih ke 3901)
+      description: Permission `accounting.journal.post`. Tanggal cut-over harus di periode terbuka.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Saldo awal diposting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpeningBalance'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/opening-items:
+    get:
+      operationId: listOpeningItems
+      tags:
+        - accounting
+      summary: Piutang & utang terbuka saldo awal per dokumen lama
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Search'
+        - name: itemType
+          in: query
+          schema:
+            $ref: '#/components/schemas/OpeningItemType'
+        - name: outstandingOnly
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Daftar saldo terbuka
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpeningItemList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/cutover-reconciliation:
+    get:
+      operationId: getCutoverReconciliation
+      tags:
+        - accounting
+      summary: Pengecekan rekonsiliasi cut-over (sub-ledger vs GL)
+      description: |
+        Neraca saldo awal balance, nilai persediaan per akun, piutang/utang terbuka, harga perolehan & akumulasi aset
+        tetap (Panduan Migrasi Data bagian 4). Sebelum saldo awal diposting, GL diambil dari Neraca Saldo Awal.
+      responses:
+        '200':
+          description: Hasil rekonsiliasi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CutoverReconciliation'
         default:
           $ref: '#/components/responses/Problem'
   /api/v1/document-sequences:
@@ -9836,6 +12576,1332 @@ components:
               $ref: '#/components/schemas/Money'
             totalOutstanding:
               $ref: '#/components/schemas/Money'
+    SalesReturnSource:
+      type: object
+      required:
+        - id
+        - number
+        - orderType
+        - partyName
+        - businessDate
+        - status
+        - totalAmount
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        orderType:
+          $ref: '#/components/schemas/SalesOrderType'
+        partyName:
+          type: string
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        status:
+          $ref: '#/components/schemas/SalesDocumentStatus'
+        totalAmount:
+          $ref: '#/components/schemas/Money'
+    SalesReturnSourceList:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesReturnSource'
+    SalesReturnBatchOption:
+      type: object
+      required:
+        - id
+        - number
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+    SalesReturnableLine:
+      type: object
+      required:
+        - salesOrderLineId
+        - lineNo
+        - product
+        - isBundle
+        - orderedQty
+        - shippedQty
+        - returnedQty
+        - availableQty
+        - unitPrice
+        - unitCost
+        - batches
+      properties:
+        salesOrderLineId:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        product:
+          $ref: '#/components/schemas/SalesProductRef'
+        isBundle:
+          type: boolean
+        orderedQty:
+          $ref: '#/components/schemas/SalesQuantity'
+        shippedQty:
+          $ref: '#/components/schemas/SalesQuantity'
+        returnedQty:
+          $ref: '#/components/schemas/SalesQuantity'
+        availableQty:
+          $ref: '#/components/schemas/SalesQuantity'
+        unitPrice:
+          $ref: '#/components/schemas/Money'
+        unitCost:
+          type: string
+          description: HPP asal per unit (4 desimal).
+        batches:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesReturnBatchOption'
+    SalesReturnSourceDetail:
+      type: object
+      required:
+        - order
+        - requiresVerification
+        - lines
+      properties:
+        order:
+          $ref: '#/components/schemas/SalesReturnSource'
+        invoiceNumber:
+          type: string
+          nullable: true
+        requiresVerification:
+          type: boolean
+          description: Retur dari mitra (MT/reseller) diverifikasi Logistik Leader sebelum barang diambil.
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesReturnableLine'
+    SalesReturnPickupUser:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+    SalesReturnPickupUserList:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesReturnPickupUser'
+    SalesReturnStatus:
+      type: string
+      description: Status Retur Penjualan (Desain Status Dokumen 5.5).
+      enum:
+        - draft
+        - submitted
+        - verified
+        - in_progress
+        - posted
+        - cancelled
+    SalesReturnSettlement:
+      type: string
+      description: |
+        `credit_note` nota kredit (mengurangi piutang invoice asal, sisanya untuk invoice berikutnya), `refund`
+        dibayar kembali (approval Head F&A), `marketplace` mengurangi Piutang Marketplace 121x.
+      enum:
+        - credit_note
+        - refund
+        - marketplace
+    SalesReturnSummary:
+      type: object
+      required:
+        - id
+        - status
+        - salesOrderId
+        - salesOrderNumber
+        - orderType
+        - partyName
+        - returnDate
+        - settlementMethod
+        - requiresVerification
+        - pickupRequired
+        - returnAmount
+        - costAmount
+        - createdAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/SalesReturnStatus'
+        salesOrderId:
+          type: string
+          format: uuid
+        salesOrderNumber:
+          type: string
+        invoiceId:
+          type: string
+          format: uuid
+          nullable: true
+        invoiceNumber:
+          type: string
+          nullable: true
+        orderType:
+          $ref: '#/components/schemas/SalesOrderType'
+        partyName:
+          type: string
+        returnDate:
+          $ref: '#/components/schemas/BusinessDate'
+        settlementMethod:
+          $ref: '#/components/schemas/SalesReturnSettlement'
+        requiresVerification:
+          type: boolean
+        pickupRequired:
+          type: boolean
+        pickupUserId:
+          type: string
+          format: uuid
+          nullable: true
+        inboundNumber:
+          type: string
+          nullable: true
+        returnAmount:
+          $ref: '#/components/schemas/Money'
+        costAmount:
+          $ref: '#/components/schemas/Money'
+        createdAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    SalesReturnList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/SalesReturnSummary'
+    SalesReturnLineInput:
+      type: object
+      required:
+        - salesOrderLineId
+        - qty
+        - returnReasonId
+      properties:
+        salesOrderLineId:
+          type: string
+          format: uuid
+        batchId:
+          type: string
+          format: uuid
+          nullable: true
+        qty:
+          $ref: '#/components/schemas/SalesQuantity'
+        returnReasonId:
+          type: string
+          format: uuid
+        note:
+          type: string
+          maxLength: 200
+    SalesReturnFields:
+      type: object
+      required:
+        - returnDate
+        - lines
+      properties:
+        returnDate:
+          $ref: '#/components/schemas/BusinessDate'
+        settlementMethod:
+          $ref: '#/components/schemas/SalesReturnSettlement'
+        note:
+          type: string
+          maxLength: 1000
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesReturnLineInput'
+    SalesReturnInput:
+      allOf:
+        - type: object
+          required:
+            - salesOrderId
+          properties:
+            salesOrderId:
+              type: string
+              format: uuid
+        - $ref: '#/components/schemas/SalesReturnFields'
+    SalesReturnFile:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+    CreditNoteSettlement:
+      type: string
+      enum:
+        - credit_note
+        - refund
+    CreditNoteStatus:
+      type: string
+      description: '`posted` ada saldo, `completed` saldo habis teralokasi, refund: `pending_approval` → `awaiting_payment` → `paid`.'
+      enum:
+        - posted
+        - completed
+        - pending_approval
+        - awaiting_payment
+        - paid
+    SalesReturnCreditNoteRef:
+      type: object
+      required:
+        - id
+        - number
+        - settlementMethod
+        - status
+        - amount
+        - remainingAmount
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        settlementMethod:
+          $ref: '#/components/schemas/CreditNoteSettlement'
+        status:
+          $ref: '#/components/schemas/CreditNoteStatus'
+        amount:
+          $ref: '#/components/schemas/Money'
+        remainingAmount:
+          $ref: '#/components/schemas/Money'
+    SalesReturnReasonRef:
+      type: object
+      required:
+        - id
+        - code
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        defaultDisposition:
+          allOf:
+            - $ref: '#/components/schemas/ReturnDisposition'
+          nullable: true
+    SalesReturnLine:
+      type: object
+      required:
+        - id
+        - lineNo
+        - salesOrderLineId
+        - product
+        - qty
+        - returnReason
+        - unitPrice
+        - lineAmount
+        - unitCost
+        - costAmount
+        - note
+        - passedQty
+        - rejectedQty
+        - qcDone
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        salesOrderLineId:
+          type: string
+          format: uuid
+        product:
+          $ref: '#/components/schemas/SalesProductRef'
+        batchId:
+          type: string
+          format: uuid
+          nullable: true
+        batchNumber:
+          type: string
+          nullable: true
+        qty:
+          $ref: '#/components/schemas/SalesQuantity'
+        returnReason:
+          $ref: '#/components/schemas/SalesReturnReasonRef'
+        unitPrice:
+          $ref: '#/components/schemas/Money'
+        lineAmount:
+          $ref: '#/components/schemas/Money'
+        unitCost:
+          type: string
+        costAmount:
+          $ref: '#/components/schemas/Money'
+        note:
+          type: string
+        passedQty:
+          $ref: '#/components/schemas/SalesQuantity'
+        rejectedQty:
+          $ref: '#/components/schemas/SalesQuantity'
+        qcDone:
+          type: boolean
+    SalesReturn:
+      allOf:
+        - $ref: '#/components/schemas/SalesReturnSummary'
+        - type: object
+          required:
+            - note
+            - sendBackNote
+            - verifyNote
+            - pickupNote
+            - receiveNote
+            - cancelReason
+            - createdByName
+            - pickupFiles
+            - documentationFiles
+            - lines
+            - allowedActions
+          properties:
+            note:
+              type: string
+            sendBackNote:
+              type: string
+            verifiedByName:
+              type: string
+              nullable: true
+            verifiedAt:
+              type: string
+              format: date-time
+              nullable: true
+            verifyNote:
+              type: string
+            pickupUserName:
+              type: string
+              nullable: true
+            pickupAssignedAt:
+              type: string
+              format: date-time
+              nullable: true
+            pickedUpAt:
+              type: string
+              format: date-time
+              nullable: true
+            pickupNote:
+              type: string
+            pickupFiles:
+              type: array
+              items:
+                $ref: '#/components/schemas/SalesReturnFile'
+            receivedByName:
+              type: string
+              nullable: true
+            receivedAt:
+              type: string
+              format: date-time
+              nullable: true
+            receiveNote:
+              type: string
+            documentationFiles:
+              type: array
+              items:
+                $ref: '#/components/schemas/SalesReturnFile'
+            inboundId:
+              type: string
+              format: uuid
+              nullable: true
+            cancelReason:
+              type: string
+            postedAt:
+              type: string
+              format: date-time
+              nullable: true
+            journalEntryId:
+              type: string
+              format: uuid
+              nullable: true
+            createdByName:
+              type: string
+            creditNote:
+              allOf:
+                - $ref: '#/components/schemas/SalesReturnCreditNoteRef'
+              nullable: true
+            lines:
+              type: array
+              items:
+                $ref: '#/components/schemas/SalesReturnLine'
+            allowedActions:
+              type: array
+              items:
+                type: string
+                enum:
+                  - edit
+                  - submit
+                  - cancel
+                  - verify
+                  - send_back
+                  - assign_pickup
+                  - record_pickup
+                  - receive
+    SalesReturnUpdate:
+      allOf:
+        - $ref: '#/components/schemas/SalesReturnFields'
+        - $ref: '#/components/schemas/VersionInput'
+    SalesReturnNoteInput:
+      type: object
+      required:
+        - version
+        - note
+      properties:
+        version:
+          type: integer
+        note:
+          type: string
+          maxLength: 1000
+    SalesReturnVerifyInput:
+      type: object
+      required:
+        - version
+        - pickupRequired
+      properties:
+        version:
+          type: integer
+        pickupRequired:
+          type: boolean
+        note:
+          type: string
+          maxLength: 1000
+    SalesReturnAssignPickupInput:
+      type: object
+      required:
+        - version
+        - pickupUserId
+      properties:
+        version:
+          type: integer
+        pickupUserId:
+          type: string
+          format: uuid
+    SalesReturnPickupInput:
+      type: object
+      required:
+        - version
+        - photoFileIds
+      properties:
+        version:
+          type: integer
+        note:
+          type: string
+          maxLength: 1000
+        photoFileIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+    SalesReturnReceivedQty:
+      type: object
+      required:
+        - lineId
+        - qty
+      properties:
+        lineId:
+          type: string
+          format: uuid
+        qty:
+          $ref: '#/components/schemas/SalesQuantity'
+    SalesReturnReceiveInput:
+      type: object
+      required:
+        - version
+        - documentationFileIds
+      properties:
+        version:
+          type: integer
+        note:
+          type: string
+          maxLength: 1000
+        documentationFileIds:
+          type: array
+          description: Foto barang dan form retur yang ditandatangani.
+          items:
+            type: string
+            format: uuid
+        lines:
+          type: array
+          description: Qty hasil cek ulang bila kurang dari qty retur (baris lain tetap).
+          items:
+            $ref: '#/components/schemas/SalesReturnReceivedQty'
+    CreditNoteSummary:
+      type: object
+      required:
+        - id
+        - number
+        - salesReturnId
+        - salesReturnNumber
+        - partyType
+        - partyId
+        - partyName
+        - settlementMethod
+        - issueDate
+        - amount
+        - appliedAmount
+        - refundedAmount
+        - remainingAmount
+        - status
+        - createdAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        salesReturnId:
+          type: string
+          format: uuid
+        salesReturnNumber:
+          type: string
+        invoiceId:
+          type: string
+          format: uuid
+          nullable: true
+        invoiceNumber:
+          type: string
+          nullable: true
+        partyType:
+          $ref: '#/components/schemas/SalesPartyType'
+        partyId:
+          type: string
+          format: uuid
+        partyName:
+          type: string
+        settlementMethod:
+          $ref: '#/components/schemas/CreditNoteSettlement'
+        issueDate:
+          $ref: '#/components/schemas/BusinessDate'
+        amount:
+          $ref: '#/components/schemas/Money'
+        appliedAmount:
+          $ref: '#/components/schemas/Money'
+        refundedAmount:
+          $ref: '#/components/schemas/Money'
+        remainingAmount:
+          $ref: '#/components/schemas/Money'
+        status:
+          $ref: '#/components/schemas/CreditNoteStatus'
+        createdAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    CreditNoteList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/CreditNoteSummary'
+    CreditNoteApplication:
+      type: object
+      required:
+        - id
+        - invoiceId
+        - invoiceNumber
+        - amount
+        - appliedDate
+      properties:
+        id:
+          type: string
+          format: uuid
+        invoiceId:
+          type: string
+          format: uuid
+        invoiceNumber:
+          type: string
+        amount:
+          $ref: '#/components/schemas/Money'
+        appliedDate:
+          $ref: '#/components/schemas/BusinessDate'
+    CreditNoteOpenInvoice:
+      type: object
+      required:
+        - id
+        - number
+        - invoiceDate
+        - dueDate
+        - totalAmount
+        - outstandingAmount
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        invoiceDate:
+          $ref: '#/components/schemas/BusinessDate'
+        dueDate:
+          $ref: '#/components/schemas/BusinessDate'
+        totalAmount:
+          $ref: '#/components/schemas/Money'
+        outstandingAmount:
+          $ref: '#/components/schemas/Money'
+    CreditNote:
+      allOf:
+        - $ref: '#/components/schemas/CreditNoteSummary'
+        - type: object
+          required:
+            - decisionNote
+            - refundAccountCode
+            - refundReference
+            - applications
+            - openInvoices
+            - allowedActions
+          properties:
+            decisionNote:
+              type: string
+            refundDate:
+              allOf:
+                - $ref: '#/components/schemas/BusinessDate'
+              nullable: true
+            refundAccountCode:
+              type: string
+            refundReference:
+              type: string
+            refundJournalEntryId:
+              type: string
+              format: uuid
+              nullable: true
+            applications:
+              type: array
+              items:
+                $ref: '#/components/schemas/CreditNoteApplication'
+            openInvoices:
+              type: array
+              description: Invoice terbuka pihak yang sama (pilihan alokasi saat saldo masih ada).
+              items:
+                $ref: '#/components/schemas/CreditNoteOpenInvoice'
+            allowedActions:
+              type: array
+              items:
+                type: string
+                enum:
+                  - print
+                  - apply
+                  - pay_refund
+    CreditNoteAllocationInput:
+      type: object
+      required:
+        - invoiceId
+        - amount
+      properties:
+        invoiceId:
+          type: string
+          format: uuid
+        amount:
+          $ref: '#/components/schemas/Money'
+    CreditNoteApplyInput:
+      type: object
+      required:
+        - version
+        - allocations
+      properties:
+        version:
+          type: integer
+        allocations:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreditNoteAllocationInput'
+    CreditNoteRefundInput:
+      type: object
+      required:
+        - version
+        - paymentDate
+        - accountCode
+      properties:
+        version:
+          type: integer
+        paymentDate:
+          $ref: '#/components/schemas/BusinessDate'
+        accountCode:
+          type: string
+          description: Kode akun Kas & Bank sumber pembayaran.
+        reference:
+          type: string
+          maxLength: 200
+    ConsignmentDeliveryStatus:
+      type: string
+      enum:
+        - draft
+        - in_transit
+        - completed
+        - cancelled
+    ConsignmentDeliveryType:
+      type: string
+      description: '`consignment` ke lokasi konsinyasi mitra (A-07), `vending_buffer` ke buffer vending (A-24).'
+      enum:
+        - consignment
+        - vending_buffer
+    ConsignmentDeliverySummary:
+      type: object
+      required:
+        - id
+        - deliveryType
+        - partnerId
+        - partnerCode
+        - partnerName
+        - businessDate
+        - status
+        - transferNumber
+        - costAmount
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+          nullable: true
+        deliveryType:
+          $ref: '#/components/schemas/ConsignmentDeliveryType'
+        partnerId:
+          type: string
+          format: uuid
+        partnerCode:
+          type: string
+        partnerName:
+          type: string
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        status:
+          $ref: '#/components/schemas/ConsignmentDeliveryStatus'
+        transferNumber:
+          type: string
+        costAmount:
+          $ref: '#/components/schemas/Money'
+        version:
+          type: integer
+    ConsignmentDeliveryList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/ConsignmentDeliverySummary'
+    ConsignmentDeliveryLineInput:
+      type: object
+      required:
+        - productId
+        - qty
+      properties:
+        productId:
+          type: string
+          format: uuid
+        qty:
+          $ref: '#/components/schemas/SalesQuantity'
+        note:
+          type: string
+          maxLength: 200
+    ConsignmentDeliveryFields:
+      type: object
+      required:
+        - fromLocationId
+        - businessDate
+        - lines
+      properties:
+        fromLocationId:
+          type: string
+          format: uuid
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        note:
+          type: string
+          maxLength: 1000
+        lines:
+          type: array
+          minItems: 1
+          maxItems: 200
+          items:
+            $ref: '#/components/schemas/ConsignmentDeliveryLineInput'
+    ConsignmentDeliveryInput:
+      allOf:
+        - $ref: '#/components/schemas/ConsignmentDeliveryFields'
+        - type: object
+          required:
+            - deliveryType
+            - partnerId
+          properties:
+            deliveryType:
+              $ref: '#/components/schemas/ConsignmentDeliveryType'
+            partnerId:
+              type: string
+              format: uuid
+    ConsignmentDeliveryLine:
+      type: object
+      required:
+        - id
+        - lineNo
+        - product
+        - qty
+        - costAmount
+        - note
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        product:
+          $ref: '#/components/schemas/SalesProductRef'
+        batchId:
+          type: string
+          format: uuid
+          nullable: true
+        qty:
+          type: string
+        costAmount:
+          $ref: '#/components/schemas/Money'
+        note:
+          type: string
+    ConsignmentDelivery:
+      allOf:
+        - $ref: '#/components/schemas/ConsignmentDeliverySummary'
+        - type: object
+          required:
+            - agreementNumber
+            - fromLocation
+            - toLocation
+            - channelName
+            - subChannelName
+            - sourceType
+            - note
+            - cancelReason
+            - createdAt
+            - createdByName
+            - updatedAt
+            - lines
+            - allowedActions
+          properties:
+            agreementNumber:
+              type: string
+            fromLocation:
+              $ref: '#/components/schemas/SalesLocationRef'
+            toLocation:
+              $ref: '#/components/schemas/SalesLocationRef'
+            channelName:
+              type: string
+            subChannelName:
+              type: string
+            sourceType:
+              type: string
+            transferId:
+              type: string
+              format: uuid
+              nullable: true
+            note:
+              type: string
+            cancelReason:
+              type: string
+            shippedAt:
+              type: string
+              format: date-time
+              nullable: true
+            receivedAt:
+              type: string
+              format: date-time
+              nullable: true
+            createdAt:
+              type: string
+              format: date-time
+            createdByName:
+              type: string
+            updatedAt:
+              type: string
+              format: date-time
+            lines:
+              type: array
+              items:
+                $ref: '#/components/schemas/ConsignmentDeliveryLine'
+            allowedActions:
+              type: array
+              items:
+                type: string
+    ConsignmentDeliveryUpdate:
+      allOf:
+        - $ref: '#/components/schemas/ConsignmentDeliveryFields'
+        - $ref: '#/components/schemas/VersionInput'
+    ConsignmentReconciliationStatus:
+      type: string
+      enum:
+        - draft
+        - in_progress
+        - pending_approval
+        - rejected
+        - posted
+        - cancelled
+    ConsignmentReconciliationSummary:
+      type: object
+      required:
+        - id
+        - partnerId
+        - partnerCode
+        - partnerName
+        - cutOffDate
+        - stockCountNumber
+        - status
+        - salesAmount
+        - billedVarianceAmount
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+          nullable: true
+        partnerId:
+          type: string
+          format: uuid
+        partnerCode:
+          type: string
+        partnerName:
+          type: string
+        periodStart:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
+        cutOffDate:
+          $ref: '#/components/schemas/BusinessDate'
+        stockCountNumber:
+          type: string
+        status:
+          $ref: '#/components/schemas/ConsignmentReconciliationStatus'
+        salesAmount:
+          $ref: '#/components/schemas/Money'
+        billedVarianceAmount:
+          $ref: '#/components/schemas/Money'
+        version:
+          type: integer
+    ConsignmentReconciliationList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/ConsignmentReconciliationSummary'
+    ConsignmentReconciliationFields:
+      type: object
+      required:
+        - cutOffDate
+        - stockCountId
+      properties:
+        cutOffDate:
+          $ref: '#/components/schemas/BusinessDate'
+        stockCountId:
+          type: string
+          format: uuid
+        note:
+          type: string
+          maxLength: 1000
+    ConsignmentReconciliationInput:
+      allOf:
+        - $ref: '#/components/schemas/ConsignmentReconciliationFields'
+        - type: object
+          required:
+            - partnerId
+          properties:
+            partnerId:
+              type: string
+              format: uuid
+    ConsignmentBorneBy:
+      type: string
+      enum:
+        - partner
+        - balans
+    ConsignmentVarianceRules:
+      type: object
+      required:
+        - lost
+        - partnerDamage
+        - productDefect
+        - nearExpiry
+      properties:
+        lost:
+          $ref: '#/components/schemas/ConsignmentBorneBy'
+        partnerDamage:
+          $ref: '#/components/schemas/ConsignmentBorneBy'
+        productDefect:
+          $ref: '#/components/schemas/ConsignmentBorneBy'
+        nearExpiry:
+          $ref: '#/components/schemas/ConsignmentBorneBy'
+    ConsignmentVarianceCause:
+      type: string
+      description: Penyebab selisih (BRD U-02).
+      enum:
+        - lost
+        - partner_damage
+        - product_defect
+        - near_expiry
+    ConsignmentReconciliationLine:
+      type: object
+      required:
+        - id
+        - lineNo
+        - product
+        - openingQty
+        - deliveredQty
+        - returnedQty
+        - countedQty
+        - soldQty
+        - reportedQty
+        - varianceQty
+        - unitPrice
+        - priceRule
+        - priceDescription
+        - salesAmount
+        - varianceAmount
+        - costAmount
+        - varianceCostAmount
+        - note
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        product:
+          $ref: '#/components/schemas/SalesProductRef'
+        openingQty:
+          type: string
+        deliveredQty:
+          type: string
+        returnedQty:
+          type: string
+        countedQty:
+          type: string
+        soldQty:
+          type: string
+          description: Terjual sistem = stok awal + kiriman − tarikan − sisa fisik.
+        reportedQty:
+          type: string
+        varianceQty:
+          type: string
+        varianceCause:
+          allOf:
+            - $ref: '#/components/schemas/ConsignmentVarianceCause'
+          nullable: true
+        borneBy:
+          allOf:
+            - $ref: '#/components/schemas/ConsignmentBorneBy'
+          nullable: true
+        unitPrice:
+          $ref: '#/components/schemas/Money'
+        priceRule:
+          type: string
+        priceDescription:
+          type: string
+        salesAmount:
+          $ref: '#/components/schemas/Money'
+        varianceAmount:
+          $ref: '#/components/schemas/Money'
+        costAmount:
+          $ref: '#/components/schemas/Money'
+        varianceCostAmount:
+          $ref: '#/components/schemas/Money'
+        note:
+          type: string
+    ConsignmentReconciliation:
+      allOf:
+        - $ref: '#/components/schemas/ConsignmentReconciliationSummary'
+        - type: object
+          required:
+            - partnerAddress
+            - agreementNumber
+            - paymentTermDays
+            - varianceRules
+            - location
+            - channelName
+            - subChannelName
+            - stockCountId
+            - partnerReportFileName
+            - baFileName
+            - note
+            - absorbedVarianceCost
+            - costAmount
+            - invoiceNumber
+            - varianceInvoiceNumber
+            - decisionNote
+            - cancelReason
+            - createdAt
+            - createdByName
+            - updatedAt
+            - lines
+            - allowedActions
+          properties:
+            partnerAddress:
+              type: string
+            agreementNumber:
+              type: string
+            paymentTermDays:
+              type: integer
+            marginPercent:
+              type: string
+              nullable: true
+            varianceRules:
+              $ref: '#/components/schemas/ConsignmentVarianceRules'
+            location:
+              $ref: '#/components/schemas/SalesLocationRef'
+            channelName:
+              type: string
+            subChannelName:
+              type: string
+            stockCountId:
+              type: string
+              format: uuid
+            partnerReportFileId:
+              type: string
+              format: uuid
+              nullable: true
+            partnerReportFileName:
+              type: string
+            baFileId:
+              type: string
+              format: uuid
+              nullable: true
+            baFileName:
+              type: string
+            note:
+              type: string
+            absorbedVarianceCost:
+              $ref: '#/components/schemas/Money'
+            costAmount:
+              $ref: '#/components/schemas/Money'
+            invoiceId:
+              type: string
+              format: uuid
+              nullable: true
+            invoiceNumber:
+              type: string
+            varianceInvoiceId:
+              type: string
+              format: uuid
+              nullable: true
+            varianceInvoiceNumber:
+              type: string
+            submittedAt:
+              type: string
+              format: date-time
+              nullable: true
+            decidedAt:
+              type: string
+              format: date-time
+              nullable: true
+            decisionNote:
+              type: string
+            postedAt:
+              type: string
+              format: date-time
+              nullable: true
+            cancelReason:
+              type: string
+            createdAt:
+              type: string
+              format: date-time
+            createdByName:
+              type: string
+            updatedAt:
+              type: string
+              format: date-time
+            lines:
+              type: array
+              items:
+                $ref: '#/components/schemas/ConsignmentReconciliationLine'
+            allowedActions:
+              type: array
+              items:
+                type: string
+    ConsignmentReconciliationDraftUpdate:
+      allOf:
+        - $ref: '#/components/schemas/ConsignmentReconciliationFields'
+        - $ref: '#/components/schemas/VersionInput'
+    ConsignmentReconciliationLineEntry:
+      type: object
+      required:
+        - lineId
+        - reportedQty
+      properties:
+        lineId:
+          type: string
+          format: uuid
+        reportedQty:
+          type: string
+          description: Qty terjual menurut laporan penjualan mitra.
+        varianceCause:
+          allOf:
+            - $ref: '#/components/schemas/ConsignmentVarianceCause'
+          nullable: true
+        note:
+          type: string
+          maxLength: 200
+    ConsignmentReconciliationUpdate:
+      type: object
+      required:
+        - version
+      properties:
+        version:
+          type: integer
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsignmentReconciliationLineEntry'
+        setFiles:
+          type: boolean
+          description: true = laporan mitra dan BA diganti dengan nilai di bawah (kosong = dilepas).
+        partnerReportFileId:
+          type: string
+          format: uuid
+          nullable: true
+        baFileId:
+          type: string
+          format: uuid
+          nullable: true
+        note:
+          type: string
+          maxLength: 1000
+          nullable: true
     BiteshipNotification:
       type: object
       description: Payload webhook status order Biteship (nama field milik Biteship).
@@ -11682,9 +15748,11 @@ components:
         - $ref: '#/components/schemas/VersionInput'
     FiscalPeriodStatus:
       type: string
+      description: '`open` Terbuka, `closed` Ditutup, `pending_approval` Menunggu Persetujuan buka kembali (tetap terkunci).'
       enum:
         - open
         - closed
+        - pending_approval
     FiscalPeriod:
       type: object
       required:
@@ -12033,6 +16101,7 @@ components:
         - businessDate
         - entryType
         - sourceType
+        - sourceId
         - sourceLabel
         - description
         - lineNo
@@ -12053,6 +16122,9 @@ components:
           $ref: '#/components/schemas/JournalEntryType'
         sourceType:
           type: string
+        sourceId:
+          type: string
+          format: uuid
         sourceLabel:
           type: string
         description:
@@ -12482,6 +16554,2782 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ReadModelRefresh'
+    CashBankAccountKind:
+      type: string
+      enum:
+        - bank
+        - cash
+    FinanceAction:
+      type: string
+      enum:
+        - edit
+        - post
+        - cancel
+        - submit
+        - revise
+        - verify
+        - pay
+        - delete
+        - restore
+    CashBankAccount:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - kind
+        - bankName
+        - accountNumberMasked
+        - accountHolder
+        - accountId
+        - accountCode
+        - accountName
+        - isActive
+        - description
+        - updatedAt
+        - version
+        - allowedActions
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        kind:
+          $ref: '#/components/schemas/CashBankAccountKind'
+        bankName:
+          type: string
+        accountNumberMasked:
+          type: string
+        accountNumber:
+          type: string
+          description: Hanya di detail.
+        accountHolder:
+          type: string
+        accountId:
+          type: string
+          format: uuid
+        accountCode:
+          type: string
+        accountName:
+          type: string
+        isActive:
+          type: boolean
+        description:
+          type: string
+        deletedAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+        allowedActions:
+          type: array
+          items:
+            $ref: '#/components/schemas/FinanceAction'
+    CashBankAccountInput:
+      type: object
+      required:
+        - code
+        - name
+        - kind
+        - accountId
+        - isActive
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+          maxLength: 150
+        kind:
+          $ref: '#/components/schemas/CashBankAccountKind'
+        bankName:
+          type: string
+        accountNumber:
+          type: string
+          description: Wajib untuk rekening bank (5–30 angka).
+        accountHolder:
+          type: string
+        accountId:
+          type: string
+          format: uuid
+        isActive:
+          type: boolean
+        description:
+          type: string
+    CashBankAccountUpdate:
+      type: object
+      required:
+        - version
+        - name
+        - kind
+        - accountId
+        - isActive
+      properties:
+        version:
+          type: integer
+        name:
+          type: string
+          maxLength: 150
+        kind:
+          $ref: '#/components/schemas/CashBankAccountKind'
+        bankName:
+          type: string
+        accountNumber:
+          type: string
+          description: Wajib untuk rekening bank (5–30 angka).
+        accountHolder:
+          type: string
+        accountId:
+          type: string
+          format: uuid
+        isActive:
+          type: boolean
+        description:
+          type: string
+    BankMutation:
+      type: object
+      required:
+        - journalLineId
+        - journalEntryId
+        - journalNumber
+        - businessDate
+        - description
+        - sourceType
+        - sourceLabel
+        - memo
+        - amount
+        - balance
+        - reconciled
+      properties:
+        journalLineId:
+          type: string
+          format: uuid
+        journalEntryId:
+          type: string
+          format: uuid
+        journalNumber:
+          type: string
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        description:
+          type: string
+        sourceType:
+          type: string
+        sourceLabel:
+          type: string
+        memo:
+          type: string
+        amount:
+          $ref: '#/components/schemas/Money'
+          description: Masuk positif, keluar negatif.
+        balance:
+          $ref: '#/components/schemas/Money'
+        reconciled:
+          type: boolean
+    BankMutationList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - account
+            - openingBalance
+            - items
+          properties:
+            account:
+              $ref: '#/components/schemas/CashBankAccount'
+            openingBalance:
+              $ref: '#/components/schemas/Money'
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/BankMutation'
+    PaymentDirection:
+      type: string
+      description: Arah pembayaran kas/bank — `incoming` penerimaan, `outgoing` pengeluaran.
+      enum:
+        - incoming
+        - outgoing
+    CashPaymentStatus:
+      type: string
+      enum:
+        - draft
+        - posted
+        - cancelled
+    CashPayment:
+      type: object
+      required:
+        - id
+        - direction
+        - bankAccountId
+        - bankAccountCode
+        - bankAccountName
+        - paymentDate
+        - amount
+        - counterAccountId
+        - counterAccountCode
+        - counterAccountName
+        - partyName
+        - reference
+        - description
+        - sourceType
+        - sourceLabel
+        - status
+        - cancelReason
+        - reconciled
+        - createdAt
+        - updatedAt
+        - version
+        - allowedActions
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        direction:
+          $ref: '#/components/schemas/PaymentDirection'
+        bankAccountId:
+          type: string
+          format: uuid
+        bankAccountCode:
+          type: string
+        bankAccountName:
+          type: string
+        paymentDate:
+          $ref: '#/components/schemas/BusinessDate'
+        amount:
+          $ref: '#/components/schemas/Money'
+        counterAccountId:
+          type: string
+          format: uuid
+        counterAccountCode:
+          type: string
+        counterAccountName:
+          type: string
+        partyType:
+          type: string
+        partyId:
+          type: string
+          format: uuid
+        partyName:
+          type: string
+        reference:
+          type: string
+        description:
+          type: string
+        proofFileId:
+          type: string
+          format: uuid
+        sourceType:
+          type: string
+        sourceId:
+          type: string
+          format: uuid
+        sourceLabel:
+          type: string
+        status:
+          $ref: '#/components/schemas/CashPaymentStatus'
+        journalEntryId:
+          type: string
+          format: uuid
+        journalNumber:
+          type: string
+        postedAt:
+          type: string
+          format: date-time
+        cancelReason:
+          type: string
+        reconciled:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+        allowedActions:
+          type: array
+          items:
+            $ref: '#/components/schemas/FinanceAction'
+    CashPaymentList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/CashPayment'
+    CashPaymentInput:
+      type: object
+      required:
+        - direction
+        - bankAccountId
+        - paymentDate
+        - amount
+        - counterAccountId
+      properties:
+        direction:
+          $ref: '#/components/schemas/PaymentDirection'
+        bankAccountId:
+          type: string
+          format: uuid
+        paymentDate:
+          $ref: '#/components/schemas/BusinessDate'
+        amount:
+          $ref: '#/components/schemas/Money'
+        counterAccountId:
+          type: string
+          format: uuid
+        partyName:
+          type: string
+        reference:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        proofFileId:
+          type: string
+          format: uuid
+    CashPaymentUpdate:
+      type: object
+      required:
+        - version
+        - direction
+        - bankAccountId
+        - paymentDate
+        - amount
+        - counterAccountId
+      properties:
+        version:
+          type: integer
+        direction:
+          $ref: '#/components/schemas/PaymentDirection'
+        bankAccountId:
+          type: string
+          format: uuid
+        paymentDate:
+          $ref: '#/components/schemas/BusinessDate'
+        amount:
+          $ref: '#/components/schemas/Money'
+        counterAccountId:
+          type: string
+          format: uuid
+        partyName:
+          type: string
+        reference:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        proofFileId:
+          type: string
+          format: uuid
+    FinanceCancelInput:
+      type: object
+      required:
+        - version
+        - reason
+      properties:
+        version:
+          type: integer
+        reason:
+          type: string
+          maxLength: 400
+    BankStatement:
+      type: object
+      required:
+        - id
+        - bankAccountId
+        - bankAccountCode
+        - bankAccountName
+        - fileId
+        - fileName
+        - periodFrom
+        - periodTo
+        - lineCount
+        - totalIn
+        - totalOut
+        - matchedCount
+        - suggestedCount
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        bankAccountId:
+          type: string
+          format: uuid
+        bankAccountCode:
+          type: string
+        bankAccountName:
+          type: string
+        fileId:
+          type: string
+          format: uuid
+        fileName:
+          type: string
+        periodFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        periodTo:
+          $ref: '#/components/schemas/BusinessDate'
+        lineCount:
+          type: integer
+        totalIn:
+          $ref: '#/components/schemas/Money'
+        totalOut:
+          $ref: '#/components/schemas/Money'
+        matchedCount:
+          type: integer
+        suggestedCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+    BankStatementList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/BankStatement'
+    BankStatementImportInput:
+      type: object
+      required:
+        - bankAccountId
+        - fileId
+      properties:
+        bankAccountId:
+          type: string
+          format: uuid
+        fileId:
+          type: string
+          format: uuid
+    BankLineStatus:
+      type: string
+      enum:
+        - unmatched
+        - suggested
+        - matched
+    BankMatchKind:
+      type: string
+      enum:
+        - journal_line
+        - document
+        - new_entry
+    BankMatchRule:
+      type: string
+      enum:
+        - reference
+        - amount_date
+        - manual
+    BankLineAction:
+      type: string
+      enum:
+        - confirm
+        - match
+        - create_entry
+        - unmatch
+    BankStatementLine:
+      type: object
+      required:
+        - id
+        - statementId
+        - lineNo
+        - transactionDate
+        - description
+        - reference
+        - amount
+        - status
+        - candidateLabel
+        - version
+        - allowedActions
+      properties:
+        id:
+          type: string
+          format: uuid
+        statementId:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        transactionDate:
+          $ref: '#/components/schemas/BusinessDate'
+        description:
+          type: string
+        reference:
+          type: string
+        amount:
+          $ref: '#/components/schemas/Money'
+          description: Masuk positif, keluar negatif.
+        balance:
+          $ref: '#/components/schemas/Money'
+        status:
+          $ref: '#/components/schemas/BankLineStatus'
+        matchKind:
+          $ref: '#/components/schemas/BankMatchKind'
+        matchRule:
+          $ref: '#/components/schemas/BankMatchRule'
+        journalLineId:
+          type: string
+          format: uuid
+        journalEntryId:
+          type: string
+          format: uuid
+        journalNumber:
+          type: string
+        candidateSource:
+          type: string
+        candidateDocumentId:
+          type: string
+          format: uuid
+        candidateLabel:
+          type: string
+        paymentId:
+          type: string
+          format: uuid
+        matchedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+        allowedActions:
+          type: array
+          items:
+            $ref: '#/components/schemas/BankLineAction'
+    BankStatementDetail:
+      allOf:
+        - $ref: '#/components/schemas/BankStatement'
+        - type: object
+          required:
+            - lines
+          properties:
+            lines:
+              type: array
+              items:
+                $ref: '#/components/schemas/BankStatementLine'
+    BankConfirmResult:
+      type: object
+      required:
+        - confirmed
+        - statement
+      properties:
+        confirmed:
+          type: integer
+        statement:
+          $ref: '#/components/schemas/BankStatementDetail'
+    BankMatchCandidate:
+      type: object
+      required:
+        - kind
+        - label
+        - date
+        - amount
+      properties:
+        kind:
+          $ref: '#/components/schemas/BankMatchKind'
+        journalLineId:
+          type: string
+          format: uuid
+        journalEntryId:
+          type: string
+          format: uuid
+        source:
+          type: string
+        documentId:
+          type: string
+          format: uuid
+        label:
+          type: string
+        date:
+          $ref: '#/components/schemas/BusinessDate'
+        amount:
+          $ref: '#/components/schemas/Money'
+    BankLineMatchInput:
+      type: object
+      required:
+        - version
+      properties:
+        version:
+          type: integer
+        journalLineId:
+          type: string
+          format: uuid
+        source:
+          type: string
+        documentId:
+          type: string
+          format: uuid
+    BankLineEntryInput:
+      type: object
+      required:
+        - version
+        - counterAccountId
+      properties:
+        version:
+          type: integer
+        counterAccountId:
+          type: string
+          format: uuid
+        description:
+          type: string
+    ExpenseClaimOption:
+      type: object
+      required:
+        - id
+        - code
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+    ExpenseClaimTypeOption:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - withholdingType
+        - requiresReceipt
+        - requiresCampaign
+        - expenseAccountCode
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        withholdingType:
+          $ref: '#/components/schemas/WithholdingType'
+        requiresReceipt:
+          type: boolean
+        requiresCampaign:
+          type: boolean
+        expenseAccountCode:
+          type: string
+    ExpenseClaimOptions:
+      type: object
+      required:
+        - divisions
+        - campaigns
+        - expenseTypes
+      properties:
+        divisions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpenseClaimOption'
+        campaigns:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpenseClaimOption'
+        expenseTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpenseClaimTypeOption'
+    ExpenseClaimStatus:
+      type: string
+      enum:
+        - draft
+        - pending_approval
+        - approved
+        - rejected
+        - awaiting_payment
+        - paid
+        - cancelled
+    ExpenseClaimType:
+      type: string
+      enum:
+        - expense
+        - reimbursement
+    ExpenseClaimPayeeType:
+      type: string
+      enum:
+        - employee
+        - supplier
+        - other
+      description: '`employee` = pengaju sendiri (reimbursement); `supplier` = pemasok; `other` = pihak lain.'
+    ExpenseClaimSummary:
+      type: object
+      required:
+        - id
+        - claimType
+        - requesterId
+        - requesterName
+        - divisionId
+        - divisionName
+        - payeeType
+        - payeeName
+        - claimDate
+        - description
+        - totalAmount
+        - withholdingAmount
+        - payableAmount
+        - status
+        - createdAt
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        claimType:
+          $ref: '#/components/schemas/ExpenseClaimType'
+        requesterId:
+          type: string
+          format: uuid
+        requesterName:
+          type: string
+        divisionId:
+          type: string
+          format: uuid
+        divisionName:
+          type: string
+        campaignId:
+          type: string
+          format: uuid
+        campaignName:
+          type: string
+        payeeType:
+          $ref: '#/components/schemas/ExpenseClaimPayeeType'
+        payeeName:
+          type: string
+        claimDate:
+          $ref: '#/components/schemas/BusinessDate'
+        description:
+          type: string
+        totalAmount:
+          $ref: '#/components/schemas/Money'
+        withholdingAmount:
+          $ref: '#/components/schemas/Money'
+        payableAmount:
+          $ref: '#/components/schemas/Money'
+        status:
+          $ref: '#/components/schemas/ExpenseClaimStatus'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    ExpenseClaimList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/ExpenseClaimSummary'
+    ExpenseClaimLineInput:
+      type: object
+      required:
+        - expenseTypeId
+        - amount
+      properties:
+        expenseTypeId:
+          type: string
+          format: uuid
+        description:
+          type: string
+        amount:
+          $ref: '#/components/schemas/Money'
+        receiptFileId:
+          type: string
+          format: uuid
+    ExpenseClaimInput:
+      type: object
+      required:
+        - claimType
+        - divisionId
+        - payeeType
+        - claimDate
+        - lines
+      properties:
+        claimType:
+          $ref: '#/components/schemas/ExpenseClaimType'
+        divisionId:
+          type: string
+          format: uuid
+        campaignId:
+          type: string
+          format: uuid
+        payeeType:
+          $ref: '#/components/schemas/ExpenseClaimPayeeType'
+        payeeId:
+          type: string
+          format: uuid
+        payeeName:
+          type: string
+        payeeTaxId:
+          type: string
+          description: NPWP/NIK penerima (opsional, terenkripsi).
+        claimDate:
+          $ref: '#/components/schemas/BusinessDate'
+        description:
+          type: string
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpenseClaimLineInput'
+    TaxPercent:
+      type: string
+      description: Persentase desimal maks. 4 angka di belakang koma, mis. `2` atau `0.5`.
+      pattern: ^[0-9]{1,3}(\.[0-9]{1,4})?$
+      example: '2'
+    ExpenseClaimLine:
+      type: object
+      required:
+        - id
+        - lineNo
+        - expenseTypeId
+        - expenseTypeCode
+        - expenseTypeName
+        - expenseAccountCode
+        - description
+        - amount
+        - withholdingType
+        - objectCode
+        - withholdingRate
+        - withholdingAmount
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        expenseTypeId:
+          type: string
+          format: uuid
+        expenseTypeCode:
+          type: string
+        expenseTypeName:
+          type: string
+        expenseAccountCode:
+          type: string
+        description:
+          type: string
+        amount:
+          $ref: '#/components/schemas/Money'
+        receiptFileId:
+          type: string
+          format: uuid
+        receiptFileName:
+          type: string
+        withholdingType:
+          $ref: '#/components/schemas/WithholdingType'
+        objectCode:
+          type: string
+        withholdingRate:
+          $ref: '#/components/schemas/TaxPercent'
+        withholdingAmount:
+          $ref: '#/components/schemas/Money'
+    TaxType:
+      type: string
+      description: Jenis pajak kalkulator tax (PPh potong 21/23/4(2) dan PPh Final UMKM); tarif di master tarif PPh.
+      enum:
+        - pph21
+        - pph23
+        - pph4_2
+        - final_umkm
+    WithholdingSlipStatus:
+      type: string
+      enum:
+        - recorded
+        - deposited
+        - cancelled
+    WithholdingSlip:
+      type: object
+      required:
+        - sourceType
+        - sourceId
+        - sourceLabel
+        - businessDate
+        - taxYear
+        - taxMonth
+        - taxType
+        - objectCode
+        - objectName
+        - taxpayerName
+        - taxpayerTaxIdMasked
+        - hasTaxId
+        - grossAmount
+        - taxableBase
+        - ratePercent
+        - taxAmount
+        - status
+        - slipNumber
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        sourceType:
+          type: string
+        sourceId:
+          type: string
+          format: uuid
+        sourceLabel:
+          type: string
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        taxYear:
+          type: integer
+        taxMonth:
+          type: integer
+        taxType:
+          $ref: '#/components/schemas/TaxType'
+        objectCode:
+          type: string
+        objectName:
+          type: string
+        taxpayerName:
+          type: string
+        taxpayerTaxIdMasked:
+          type: string
+        hasTaxId:
+          type: boolean
+        grossAmount:
+          $ref: '#/components/schemas/Money'
+        taxableBase:
+          $ref: '#/components/schemas/Money'
+        ratePercent:
+          $ref: '#/components/schemas/TaxPercent'
+        taxAmount:
+          $ref: '#/components/schemas/Money'
+        status:
+          $ref: '#/components/schemas/WithholdingSlipStatus'
+        depositId:
+          type: string
+          format: uuid
+        depositNumber:
+          type: string
+        slipNumber:
+          type: string
+        version:
+          type: integer
+    ExpenseClaimDetail:
+      allOf:
+        - $ref: '#/components/schemas/ExpenseClaimSummary'
+        - type: object
+          required:
+            - lines
+            - payeeHasTaxId
+            - decisionNote
+            - cancelReason
+            - withholdings
+            - allowedActions
+          properties:
+            payeeId:
+              type: string
+              format: uuid
+            payeeTaxIdMasked:
+              type: string
+            payeeHasTaxId:
+              type: boolean
+            lines:
+              type: array
+              items:
+                $ref: '#/components/schemas/ExpenseClaimLine'
+            submittedAt:
+              type: string
+              format: date-time
+            decidedAt:
+              type: string
+              format: date-time
+            decisionNote:
+              type: string
+            verifiedAt:
+              type: string
+              format: date-time
+            verifyDate:
+              $ref: '#/components/schemas/BusinessDate'
+            journalEntryId:
+              type: string
+              format: uuid
+            journalNumber:
+              type: string
+            paymentId:
+              type: string
+              format: uuid
+            paymentNumber:
+              type: string
+            paidAt:
+              type: string
+              format: date-time
+            cancelReason:
+              type: string
+            withholdings:
+              type: array
+              items:
+                $ref: '#/components/schemas/WithholdingSlip'
+            allowedActions:
+              type: array
+              items:
+                $ref: '#/components/schemas/FinanceAction'
+    ExpenseClaimUpdate:
+      type: object
+      required:
+        - version
+        - claimType
+        - divisionId
+        - payeeType
+        - claimDate
+        - lines
+      properties:
+        version:
+          type: integer
+        claimType:
+          $ref: '#/components/schemas/ExpenseClaimType'
+        divisionId:
+          type: string
+          format: uuid
+        campaignId:
+          type: string
+          format: uuid
+        payeeType:
+          $ref: '#/components/schemas/ExpenseClaimPayeeType'
+        payeeId:
+          type: string
+          format: uuid
+        payeeName:
+          type: string
+        payeeTaxId:
+          type: string
+          description: NPWP/NIK penerima (opsional, terenkripsi).
+        claimDate:
+          $ref: '#/components/schemas/BusinessDate'
+        description:
+          type: string
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpenseClaimLineInput'
+    ExpenseClaimTaxChoice:
+      type: object
+      required:
+        - lineId
+        - withholdingType
+      properties:
+        lineId:
+          type: string
+          format: uuid
+        withholdingType:
+          $ref: '#/components/schemas/WithholdingType'
+        objectCode:
+          type: string
+    ExpenseClaimVerifyInput:
+      type: object
+      required:
+        - version
+        - lines
+      properties:
+        version:
+          type: integer
+        payeeTaxId:
+          type: string
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpenseClaimTaxChoice'
+    ExpenseClaimVerifyPreview:
+      type: object
+      required:
+        - withholdings
+        - totalWithholding
+        - payableAmount
+      properties:
+        withholdings:
+          type: array
+          items:
+            $ref: '#/components/schemas/WithholdingSlip'
+        totalWithholding:
+          $ref: '#/components/schemas/Money'
+        payableAmount:
+          $ref: '#/components/schemas/Money'
+    ExpenseClaimPayInput:
+      type: object
+      required:
+        - version
+        - bankAccountId
+        - paymentDate
+      properties:
+        version:
+          type: integer
+        bankAccountId:
+          type: string
+          format: uuid
+        paymentDate:
+          $ref: '#/components/schemas/BusinessDate'
+        reference:
+          type: string
+        proofFileId:
+          type: string
+          format: uuid
+    PettyCashFund:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - holderUserId
+        - holderName
+        - divisionId
+        - divisionName
+        - ceilingAmount
+        - balanceAmount
+        - shortfallAmount
+        - isActive
+        - description
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        holderUserId:
+          type: string
+          format: uuid
+        holderName:
+          type: string
+        divisionId:
+          type: string
+          format: uuid
+        divisionName:
+          type: string
+        ceilingAmount:
+          $ref: '#/components/schemas/Money'
+        balanceAmount:
+          $ref: '#/components/schemas/Money'
+        shortfallAmount:
+          $ref: '#/components/schemas/Money'
+        isActive:
+          type: boolean
+        description:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    PettyCashFundList:
+      type: object
+      required:
+        - items
+        - maxPerTransaction
+        - defaultCeiling
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PettyCashFund'
+        maxPerTransaction:
+          $ref: '#/components/schemas/Money'
+        defaultCeiling:
+          $ref: '#/components/schemas/Money'
+    PettyCashFundInput:
+      type: object
+      required:
+        - code
+        - name
+        - holderUserId
+        - divisionId
+        - isActive
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        holderUserId:
+          type: string
+          format: uuid
+        divisionId:
+          type: string
+          format: uuid
+        ceilingAmount:
+          $ref: '#/components/schemas/Money'
+        isActive:
+          type: boolean
+        description:
+          type: string
+    PettyCashFundUpdate:
+      type: object
+      required:
+        - version
+        - name
+        - holderUserId
+        - divisionId
+        - ceilingAmount
+        - isActive
+      properties:
+        version:
+          type: integer
+        name:
+          type: string
+        holderUserId:
+          type: string
+          format: uuid
+        divisionId:
+          type: string
+          format: uuid
+        ceilingAmount:
+          $ref: '#/components/schemas/Money'
+        isActive:
+          type: boolean
+        description:
+          type: string
+    PettyCashType:
+      type: string
+      enum:
+        - expense
+        - replenishment
+    PettyCashStatus:
+      type: string
+      enum:
+        - draft
+        - pending_approval
+        - approved
+        - rejected
+        - posted
+        - cancelled
+    PettyCashTransaction:
+      type: object
+      required:
+        - id
+        - fundId
+        - fundCode
+        - fundName
+        - type
+        - businessDate
+        - expenseTypeCode
+        - expenseTypeName
+        - divisionId
+        - divisionName
+        - campaignName
+        - description
+        - amount
+        - status
+        - decisionNote
+        - cancelReason
+        - createdAt
+        - updatedAt
+        - version
+        - allowedActions
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        fundId:
+          type: string
+          format: uuid
+        fundCode:
+          type: string
+        fundName:
+          type: string
+        type:
+          $ref: '#/components/schemas/PettyCashType'
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        expenseTypeId:
+          type: string
+          format: uuid
+        expenseTypeCode:
+          type: string
+        expenseTypeName:
+          type: string
+        divisionId:
+          type: string
+          format: uuid
+        divisionName:
+          type: string
+        campaignId:
+          type: string
+          format: uuid
+        campaignName:
+          type: string
+        description:
+          type: string
+        amount:
+          $ref: '#/components/schemas/Money'
+        receiptFileId:
+          type: string
+          format: uuid
+        receiptFileName:
+          type: string
+        bankAccountId:
+          type: string
+          format: uuid
+        bankAccountName:
+          type: string
+        status:
+          $ref: '#/components/schemas/PettyCashStatus'
+        decisionNote:
+          type: string
+        journalEntryId:
+          type: string
+          format: uuid
+        journalNumber:
+          type: string
+        postedAt:
+          type: string
+          format: date-time
+        cancelReason:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+        allowedActions:
+          type: array
+          items:
+            $ref: '#/components/schemas/FinanceAction'
+    PettyCashTransactionList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/PettyCashTransaction'
+    PettyCashTransactionInput:
+      type: object
+      required:
+        - type
+        - fundId
+        - businessDate
+      properties:
+        type:
+          $ref: '#/components/schemas/PettyCashType'
+        fundId:
+          type: string
+          format: uuid
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        expenseTypeId:
+          type: string
+          format: uuid
+        divisionId:
+          type: string
+          format: uuid
+        campaignId:
+          type: string
+          format: uuid
+        description:
+          type: string
+        amount:
+          $ref: '#/components/schemas/Money'
+        receiptFileId:
+          type: string
+          format: uuid
+    PettyCashTransactionUpdate:
+      type: object
+      required:
+        - version
+        - businessDate
+        - amount
+      properties:
+        version:
+          type: integer
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        expenseTypeId:
+          type: string
+          format: uuid
+        divisionId:
+          type: string
+          format: uuid
+        campaignId:
+          type: string
+          format: uuid
+        description:
+          type: string
+        amount:
+          $ref: '#/components/schemas/Money'
+        receiptFileId:
+          type: string
+          format: uuid
+    PettyCashPostInput:
+      type: object
+      required:
+        - version
+      properties:
+        version:
+          type: integer
+        bankAccountId:
+          type: string
+          format: uuid
+    TaxRateBracket:
+      type: object
+      required:
+        - ratePercent
+      properties:
+        upTo:
+          $ref: '#/components/schemas/Money'
+          description: Kosong = lapisan teratas tanpa batas.
+        ratePercent:
+          $ref: '#/components/schemas/TaxPercent'
+    TaxRate:
+      type: object
+      required:
+        - id
+        - taxType
+        - objectCode
+        - name
+        - ratePercent
+        - brackets
+        - basePercent
+        - noTaxIdSurchargePercent
+        - isDefault
+        - validFrom
+        - note
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        taxType:
+          $ref: '#/components/schemas/TaxType'
+        objectCode:
+          type: string
+        name:
+          type: string
+        ratePercent:
+          $ref: '#/components/schemas/TaxPercent'
+        brackets:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxRateBracket'
+        basePercent:
+          $ref: '#/components/schemas/TaxPercent'
+        noTaxIdSurchargePercent:
+          $ref: '#/components/schemas/TaxPercent'
+        isDefault:
+          type: boolean
+        validFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        note:
+          type: string
+        validTo:
+          $ref: '#/components/schemas/BusinessDate'
+        version:
+          type: integer
+    TaxRateInput:
+      type: object
+      required:
+        - taxType
+        - objectCode
+        - name
+        - isDefault
+        - validFrom
+      properties:
+        taxType:
+          $ref: '#/components/schemas/TaxType'
+        objectCode:
+          type: string
+        name:
+          type: string
+        ratePercent:
+          $ref: '#/components/schemas/TaxPercent'
+        brackets:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxRateBracket'
+        basePercent:
+          $ref: '#/components/schemas/TaxPercent'
+        noTaxIdSurchargePercent:
+          $ref: '#/components/schemas/TaxPercent'
+        isDefault:
+          type: boolean
+        validFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        note:
+          type: string
+    WithholdingSlipList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/WithholdingSlip'
+    WithholdingSummaryRow:
+      type: object
+      required:
+        - taxType
+        - taxYear
+        - taxMonth
+        - slipCount
+        - openAmount
+        - depositedAmount
+      properties:
+        taxType:
+          $ref: '#/components/schemas/TaxType'
+        taxYear:
+          type: integer
+        taxMonth:
+          type: integer
+        slipCount:
+          type: integer
+        openAmount:
+          $ref: '#/components/schemas/Money'
+        depositedAmount:
+          $ref: '#/components/schemas/Money'
+    WithholdingSlipNumberInput:
+      type: object
+      required:
+        - version
+        - slipNumber
+      properties:
+        version:
+          type: integer
+        slipNumber:
+          type: string
+    WithholdingExportInput:
+      type: object
+      required:
+        - year
+        - month
+      properties:
+        year:
+          type: integer
+        month:
+          type: integer
+          minimum: 1
+          maximum: 12
+        taxType:
+          $ref: '#/components/schemas/TaxType'
+    FinanceDownloadLink:
+      type: object
+      required:
+        - fileId
+        - url
+        - expiresAt
+      properties:
+        fileId:
+          type: string
+          format: uuid
+        url:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+    TaxDeposit:
+      type: object
+      required:
+        - id
+        - number
+        - taxType
+        - taxYear
+        - taxMonth
+        - bankAccountId
+        - bankAccountName
+        - depositDate
+        - amount
+        - billingCode
+        - ntpn
+        - journalEntryId
+        - journalNumber
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        taxType:
+          $ref: '#/components/schemas/TaxType'
+        taxYear:
+          type: integer
+        taxMonth:
+          type: integer
+        bankAccountId:
+          type: string
+          format: uuid
+        bankAccountName:
+          type: string
+        depositDate:
+          $ref: '#/components/schemas/BusinessDate'
+        amount:
+          $ref: '#/components/schemas/Money'
+        billingCode:
+          type: string
+        ntpn:
+          type: string
+        journalEntryId:
+          type: string
+          format: uuid
+        journalNumber:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    TaxDepositInput:
+      type: object
+      required:
+        - taxType
+        - taxYear
+        - taxMonth
+        - bankAccountId
+        - depositDate
+      properties:
+        taxType:
+          $ref: '#/components/schemas/TaxType'
+        taxYear:
+          type: integer
+        taxMonth:
+          type: integer
+          minimum: 1
+          maximum: 12
+        bankAccountId:
+          type: string
+          format: uuid
+        depositDate:
+          $ref: '#/components/schemas/BusinessDate'
+        billingCode:
+          type: string
+        ntpn:
+          type: string
+    FinalTaxSetting:
+      type: object
+      required:
+        - id
+        - validFrom
+        - isEnabled
+        - openingTurnover
+        - note
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        validFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        isEnabled:
+          type: boolean
+        openingYear:
+          type: integer
+        openingTurnover:
+          $ref: '#/components/schemas/Money'
+        note:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    FinalTaxRun:
+      type: object
+      required:
+        - id
+        - taxYear
+        - taxMonth
+        - grossRevenue
+        - ratePercent
+        - taxAmount
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        taxYear:
+          type: integer
+        taxMonth:
+          type: integer
+        grossRevenue:
+          $ref: '#/components/schemas/Money'
+        ratePercent:
+          $ref: '#/components/schemas/TaxPercent'
+        taxAmount:
+          $ref: '#/components/schemas/Money'
+        journalEntryId:
+          type: string
+          format: uuid
+        journalNumber:
+          type: string
+        depositId:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+    FinalTaxMonth:
+      type: object
+      required:
+        - taxYear
+        - taxMonth
+        - grossRevenue
+        - cumulative
+      properties:
+        taxYear:
+          type: integer
+        taxMonth:
+          type: integer
+        grossRevenue:
+          $ref: '#/components/schemas/Money'
+        cumulative:
+          $ref: '#/components/schemas/Money'
+        run:
+          $ref: '#/components/schemas/FinalTaxRun'
+    FinalTaxThresholdStatus:
+      type: string
+      enum:
+        - below
+        - approaching
+        - exceeded
+    FinalTaxThreshold:
+      type: object
+      required:
+        - cumulative
+        - limit
+        - remaining
+        - usedPercent
+        - status
+      properties:
+        cumulative:
+          $ref: '#/components/schemas/Money'
+        limit:
+          $ref: '#/components/schemas/Money'
+        remaining:
+          $ref: '#/components/schemas/Money'
+        usedPercent:
+          type: string
+        status:
+          $ref: '#/components/schemas/FinalTaxThresholdStatus'
+    FinalTaxSummary:
+      type: object
+      required:
+        - year
+        - enabled
+        - settings
+        - openingTurnover
+        - months
+        - threshold
+      properties:
+        year:
+          type: integer
+        enabled:
+          type: boolean
+        setting:
+          $ref: '#/components/schemas/FinalTaxSetting'
+        settings:
+          type: array
+          items:
+            $ref: '#/components/schemas/FinalTaxSetting'
+        ratePercent:
+          $ref: '#/components/schemas/TaxPercent'
+        openingTurnover:
+          $ref: '#/components/schemas/Money'
+        months:
+          type: array
+          items:
+            $ref: '#/components/schemas/FinalTaxMonth'
+        threshold:
+          $ref: '#/components/schemas/FinalTaxThreshold'
+    FinalTaxSettingInput:
+      type: object
+      required:
+        - validFrom
+        - isEnabled
+      properties:
+        validFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        isEnabled:
+          type: boolean
+        openingYear:
+          type: integer
+        openingTurnover:
+          $ref: '#/components/schemas/Money'
+          description: Omzet bruto kumulatif tahun `openingYear` sebelum cut-over.
+        note:
+          type: string
+    FinalTaxRunInput:
+      type: object
+      required:
+        - year
+        - month
+      properties:
+        year:
+          type: integer
+        month:
+          type: integer
+          minimum: 1
+          maximum: 12
+    TrialBalanceRow:
+      type: object
+      required:
+        - accountId
+        - accountCode
+        - accountName
+        - group
+        - groupLabel
+        - normalBalance
+        - openingDebit
+        - openingCredit
+        - periodDebit
+        - periodCredit
+        - closingDebit
+        - closingCredit
+      properties:
+        accountId:
+          type: string
+          format: uuid
+        accountCode:
+          type: string
+        accountName:
+          type: string
+        group:
+          type: integer
+        groupLabel:
+          type: string
+        normalBalance:
+          $ref: '#/components/schemas/NormalBalance'
+        openingDebit:
+          $ref: '#/components/schemas/Money'
+        openingCredit:
+          $ref: '#/components/schemas/Money'
+        periodDebit:
+          $ref: '#/components/schemas/Money'
+        periodCredit:
+          $ref: '#/components/schemas/Money'
+        closingDebit:
+          $ref: '#/components/schemas/Money'
+        closingCredit:
+          $ref: '#/components/schemas/Money'
+    TrialBalanceTotals:
+      type: object
+      required:
+        - openingDebit
+        - openingCredit
+        - periodDebit
+        - periodCredit
+        - closingDebit
+        - closingCredit
+      properties:
+        openingDebit:
+          $ref: '#/components/schemas/Money'
+        openingCredit:
+          $ref: '#/components/schemas/Money'
+        periodDebit:
+          $ref: '#/components/schemas/Money'
+        periodCredit:
+          $ref: '#/components/schemas/Money'
+        closingDebit:
+          $ref: '#/components/schemas/Money'
+        closingCredit:
+          $ref: '#/components/schemas/Money'
+    TrialBalance:
+      type: object
+      required:
+        - dateFrom
+        - dateTo
+        - rows
+        - totals
+        - balanced
+      properties:
+        dateFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        dateTo:
+          $ref: '#/components/schemas/BusinessDate'
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrialBalanceRow'
+        totals:
+          $ref: '#/components/schemas/TrialBalanceTotals'
+        balanced:
+          type: boolean
+    FixedAssetClass:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - usefulLifeMonths
+        - assetAccountId
+        - assetAccountCode
+        - accumulatedAccountId
+        - accumulatedAccountCode
+        - isActive
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        usefulLifeMonths:
+          type: integer
+        assetAccountId:
+          type: string
+          format: uuid
+        assetAccountCode:
+          type: string
+        accumulatedAccountId:
+          type: string
+          format: uuid
+        accumulatedAccountCode:
+          type: string
+        isActive:
+          type: boolean
+        version:
+          type: integer
+    FixedAssetClassCreate:
+      type: object
+      required:
+        - code
+        - name
+        - usefulLifeMonths
+        - assetAccountId
+        - accumulatedAccountId
+        - isActive
+      properties:
+        code:
+          type: string
+          example: vending_machine
+        name:
+          type: string
+        usefulLifeMonths:
+          type: integer
+          minimum: 1
+          maximum: 600
+        assetAccountId:
+          type: string
+          format: uuid
+        accumulatedAccountId:
+          type: string
+          format: uuid
+        isActive:
+          type: boolean
+    FixedAssetClassUpdate:
+      type: object
+      required:
+        - name
+        - usefulLifeMonths
+        - assetAccountId
+        - accumulatedAccountId
+        - isActive
+        - version
+      properties:
+        name:
+          type: string
+        usefulLifeMonths:
+          type: integer
+          minimum: 1
+          maximum: 600
+        assetAccountId:
+          type: string
+          format: uuid
+        accumulatedAccountId:
+          type: string
+          format: uuid
+        isActive:
+          type: boolean
+        version:
+          type: integer
+    FixedAssetStatus:
+      type: string
+      description: '`draft` Draft, `active` Aktif, `disposed` Dilepas.'
+      enum:
+        - draft
+        - active
+        - disposed
+    FixedAssetSource:
+      type: string
+      description: '`purchase` pembelian setelah go-live, `opening` saldo awal migrasi.'
+      enum:
+        - purchase
+        - opening
+    FixedAsset:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - classId
+        - className
+        - locationLabel
+        - divisionId
+        - source
+        - acquisitionDate
+        - cost
+        - salvage
+        - usefulLifeMonths
+        - depreciationStart
+        - openingAccumulated
+        - openingDepreciatedMonths
+        - accumulated
+        - bookValue
+        - monthlyDepreciation
+        - status
+        - disposalReason
+        - note
+        - allowedActions
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        classId:
+          type: string
+          format: uuid
+        className:
+          type: string
+        locationId:
+          type: string
+          format: uuid
+          nullable: true
+        locationLabel:
+          type: string
+        divisionId:
+          type: string
+          format: uuid
+        source:
+          $ref: '#/components/schemas/FixedAssetSource'
+        acquisitionDate:
+          $ref: '#/components/schemas/BusinessDate'
+        cost:
+          $ref: '#/components/schemas/Money'
+        salvage:
+          $ref: '#/components/schemas/Money'
+        usefulLifeMonths:
+          type: integer
+        depreciationStart:
+          $ref: '#/components/schemas/BusinessDate'
+        openingAccumulated:
+          $ref: '#/components/schemas/Money'
+        openingDepreciatedMonths:
+          type: integer
+        accumulated:
+          $ref: '#/components/schemas/Money'
+        bookValue:
+          $ref: '#/components/schemas/Money'
+        monthlyDepreciation:
+          $ref: '#/components/schemas/Money'
+        paymentAccountId:
+          type: string
+          format: uuid
+          nullable: true
+        status:
+          $ref: '#/components/schemas/FixedAssetStatus'
+        acquisitionJournalId:
+          type: string
+          format: uuid
+          nullable: true
+        disposalDate:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
+        disposalProceeds:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          nullable: true
+        disposalAccountId:
+          type: string
+          format: uuid
+          nullable: true
+        disposalReason:
+          type: string
+        disposalJournalId:
+          type: string
+          format: uuid
+          nullable: true
+        note:
+          type: string
+        allowedActions:
+          type: array
+          items:
+            type: string
+            enum:
+              - edit
+              - delete
+              - activate
+              - dispose
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    FixedAssetList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/FixedAsset'
+    FixedAssetFields:
+      type: object
+      required:
+        - name
+        - classId
+        - divisionId
+        - source
+        - acquisitionDate
+        - cost
+      properties:
+        name:
+          type: string
+        classId:
+          type: string
+          format: uuid
+        locationId:
+          type: string
+          format: uuid
+          nullable: true
+        locationLabel:
+          type: string
+        divisionId:
+          type: string
+          format: uuid
+        source:
+          $ref: '#/components/schemas/FixedAssetSource'
+        acquisitionDate:
+          $ref: '#/components/schemas/BusinessDate'
+        cost:
+          $ref: '#/components/schemas/Money'
+        salvage:
+          $ref: '#/components/schemas/Money'
+        usefulLifeMonths:
+          type: integer
+          description: Kosong/0 = umur manfaat kelas.
+        openingAccumulated:
+          $ref: '#/components/schemas/Money'
+        paymentAccountId:
+          type: string
+          format: uuid
+          nullable: true
+        note:
+          type: string
+    FixedAssetCreate:
+      allOf:
+        - $ref: '#/components/schemas/FixedAssetFields'
+        - type: object
+          required:
+            - code
+          properties:
+            code:
+              type: string
+              example: AST-VM-001
+    DepreciationLine:
+      type: object
+      required:
+        - id
+        - runId
+        - assetId
+        - assetCode
+        - assetName
+        - periodLabel
+        - amount
+        - accumulated
+        - bookValue
+        - journalEntryId
+        - journalNumber
+      properties:
+        id:
+          type: string
+          format: uuid
+        runId:
+          type: string
+          format: uuid
+        assetId:
+          type: string
+          format: uuid
+        assetCode:
+          type: string
+        assetName:
+          type: string
+        periodLabel:
+          type: string
+        amount:
+          $ref: '#/components/schemas/Money'
+        accumulated:
+          $ref: '#/components/schemas/Money'
+        bookValue:
+          $ref: '#/components/schemas/Money'
+        journalEntryId:
+          type: string
+          format: uuid
+        journalNumber:
+          type: string
+    FixedAssetDetail:
+      type: object
+      required:
+        - asset
+        - depreciation
+      properties:
+        asset:
+          $ref: '#/components/schemas/FixedAsset'
+        depreciation:
+          type: array
+          items:
+            $ref: '#/components/schemas/DepreciationLine'
+    FixedAssetUpdate:
+      allOf:
+        - $ref: '#/components/schemas/FixedAssetFields'
+        - type: object
+          required:
+            - version
+          properties:
+            version:
+              type: integer
+    FixedAssetDisposeInput:
+      type: object
+      required:
+        - version
+        - disposalDate
+        - proceeds
+        - reason
+      properties:
+        version:
+          type: integer
+        disposalDate:
+          $ref: '#/components/schemas/BusinessDate'
+        proceeds:
+          $ref: '#/components/schemas/Money'
+        disposalAccountId:
+          type: string
+          format: uuid
+          nullable: true
+        reason:
+          type: string
+    DepreciationRun:
+      type: object
+      required:
+        - id
+        - periodId
+        - year
+        - month
+        - periodLabel
+        - assetCount
+        - total
+        - runCount
+        - lastRunAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        periodId:
+          type: string
+          format: uuid
+        year:
+          type: integer
+        month:
+          type: integer
+        periodLabel:
+          type: string
+        assetCount:
+          type: integer
+        total:
+          $ref: '#/components/schemas/Money'
+        runCount:
+          type: integer
+        lastRunAt:
+          type: string
+          format: date-time
+    DepreciationRunList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/DepreciationRun'
+    DepreciationRunInput:
+      type: object
+      required:
+        - year
+        - month
+      properties:
+        year:
+          type: integer
+        month:
+          type: integer
+          minimum: 1
+          maximum: 12
+    DepreciationRunDetail:
+      type: object
+      required:
+        - run
+        - lines
+      properties:
+        run:
+          $ref: '#/components/schemas/DepreciationRun'
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/DepreciationLine'
+    CloseStepCode:
+      type: string
+      enum:
+        - operational_documents
+        - consignment_vending_reconciliation
+        - settlement_reconciliation
+        - bank_petty_cash_reconciliation
+        - payroll
+        - depreciation
+        - tax_recap
+        - inventory_review
+        - financial_review
+    CloseStepStatus:
+      type: string
+      description: '`pending` Belum, `done` Selesai, `skipped` Tidak Berlaku.'
+      enum:
+        - pending
+        - done
+        - skipped
+    CloseCheckResult:
+      type: object
+      required:
+        - source
+        - ok
+        - message
+      properties:
+        source:
+          type: string
+        ok:
+          type: boolean
+        message:
+          type: string
+        link:
+          type: string
+    CloseChecklistStep:
+      type: object
+      required:
+        - stepCode
+        - order
+        - title
+        - picLabel
+        - automatic
+        - status
+        - note
+        - checks
+        - version
+      properties:
+        stepCode:
+          $ref: '#/components/schemas/CloseStepCode'
+        order:
+          type: integer
+        title:
+          type: string
+        picLabel:
+          type: string
+          description: PIC default BRD 5.15.
+        automatic:
+          type: boolean
+        status:
+          $ref: '#/components/schemas/CloseStepStatus'
+        picUserId:
+          type: string
+          format: uuid
+          nullable: true
+        picUserName:
+          type: string
+          nullable: true
+        completedBy:
+          type: string
+          format: uuid
+          nullable: true
+        completedByName:
+          type: string
+          nullable: true
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        note:
+          type: string
+        checks:
+          type: array
+          items:
+            $ref: '#/components/schemas/CloseCheckResult'
+        version:
+          type: integer
+          description: 0 = langkah belum pernah disimpan.
+    FiscalPeriodReopenRequest:
+      type: object
+      required:
+        - id
+        - reason
+        - status
+        - requestedBy
+        - requestedAt
+        - decisionNote
+      properties:
+        id:
+          type: string
+          format: uuid
+        reason:
+          type: string
+        status:
+          type: string
+          enum:
+            - pending_approval
+            - approved
+            - rejected
+        requestedBy:
+          type: string
+          format: uuid
+        requestedByName:
+          type: string
+          nullable: true
+        requestedAt:
+          type: string
+          format: date-time
+        decidedAt:
+          type: string
+          format: date-time
+          nullable: true
+        decisionNote:
+          type: string
+    CloseChecklist:
+      type: object
+      required:
+        - period
+        - steps
+        - blockers
+        - reopenRequests
+        - allowedActions
+      properties:
+        period:
+          $ref: '#/components/schemas/FiscalPeriod'
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/CloseChecklistStep'
+        blockers:
+          type: array
+          description: Alasan periode belum bisa ditutup.
+          items:
+            type: string
+        reopenRequests:
+          type: array
+          items:
+            $ref: '#/components/schemas/FiscalPeriodReopenRequest'
+        allowedActions:
+          type: array
+          items:
+            type: string
+            enum:
+              - close
+              - request_reopen
+              - edit_checklist
+    CloseChecklistStepInput:
+      type: object
+      required:
+        - status
+        - version
+      properties:
+        status:
+          $ref: '#/components/schemas/CloseStepStatus'
+        picUserId:
+          type: string
+          format: uuid
+          nullable: true
+        note:
+          type: string
+        version:
+          type: integer
+    FiscalPeriodReopenInput:
+      type: object
+      required:
+        - version
+        - reason
+      properties:
+        version:
+          type: integer
+        reason:
+          type: string
+    OpeningBalanceLine:
+      type: object
+      required:
+        - id
+        - accountId
+        - accountCode
+        - accountName
+        - debit
+        - credit
+        - note
+      properties:
+        id:
+          type: string
+          format: uuid
+        accountId:
+          type: string
+          format: uuid
+        accountCode:
+          type: string
+        accountName:
+          type: string
+        debit:
+          $ref: '#/components/schemas/Money'
+        credit:
+          $ref: '#/components/schemas/Money'
+        note:
+          type: string
+    OpeningBalance:
+      type: object
+      required:
+        - lines
+        - totalDebit
+        - totalCredit
+        - difference
+        - allowedActions
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: true
+        cutoverDate:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
+        status:
+          type: string
+          description: '`draft` Draft, `posted` Diposting.'
+          enum:
+            - draft
+            - posted
+          nullable: true
+        journalEntryId:
+          type: string
+          format: uuid
+          nullable: true
+        journalNumber:
+          type: string
+          nullable: true
+        postedAt:
+          type: string
+          format: date-time
+          nullable: true
+        version:
+          type: integer
+          nullable: true
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/OpeningBalanceLine'
+        totalDebit:
+          $ref: '#/components/schemas/Money'
+        totalCredit:
+          $ref: '#/components/schemas/Money'
+        difference:
+          $ref: '#/components/schemas/Money'
+        allowedActions:
+          type: array
+          items:
+            type: string
+            enum:
+              - edit
+              - post
+    OpeningBalanceSetInput:
+      type: object
+      required:
+        - cutoverDate
+        - version
+      properties:
+        cutoverDate:
+          $ref: '#/components/schemas/BusinessDate'
+        version:
+          type: integer
+          description: 0 saat membuat saldo awal pertama kali.
+    OpeningBalanceLineInput:
+      type: object
+      required:
+        - accountId
+        - debit
+        - credit
+      properties:
+        accountId:
+          type: string
+          format: uuid
+        debit:
+          $ref: '#/components/schemas/Money'
+        credit:
+          $ref: '#/components/schemas/Money'
+        note:
+          type: string
+    OpeningItemType:
+      type: string
+      description: '`receivable` piutang, `payable` utang.'
+      enum:
+        - receivable
+        - payable
+    OpeningItem:
+      type: object
+      required:
+        - id
+        - itemType
+        - partyType
+        - partyId
+        - partyCode
+        - documentNumber
+        - documentDate
+        - dueDate
+        - amount
+        - openAmount
+        - settledAmount
+        - outstanding
+        - accountCode
+        - note
+      properties:
+        id:
+          type: string
+          format: uuid
+        itemType:
+          $ref: '#/components/schemas/OpeningItemType'
+        partyType:
+          type: string
+          enum:
+            - customer
+            - partner
+            - supplier
+        partyId:
+          type: string
+          format: uuid
+        partyCode:
+          type: string
+        documentNumber:
+          type: string
+        documentDate:
+          $ref: '#/components/schemas/BusinessDate'
+        dueDate:
+          $ref: '#/components/schemas/BusinessDate'
+        amount:
+          $ref: '#/components/schemas/Money'
+        openAmount:
+          $ref: '#/components/schemas/Money'
+        settledAmount:
+          $ref: '#/components/schemas/Money'
+        outstanding:
+          $ref: '#/components/schemas/Money'
+        accountCode:
+          type: string
+        channelId:
+          type: string
+          format: uuid
+          nullable: true
+        note:
+          type: string
+    OpeningItemList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+            - outstandingTotal
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/OpeningItem'
+            outstandingTotal:
+              $ref: '#/components/schemas/Money'
+    CutoverReconciliationCheck:
+      type: object
+      required:
+        - code
+        - label
+        - accountCode
+        - subledger
+        - ledger
+        - difference
+        - status
+        - note
+      properties:
+        code:
+          type: string
+        label:
+          type: string
+        accountCode:
+          type: string
+        subledger:
+          $ref: '#/components/schemas/Money'
+        ledger:
+          $ref: '#/components/schemas/Money'
+        difference:
+          $ref: '#/components/schemas/Money'
+        status:
+          type: string
+          enum:
+            - ok
+            - failed
+            - skipped
+        note:
+          type: string
+    CutoverReconciliation:
+      type: object
+      required:
+        - checks
+        - passed
+      properties:
+        cutoverDate:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
+        ledgerSource:
+          type: string
+          description: '`posted` = saldo GL terposting s.d. cut-over; `draft` = Neraca Saldo Awal belum diposting.'
+          enum:
+            - posted
+            - draft
+          nullable: true
+        checks:
+          type: array
+          items:
+            $ref: '#/components/schemas/CutoverReconciliationCheck'
+        passed:
+          type: boolean
     DocumentSequence:
       type: object
       required:
@@ -17545,7 +24393,9 @@ components:
           type: string
         params:
           type: object
-          description: Parameter ekspor laporan (mis. dateFrom, dateTo, locationId); diabaikan untuk ekspor master.
+          description: |
+            Parameter ekspor laporan (mis. `year`, `month`, `dateFrom`, `dateTo`, `accountId`, `divisionId` untuk
+            Neraca Saldo / Buku Besar). Jenis data master mengabaikannya.
           additionalProperties:
             type: string
     PurchaseOption:

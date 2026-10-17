@@ -7,27 +7,38 @@ package sqlcgen
 
 import (
 	"context"
-	"time"
 
 	"balans/internal/platform/clock"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/shopspring/decimal"
 )
 
-const listReadModelRefreshes = `-- name: ListReadModelRefreshes :many
-SELECT name, refreshed_at, duration_ms FROM read_model_refreshes ORDER BY name
+const accountNetBalances = `-- name: AccountNetBalances :many
+SELECT a.code, coalesce(sum(l.debit_amount - l.credit_amount), 0)::numeric AS net_amount
+FROM journal_lines l
+JOIN journal_entries e ON e.id = l.journal_entry_id
+JOIN accounts a ON a.id = l.account_id
+WHERE e.status = 'posted' AND e.business_date <= $1::date
+GROUP BY a.code
 `
 
-func (q *Queries) ListReadModelRefreshes(ctx context.Context) ([]ReadModelRefresh, error) {
-	rows, err := q.db.Query(ctx, listReadModelRefreshes)
+type AccountNetBalancesRow struct {
+	Code      string
+	NetAmount decimal.Decimal
+}
+
+// Saldo debit − kredit per kode akun s.d. tanggal (rekonsiliasi cut-over).
+func (q *Queries) AccountNetBalances(ctx context.Context, asOf clock.BusinessDate) ([]AccountNetBalancesRow, error) {
+	rows, err := q.db.Query(ctx, accountNetBalances, asOf)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ReadModelRefresh
+	var items []AccountNetBalancesRow
 	for rows.Next() {
-		var i ReadModelRefresh
-		if err := rows.Scan(&i.Name, &i.RefreshedAt, &i.DurationMs); err != nil {
+		var i AccountNetBalancesRow
+		if err := rows.Scan(&i.Code, &i.NetAmount); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -38,100 +49,85 @@ func (q *Queries) ListReadModelRefreshes(ctx context.Context) ([]ReadModelRefres
 	return items, nil
 }
 
-const reportDimensionMovements = `-- name: ReportDimensionMovements :many
-SELECT g.account_id,
-       (CASE $1::text
-            WHEN 'channel' THEN g.channel_id
-            WHEN 'sub_channel' THEN g.sub_channel_id
-            WHEN 'division' THEN g.division_id
-            ELSE g.campaign_id END)::uuid AS dimension_id,
-       sum(g.debit_amount - g.credit_amount)::numeric AS net
-FROM rm_gl_daily g
-JOIN accounts a ON a.id = g.account_id
-WHERE a.account_group >= 4
-  AND g.business_date >= $2::date AND g.business_date <= $3::date
-  AND ($4::uuid IS NULL OR g.channel_id = $4)
-GROUP BY 1, 2
+const ledgerExportLines = `-- name: LedgerExportLines :many
+SELECT a.code AS account_code, a.name AS account_name, e.number, e.business_date, e.description, e.source_type,
+       e.source_label, l.debit_amount, l.credit_amount, l.memo, l.channel_id, l.sub_channel_id, l.division_id, l.campaign_id
+FROM journal_lines l
+JOIN journal_entries e ON e.id = l.journal_entry_id
+JOIN accounts a ON a.id = l.account_id
+WHERE e.status = 'posted'
+  AND e.business_date >= $1::date AND e.business_date <= $2::date
+  AND ($3::uuid IS NULL OR l.account_id = $3)
+  AND ($4::uuid IS NULL OR l.channel_id = $4)
+  AND ($5::uuid IS NULL OR l.sub_channel_id = $5)
+  AND ($6::uuid IS NULL OR l.division_id = $6)
+  AND ($7::uuid IS NULL OR l.campaign_id = $7)
+ORDER BY a.code, e.business_date, e.number, l.line_no
+LIMIT $8
 `
 
-type ReportDimensionMovementsParams struct {
-	Dimension string
-	DateFrom  clock.BusinessDate
-	DateTo    clock.BusinessDate
-	ChannelID uuid.NullUUID
+type LedgerExportLinesParams struct {
+	DateFrom     clock.BusinessDate
+	DateTo       clock.BusinessDate
+	AccountID    uuid.NullUUID
+	ChannelID    uuid.NullUUID
+	SubChannelID uuid.NullUUID
+	DivisionID   uuid.NullUUID
+	CampaignID   uuid.NullUUID
+	RowLimit     int32
 }
 
-type ReportDimensionMovementsRow struct {
-	AccountID   uuid.UUID
-	DimensionID uuid.UUID
-	Net         decimal.Decimal
+type LedgerExportLinesRow struct {
+	AccountCode  string
+	AccountName  string
+	Number       pgtype.Text
+	BusinessDate clock.BusinessDate
+	Description  string
+	SourceType   string
+	SourceLabel  string
+	DebitAmount  decimal.Decimal
+	CreditAmount decimal.Decimal
+	Memo         string
+	ChannelID    uuid.NullUUID
+	SubChannelID uuid.NullUUID
+	DivisionID   uuid.NullUUID
+	CampaignID   uuid.NullUUID
 }
 
-// Mutasi akun laba rugi (kelompok 4–7) per nilai satu dimensi; UUID nol = tanpa dimensi.
-func (q *Queries) ReportDimensionMovements(ctx context.Context, arg ReportDimensionMovementsParams) ([]ReportDimensionMovementsRow, error) {
-	rows, err := q.db.Query(ctx, reportDimensionMovements,
-		arg.Dimension,
+// Buku Besar detail semua akun (atau satu akun) untuk ekspor Excel, urut akun lalu tanggal.
+func (q *Queries) LedgerExportLines(ctx context.Context, arg LedgerExportLinesParams) ([]LedgerExportLinesRow, error) {
+	rows, err := q.db.Query(ctx, ledgerExportLines,
 		arg.DateFrom,
 		arg.DateTo,
+		arg.AccountID,
 		arg.ChannelID,
+		arg.SubChannelID,
+		arg.DivisionID,
+		arg.CampaignID,
+		arg.RowLimit,
 	)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ReportDimensionMovementsRow
+	var items []LedgerExportLinesRow
 	for rows.Next() {
-		var i ReportDimensionMovementsRow
-		if err := rows.Scan(&i.AccountID, &i.DimensionID, &i.Net); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const reportMonthlyAccounts = `-- name: ReportMonthlyAccounts :many
-SELECT date_trunc('month', g.business_date)::date AS month, a.code,
-       sum(g.debit_amount)::numeric AS debit, sum(g.credit_amount)::numeric AS credit
-FROM rm_gl_daily g
-JOIN accounts a ON a.id = g.account_id
-WHERE a.code = ANY($1::text[])
-  AND g.business_date >= $2::date AND g.business_date <= $3::date
-GROUP BY 1, 2
-ORDER BY 1, 2
-`
-
-type ReportMonthlyAccountsParams struct {
-	Codes    []string
-	DateFrom clock.BusinessDate
-	DateTo   clock.BusinessDate
-}
-
-type ReportMonthlyAccountsRow struct {
-	Month  clock.BusinessDate
-	Code   string
-	Debit  decimal.Decimal
-	Credit decimal.Decimal
-}
-
-// Mutasi bulanan akun tertentu (rekap pajak).
-func (q *Queries) ReportMonthlyAccounts(ctx context.Context, arg ReportMonthlyAccountsParams) ([]ReportMonthlyAccountsRow, error) {
-	rows, err := q.db.Query(ctx, reportMonthlyAccounts, arg.Codes, arg.DateFrom, arg.DateTo)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []ReportMonthlyAccountsRow
-	for rows.Next() {
-		var i ReportMonthlyAccountsRow
+		var i LedgerExportLinesRow
 		if err := rows.Scan(
-			&i.Month,
-			&i.Code,
-			&i.Debit,
-			&i.Credit,
+			&i.AccountCode,
+			&i.AccountName,
+			&i.Number,
+			&i.BusinessDate,
+			&i.Description,
+			&i.SourceType,
+			&i.SourceLabel,
+			&i.DebitAmount,
+			&i.CreditAmount,
+			&i.Memo,
+			&i.ChannelID,
+			&i.SubChannelID,
+			&i.DivisionID,
+			&i.CampaignID,
 		); err != nil {
 			return nil, err
 		}
@@ -143,64 +139,24 @@ func (q *Queries) ReportMonthlyAccounts(ctx context.Context, arg ReportMonthlyAc
 	return items, nil
 }
 
-const reportMonthlyGroups = `-- name: ReportMonthlyGroups :many
-SELECT date_trunc('month', g.business_date)::date AS month, a.account_group,
-       sum(g.debit_amount - g.credit_amount)::numeric AS net
-FROM rm_gl_daily g
-JOIN accounts a ON a.id = g.account_id
-WHERE a.account_group >= 4
-  AND g.business_date >= $1::date AND g.business_date <= $2::date
-GROUP BY 1, 2
-ORDER BY 1, 2
+const trialBalance = `-- name: TrialBalance :many
+SELECT a.id AS account_id, a.code AS account_code, a.name AS account_name, a.account_group, a.normal_balance,
+       coalesce(sum(l.debit_amount - l.credit_amount) FILTER (WHERE e.business_date < $1::date), 0)::numeric AS opening_net,
+       coalesce(sum(l.debit_amount) FILTER (WHERE e.business_date >= $1::date), 0)::numeric AS period_debit,
+       coalesce(sum(l.credit_amount) FILTER (WHERE e.business_date >= $1::date), 0)::numeric AS period_credit
+FROM journal_lines l
+JOIN journal_entries e ON e.id = l.journal_entry_id
+JOIN accounts a ON a.id = l.account_id
+WHERE e.status = 'posted' AND e.business_date <= $2::date
+  AND ($3::uuid IS NULL OR l.channel_id = $3)
+  AND ($4::uuid IS NULL OR l.sub_channel_id = $4)
+  AND ($5::uuid IS NULL OR l.division_id = $5)
+  AND ($6::uuid IS NULL OR l.campaign_id = $6)
+GROUP BY a.id, a.code, a.name, a.account_group, a.normal_balance
+ORDER BY a.code
 `
 
-type ReportMonthlyGroupsParams struct {
-	DateFrom clock.BusinessDate
-	DateTo   clock.BusinessDate
-}
-
-type ReportMonthlyGroupsRow struct {
-	Month        clock.BusinessDate
-	AccountGroup int16
-	Net          decimal.Decimal
-}
-
-// Mutasi bulanan per kelompok akun laba rugi (tren dashboard).
-func (q *Queries) ReportMonthlyGroups(ctx context.Context, arg ReportMonthlyGroupsParams) ([]ReportMonthlyGroupsRow, error) {
-	rows, err := q.db.Query(ctx, reportMonthlyGroups, arg.DateFrom, arg.DateTo)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []ReportMonthlyGroupsRow
-	for rows.Next() {
-		var i ReportMonthlyGroupsRow
-		if err := rows.Scan(&i.Month, &i.AccountGroup, &i.Net); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const reportMovements = `-- name: ReportMovements :many
-
-SELECT g.account_id,
-       coalesce(sum(g.debit_amount - g.credit_amount) FILTER (WHERE g.business_date < $1::date), 0)::numeric AS before_net,
-       coalesce(sum(g.debit_amount - g.credit_amount) FILTER (WHERE g.business_date >= $1::date), 0)::numeric AS during_net
-FROM rm_gl_daily g
-WHERE g.business_date <= $2::date
-  AND ($3::uuid IS NULL OR g.channel_id = $3)
-  AND ($4::uuid IS NULL OR g.sub_channel_id = $4)
-  AND ($5::uuid IS NULL OR g.division_id = $5)
-  AND ($6::uuid IS NULL OR g.campaign_id = $6)
-GROUP BY g.account_id
-`
-
-type ReportMovementsParams struct {
+type TrialBalanceParams struct {
 	DateFrom     clock.BusinessDate
 	DateTo       clock.BusinessDate
 	ChannelID    uuid.NullUUID
@@ -209,16 +165,21 @@ type ReportMovementsParams struct {
 	CampaignID   uuid.NullUUID
 }
 
-type ReportMovementsRow struct {
-	AccountID uuid.UUID
-	BeforeNet decimal.Decimal
-	DuringNet decimal.Decimal
+type TrialBalanceRow struct {
+	AccountID     uuid.UUID
+	AccountCode   string
+	AccountName   string
+	AccountGroup  int16
+	NormalBalance string
+	OpeningNet    decimal.Decimal
+	PeriodDebit   decimal.Decimal
+	PeriodCredit  decimal.Decimal
 }
 
-// Laporan dari read model rm_gl_daily (TG 5.17): tidak menjumlah ulang journal_lines saat laporan dibuka.
-// Mutasi debit − kredit per akun sebelum date_from dan selama date_from..date_to, opsional per dimensi.
-func (q *Queries) ReportMovements(ctx context.Context, arg ReportMovementsParams) ([]ReportMovementsRow, error) {
-	rows, err := q.db.Query(ctx, reportMovements,
+// Neraca Saldo (ACC-18): per akun yang punya mutasi s.d. date_to, saldo awal (sebelum date_from, debit − kredit)
+// dan mutasi rentang dari jurnal yang sudah diposting, dengan filter dimensi opsional.
+func (q *Queries) TrialBalance(ctx context.Context, arg TrialBalanceParams) ([]TrialBalanceRow, error) {
+	rows, err := q.db.Query(ctx, trialBalance,
 		arg.DateFrom,
 		arg.DateTo,
 		arg.ChannelID,
@@ -230,78 +191,18 @@ func (q *Queries) ReportMovements(ctx context.Context, arg ReportMovementsParams
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ReportMovementsRow
+	var items []TrialBalanceRow
 	for rows.Next() {
-		var i ReportMovementsRow
-		if err := rows.Scan(&i.AccountID, &i.BeforeNet, &i.DuringNet); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const reportTaxLines = `-- name: ReportTaxLines :many
-SELECT e.id AS entry_id, e.business_date, coalesce(e.number, '')::text AS number, e.source_type, e.source_label,
-       e.description, a.code AS account_code, a.name AS account_name, l.debit_amount, l.credit_amount
-FROM journal_lines l
-JOIN journal_entries e ON e.id = l.journal_entry_id
-JOIN accounts a ON a.id = l.account_id
-WHERE e.status = 'posted' AND a.code = ANY($1::text[])
-  AND e.business_date >= $2::date AND e.business_date <= $3::date
-ORDER BY e.business_date, e.number, l.line_no
-LIMIT $4
-`
-
-type ReportTaxLinesParams struct {
-	Codes    []string
-	DateFrom clock.BusinessDate
-	DateTo   clock.BusinessDate
-	RowLimit int32
-}
-
-type ReportTaxLinesRow struct {
-	EntryID      uuid.UUID
-	BusinessDate clock.BusinessDate
-	Number       string
-	SourceType   string
-	SourceLabel  string
-	Description  string
-	AccountCode  string
-	AccountName  string
-	DebitAmount  decimal.Decimal
-	CreditAmount decimal.Decimal
-}
-
-// Rincian jurnal akun pajak satu periode (bukan penjumlahan; dibatasi jumlah baris).
-func (q *Queries) ReportTaxLines(ctx context.Context, arg ReportTaxLinesParams) ([]ReportTaxLinesRow, error) {
-	rows, err := q.db.Query(ctx, reportTaxLines,
-		arg.Codes,
-		arg.DateFrom,
-		arg.DateTo,
-		arg.RowLimit,
-	)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []ReportTaxLinesRow
-	for rows.Next() {
-		var i ReportTaxLinesRow
+		var i TrialBalanceRow
 		if err := rows.Scan(
-			&i.EntryID,
-			&i.BusinessDate,
-			&i.Number,
-			&i.SourceType,
-			&i.SourceLabel,
-			&i.Description,
+			&i.AccountID,
 			&i.AccountCode,
 			&i.AccountName,
-			&i.DebitAmount,
-			&i.CreditAmount,
+			&i.AccountGroup,
+			&i.NormalBalance,
+			&i.OpeningNet,
+			&i.PeriodDebit,
+			&i.PeriodCredit,
 		); err != nil {
 			return nil, err
 		}
@@ -311,32 +212,4 @@ func (q *Queries) ReportTaxLines(ctx context.Context, arg ReportTaxLinesParams) 
 		return nil, err
 	}
 	return items, nil
-}
-
-const tryReadModelLock = `-- name: TryReadModelLock :one
-SELECT pg_try_advisory_xact_lock(hashtext('accounting.refresh_read_models'))::boolean AS locked
-`
-
-func (q *Queries) TryReadModelLock(ctx context.Context) (bool, error) {
-	row := q.db.QueryRow(ctx, tryReadModelLock)
-	var locked bool
-	err := row.Scan(&locked)
-	return locked, err
-}
-
-const upsertReadModelRefresh = `-- name: UpsertReadModelRefresh :exec
-INSERT INTO read_model_refreshes (name, refreshed_at, duration_ms)
-VALUES ($1, $2, $3)
-ON CONFLICT (name) DO UPDATE SET refreshed_at = EXCLUDED.refreshed_at, duration_ms = EXCLUDED.duration_ms
-`
-
-type UpsertReadModelRefreshParams struct {
-	Name        string
-	RefreshedAt time.Time
-	DurationMs  int32
-}
-
-func (q *Queries) UpsertReadModelRefresh(ctx context.Context, arg UpsertReadModelRefreshParams) error {
-	_, err := q.db.Exec(ctx, upsertReadModelRefresh, arg.Name, arg.RefreshedAt, arg.DurationMs)
-	return err
 }

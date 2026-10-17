@@ -27,7 +27,7 @@ func (h *salesHarness) refreshReports() {
 	require.True(h.t, ran)
 }
 
-func dec(t *testing.T, v any) decimal.Decimal {
+func reportDec(t *testing.T, v any) decimal.Decimal {
 	t.Helper()
 	s, ok := v.(string)
 	require.True(t, ok, "nilai %v bukan string", v)
@@ -75,7 +75,7 @@ func (h *salesHarness) reportSnapshot() reportSnapshot {
 	h.as("admin@balans.local")
 	stock := h.json(http.MethodGet, "/api/v1/inventory/reports/stock-position", nil, http.StatusOK)
 	return reportSnapshot{
-		salesNet: dec(h.t, total["net"]), salesCOGS: dec(h.t, total["cogs"]), stockValue: dec(h.t, stock["totalValue"]),
+		salesNet: reportDec(h.t, total["net"]), salesCOGS: reportDec(h.t, total["cogs"]), stockValue: reportDec(h.t, stock["totalValue"]),
 		glInventory: h.glNet("13%", "2000-01-01", "2026-11-02", ""),
 		glRevenue:   h.glNet("410%", "2026-11-02", "2026-11-02", "AND c.code = 'marketplace'").Neg(),
 	}
@@ -184,10 +184,10 @@ func TestReportsFinancialStatementsReconcileWithLedger(t *testing.T) {
 	is := h.json(http.MethodGet, "/api/v1/reports/financial-statements?kind=income_statement"+q, nil, http.StatusOK)
 	sum := is["summary"].(map[string]any)
 	// Laba Rugi = jurnal kelompok 4 – 7 (dibaca langsung dari journal_lines).
-	assert.Equal(t, h.glNet("4%", from, to, "").Neg().StringFixed(2), dec(t, sum["revenue"]).StringFixed(2))
-	assert.Equal(t, h.glNet("5%", from, to, "").StringFixed(2), dec(t, sum["cogs"]).StringFixed(2))
+	assert.Equal(t, h.glNet("4%", from, to, "").Neg().StringFixed(2), reportDec(t, sum["revenue"]).StringFixed(2))
+	assert.Equal(t, h.glNet("5%", from, to, "").StringFixed(2), reportDec(t, sum["cogs"]).StringFixed(2))
 	net := h.glNet("4%", from, to, "").Add(h.glNet("5%", from, to, "")).Add(h.glNet("6%", from, to, "")).Add(h.glNet("7%", from, to, "")).Neg()
-	assert.Equal(t, net.StringFixed(2), dec(t, sum["netProfit"]).StringFixed(2))
+	assert.Equal(t, net.StringFixed(2), reportDec(t, sum["netProfit"]).StringFixed(2))
 	assert.NotNil(t, is["refreshedAt"])
 
 	bs := h.json(http.MethodGet, "/api/v1/reports/financial-statements?kind=balance_sheet&dateTo="+to, nil, http.StatusOK)
@@ -208,9 +208,9 @@ func TestReportsFinancialStatementsReconcileWithLedger(t *testing.T) {
 		r := h.json(http.MethodGet, "/api/v1/reports/profit-loss-by-dimension?dimension="+dim+q, nil, http.StatusOK)
 		total := decimal.Zero
 		for _, c := range items(r, "columns") {
-			total = total.Add(dec(t, c["summary"].(map[string]any)["netProfit"]))
+			total = total.Add(reportDec(t, c["summary"].(map[string]any)["netProfit"]))
 		}
-		assert.Equal(t, dec(t, sum["netProfit"]).StringFixed(2), total.StringFixed(2), "Σ kolom %s = laba bersih", dim)
+		assert.Equal(t, reportDec(t, sum["netProfit"]).StringFixed(2), total.StringFixed(2), "Σ kolom %s = laba bersih", dim)
 		assert.Equal(t, sum["netProfit"], r["total"].(map[string]any)["netProfit"])
 	}
 

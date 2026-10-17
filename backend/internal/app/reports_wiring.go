@@ -13,7 +13,7 @@ import (
 	"balans/internal/warehouse"
 )
 
-// reportExporter mengisi dataexchange.Exporter + ParamExporter dengan fungsi ekspor laporan modul pemilik data
+// reportExporter mengisi dataexchange.Exporter + ParamsValidator dengan fungsi ekspor laporan modul pemilik data
 // (TG 5.17: ekspor laporan berjalan sebagai job dataexchange.export).
 type reportExporter struct {
 	spec     dataexchange.Spec
@@ -24,18 +24,14 @@ type reportExporter struct {
 func (r reportExporter) Spec() dataexchange.Spec { return r.spec }
 
 func (r reportExporter) Export(ctx context.Context, emit func(tabular.Row) error) error {
-	return r.export(ctx, nil, emit)
+	return r.export(ctx, dataexchange.ExportParams(ctx), emit)
 }
 
-func (r reportExporter) ValidateParams(params map[string]string) error {
+func (r reportExporter) ValidateParams(_ context.Context, params map[string]string) error {
 	if r.validate == nil {
 		return nil
 	}
 	return r.validate(params)
-}
-
-func (r reportExporter) ExportWith(ctx context.Context, params map[string]string, emit func(tabular.Row) error) error {
-	return r.export(ctx, params, emit)
 }
 
 // reportSpec menyusun jenis data ekspor laporan; perm adalah permission baca laporan (bukan `<kind>.export`).

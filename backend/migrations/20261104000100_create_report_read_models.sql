@@ -135,11 +135,7 @@ FULL JOIN rc ON rc.product_id = mv.product_id AND rc.location_id = mv.location_i
 CREATE UNIQUE INDEX uq_rm_stock_values_key ON rm_stock_values (product_id, location_id, batch_id);
 CREATE INDEX idx_rm_stock_values_location ON rm_stock_values (location_id);
 
--- dataexchange: parameter ekspor laporan (periode, filter) yang dibaca job dataexchange.export.
-ALTER TABLE export_jobs ADD COLUMN params jsonb NOT NULL DEFAULT '{}'::jsonb;
-
 -- +goose Down
-ALTER TABLE export_jobs DROP COLUMN params;
 DROP MATERIALIZED VIEW rm_stock_values;
 DROP MATERIALIZED VIEW rm_sales_lines;
 DROP MATERIALIZED VIEW rm_gl_daily;

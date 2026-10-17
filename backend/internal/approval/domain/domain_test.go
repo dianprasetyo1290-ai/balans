@@ -371,7 +371,7 @@ func TestDelegation(t *testing.T) {
 
 func TestSubjectTypes(t *testing.T) {
 	types := domain.SubjectTypes()
-	assert.Len(t, types, 14)
+	assert.Len(t, types, 15)
 	info, ok := domain.LookupSubjectType(domain.SubjectReturnDisposition)
 	require.True(t, ok)
 	assert.True(t, info.HasCondition(domain.ConditionHasDisposal))

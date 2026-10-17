@@ -311,7 +311,8 @@ type ExportJobStatus string
 type ExportJobInput struct {
 	Kind string `json:"kind"`
 
-	// Params Parameter ekspor laporan (mis. dateFrom, dateTo, locationId); diabaikan untuk ekspor master.
+	// Params Parameter ekspor laporan (mis. `year`, `month`, `dateFrom`, `dateTo`, `accountId`, `divisionId` untuk
+	// Neraca Saldo / Buku Besar). Jenis data master mengabaikannya.
 	Params *map[string]string `json:"params,omitempty"`
 }
 

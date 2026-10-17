@@ -63,3 +63,34 @@ export const agingSearchSchema = z.object({
 export const detailSearchSchema = z.object({
   tab: z.enum(["summary", "history"]).optional().catch(undefined),
 })
+
+/** Filter Penjualan › Konsinyasi (pengiriman titipan). */
+export const consignmentDeliverySearchSchema = z.object({
+  page: z.number().int().min(1).catch(1),
+  q: z.string().optional(),
+  status: z
+    .enum(["draft", "in_transit", "completed", "cancelled"])
+    .optional()
+    .catch(undefined),
+  deliveryType: z
+    .enum(["consignment", "vending_buffer"])
+    .optional()
+    .catch(undefined),
+})
+
+/** Filter Penjualan › Rekonsiliasi Konsinyasi. */
+export const reconciliationSearchSchema = z.object({
+  page: z.number().int().min(1).catch(1),
+  q: z.string().optional(),
+  status: z
+    .enum([
+      "draft",
+      "in_progress",
+      "pending_approval",
+      "rejected",
+      "posted",
+      "cancelled",
+    ])
+    .optional()
+    .catch(undefined),
+})
