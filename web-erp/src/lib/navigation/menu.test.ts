@@ -53,6 +53,37 @@ describe("menu", () => {
     ).not.toContain("Matriks Persetujuan")
   })
 
+  it("menampilkan halaman akuntansi dan nomor dokumen jika modulnya aktif", () => {
+    const perms = [
+      "accounting.account.read",
+      "accounting.journal.read",
+      "accounting.dimension.read",
+      "accounting.fiscal_period.read",
+      "document.sequence.read",
+    ]
+    const labels = (modules: string[]) =>
+      visibleMenu(modules, [], perms).flatMap((g) =>
+        g.items.map((i) => `${g.label} › ${i.label}`)
+      )
+    expect(labels([])).not.toContain("Keuangan & Akuntansi › Jurnal Umum")
+    expect(labels(["accounting", "document"])).toEqual(
+      expect.arrayContaining([
+        "Data Master › Kampanye",
+        "Data Master › Channel & Divisi",
+        "Keuangan & Akuntansi › Chart of Accounts",
+        "Keuangan & Akuntansi › Jurnal Umum",
+        "Keuangan & Akuntansi › Buku Besar",
+        "Keuangan & Akuntansi › Periode Akuntansi",
+        "Pengaturan › Nomor Dokumen",
+      ])
+    )
+    expect(
+      visibleMenu(["accounting"], [], ["accounting.account.read"]).flatMap(
+        (g) => g.items.map((i) => i.label)
+      )
+    ).not.toContain("Jurnal Umum")
+  })
+
   it("menyembunyikan halaman yang permission-nya tidak dimiliki user", () => {
     const labels = visibleMenu([], [], ["identity.user.read"]).flatMap((g) =>
       g.items.map((i) => i.label)

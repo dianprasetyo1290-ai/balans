@@ -17,6 +17,7 @@ export const STATUS_LABELS = {
   cancelled: { label: "Dibatalkan", tone: "neutral" },
   completed: { label: "Selesai", tone: "success" },
   closed: { label: "Ditutup", tone: "neutral" },
+  open: { label: "Terbuka", tone: "success" },
   expired: { label: "Kedaluwarsa", tone: "danger" },
   in_transit: { label: "Dalam Pengiriman", tone: "info" },
   partially_received: { label: "Diterima Sebagian", tone: "warning" },
