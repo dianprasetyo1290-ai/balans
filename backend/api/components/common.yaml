@@ -88,6 +88,20 @@ ReportGroupBy:
   type: string
   description: Pengelompokan laporan penjualan & margin (RPT-05, RPT-15).
   enum: [channel, sub_channel, product, category, month, day]
+DeliveryOrderType:
+  type: string
+  description: |
+    Jenis Delivery Order: `sales` penjualan (MT beli putus, B2B, WA/IG, karyawan), `marketplace` pesanan marketplace
+    (serah ke kurir = pengakuan penjualan), `consignment` konsinyasi, `vending_buffer` buffer vending, `transfer` lainnya.
+  enum: [sales, marketplace, consignment, vending_buffer, transfer]
+DeliveryOrderStatus:
+  type: string
+  description: Status Delivery Order (Desain Status Dokumen 5.4).
+  enum: [draft, in_progress, in_transit, received, cancelled]
+ShipmentStatus:
+  type: string
+  description: "`picked_up` diserahkan ke kurir, `in_transit` dalam perjalanan, `delivered` diterima, `returned` kembali."
+  enum: [picked_up, in_transit, delivered, returned]
 VersionInput:
   type: object
   required: [version]

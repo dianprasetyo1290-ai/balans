@@ -59,33 +59,61 @@ export function printStyles(format: LabelFormat) {
 }`
 }
 
-/** Satu label produk 50 × 30 mm: nama & varian, SKU, barcode utama, batch dan tanggal kedaluwarsa. */
-export function ProductLabel({ item }: { item: LabelItem }) {
-  const p = item.product
+/** Isi satu label produk; dipakai juga label produk mitra di DO (kode artikel & barcode retailer, S-316). */
+export type ProductLabelContent = {
+  name: string
+  sku: string
+  barcode?: string
+  symbology?: Product["barcodes"][number]["symbology"]
+  batch?: string
+  expiry?: string
+  /** Kode artikel mitra (retailer) ditampilkan menggantikan SKU bila ada. */
+  articleCode?: string
+}
+
+/** Label produk 50 × 30 mm: nama & varian, SKU/kode mitra, barcode, batch dan tanggal kedaluwarsa. */
+export function ProductLabelView({ label }: { label: ProductLabelContent }) {
   return (
     <div className="flex h-[30mm] w-[50mm] [break-inside:avoid] flex-col overflow-hidden bg-white px-[2mm] py-[1.5mm] text-black">
       <div className="line-clamp-2 text-[7pt] leading-tight font-semibold">
-        {productDisplayName(p)}
+        {label.name}
       </div>
       <div className="flex justify-between text-[6pt] leading-tight">
-        <span>{p.sku}</span>
-        {item.batch ? <span>Batch {item.batch}</span> : null}
+        <span>{label.articleCode || label.sku}</span>
+        {label.batch ? <span>Batch {label.batch}</span> : null}
       </div>
-      {p.primaryBarcode ? (
+      {label.barcode ? (
         <Barcode
-          value={p.primaryBarcode}
-          symbology={p.barcodes.find((b) => b.isPrimary)?.symbology}
+          value={label.barcode}
+          symbology={label.symbology}
           className="mt-[0.5mm] min-h-0 flex-1"
         />
       ) : (
         <div className="flex-1" />
       )}
-      {item.expiry ? (
+      {label.expiry ? (
         <div className="text-right text-[6pt] leading-tight">
-          ED {formatDate(item.expiry)}
+          ED {formatDate(label.expiry)}
         </div>
       ) : null}
     </div>
+  )
+}
+
+/** Satu label produk 50 × 30 mm dari master produk. */
+export function ProductLabel({ item }: { item: LabelItem }) {
+  const p = item.product
+  return (
+    <ProductLabelView
+      label={{
+        name: productDisplayName(p),
+        sku: p.sku,
+        barcode: p.primaryBarcode ?? undefined,
+        symbology: p.barcodes.find((b) => b.isPrimary)?.symbology,
+        batch: item.batch,
+        expiry: item.expiry,
+      }}
+    />
   )
 }
 

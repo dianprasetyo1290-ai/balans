@@ -219,6 +219,9 @@ type Id = openapi_types.UUID
 // IdempotencyKey defines model for IdempotencyKey.
 type IdempotencyKey = openapi_types.UUID
 
+// OutboundLineId defines model for OutboundLineId.
+type OutboundLineId = openapi_types.UUID
+
 // CreateFileUploadParams defines parameters for CreateFileUpload.
 type CreateFileUploadParams struct {
 	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).

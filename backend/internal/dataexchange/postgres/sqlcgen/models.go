@@ -376,6 +376,21 @@ type CostLayerConsumption struct {
 	CreatedBy       uuid.UUID
 }
 
+type Courier struct {
+	ID         uuid.UUID
+	Code       string
+	Name       string
+	IsInternal bool
+	IsActive   bool
+	CreatedAt  time.Time
+	CreatedBy  uuid.UUID
+	UpdatedAt  time.Time
+	UpdatedBy  uuid.UUID
+	Version    int32
+	DeletedAt  *time.Time
+	DeletedBy  uuid.NullUUID
+}
+
 type CreditNote struct {
 	ID                   uuid.UUID
 	Number               string
@@ -490,6 +505,51 @@ type CustomerPaymentAllocation struct {
 	PaymentID uuid.UUID
 	InvoiceID uuid.UUID
 	Amount    decimal.Decimal
+}
+
+type DeliveryOrder struct {
+	ID                  uuid.UUID
+	Number              pgtype.Text
+	DeliveryType        string
+	SourceType          string
+	SourceID            uuid.UUID
+	SourceLabel         string
+	SalesOrderID        uuid.NullUUID
+	PartnerID           uuid.NullUUID
+	CustomerID          uuid.NullUUID
+	RecipientName       string
+	RecipientPhone      string
+	ShipToAddress       string
+	LocationID          uuid.UUID
+	BusinessDate        clock.BusinessDate
+	Status              string
+	Note                string
+	OutboundID          uuid.NullUUID
+	OutboundCompletedAt *time.Time
+	ReleasedBy          uuid.NullUUID
+	ReleasedByName      string
+	ReleasedAt          *time.Time
+	ShippedAt           *time.Time
+	DeliveredAt         *time.Time
+	CancelledAt         *time.Time
+	CancelReason        string
+	CreatedAt           time.Time
+	CreatedBy           uuid.UUID
+	UpdatedAt           time.Time
+	UpdatedBy           uuid.UUID
+	Version             int32
+}
+
+type DeliveryOrderLine struct {
+	ID               uuid.UUID
+	DeliveryOrderID  uuid.UUID
+	LineNo           int32
+	SourceLineID     uuid.NullUUID
+	SalesOrderLineID uuid.NullUUID
+	ProductID        uuid.UUID
+	Qty              decimal.Decimal
+	ShippedQty       decimal.Decimal
+	Batches          []byte
 }
 
 type DepreciationLine struct {
@@ -1317,6 +1377,64 @@ type OpeningItemSettlement struct {
 	Amount        decimal.Decimal
 	CreatedAt     time.Time
 	CreatedBy     uuid.UUID
+}
+
+type Outbound struct {
+	ID               uuid.UUID
+	Number           string
+	SourceType       string
+	SourceID         uuid.UUID
+	SourceLabel      string
+	WarehouseID      uuid.UUID
+	LocationID       uuid.UUID
+	BusinessDate     clock.BusinessDate
+	RecipientName    string
+	RecipientPhone   string
+	RecipientAddress string
+	Status           string
+	Note             string
+	PreparedBy       uuid.NullUUID
+	PreparedByName   string
+	PackedAt         *time.Time
+	CheckedBy        uuid.NullUUID
+	CheckedByName    string
+	CompletedAt      *time.Time
+	CancelledAt      *time.Time
+	CancelReason     string
+	CreatedAt        time.Time
+	CreatedBy        uuid.UUID
+	UpdatedAt        time.Time
+	UpdatedBy        uuid.UUID
+	Version          int32
+}
+
+type OutboundLine struct {
+	ID                  uuid.UUID
+	OutboundID          uuid.UUID
+	LineNo              int32
+	SourceLineID        uuid.NullUUID
+	ProductID           uuid.UUID
+	BatchID             uuid.NullUUID
+	AllocatedQty        decimal.Decimal
+	PickedQty           decimal.Decimal
+	PassedQty           decimal.Decimal
+	RejectedQty         decimal.Decimal
+	Status              string
+	ReplacementOfLineID uuid.NullUUID
+	RejectReason        string
+	ReturnLabel         string
+	CheckedBy           uuid.NullUUID
+	CheckedByName       string
+	CheckedAt           *time.Time
+}
+
+type OutboundPackage struct {
+	ID            uuid.UUID
+	OutboundID    uuid.UUID
+	PackageNumber int32
+	PackageCount  int32
+	WeightGrams   pgtype.Int4
+	Contents      []byte
 }
 
 type Partner struct {
@@ -2271,6 +2389,44 @@ type Session struct {
 	UserAgent        string
 	Ip               string
 	CreatedAt        time.Time
+}
+
+type Shipment struct {
+	ID                    uuid.UUID
+	DeliveryOrderID       uuid.UUID
+	CourierID             uuid.UUID
+	InternalCourierUserID uuid.NullUUID
+	InternalCourierName   string
+	ServiceCode           string
+	TrackingNumber        string
+	MarketplaceAwb        string
+	ShippingCostAmount    decimal.Decimal
+	PackageCount          int32
+	Status                string
+	ShippedAt             time.Time
+	DeliveredAt           *time.Time
+	ReceivedByName        string
+	DeliveryNote          string
+	ProofFileIds          []uuid.UUID
+	ConfirmedBy           uuid.NullUUID
+	ConfirmedByName       string
+	CreatedAt             time.Time
+	CreatedBy             uuid.UUID
+	UpdatedAt             time.Time
+	UpdatedBy             uuid.UUID
+	Version               int32
+}
+
+type ShipmentEvent struct {
+	ID            uuid.UUID
+	ShipmentID    uuid.UUID
+	Status        string
+	OccurredAt    time.Time
+	Source        string
+	Note          string
+	CreatedBy     uuid.UUID
+	CreatedByName string
+	CreatedAt     time.Time
 }
 
 type SpecialPrice struct {

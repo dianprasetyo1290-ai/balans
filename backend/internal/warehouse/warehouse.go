@@ -13,6 +13,10 @@
 //   - TransferStock / ReceiveTransfer: memindah stok antar lokasi (DO konsinyasi A-07, buffer vending A-24, kirim
 //     ke maklon) dan mengembalikan nilai FIFO barang yang dipindah untuk jurnal modul pemanggil.
 //   - StockCountResult: hasil stock count konsinyasi/vending untuk rekonsiliasi.
+//   - CreateOutbound / RegisterOutboundHandler / CancelOutbound (R1.3, WMS-12): dokumen asal (Delivery Order)
+//     mendaftarkan barang yang stoknya sudah reserved; Staf Gudang picking per batch & packing koli, QC oleh
+//     Fulfillment Leader/Merchandiser yang bukan penyiap. QC gagal memanggil OutboundHandler.Replace (barang ke
+//     Karantina + stok pengganti FEFO) dan SetQCReturns (retur pembelian otomatis ke pemasok/maklon, D-24).
 package warehouse
 
 import (
@@ -105,6 +109,31 @@ type (
 	BatchInfo = service.BatchInfo
 	// Users mencari user per role (adapter identity).
 	Users = service.Users
+
+	// Outbound adalah dokumen picking, packing (koli), dan QC barang keluar (WMS-12).
+	Outbound = domain.Outbound
+	// OutboundLine adalah satu baris picking per batch.
+	OutboundLine = domain.OutboundLine
+	// OutboundLineInput adalah baris yang didaftarkan dokumen asal (stok sudah reserved dokumen asal).
+	OutboundLineInput = domain.OutboundLineInput
+	// OutboundPackage adalah satu koli.
+	OutboundPackage = domain.OutboundPackage
+	// OutboundLineStatus adalah status baris Outbound.
+	OutboundLineStatus = domain.OutboundLineStatus
+	// ReplacementBatch adalah batch stok pengganti dari dokumen asal.
+	ReplacementBatch = domain.ReplacementBatch
+	// OutboundHandler adalah callback dokumen asal (stok pengganti QC gagal, Outbound selesai).
+	OutboundHandler = service.OutboundHandler
+	// OutboundRejection adalah permintaan stok pengganti ke dokumen asal.
+	OutboundRejection = service.OutboundRejection
+	// OutboundReplacement adalah jawaban dokumen asal atas OutboundRejection.
+	OutboundReplacement = service.OutboundReplacement
+	// OutboundResult adalah Outbound yang selesai.
+	OutboundResult = service.OutboundResult
+	// OutboundReturn adalah barang reject QC Outbound untuk retur pembelian otomatis.
+	OutboundReturn = service.OutboundReturn
+	// QCReturns membuat retur pembelian otomatis (adapter procurement).
+	QCReturns = service.QCReturns
 )
 
 // Jenis lokasi, jenis pihak, perlakuan reject, jenis asal Inbound, status & jenis baris stok.
@@ -135,6 +164,14 @@ const (
 	SourceStockTransfer       = domain.SourceStockTransfer
 	SourceInternalUsageReturn = domain.SourceInternalUsageReturn
 
+	OutboundSourceDeliveryOrder = domain.OutboundSourceDeliveryOrder
+	OutboundPending             = domain.OutboundPending
+	OutboundPicked              = domain.OutboundPicked
+	OutboundPassed              = domain.OutboundPassed
+	OutboundRejected            = domain.OutboundRejected
+	OutboundHeld                = domain.OutboundHeld
+	OutboundDropped             = domain.OutboundDropped
+
 	StatusAvailable  = service.StockAvailable
 	StatusQuarantine = service.StockQuarantine
 	StatusInTransit  = service.StockInTransit
@@ -162,6 +199,12 @@ const (
 	EntitySchedule   = service.EntityCountSchedule
 	FileOwnerQC      = service.FileOwnerQualityCheck
 	FileOwnerCount   = service.FileOwnerStockCount
+
+	PermOutboundRead    = service.PermOutboundRead
+	PermOutboundQCRead  = service.PermOutboundQCRd
+	PermOutboundQC      = service.PermOutboundQC
+	EntityOutbound      = service.EntityOutbound
+	FileOwnerOutboundQC = service.FileOwnerOutboundQC
 )
 
 // LocationQuery adalah kriteria pencarian lokasi aktif untuk modul lain. Field kosong tidak difilter.
@@ -224,6 +267,7 @@ func AuditEntities() map[string]string {
 	return map[string]string{
 		EntityWarehouse: PermWarehouseRead, EntityLocation: PermLocationRead, EntityInbound: PermInboundRead,
 		EntityTransfer: PermTransferRead, EntityStockCount: PermCountRead, EntitySchedule: PermCountRead,
+		EntityOutbound: PermOutboundRead,
 	}
 }
 
@@ -393,3 +437,52 @@ func (m *Module) StockCountResult(ctx context.Context, id uuid.UUID) (StockCount
 func (m *Module) RunStockCountSchedules(ctx context.Context) (int, error) {
 	return m.svc.RunSchedules(ctx)
 }
+
+// OutboundRequest adalah permintaan Outbound dari dokumen asal (mis. Delivery Order). Stok sudah reserved oleh
+// dokumen asal; Outbound mencatat picking per batch, packing (koli), dan QC.
+type OutboundRequest struct {
+	// SourceType snake_case (mis. OutboundSourceDeliveryOrder); SourceID unik per jenis.
+	SourceType  string
+	SourceID    uuid.UUID
+	SourceLabel string
+	// LocationID lokasi asal di dalam gudang (lokasi reservasi).
+	LocationID uuid.UUID
+	// BusinessDate kosong = hari ini.
+	BusinessDate     clock.BusinessDate
+	RecipientName    string
+	RecipientPhone   string
+	RecipientAddress string
+	Note             string
+	// Lines: satu baris per batch; SourceLineID baris dokumen asal yang memegang reservasi (mis. alokasi SO).
+	Lines []OutboundLineInput
+}
+
+// CreateOutbound membuat Outbound (nomor OUT) di transaksi aktif tanpa cek permission. Picking & packing oleh Staf
+// Gudang, QC oleh Fulfillment Leader/Merchandiser (bukan penyiap) di Gudang › Outbound. QC gagal memanggil
+// OutboundHandler.Replace dokumen asal; Outbound selesai memanggil OutboundHandler.Completed.
+func (m *Module) CreateOutbound(ctx context.Context, r OutboundRequest) (Outbound, error) {
+	return m.svc.CreateOutbound(ctx, domain.OutboundInput{
+		SourceType: r.SourceType, SourceID: r.SourceID, SourceLabel: r.SourceLabel, LocationID: r.LocationID,
+		BusinessDate: r.BusinessDate, RecipientName: r.RecipientName, RecipientPhone: r.RecipientPhone,
+		RecipientAddress: r.RecipientAddress, Note: r.Note, Lines: r.Lines,
+	})
+}
+
+// OutboundBySource membaca Outbound dokumen asal tanpa cek permission (NOT_FOUND bila belum ada).
+func (m *Module) OutboundBySource(ctx context.Context, sourceType string, sourceID uuid.UUID) (Outbound, error) {
+	return m.svc.OutboundBySource(ctx, sourceType, sourceID)
+}
+
+// CancelOutbound membatalkan Outbound terbuka dokumen asal di transaksi aktif (reservasi tetap milik dokumen
+// asal). Tanpa Outbound terbuka: tidak melakukan apa pun.
+func (m *Module) CancelOutbound(ctx context.Context, sourceType string, sourceID uuid.UUID, reason string) error {
+	return m.svc.CancelOutboundBySource(ctx, sourceType, sourceID, reason)
+}
+
+// RegisterOutboundHandler mendaftarkan callback dokumen asal Outbound (registrasi terakhir menang).
+func (m *Module) RegisterOutboundHandler(sourceType string, h OutboundHandler) {
+	m.svc.RegisterOutboundHandler(sourceType, h)
+}
+
+// SetQCReturns memasang retur pembelian otomatis untuk barang reject QC Outbound dari pemasok/maklon (D-24, S-311).
+func (m *Module) SetQCReturns(r QCReturns) { m.svc.SetQCReturns(r) }

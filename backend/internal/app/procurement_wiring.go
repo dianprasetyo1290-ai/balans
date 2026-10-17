@@ -41,6 +41,8 @@ func (a *App) buildProcurement(mailer *notification.Module) error {
 	// Hasil QC Inbound barang dari Penerimaan Barang: qty ditolak dikembalikan ke pemasok sebagai retur pembelian
 	// tanpa approval (D-24, PRC-05).
 	a.warehouse.RegisterInboundHandler(warehouse.SourceGoodsReceipt, receiptQCHandler(m, a.Clock))
+	// Barang reject QC Outbound dari pemasok/maklon langsung diretur dari Karantina tanpa approval (D-24, S-311).
+	a.warehouse.SetQCReturns(outboundQCReturns{procurement: m, clock: a.Clock})
 	registerAuditEntities(a.audit, procurement.AuditEntities())
 	a.procurement = m
 	a.modules = append(a.modules, m)

@@ -44,6 +44,7 @@ describe("menu", () => {
       "/warehouse/stock-transfers",
       "/warehouse/petty-stock-requests",
       "/warehouse/in-transit",
+      "/warehouse/outbounds",
       "/warehouse/stock-counts",
       "/warehouse/returns",
       "/warehouse/return-dispositions",
@@ -134,6 +135,26 @@ describe("menu", () => {
     expect(group(["catalog"], "Logistik", ["catalog.product.read"])).toBe(
       undefined
     )
+  })
+
+  it("menampilkan halaman Logistik R1.3 sesuai Naming Convention", () => {
+    const logistik = visibleMenu(
+      ["logistics", "catalog"],
+      [],
+      [
+        "logistics.delivery_order.read",
+        "logistics.shipment.read",
+        "logistics.label.post",
+      ]
+    ).find((g) => g.label === "Logistik")
+    expect(logistik?.items.map((i) => i.label)).toEqual([
+      "Delivery Order",
+      "Pengiriman",
+      "Kurir & Resi",
+      "Label Produk",
+      "Label Koli",
+      "Pelacakan Pengiriman",
+    ])
   })
 
   it("menampilkan data master party dan karyawan sesuai modul dan permission", () => {

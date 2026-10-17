@@ -252,6 +252,9 @@ type Problem struct {
 // Id defines model for Id.
 type Id = openapi_types.UUID
 
+// OutboundLineId defines model for OutboundLineId.
+type OutboundLineId = openapi_types.UUID
+
 // Page defines model for Page.
 type Page = int
 

@@ -180,6 +180,9 @@ type Problem struct {
 // Id defines model for Id.
 type Id = openapi_types.UUID
 
+// OutboundLineId defines model for OutboundLineId.
+type OutboundLineId = openapi_types.UUID
+
 // ListDocumentSequencesParams defines parameters for ListDocumentSequences.
 type ListDocumentSequencesParams struct {
 	Year *int `form:"year,omitempty" json:"year,omitempty"`

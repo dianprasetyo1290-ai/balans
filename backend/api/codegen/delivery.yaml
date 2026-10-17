@@ -1,0 +1,8 @@
+package: deliveryhttp
+generate:
+  chi-server: true
+  strict-server: true
+  models: true
+output: internal/logistics/http/deliveryhttp/api.gen.go
+output-options:
+  include-tags: [delivery]

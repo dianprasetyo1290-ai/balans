@@ -280,7 +280,11 @@ export const MENU: MenuGroup[] = [
         to: "/warehouse/in-transit",
         permission: "warehouse.stock_transfer.read",
       },
-      { label: "Outbound" },
+      {
+        label: "Outbound",
+        to: "/warehouse/outbounds",
+        permission: ["warehouse.outbound.read", "warehouse.outbound_qc.read"],
+      },
       {
         label: "Stock Count",
         to: "/warehouse/stock-counts",
@@ -343,14 +347,43 @@ export const MENU: MenuGroup[] = [
     icon: TruckIcon,
     modules: ["logistics", "catalog"],
     items: [
-      ...items("Delivery Order", "Pengiriman", "Kurir & Resi"),
+      {
+        label: "Delivery Order",
+        to: "/logistics/delivery-orders",
+        permission: "logistics.delivery_order.read",
+        module: "logistics",
+      },
+      {
+        label: "Pengiriman",
+        to: "/logistics/shipments",
+        permission: "logistics.shipment.read",
+        module: "logistics",
+      },
+      {
+        label: "Kurir & Resi",
+        to: "/logistics/couriers",
+        permission: "logistics.shipment.read",
+        module: "logistics",
+      },
       {
         label: "Label Produk",
         to: "/logistics/product-labels",
         permission: ["logistics.label.post", "logistics.label.read"],
         module: "catalog",
       },
-      ...items("Label Pengiriman", "Pelacakan Pengiriman"),
+      {
+        label: "Label Koli",
+        to: "/logistics/package-labels",
+        permission: ["logistics.label.post", "logistics.delivery_order.read"],
+        module: "logistics",
+      },
+      ...items("Label Pengiriman"),
+      {
+        label: "Pelacakan Pengiriman",
+        to: "/logistics/tracking",
+        permission: "logistics.shipment.read",
+        module: "logistics",
+      },
     ],
   },
   {

@@ -6,6 +6,7 @@ import (
 	"slices"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 
 	"balans/internal/accounting"
 	"balans/internal/approval"
@@ -169,6 +170,8 @@ type Stock interface {
 	Reserve(ctx context.Context, r inventory.ReserveRequest) (inventory.PostingResult, error)
 	Release(ctx context.Context, r inventory.ReleaseRequest) (inventory.PostingResult, error)
 	Batch(ctx context.Context, id uuid.UUID) (inventory.Batch, error)
+	// SuggestBatches menghitung stok available FEFO untuk stok pengganti QC Outbound.
+	SuggestBatches(ctx context.Context, productID, locationID uuid.UUID, qty decimal.Decimal) (inventory.Suggestion, error)
 }
 
 // Ledger membaca dimensi & akun dan membuat jurnal otomatis (modul accounting).

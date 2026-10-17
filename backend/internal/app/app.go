@@ -70,6 +70,7 @@ type App struct {
 	notification *notification.Module
 	dataexchange *dataexchange.Module
 	sales        *sales.Module
+	logistics    *logistics.Module
 	procurement  *procurement.Module
 	cipher       *pii.Cipher
 	modules      []module
@@ -258,7 +259,7 @@ func (a *App) buildModules() error {
 			WebhookSecret: cfg.BiteshipWebhookSecret,
 			WebhookURL:    cfg.InternalAPIURL + "/api/v1/webhooks/biteship",
 		})
-		a.modules = append(a.modules, logistics.New(logistics.Deps{Provider: provider, Inbox: inbox, Responder: a.Responder, Log: a.Log}))
+		a.buildLogistics(inbox, provider)
 		console.Shipments = provider
 	}
 

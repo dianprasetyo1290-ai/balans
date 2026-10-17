@@ -16,6 +16,8 @@ tags:
     description: Penjualan (Sales Order semua channel, Proforma, Invoice NON-PKP, piutang & pembayaran pelanggan), alasan retur, webhook payment gateway (R1.3)
   - name: logistics
     description: Pengiriman, termasuk webhook kurir
+  - name: delivery
+    description: Logistik R1.3 — master kurir, Delivery Order, pengiriman, resi & AWB, pelacakan, label koli
   - name: identity
     description: Sesi, pengguna, dan permission (R1.1)
   - name: audit
@@ -27,7 +29,7 @@ tags:
   - name: catalog
     description: Master produk, packaging, material, bundling (R1.1)
   - name: warehouse
-    description: Gudang dan lokasi stok (R1.1); Inbound/QC, Transfer Stok, Petty Stock, Stock Count (R1.2)
+    description: Gudang dan lokasi stok (R1.1); Inbound/QC, Transfer Stok, Petty Stock, Stock Count (R1.2); Outbound/QC (R1.3)
   - name: inventory
     description: Ledger stok, batch, HPP FIFO, saran FEFO (R1.2)
   - name: accounting
@@ -1873,6 +1875,317 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+  /api/v1/couriers:
+    get:
+      operationId: listCouriers
+      tags:
+        - delivery
+      summary: Master kurir (Kurir & Resi)
+      description: Permission `logistics.shipment.read` atau `logistics.delivery_order.read`.
+      parameters:
+        - name: active
+          in: query
+          description: true = hanya kurir aktif (dropdown pengiriman).
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Daftar kurir
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourierList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createCourier
+      tags:
+        - delivery
+      summary: Menambah kurir
+      description: Permission `logistics.shipment.write`.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourierInput'
+      responses:
+        '201':
+          description: Kurir dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Courier'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/couriers/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    put:
+      operationId: updateCourier
+      tags:
+        - delivery
+      summary: Mengubah nama, jenis, atau status kurir (kode tetap)
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourierUpdateInput'
+      responses:
+        '200':
+          description: Kurir diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Courier'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/delivery-orders:
+    get:
+      operationId: listDeliveryOrders
+      tags:
+        - delivery
+      summary: Daftar Delivery Order
+      description: Cari nomor DO, dokumen asal, penerima, resi, atau AWB. Permission `logistics.delivery_order.read`.
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Search'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/DeliveryOrderStatus'
+        - name: deliveryType
+          in: query
+          schema:
+            $ref: '#/components/schemas/DeliveryOrderType'
+        - name: sourceId
+          in: query
+          description: DO milik satu dokumen asal (mis. Sales Order).
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Daftar DO
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryOrderList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createDeliveryOrder
+      tags:
+        - delivery
+      summary: Membuat Delivery Order Draft dari Sales Order Diproses (S-309)
+      description: |
+        Satu baris per alokasi yang belum dikirim, batch dari alokasi FEFO. Hanya satu DO terbuka per Sales Order.
+        Permission `logistics.delivery_order.write`.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeliveryOrderCreateInput'
+      responses:
+        '201':
+          description: DO dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryOrder'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/delivery-orders/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      operationId: getDeliveryOrder
+      tags:
+        - delivery
+      summary: Detail DO beserta Outbound, koli, label produk, pengiriman, dan riwayat pelacakan
+      description: Permission `logistics.delivery_order.read`, `logistics.shipment.read`, atau `logistics.label.post`.
+      responses:
+        '200':
+          description: Detail DO
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryOrder'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/delivery-orders/{id}/release:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      operationId: releaseDeliveryOrder
+      tags:
+        - delivery
+      summary: Release DO (Logistik Leader) — nomor DO dan Outbound dibuat
+      description: Permission `logistics.delivery_order.post`.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: DO Diproses
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryOrder'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/delivery-orders/{id}/ship:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      operationId: shipDeliveryOrder
+      tags:
+        - delivery
+      summary: Serah ke kurir — kurir, resi manual, AWB marketplace, kurir internal (S-312)
+      description: |
+        Hanya setelah Outbound selesai QC. Barang lulus QC keluar dari stok dan jurnal dokumen asal dibuat (HPP A-06;
+        marketplace A-10 saat serah ke kurir). Kurir internal wajib memilih Merchandiser. Permission
+        `logistics.shipment.write`.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeliveryOrderShipInput'
+      responses:
+        '200':
+          description: DO Dalam Pengiriman
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryOrder'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/delivery-orders/{id}/deliver:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      operationId: deliverDeliveryOrder
+      tags:
+        - delivery
+      summary: Konfirmasi barang diterima (foto/tanda terima dari HP)
+      description: |
+        Kurir internal: hanya Merchandiser pengantar dan wajib foto/tanda terima (unggah ke owner `delivery_proof`).
+        Permission `logistics.shipment.post`.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeliveryOrderDeliverInput'
+      responses:
+        '200':
+          description: DO Diterima
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryOrder'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/delivery-orders/{id}/cancel:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      operationId: cancelDeliveryOrder
+      tags:
+        - delivery
+      summary: Membatalkan DO sebelum dikirim (Outbound ikut dibatalkan)
+      description: Permission `logistics.delivery_order.cancel`.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeliveryOrderCancelInput'
+      responses:
+        '200':
+          description: DO Dibatalkan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryOrder'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/shipments:
+    get:
+      operationId: listShipments
+      tags:
+        - delivery
+      summary: Daftar pengiriman (Pengiriman, Pelacakan Pengiriman)
+      description: Cari nomor DO, penerima, resi, atau AWB. Permission `logistics.shipment.read`.
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Search'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/ShipmentStatus'
+        - name: mine
+          in: query
+          description: true = hanya pengiriman kurir internal yang ditugaskan ke user ini.
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Daftar pengiriman
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShipmentList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/shipments/{id}/events:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      operationId: recordShipmentEvent
+      tags:
+        - delivery
+      summary: Mencatat status pelacakan manual (diserahkan, dalam perjalanan, kembali)
+      description: Status Diterima dicatat lewat konfirmasi diterima DO. Permission `logistics.shipment.write`.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShipmentEventInput'
+      responses:
+        '200':
+          description: Pengiriman setelah dicatat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shipment'
+        default:
+          $ref: '#/components/responses/Problem'
   /api/v1/auth/login:
     post:
       operationId: login
@@ -6332,6 +6645,186 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Inbound'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/outbounds:
+    get:
+      operationId: listOutbounds
+      tags:
+        - warehouse
+      summary: Daftar Outbound — picking, packing, dan QC barang keluar (WMS-12)
+      description: Terbaru lebih dulu. Permission `warehouse.outbound.read` atau `warehouse.outbound_qc.read`.
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Search'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/OutboundStatus'
+        - name: sourceType
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Daftar Outbound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutboundList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/outbounds/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      operationId: getOutbound
+      tags:
+        - warehouse
+      summary: Detail Outbound beserta picking list per batch, koli, dan catatan QC
+      responses:
+        '200':
+          description: Detail Outbound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Outbound'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/outbounds/{id}/pick:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      operationId: pickOutbound
+      tags:
+        - warehouse
+      summary: Konfirmasi picking (Staf Gudang, penyiap barang)
+      description: |
+        Baris yang dipilih (kosong = semua baris menunggu picking) dicatat sudah diambil sesuai batch dan qty alokasi.
+        User ini menjadi penyiap barang (`prepared_by`) dan tidak boleh melakukan QC. Permission `warehouse.outbound.write`.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OutboundPickInput'
+      responses:
+        '200':
+          description: Outbound setelah picking
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Outbound'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/outbounds/{id}/pack:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      operationId: packOutbound
+      tags:
+        - warehouse
+      summary: Packing dan pencatatan koli (S-316)
+      description: |
+        Semua baris yang diambil/lulus QC harus masuk koli seluruhnya. Packing ulang menggantikan koli sebelumnya
+        (wajib setelah QC gagal dan stok pengganti). Permission `warehouse.outbound.write`.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OutboundPackInput'
+      responses:
+        '200':
+          description: Outbound setelah packing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Outbound'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/outbounds/{id}/lines/{lineId}/qc:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/OutboundLineId'
+    post:
+      operationId: recordOutboundQc
+      tags:
+        - warehouse
+      summary: QC Outbound satu baris (Fulfillment Leader/Merchandiser, bukan penyiap barang)
+      description: |
+        Qty lulus + ditolak = qty diambil. Qty ditolak pindah ke Karantina dan stok pengganti FEFO langsung
+        dialokasikan (baris pengganti menunggu picking ulang); stok kurang → baris ditahan dan Sales/CS mendapat
+        notifikasi; barang dari pemasok/maklon diretur otomatis tanpa approval (nota debit, A-02). QC oleh penyiap
+        barang ditolak `FORBIDDEN`. Permission `warehouse.outbound_qc.post`.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OutboundQcInput'
+      responses:
+        '200':
+          description: Outbound setelah QC
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Outbound'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/outbounds/{id}/lines/{lineId}/reallocate:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/OutboundLineId'
+    post:
+      operationId: reallocateOutboundLine
+      tags:
+        - warehouse
+      summary: Alokasi ulang baris yang ditahan setelah stok tersedia
+      description: Permission `warehouse.outbound.write`. Stok tetap kurang → `STOCK_INSUFFICIENT`.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Outbound setelah alokasi ulang
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Outbound'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/outbounds/{id}/lines/{lineId}/drop:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/OutboundLineId'
+    post:
+      operationId: dropOutboundLine
+      tags:
+        - warehouse
+      summary: Kirim sebagian — qty baris ditahan tidak ikut dikirim (keputusan user)
+      description: Sisa pesanan tetap terbuka untuk dikirim dengan dokumen berikutnya. Permission `warehouse.outbound.post`.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OutboundDropInput'
+      responses:
+        '200':
+          description: Outbound setelah keputusan kirim sebagian
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Outbound'
         default:
           $ref: '#/components/responses/Problem'
   /api/v1/stock-transfers:
@@ -13919,6 +14412,645 @@ components:
           type: string
         status:
           type: string
+    Courier:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - isInternal
+        - isActive
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        isInternal:
+          type: boolean
+          description: Kurir internal (Merchandiser) — wajib memilih user pengantar.
+        isActive:
+          type: boolean
+        version:
+          type: integer
+    CourierList:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Courier'
+    CourierInput:
+      type: object
+      required:
+        - code
+        - name
+        - isInternal
+        - isActive
+      properties:
+        code:
+          type: string
+          maxLength: 30
+        name:
+          type: string
+          maxLength: 100
+        isInternal:
+          type: boolean
+        isActive:
+          type: boolean
+    CourierUpdateInput:
+      type: object
+      required:
+        - version
+        - name
+        - isInternal
+        - isActive
+      properties:
+        version:
+          type: integer
+        name:
+          type: string
+          maxLength: 100
+        isInternal:
+          type: boolean
+        isActive:
+          type: boolean
+    DeliveryOrderStatus:
+      type: string
+      description: Status Delivery Order (Desain Status Dokumen 5.4).
+      enum:
+        - draft
+        - in_progress
+        - in_transit
+        - received
+        - cancelled
+    DeliveryOrderType:
+      type: string
+      description: |
+        Jenis Delivery Order: `sales` penjualan (MT beli putus, B2B, WA/IG, karyawan), `marketplace` pesanan marketplace
+        (serah ke kurir = pengakuan penjualan), `consignment` konsinyasi, `vending_buffer` buffer vending, `transfer` lainnya.
+      enum:
+        - sales
+        - marketplace
+        - consignment
+        - vending_buffer
+        - transfer
+    DeliveryOrderSummary:
+      type: object
+      required:
+        - id
+        - deliveryType
+        - sourceType
+        - sourceId
+        - sourceLabel
+        - recipientName
+        - businessDate
+        - status
+        - lineCount
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        deliveryType:
+          $ref: '#/components/schemas/DeliveryOrderType'
+        sourceType:
+          type: string
+        sourceId:
+          type: string
+          format: uuid
+        sourceLabel:
+          type: string
+        recipientName:
+          type: string
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        status:
+          $ref: '#/components/schemas/DeliveryOrderStatus'
+        lineCount:
+          type: integer
+        courierName:
+          type: string
+        trackingNumber:
+          type: string
+        marketplaceAwb:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    DeliveryOrderList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/DeliveryOrderSummary'
+    DeliveryOrderCreateInput:
+      type: object
+      required:
+        - salesOrderId
+      properties:
+        salesOrderId:
+          type: string
+          format: uuid
+        note:
+          type: string
+          maxLength: 500
+    LocationType:
+      type: string
+      description: |
+        Di dalam gudang: `inbound`, `finished_goods` (FG Non-Ecommerce), `ecommerce` (E-commerce Stock), `petty_stock` (Petty Stock),
+        `raw_material` (RM), `goods_material` (GM), `returns`, `event`. Eksternal: `toll_manufacturer` (maklon),
+        `consignment`, `vending_buffer`, `vending_machine`.
+      enum:
+        - inbound
+        - finished_goods
+        - ecommerce
+        - petty_stock
+        - raw_material
+        - goods_material
+        - returns
+        - event
+        - toll_manufacturer
+        - consignment
+        - vending_buffer
+        - vending_machine
+    WhLocationRef:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - locationType
+        - locationTypeLabel
+        - isExternal
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        locationType:
+          $ref: '#/components/schemas/LocationType'
+        locationTypeLabel:
+          type: string
+        isExternal:
+          type: boolean
+        warehouseName:
+          type: string
+    DeliveryOutboundRef:
+      type: object
+      required:
+        - id
+        - number
+        - status
+        - needsAttention
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        status:
+          type: string
+          enum:
+            - in_progress
+            - completed
+            - cancelled
+        needsAttention:
+          type: boolean
+          description: Ada baris ditahan menunggu stok.
+    DeliveryProductRef:
+      type: object
+      required:
+        - id
+        - sku
+        - name
+        - uom
+      properties:
+        id:
+          type: string
+          format: uuid
+        sku:
+          type: string
+        name:
+          type: string
+        uom:
+          type: string
+        barcode:
+          type: string
+          description: Barcode utama produk.
+    DeliveryQuantity:
+      type: string
+      description: Kuantitas desimal (maks. 3 angka di belakang koma).
+      pattern: ^-?[0-9]{1,15}(\.[0-9]{1,3})?$
+    DeliveryBatchRef:
+      type: object
+      required:
+        - id
+        - number
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        expiryDate:
+          $ref: '#/components/schemas/BusinessDate'
+    DeliveryOrderBatch:
+      type: object
+      required:
+        - qty
+      properties:
+        batch:
+          $ref: '#/components/schemas/DeliveryBatchRef'
+        qty:
+          $ref: '#/components/schemas/DeliveryQuantity'
+    DeliveryOrderLine:
+      type: object
+      required:
+        - id
+        - lineNo
+        - product
+        - qty
+        - shippedQty
+        - batches
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        sourceLineId:
+          type: string
+          format: uuid
+        product:
+          $ref: '#/components/schemas/DeliveryProductRef'
+        qty:
+          $ref: '#/components/schemas/DeliveryQuantity'
+        shippedQty:
+          $ref: '#/components/schemas/DeliveryQuantity'
+        batches:
+          type: array
+          description: Rencana batch saat DO dibuat (batch final di picking list Outbound).
+          items:
+            $ref: '#/components/schemas/DeliveryOrderBatch'
+    DeliveryPrintLine:
+      type: object
+      description: Baris cetak DO/surat jalan tanpa harga — produk, batch, kedaluwarsa, qty.
+      required:
+        - product
+        - qty
+      properties:
+        product:
+          $ref: '#/components/schemas/DeliveryProductRef'
+        batch:
+          $ref: '#/components/schemas/DeliveryBatchRef'
+        qty:
+          $ref: '#/components/schemas/DeliveryQuantity'
+    DeliveryPackageItem:
+      type: object
+      required:
+        - product
+        - qty
+      properties:
+        product:
+          $ref: '#/components/schemas/DeliveryProductRef'
+        batch:
+          $ref: '#/components/schemas/DeliveryBatchRef'
+        qty:
+          $ref: '#/components/schemas/DeliveryQuantity'
+    DeliveryPackage:
+      type: object
+      required:
+        - packageNumber
+        - packageCount
+        - items
+      properties:
+        packageNumber:
+          type: integer
+        packageCount:
+          type: integer
+        weightGrams:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryPackageItem'
+    DeliveryProductLabel:
+      type: object
+      description: Label produk per baris DO; kode produk mitra dipakai bila ada (S-316).
+      required:
+        - product
+        - qty
+        - partnerCodeMissing
+      properties:
+        product:
+          $ref: '#/components/schemas/DeliveryProductRef'
+        batch:
+          $ref: '#/components/schemas/DeliveryBatchRef'
+        qty:
+          $ref: '#/components/schemas/DeliveryQuantity'
+        partnerArticleCode:
+          type: string
+        partnerBarcode:
+          type: string
+        partnerCodeMissing:
+          type: boolean
+          description: DO untuk mitra tetapi produk belum punya kode produk mitra (tampilkan peringatan).
+    ShipmentStatus:
+      type: string
+      description: '`picked_up` diserahkan ke kurir, `in_transit` dalam perjalanan, `delivered` diterima, `returned` kembali.'
+      enum:
+        - picked_up
+        - in_transit
+        - delivered
+        - returned
+    Shipment:
+      type: object
+      required:
+        - id
+        - deliveryOrderId
+        - courier
+        - internalCourierName
+        - serviceCode
+        - trackingNumber
+        - marketplaceAwb
+        - shippingCost
+        - packageCount
+        - status
+        - shippedAt
+        - receivedByName
+        - deliveryNote
+        - proofFileIds
+        - confirmedByName
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        deliveryOrderId:
+          type: string
+          format: uuid
+        courier:
+          $ref: '#/components/schemas/Courier'
+        internalCourierUserId:
+          type: string
+          format: uuid
+        internalCourierName:
+          type: string
+        serviceCode:
+          type: string
+        trackingNumber:
+          type: string
+        marketplaceAwb:
+          type: string
+        shippingCost:
+          $ref: '#/components/schemas/Money'
+        packageCount:
+          type: integer
+        status:
+          $ref: '#/components/schemas/ShipmentStatus'
+        shippedAt:
+          type: string
+          format: date-time
+        deliveredAt:
+          type: string
+          format: date-time
+        receivedByName:
+          type: string
+        deliveryNote:
+          type: string
+        proofFileIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        confirmedByName:
+          type: string
+        version:
+          type: integer
+    ShipmentEvent:
+      type: object
+      required:
+        - id
+        - status
+        - occurredAt
+        - source
+        - note
+        - createdByName
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/ShipmentStatus'
+        occurredAt:
+          type: string
+          format: date-time
+        source:
+          type: string
+          enum:
+            - manual
+            - webhook
+        note:
+          type: string
+        createdByName:
+          type: string
+    DeliveryOrder:
+      allOf:
+        - $ref: '#/components/schemas/DeliveryOrderSummary'
+        - type: object
+          required:
+            - recipientPhone
+            - shipToAddress
+            - location
+            - note
+            - releasedByName
+            - cancelReason
+            - lines
+            - printLines
+            - packages
+            - productLabels
+            - events
+            - allowedActions
+            - version
+          properties:
+            salesOrderId:
+              type: string
+              format: uuid
+            partnerId:
+              type: string
+              format: uuid
+            customerId:
+              type: string
+              format: uuid
+            recipientPhone:
+              type: string
+            shipToAddress:
+              type: string
+            location:
+              $ref: '#/components/schemas/WhLocationRef'
+            note:
+              type: string
+            releasedByName:
+              type: string
+            releasedAt:
+              type: string
+              format: date-time
+            outboundCompletedAt:
+              type: string
+              format: date-time
+            shippedAt:
+              type: string
+              format: date-time
+            deliveredAt:
+              type: string
+              format: date-time
+            cancelReason:
+              type: string
+            outbound:
+              $ref: '#/components/schemas/DeliveryOutboundRef'
+            lines:
+              type: array
+              items:
+                $ref: '#/components/schemas/DeliveryOrderLine'
+            printLines:
+              type: array
+              items:
+                $ref: '#/components/schemas/DeliveryPrintLine'
+            packages:
+              type: array
+              items:
+                $ref: '#/components/schemas/DeliveryPackage'
+            productLabels:
+              type: array
+              items:
+                $ref: '#/components/schemas/DeliveryProductLabel'
+            shipment:
+              $ref: '#/components/schemas/Shipment'
+            events:
+              type: array
+              items:
+                $ref: '#/components/schemas/ShipmentEvent'
+            allowedActions:
+              type: array
+              items:
+                type: string
+                enum:
+                  - release
+                  - ship
+                  - deliver
+                  - cancel
+            version:
+              type: integer
+    DeliveryOrderShipInput:
+      type: object
+      required:
+        - version
+        - courierId
+      properties:
+        version:
+          type: integer
+        courierId:
+          type: string
+          format: uuid
+        internalCourierUserId:
+          type: string
+          format: uuid
+          description: Wajib untuk kurir internal — user Merchandiser yang mengantar.
+        serviceCode:
+          type: string
+          maxLength: 40
+        trackingNumber:
+          type: string
+          maxLength: 60
+          description: Nomor resi kurir (manual).
+        marketplaceAwb:
+          type: string
+          maxLength: 60
+          description: AWB/barcode marketplace — wajib untuk DO marketplace.
+        shippingCost:
+          $ref: '#/components/schemas/Money'
+    DeliveryOrderDeliverInput:
+      type: object
+      properties:
+        receivedByName:
+          type: string
+          maxLength: 200
+        note:
+          type: string
+          maxLength: 500
+        proofFileIds:
+          type: array
+          maxItems: 5
+          items:
+            type: string
+            format: uuid
+    DeliveryOrderCancelInput:
+      type: object
+      required:
+        - version
+        - reason
+      properties:
+        version:
+          type: integer
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 500
+    ShipmentSummary:
+      allOf:
+        - $ref: '#/components/schemas/Shipment'
+        - type: object
+          required:
+            - deliveryOrderNumber
+            - deliveryType
+            - recipientName
+            - sourceLabel
+          properties:
+            deliveryOrderNumber:
+              type: string
+            deliveryType:
+              $ref: '#/components/schemas/DeliveryOrderType'
+            recipientName:
+              type: string
+            sourceLabel:
+              type: string
+    ShipmentList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/ShipmentSummary'
+    ShipmentEventInput:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          $ref: '#/components/schemas/ShipmentStatus'
+        note:
+          type: string
+          maxLength: 500
     LoginRequest:
       type: object
       required:
@@ -15239,25 +16371,6 @@ components:
       allOf:
         - $ref: '#/components/schemas/WarehouseFields'
         - $ref: '#/components/schemas/VersionInput'
-    LocationType:
-      type: string
-      description: |
-        Di dalam gudang: `inbound`, `finished_goods` (FG Non-Ecommerce), `ecommerce` (E-commerce Stock), `petty_stock` (Petty Stock),
-        `raw_material` (RM), `goods_material` (GM), `returns`, `event`. Eksternal: `toll_manufacturer` (maklon),
-        `consignment`, `vending_buffer`, `vending_machine`.
-      enum:
-        - inbound
-        - finished_goods
-        - ecommerce
-        - petty_stock
-        - raw_material
-        - goods_material
-        - returns
-        - event
-        - toll_manufacturer
-        - consignment
-        - vending_buffer
-        - vending_machine
     ExternalPartyType:
       type: string
       enum:
@@ -19394,31 +20507,6 @@ components:
       enum:
         - in_progress
         - completed
-    WhLocationRef:
-      type: object
-      required:
-        - id
-        - code
-        - name
-        - locationType
-        - locationTypeLabel
-        - isExternal
-      properties:
-        id:
-          type: string
-          format: uuid
-        code:
-          type: string
-        name:
-          type: string
-        locationType:
-          $ref: '#/components/schemas/LocationType'
-        locationTypeLabel:
-          type: string
-        isExternal:
-          type: boolean
-        warehouseName:
-          type: string
     InboundSummary:
       type: object
       required:
@@ -19681,6 +20769,330 @@ components:
           items:
             type: string
             format: uuid
+    OutboundStatus:
+      type: string
+      description: '`in_progress` Diproses, `completed` Selesai (siap diserahkan), `cancelled` Dibatalkan.'
+      enum:
+        - in_progress
+        - completed
+        - cancelled
+    OutboundSummary:
+      type: object
+      required:
+        - id
+        - number
+        - sourceType
+        - sourceTypeLabel
+        - sourceId
+        - sourceLabel
+        - location
+        - businessDate
+        - recipientName
+        - status
+        - lineCount
+        - pendingCount
+        - heldCount
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        sourceType:
+          type: string
+        sourceTypeLabel:
+          type: string
+        sourceId:
+          type: string
+          format: uuid
+        sourceLabel:
+          type: string
+        location:
+          $ref: '#/components/schemas/WhLocationRef'
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        recipientName:
+          type: string
+        status:
+          $ref: '#/components/schemas/OutboundStatus'
+        lineCount:
+          type: integer
+        pendingCount:
+          type: integer
+          description: Baris menunggu picking atau QC.
+        heldCount:
+          type: integer
+          description: Baris ditahan menunggu stok.
+        createdAt:
+          type: string
+          format: date-time
+    OutboundList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/OutboundSummary'
+    OutboundLineStatus:
+      type: string
+      description: |
+        `pending` menunggu picking, `picked` sudah diambil (menunggu QC), `passed` lulus QC, `qc_rejected` Ditolak QC,
+        `held` ditahan menunggu stok pengganti, `dropped` tidak ikut dikirim (kirim sebagian).
+      enum:
+        - pending
+        - picked
+        - passed
+        - qc_rejected
+        - held
+        - dropped
+    OutboundLineAction:
+      type: string
+      enum:
+        - qc
+        - reallocate
+        - drop
+    OutboundLine:
+      type: object
+      required:
+        - id
+        - lineNo
+        - product
+        - allocatedQty
+        - pickedQty
+        - passedQty
+        - rejectedQty
+        - status
+        - rejectReason
+        - returnLabel
+        - allowedActions
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        sourceLineId:
+          type: string
+          format: uuid
+        product:
+          $ref: '#/components/schemas/WhProductRef'
+        batch:
+          $ref: '#/components/schemas/WhBatchRef'
+        allocatedQty:
+          $ref: '#/components/schemas/WhQuantity'
+        pickedQty:
+          $ref: '#/components/schemas/WhQuantity'
+        passedQty:
+          $ref: '#/components/schemas/WhQuantity'
+        rejectedQty:
+          $ref: '#/components/schemas/WhQuantity'
+        status:
+          $ref: '#/components/schemas/OutboundLineStatus'
+        replacementOfLineId:
+          type: string
+          format: uuid
+        rejectReason:
+          type: string
+        returnLabel:
+          type: string
+          description: Nomor retur pembelian otomatis (RB) barang yang ditolak.
+        checkedByName:
+          type: string
+        checkedAt:
+          type: string
+          format: date-time
+        allowedActions:
+          type: array
+          items:
+            $ref: '#/components/schemas/OutboundLineAction'
+    OutboundPackageItem:
+      type: object
+      required:
+        - lineId
+        - product
+        - qty
+      properties:
+        lineId:
+          type: string
+          format: uuid
+        product:
+          $ref: '#/components/schemas/WhProductRef'
+        batch:
+          $ref: '#/components/schemas/WhBatchRef'
+        qty:
+          $ref: '#/components/schemas/WhQuantity'
+    OutboundPackage:
+      type: object
+      required:
+        - packageNumber
+        - packageCount
+        - items
+      properties:
+        packageNumber:
+          type: integer
+        packageCount:
+          type: integer
+        weightGrams:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OutboundPackageItem'
+    OutboundAction:
+      type: string
+      enum:
+        - pick
+        - pack
+    Outbound:
+      allOf:
+        - $ref: '#/components/schemas/OutboundSummary'
+        - type: object
+          required:
+            - recipientPhone
+            - recipientAddress
+            - note
+            - preparedByName
+            - checkedByName
+            - needsRepack
+            - lines
+            - packages
+            - checks
+            - allowedActions
+            - version
+          properties:
+            recipientPhone:
+              type: string
+            recipientAddress:
+              type: string
+            note:
+              type: string
+            preparedById:
+              type: string
+              format: uuid
+            preparedByName:
+              type: string
+            packedAt:
+              type: string
+              format: date-time
+            checkedByName:
+              type: string
+            completedAt:
+              type: string
+              format: date-time
+            cancelReason:
+              type: string
+            needsRepack:
+              type: boolean
+              description: Isi barang berubah setelah QC (stok pengganti); koli harus dicatat ulang.
+            version:
+              type: integer
+            lines:
+              type: array
+              items:
+                $ref: '#/components/schemas/OutboundLine'
+            packages:
+              type: array
+              items:
+                $ref: '#/components/schemas/OutboundPackage'
+            checks:
+              type: array
+              items:
+                $ref: '#/components/schemas/InboundQualityCheck'
+            allowedActions:
+              type: array
+              items:
+                $ref: '#/components/schemas/OutboundAction'
+    OutboundPickInput:
+      type: object
+      required:
+        - version
+      properties:
+        version:
+          type: integer
+        lineIds:
+          type: array
+          maxItems: 200
+          items:
+            type: string
+            format: uuid
+    OutboundPackItemInput:
+      type: object
+      required:
+        - lineId
+        - qty
+      properties:
+        lineId:
+          type: string
+          format: uuid
+        qty:
+          $ref: '#/components/schemas/WhQuantity'
+    OutboundPackageInput:
+      type: object
+      required:
+        - items
+      properties:
+        weightGrams:
+          type: integer
+          minimum: 1
+        items:
+          type: array
+          minItems: 1
+          maxItems: 200
+          items:
+            $ref: '#/components/schemas/OutboundPackItemInput'
+    OutboundPackInput:
+      type: object
+      required:
+        - version
+        - packages
+      properties:
+        version:
+          type: integer
+        packages:
+          type: array
+          minItems: 1
+          maxItems: 500
+          items:
+            $ref: '#/components/schemas/OutboundPackageInput'
+    OutboundQcInput:
+      type: object
+      required:
+        - passedQty
+        - rejectedQty
+        - checks
+      properties:
+        passedQty:
+          $ref: '#/components/schemas/WhQuantity'
+        rejectedQty:
+          $ref: '#/components/schemas/WhQuantity'
+        checks:
+          $ref: '#/components/schemas/InboundQcChecklist'
+        rejectReason:
+          type: string
+          maxLength: 500
+        note:
+          type: string
+          maxLength: 500
+        photoFileIds:
+          type: array
+          maxItems: 5
+          items:
+            type: string
+            format: uuid
+    OutboundDropInput:
+      type: object
+      required:
+        - reason
+      properties:
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 500
     StockTransferType:
       type: string
       description: '`direct` Transfer Stok, `request` Permintaan Petty Stock.'
@@ -26660,6 +28072,13 @@ components:
     ReportCampaignId:
       name: campaignId
       in: query
+      schema:
+        type: string
+        format: uuid
+    OutboundLineId:
+      name: lineId
+      in: path
+      required: true
       schema:
         type: string
         format: uuid

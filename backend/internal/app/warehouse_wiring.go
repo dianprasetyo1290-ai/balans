@@ -172,6 +172,10 @@ func (a *App) connectWarehouseDocuments() {
 			ContentTypes: photos, MaxBytes: maxPhotoBytes,
 		})
 		a.filestore.RegisterOwner(filestore.OwnerPolicy{
+			OwnerType: warehouse.FileOwnerOutboundQC, WritePermission: warehouse.PermOutboundQC, ReadPermission: warehouse.PermOutboundQCRead,
+			ContentTypes: photos, MaxBytes: maxPhotoBytes,
+		})
+		a.filestore.RegisterOwner(filestore.OwnerPolicy{
 			OwnerType: warehouse.FileOwnerCount, WritePermission: warehouse.PermCountWrite, ReadPermission: warehouse.PermCountRead,
 			ContentTypes: photos, MaxBytes: maxPhotoBytes,
 		})

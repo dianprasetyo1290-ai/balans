@@ -16,6 +16,8 @@ tags:
     description: Penjualan (Sales Order semua channel, Proforma, Invoice NON-PKP, piutang & pembayaran pelanggan), alasan retur, webhook payment gateway (R1.3)
   - name: logistics
     description: Pengiriman, termasuk webhook kurir
+  - name: delivery
+    description: Logistik R1.3 — master kurir, Delivery Order, pengiriman, resi & AWB, pelacakan, label koli
   - name: identity
     description: Sesi, pengguna, dan permission (R1.1)
   - name: audit
@@ -27,7 +29,7 @@ tags:
   - name: catalog
     description: Master produk, packaging, material, bundling (R1.1)
   - name: warehouse
-    description: Gudang dan lokasi stok (R1.1); Inbound/QC, Transfer Stok, Petty Stock, Stock Count (R1.2)
+    description: Gudang dan lokasi stok (R1.1); Inbound/QC, Transfer Stok, Petty Stock, Stock Count (R1.2); Outbound/QC (R1.3)
   - name: inventory
     description: Ledger stok, batch, HPP FIFO, saran FEFO (R1.2)
   - name: accounting
@@ -169,6 +171,26 @@ paths:
     $ref: "./paths/sales_consignment.yaml#/consignmentReconciliationCancel"
   /api/v1/webhooks/biteship:
     $ref: "./paths/logistics.yaml#/biteshipWebhook"
+  /api/v1/couriers:
+    $ref: "./paths/logistics_delivery.yaml#/couriers"
+  /api/v1/couriers/{id}:
+    $ref: "./paths/logistics_delivery.yaml#/courier"
+  /api/v1/delivery-orders:
+    $ref: "./paths/logistics_delivery.yaml#/deliveryOrders"
+  /api/v1/delivery-orders/{id}:
+    $ref: "./paths/logistics_delivery.yaml#/deliveryOrder"
+  /api/v1/delivery-orders/{id}/release:
+    $ref: "./paths/logistics_delivery.yaml#/deliveryOrderRelease"
+  /api/v1/delivery-orders/{id}/ship:
+    $ref: "./paths/logistics_delivery.yaml#/deliveryOrderShip"
+  /api/v1/delivery-orders/{id}/deliver:
+    $ref: "./paths/logistics_delivery.yaml#/deliveryOrderDeliver"
+  /api/v1/delivery-orders/{id}/cancel:
+    $ref: "./paths/logistics_delivery.yaml#/deliveryOrderCancel"
+  /api/v1/shipments:
+    $ref: "./paths/logistics_delivery.yaml#/shipments"
+  /api/v1/shipments/{id}/events:
+    $ref: "./paths/logistics_delivery.yaml#/shipmentEvents"
   /api/v1/auth/login:
     $ref: "./paths/identity.yaml#/login"
   /api/v1/auth/refresh:
@@ -455,6 +477,20 @@ paths:
     $ref: "./paths/warehouse_documents.yaml#/inbound"
   /api/v1/inbounds/{id}/lines/{lineId}/qc:
     $ref: "./paths/warehouse_documents.yaml#/inboundLineQc"
+  /api/v1/outbounds:
+    $ref: "./paths/warehouse_outbounds.yaml#/outbounds"
+  /api/v1/outbounds/{id}:
+    $ref: "./paths/warehouse_outbounds.yaml#/outbound"
+  /api/v1/outbounds/{id}/pick:
+    $ref: "./paths/warehouse_outbounds.yaml#/outboundPick"
+  /api/v1/outbounds/{id}/pack:
+    $ref: "./paths/warehouse_outbounds.yaml#/outboundPack"
+  /api/v1/outbounds/{id}/lines/{lineId}/qc:
+    $ref: "./paths/warehouse_outbounds.yaml#/outboundLineQc"
+  /api/v1/outbounds/{id}/lines/{lineId}/reallocate:
+    $ref: "./paths/warehouse_outbounds.yaml#/outboundLineReallocate"
+  /api/v1/outbounds/{id}/lines/{lineId}/drop:
+    $ref: "./paths/warehouse_outbounds.yaml#/outboundLineDrop"
   /api/v1/stock-transfers:
     $ref: "./paths/warehouse_documents.yaml#/stockTransfers"
   /api/v1/stock-transfers/in-transit:

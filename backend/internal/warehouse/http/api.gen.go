@@ -157,13 +157,13 @@ func (e ExternalPartyType) Valid() bool {
 
 // Defines values for InboundLineAllowedActions.
 const (
-	Qc InboundLineAllowedActions = "qc"
+	InboundLineAllowedActionsQc InboundLineAllowedActions = "qc"
 )
 
 // Valid indicates whether the value is a known member of the InboundLineAllowedActions enum.
 func (e InboundLineAllowedActions) Valid() bool {
 	switch e {
-	case Qc:
+	case InboundLineAllowedActionsQc:
 		return true
 	default:
 		return false
@@ -287,6 +287,96 @@ func (e LocationType) Valid() bool {
 	case LocationTypeVendingBuffer:
 		return true
 	case LocationTypeVendingMachine:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for OutboundAction.
+const (
+	Pack OutboundAction = "pack"
+	Pick OutboundAction = "pick"
+)
+
+// Valid indicates whether the value is a known member of the OutboundAction enum.
+func (e OutboundAction) Valid() bool {
+	switch e {
+	case Pack:
+		return true
+	case Pick:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for OutboundLineAction.
+const (
+	OutboundLineActionDrop       OutboundLineAction = "drop"
+	OutboundLineActionQc         OutboundLineAction = "qc"
+	OutboundLineActionReallocate OutboundLineAction = "reallocate"
+)
+
+// Valid indicates whether the value is a known member of the OutboundLineAction enum.
+func (e OutboundLineAction) Valid() bool {
+	switch e {
+	case OutboundLineActionDrop:
+		return true
+	case OutboundLineActionQc:
+		return true
+	case OutboundLineActionReallocate:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for OutboundLineStatus.
+const (
+	OutboundLineStatusDropped    OutboundLineStatus = "dropped"
+	OutboundLineStatusHeld       OutboundLineStatus = "held"
+	OutboundLineStatusPassed     OutboundLineStatus = "passed"
+	OutboundLineStatusPending    OutboundLineStatus = "pending"
+	OutboundLineStatusPicked     OutboundLineStatus = "picked"
+	OutboundLineStatusQcRejected OutboundLineStatus = "qc_rejected"
+)
+
+// Valid indicates whether the value is a known member of the OutboundLineStatus enum.
+func (e OutboundLineStatus) Valid() bool {
+	switch e {
+	case OutboundLineStatusDropped:
+		return true
+	case OutboundLineStatusHeld:
+		return true
+	case OutboundLineStatusPassed:
+		return true
+	case OutboundLineStatusPending:
+		return true
+	case OutboundLineStatusPicked:
+		return true
+	case OutboundLineStatusQcRejected:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for OutboundStatus.
+const (
+	OutboundStatusCancelled  OutboundStatus = "cancelled"
+	OutboundStatusCompleted  OutboundStatus = "completed"
+	OutboundStatusInProgress OutboundStatus = "in_progress"
+)
+
+// Valid indicates whether the value is a known member of the OutboundStatus enum.
+func (e OutboundStatus) Valid() bool {
+	switch e {
+	case OutboundStatusCancelled:
+		return true
+	case OutboundStatusCompleted:
+		return true
+	case OutboundStatusInProgress:
 		return true
 	default:
 		return false
@@ -748,6 +838,211 @@ type LocationUpdate struct {
 //
 // Example: 1250000.00
 type Money = string
+
+// Outbound defines model for Outbound.
+type Outbound struct {
+	AllowedActions []OutboundAction `json:"allowedActions"`
+
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate  BusinessDate          `json:"businessDate"`
+	CancelReason  *string               `json:"cancelReason,omitempty"`
+	CheckedByName string                `json:"checkedByName"`
+	Checks        []InboundQualityCheck `json:"checks"`
+	CompletedAt   *time.Time            `json:"completedAt,omitempty"`
+	CreatedAt     time.Time             `json:"createdAt"`
+
+	// HeldCount Baris ditahan menunggu stok.
+	HeldCount int                `json:"heldCount"`
+	Id        openapi_types.UUID `json:"id"`
+	LineCount int                `json:"lineCount"`
+	Lines     []OutboundLine     `json:"lines"`
+	Location  WhLocationRef      `json:"location"`
+
+	// NeedsRepack Isi barang berubah setelah QC (stok pengganti); koli harus dicatat ulang.
+	NeedsRepack bool              `json:"needsRepack"`
+	Note        string            `json:"note"`
+	Number      string            `json:"number"`
+	Packages    []OutboundPackage `json:"packages"`
+	PackedAt    *time.Time        `json:"packedAt,omitempty"`
+
+	// PendingCount Baris menunggu picking atau QC.
+	PendingCount     int                 `json:"pendingCount"`
+	PreparedById     *openapi_types.UUID `json:"preparedById,omitempty"`
+	PreparedByName   string              `json:"preparedByName"`
+	RecipientAddress string              `json:"recipientAddress"`
+	RecipientName    string              `json:"recipientName"`
+	RecipientPhone   string              `json:"recipientPhone"`
+	SourceId         openapi_types.UUID  `json:"sourceId"`
+	SourceLabel      string              `json:"sourceLabel"`
+	SourceType       string              `json:"sourceType"`
+	SourceTypeLabel  string              `json:"sourceTypeLabel"`
+
+	// Status `in_progress` Diproses, `completed` Selesai (siap diserahkan), `cancelled` Dibatalkan.
+	Status  OutboundStatus `json:"status"`
+	Version int            `json:"version"`
+}
+
+// OutboundAction defines model for OutboundAction.
+type OutboundAction string
+
+// OutboundDropInput defines model for OutboundDropInput.
+type OutboundDropInput struct {
+	Reason string `json:"reason"`
+}
+
+// OutboundLine defines model for OutboundLine.
+type OutboundLine struct {
+	// AllocatedQty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+	//
+	// Example: 12.000
+	AllocatedQty   WhQuantity           `json:"allocatedQty"`
+	AllowedActions []OutboundLineAction `json:"allowedActions"`
+	Batch          *WhBatchRef          `json:"batch,omitempty"`
+	CheckedAt      *time.Time           `json:"checkedAt,omitempty"`
+	CheckedByName  *string              `json:"checkedByName,omitempty"`
+	Id             openapi_types.UUID   `json:"id"`
+	LineNo         int                  `json:"lineNo"`
+
+	// PassedQty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+	//
+	// Example: 12.000
+	PassedQty WhQuantity `json:"passedQty"`
+
+	// PickedQty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+	//
+	// Example: 12.000
+	PickedQty    WhQuantity   `json:"pickedQty"`
+	Product      WhProductRef `json:"product"`
+	RejectReason string       `json:"rejectReason"`
+
+	// RejectedQty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+	//
+	// Example: 12.000
+	RejectedQty         WhQuantity          `json:"rejectedQty"`
+	ReplacementOfLineId *openapi_types.UUID `json:"replacementOfLineId,omitempty"`
+
+	// ReturnLabel Nomor retur pembelian otomatis (RB) barang yang ditolak.
+	ReturnLabel  string              `json:"returnLabel"`
+	SourceLineId *openapi_types.UUID `json:"sourceLineId,omitempty"`
+
+	// Status `pending` menunggu picking, `picked` sudah diambil (menunggu QC), `passed` lulus QC, `qc_rejected` Ditolak QC,
+	// `held` ditahan menunggu stok pengganti, `dropped` tidak ikut dikirim (kirim sebagian).
+	Status OutboundLineStatus `json:"status"`
+}
+
+// OutboundLineAction defines model for OutboundLineAction.
+type OutboundLineAction string
+
+// OutboundLineStatus `pending` menunggu picking, `picked` sudah diambil (menunggu QC), `passed` lulus QC, `qc_rejected` Ditolak QC,
+// `held` ditahan menunggu stok pengganti, `dropped` tidak ikut dikirim (kirim sebagian).
+type OutboundLineStatus string
+
+// OutboundList defines model for OutboundList.
+type OutboundList struct {
+	Items      []OutboundSummary `json:"items"`
+	Page       int               `json:"page"`
+	PageSize   int               `json:"pageSize"`
+	TotalItems int64             `json:"totalItems"`
+	TotalPages int               `json:"totalPages"`
+}
+
+// OutboundPackInput defines model for OutboundPackInput.
+type OutboundPackInput struct {
+	Packages []OutboundPackageInput `json:"packages"`
+	Version  int                    `json:"version"`
+}
+
+// OutboundPackItemInput defines model for OutboundPackItemInput.
+type OutboundPackItemInput struct {
+	LineId openapi_types.UUID `json:"lineId"`
+
+	// Qty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+	//
+	// Example: 12.000
+	Qty WhQuantity `json:"qty"`
+}
+
+// OutboundPackage defines model for OutboundPackage.
+type OutboundPackage struct {
+	Items         []OutboundPackageItem `json:"items"`
+	PackageCount  int                   `json:"packageCount"`
+	PackageNumber int                   `json:"packageNumber"`
+	WeightGrams   *int                  `json:"weightGrams,omitempty"`
+}
+
+// OutboundPackageInput defines model for OutboundPackageInput.
+type OutboundPackageInput struct {
+	Items       []OutboundPackItemInput `json:"items"`
+	WeightGrams *int                    `json:"weightGrams,omitempty"`
+}
+
+// OutboundPackageItem defines model for OutboundPackageItem.
+type OutboundPackageItem struct {
+	Batch   *WhBatchRef        `json:"batch,omitempty"`
+	LineId  openapi_types.UUID `json:"lineId"`
+	Product WhProductRef       `json:"product"`
+
+	// Qty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+	//
+	// Example: 12.000
+	Qty WhQuantity `json:"qty"`
+}
+
+// OutboundPickInput defines model for OutboundPickInput.
+type OutboundPickInput struct {
+	LineIds *[]openapi_types.UUID `json:"lineIds,omitempty"`
+	Version int                   `json:"version"`
+}
+
+// OutboundQcInput defines model for OutboundQcInput.
+type OutboundQcInput struct {
+	Checks InboundQcChecklist `json:"checks"`
+	Note   *string            `json:"note,omitempty"`
+
+	// PassedQty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+	//
+	// Example: 12.000
+	PassedQty    WhQuantity            `json:"passedQty"`
+	PhotoFileIds *[]openapi_types.UUID `json:"photoFileIds,omitempty"`
+	RejectReason *string               `json:"rejectReason,omitempty"`
+
+	// RejectedQty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+	//
+	// Example: 12.000
+	RejectedQty WhQuantity `json:"rejectedQty"`
+}
+
+// OutboundStatus `in_progress` Diproses, `completed` Selesai (siap diserahkan), `cancelled` Dibatalkan.
+type OutboundStatus string
+
+// OutboundSummary defines model for OutboundSummary.
+type OutboundSummary struct {
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate `json:"businessDate"`
+	CreatedAt    time.Time    `json:"createdAt"`
+
+	// HeldCount Baris ditahan menunggu stok.
+	HeldCount int                `json:"heldCount"`
+	Id        openapi_types.UUID `json:"id"`
+	LineCount int                `json:"lineCount"`
+	Location  WhLocationRef      `json:"location"`
+	Number    string             `json:"number"`
+
+	// PendingCount Baris menunggu picking atau QC.
+	PendingCount    int                `json:"pendingCount"`
+	RecipientName   string             `json:"recipientName"`
+	SourceId        openapi_types.UUID `json:"sourceId"`
+	SourceLabel     string             `json:"sourceLabel"`
+	SourceType      string             `json:"sourceType"`
+	SourceTypeLabel string             `json:"sourceTypeLabel"`
+
+	// Status `in_progress` Diproses, `completed` Selesai (siap diserahkan), `cancelled` Dibatalkan.
+	Status OutboundStatus `json:"status"`
+}
 
 // Pagination Metadata pagination standar (Technical Guideline 8.2).
 type Pagination struct {
@@ -1347,6 +1642,9 @@ type Id = openapi_types.UUID
 // IdempotencyKey defines model for IdempotencyKey.
 type IdempotencyKey = openapi_types.UUID
 
+// OutboundLineId defines model for OutboundLineId.
+type OutboundLineId = openapi_types.UUID
+
 // Page defines model for Page.
 type Page = int
 
@@ -1416,6 +1714,45 @@ type UpdateLocationParams struct {
 
 // RestoreLocationParams defines parameters for RestoreLocation.
 type RestoreLocationParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// ListOutboundsParams defines parameters for ListOutbounds.
+type ListOutboundsParams struct {
+	Page       *Page           `form:"page,omitempty" json:"page,omitempty"`
+	PageSize   *PageSize       `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+	Q          *Search         `form:"q,omitempty" json:"q,omitempty"`
+	Status     *OutboundStatus `form:"status,omitempty" json:"status,omitempty"`
+	SourceType *string         `form:"sourceType,omitempty" json:"sourceType,omitempty"`
+}
+
+// DropOutboundLineParams defines parameters for DropOutboundLine.
+type DropOutboundLineParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// RecordOutboundQcParams defines parameters for RecordOutboundQc.
+type RecordOutboundQcParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// ReallocateOutboundLineParams defines parameters for ReallocateOutboundLine.
+type ReallocateOutboundLineParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// PackOutboundParams defines parameters for PackOutbound.
+type PackOutboundParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// PickOutboundParams defines parameters for PickOutbound.
+type PickOutboundParams struct {
 	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
 	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
 }
@@ -1590,6 +1927,18 @@ type CreateLocationJSONRequestBody = LocationInput
 // UpdateLocationJSONRequestBody defines body for UpdateLocation for application/json ContentType.
 type UpdateLocationJSONRequestBody = LocationUpdate
 
+// DropOutboundLineJSONRequestBody defines body for DropOutboundLine for application/json ContentType.
+type DropOutboundLineJSONRequestBody = OutboundDropInput
+
+// RecordOutboundQcJSONRequestBody defines body for RecordOutboundQc for application/json ContentType.
+type RecordOutboundQcJSONRequestBody = OutboundQcInput
+
+// PackOutboundJSONRequestBody defines body for PackOutbound for application/json ContentType.
+type PackOutboundJSONRequestBody = OutboundPackInput
+
+// PickOutboundJSONRequestBody defines body for PickOutbound for application/json ContentType.
+type PickOutboundJSONRequestBody = OutboundPickInput
+
 // CreateStockCountScheduleJSONRequestBody defines body for CreateStockCountSchedule for application/json ContentType.
 type CreateStockCountScheduleJSONRequestBody = StockCountScheduleInput
 
@@ -1649,6 +1998,27 @@ type ServerInterface interface {
 	// RestoreLocation Memulihkan lokasi yang dihapus (hanya Admin Sistem)
 	// (POST /api/v1/locations/{id}/restore)
 	RestoreLocation(w http.ResponseWriter, r *http.Request, id Id, params RestoreLocationParams)
+	// ListOutbounds Daftar Outbound — picking, packing, dan QC barang keluar (WMS-12)
+	// (GET /api/v1/outbounds)
+	ListOutbounds(w http.ResponseWriter, r *http.Request, params ListOutboundsParams)
+	// GetOutbound Detail Outbound beserta picking list per batch, koli, dan catatan QC
+	// (GET /api/v1/outbounds/{id})
+	GetOutbound(w http.ResponseWriter, r *http.Request, id Id)
+	// DropOutboundLine Kirim sebagian — qty baris ditahan tidak ikut dikirim (keputusan user)
+	// (POST /api/v1/outbounds/{id}/lines/{lineId}/drop)
+	DropOutboundLine(w http.ResponseWriter, r *http.Request, id Id, lineId OutboundLineId, params DropOutboundLineParams)
+	// RecordOutboundQc QC Outbound satu baris (Fulfillment Leader/Merchandiser, bukan penyiap barang)
+	// (POST /api/v1/outbounds/{id}/lines/{lineId}/qc)
+	RecordOutboundQc(w http.ResponseWriter, r *http.Request, id Id, lineId OutboundLineId, params RecordOutboundQcParams)
+	// ReallocateOutboundLine Alokasi ulang baris yang ditahan setelah stok tersedia
+	// (POST /api/v1/outbounds/{id}/lines/{lineId}/reallocate)
+	ReallocateOutboundLine(w http.ResponseWriter, r *http.Request, id Id, lineId OutboundLineId, params ReallocateOutboundLineParams)
+	// PackOutbound Packing dan pencatatan koli (S-316)
+	// (POST /api/v1/outbounds/{id}/pack)
+	PackOutbound(w http.ResponseWriter, r *http.Request, id Id, params PackOutboundParams)
+	// PickOutbound Konfirmasi picking (Staf Gudang, penyiap barang)
+	// (POST /api/v1/outbounds/{id}/pick)
+	PickOutbound(w http.ResponseWriter, r *http.Request, id Id, params PickOutboundParams)
 	// ListStockCountSchedules Jadwal Stock Count (cycle count, konsinyasi/vending bulanan, penuh akhir tahun)
 	// (GET /api/v1/stock-count-schedules)
 	ListStockCountSchedules(w http.ResponseWriter, r *http.Request)
@@ -1769,6 +2139,48 @@ func (_ Unimplemented) UpdateLocation(w http.ResponseWriter, r *http.Request, id
 // RestoreLocation Memulihkan lokasi yang dihapus (hanya Admin Sistem)
 // (POST /api/v1/locations/{id}/restore)
 func (_ Unimplemented) RestoreLocation(w http.ResponseWriter, r *http.Request, id Id, params RestoreLocationParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListOutbounds Daftar Outbound — picking, packing, dan QC barang keluar (WMS-12)
+// (GET /api/v1/outbounds)
+func (_ Unimplemented) ListOutbounds(w http.ResponseWriter, r *http.Request, params ListOutboundsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetOutbound Detail Outbound beserta picking list per batch, koli, dan catatan QC
+// (GET /api/v1/outbounds/{id})
+func (_ Unimplemented) GetOutbound(w http.ResponseWriter, r *http.Request, id Id) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// DropOutboundLine Kirim sebagian — qty baris ditahan tidak ikut dikirim (keputusan user)
+// (POST /api/v1/outbounds/{id}/lines/{lineId}/drop)
+func (_ Unimplemented) DropOutboundLine(w http.ResponseWriter, r *http.Request, id Id, lineId OutboundLineId, params DropOutboundLineParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// RecordOutboundQc QC Outbound satu baris (Fulfillment Leader/Merchandiser, bukan penyiap barang)
+// (POST /api/v1/outbounds/{id}/lines/{lineId}/qc)
+func (_ Unimplemented) RecordOutboundQc(w http.ResponseWriter, r *http.Request, id Id, lineId OutboundLineId, params RecordOutboundQcParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ReallocateOutboundLine Alokasi ulang baris yang ditahan setelah stok tersedia
+// (POST /api/v1/outbounds/{id}/lines/{lineId}/reallocate)
+func (_ Unimplemented) ReallocateOutboundLine(w http.ResponseWriter, r *http.Request, id Id, lineId OutboundLineId, params ReallocateOutboundLineParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// PackOutbound Packing dan pencatatan koli (S-316)
+// (POST /api/v1/outbounds/{id}/pack)
+func (_ Unimplemented) PackOutbound(w http.ResponseWriter, r *http.Request, id Id, params PackOutboundParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// PickOutbound Konfirmasi picking (Staf Gudang, penyiap barang)
+// (POST /api/v1/outbounds/{id}/pick)
+func (_ Unimplemented) PickOutbound(w http.ResponseWriter, r *http.Request, id Id, params PickOutboundParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -2481,6 +2893,414 @@ func (siw *ServerInterfaceWrapper) RestoreLocation(w http.ResponseWriter, r *htt
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.RestoreLocation(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListOutbounds operation middleware
+func (siw *ServerInterfaceWrapper) ListOutbounds(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListOutboundsParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", r.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "page"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "pageSize", r.URL.Query(), &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "pageSize"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "q" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "q", r.URL.Query(), &params.Q, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "q"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "q", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "status" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "status", r.URL.Query(), &params.Status, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "status"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "status", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "sourceType" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "sourceType", r.URL.Query(), &params.SourceType, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "sourceType"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "sourceType", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListOutbounds(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetOutbound operation middleware
+func (siw *ServerInterfaceWrapper) GetOutbound(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetOutbound(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// DropOutboundLine operation middleware
+func (siw *ServerInterfaceWrapper) DropOutboundLine(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "lineId" -------------
+	var lineId OutboundLineId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "lineId", chi.URLParam(r, "lineId"), &lineId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "lineId", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params DropOutboundLineParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DropOutboundLine(w, r, id, lineId, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// RecordOutboundQc operation middleware
+func (siw *ServerInterfaceWrapper) RecordOutboundQc(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "lineId" -------------
+	var lineId OutboundLineId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "lineId", chi.URLParam(r, "lineId"), &lineId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "lineId", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params RecordOutboundQcParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.RecordOutboundQc(w, r, id, lineId, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ReallocateOutboundLine operation middleware
+func (siw *ServerInterfaceWrapper) ReallocateOutboundLine(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "lineId" -------------
+	var lineId OutboundLineId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "lineId", chi.URLParam(r, "lineId"), &lineId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "lineId", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ReallocateOutboundLineParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ReallocateOutboundLine(w, r, id, lineId, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PackOutbound operation middleware
+func (siw *ServerInterfaceWrapper) PackOutbound(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params PackOutboundParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PackOutbound(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PickOutbound operation middleware
+func (siw *ServerInterfaceWrapper) PickOutbound(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params PickOutboundParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PickOutbound(w, r, id, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -3791,6 +4611,27 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		r.Post(options.BaseURL+"/api/v1/inbounds/{id}/lines/{lineId}/qc", wrapper.RecordInboundQc)
 	})
 	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/outbounds", wrapper.ListOutbounds)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/outbounds/{id}", wrapper.GetOutbound)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/outbounds/{id}/pick", wrapper.PickOutbound)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/outbounds/{id}/pack", wrapper.PackOutbound)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/outbounds/{id}/lines/{lineId}/qc", wrapper.RecordOutboundQc)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/outbounds/{id}/lines/{lineId}/reallocate", wrapper.ReallocateOutboundLine)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/outbounds/{id}/lines/{lineId}/drop", wrapper.DropOutboundLine)
+	})
+	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/api/v1/stock-transfers", wrapper.ListStockTransfers)
 	})
 	r.Group(func(r chi.Router) {
@@ -4183,6 +5024,291 @@ type RestoreLocationdefaultApplicationProblemPlusJSONResponse struct {
 }
 
 func (response RestoreLocationdefaultApplicationProblemPlusJSONResponse) VisitRestoreLocationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListOutboundsRequestObject struct {
+	Params ListOutboundsParams
+}
+
+type ListOutboundsResponseObject interface {
+	VisitListOutboundsResponse(w http.ResponseWriter) error
+}
+
+type ListOutbounds200JSONResponse OutboundList
+
+func (response ListOutbounds200JSONResponse) VisitListOutboundsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListOutboundsdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListOutboundsdefaultApplicationProblemPlusJSONResponse) VisitListOutboundsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetOutboundRequestObject struct {
+	Id Id `json:"id"`
+}
+
+type GetOutboundResponseObject interface {
+	VisitGetOutboundResponse(w http.ResponseWriter) error
+}
+
+type GetOutbound200JSONResponse Outbound
+
+func (response GetOutbound200JSONResponse) VisitGetOutboundResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetOutbounddefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetOutbounddefaultApplicationProblemPlusJSONResponse) VisitGetOutboundResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DropOutboundLineRequestObject struct {
+	Id     Id             `json:"id"`
+	LineId OutboundLineId `json:"lineId"`
+	Params DropOutboundLineParams
+	Body   *DropOutboundLineJSONRequestBody
+}
+
+type DropOutboundLineResponseObject interface {
+	VisitDropOutboundLineResponse(w http.ResponseWriter) error
+}
+
+type DropOutboundLine200JSONResponse Outbound
+
+func (response DropOutboundLine200JSONResponse) VisitDropOutboundLineResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DropOutboundLinedefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response DropOutboundLinedefaultApplicationProblemPlusJSONResponse) VisitDropOutboundLineResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RecordOutboundQcRequestObject struct {
+	Id     Id             `json:"id"`
+	LineId OutboundLineId `json:"lineId"`
+	Params RecordOutboundQcParams
+	Body   *RecordOutboundQcJSONRequestBody
+}
+
+type RecordOutboundQcResponseObject interface {
+	VisitRecordOutboundQcResponse(w http.ResponseWriter) error
+}
+
+type RecordOutboundQc200JSONResponse Outbound
+
+func (response RecordOutboundQc200JSONResponse) VisitRecordOutboundQcResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RecordOutboundQcdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response RecordOutboundQcdefaultApplicationProblemPlusJSONResponse) VisitRecordOutboundQcResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ReallocateOutboundLineRequestObject struct {
+	Id     Id             `json:"id"`
+	LineId OutboundLineId `json:"lineId"`
+	Params ReallocateOutboundLineParams
+}
+
+type ReallocateOutboundLineResponseObject interface {
+	VisitReallocateOutboundLineResponse(w http.ResponseWriter) error
+}
+
+type ReallocateOutboundLine200JSONResponse Outbound
+
+func (response ReallocateOutboundLine200JSONResponse) VisitReallocateOutboundLineResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ReallocateOutboundLinedefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ReallocateOutboundLinedefaultApplicationProblemPlusJSONResponse) VisitReallocateOutboundLineResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PackOutboundRequestObject struct {
+	Id     Id `json:"id"`
+	Params PackOutboundParams
+	Body   *PackOutboundJSONRequestBody
+}
+
+type PackOutboundResponseObject interface {
+	VisitPackOutboundResponse(w http.ResponseWriter) error
+}
+
+type PackOutbound200JSONResponse Outbound
+
+func (response PackOutbound200JSONResponse) VisitPackOutboundResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PackOutbounddefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response PackOutbounddefaultApplicationProblemPlusJSONResponse) VisitPackOutboundResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PickOutboundRequestObject struct {
+	Id     Id `json:"id"`
+	Params PickOutboundParams
+	Body   *PickOutboundJSONRequestBody
+}
+
+type PickOutboundResponseObject interface {
+	VisitPickOutboundResponse(w http.ResponseWriter) error
+}
+
+type PickOutbound200JSONResponse Outbound
+
+func (response PickOutbound200JSONResponse) VisitPickOutboundResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PickOutbounddefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response PickOutbounddefaultApplicationProblemPlusJSONResponse) VisitPickOutboundResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
@@ -5057,6 +6183,27 @@ type StrictServerInterface interface {
 	// RestoreLocation Memulihkan lokasi yang dihapus (hanya Admin Sistem)
 	// (POST /api/v1/locations/{id}/restore)
 	RestoreLocation(ctx context.Context, request RestoreLocationRequestObject) (RestoreLocationResponseObject, error)
+	// ListOutbounds Daftar Outbound — picking, packing, dan QC barang keluar (WMS-12)
+	// (GET /api/v1/outbounds)
+	ListOutbounds(ctx context.Context, request ListOutboundsRequestObject) (ListOutboundsResponseObject, error)
+	// GetOutbound Detail Outbound beserta picking list per batch, koli, dan catatan QC
+	// (GET /api/v1/outbounds/{id})
+	GetOutbound(ctx context.Context, request GetOutboundRequestObject) (GetOutboundResponseObject, error)
+	// DropOutboundLine Kirim sebagian — qty baris ditahan tidak ikut dikirim (keputusan user)
+	// (POST /api/v1/outbounds/{id}/lines/{lineId}/drop)
+	DropOutboundLine(ctx context.Context, request DropOutboundLineRequestObject) (DropOutboundLineResponseObject, error)
+	// RecordOutboundQc QC Outbound satu baris (Fulfillment Leader/Merchandiser, bukan penyiap barang)
+	// (POST /api/v1/outbounds/{id}/lines/{lineId}/qc)
+	RecordOutboundQc(ctx context.Context, request RecordOutboundQcRequestObject) (RecordOutboundQcResponseObject, error)
+	// ReallocateOutboundLine Alokasi ulang baris yang ditahan setelah stok tersedia
+	// (POST /api/v1/outbounds/{id}/lines/{lineId}/reallocate)
+	ReallocateOutboundLine(ctx context.Context, request ReallocateOutboundLineRequestObject) (ReallocateOutboundLineResponseObject, error)
+	// PackOutbound Packing dan pencatatan koli (S-316)
+	// (POST /api/v1/outbounds/{id}/pack)
+	PackOutbound(ctx context.Context, request PackOutboundRequestObject) (PackOutboundResponseObject, error)
+	// PickOutbound Konfirmasi picking (Staf Gudang, penyiap barang)
+	// (POST /api/v1/outbounds/{id}/pick)
+	PickOutbound(ctx context.Context, request PickOutboundRequestObject) (PickOutboundResponseObject, error)
 	// ListStockCountSchedules Jadwal Stock Count (cycle count, konsinyasi/vending bulanan, penuh akhir tahun)
 	// (GET /api/v1/stock-count-schedules)
 	ListStockCountSchedules(ctx context.Context, request ListStockCountSchedulesRequestObject) (ListStockCountSchedulesResponseObject, error)
@@ -5414,6 +6561,224 @@ func (sh *strictHandler) RestoreLocation(w http.ResponseWriter, r *http.Request,
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(RestoreLocationResponseObject); ok {
 		if err := validResponse.VisitRestoreLocationResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListOutbounds operation middleware
+func (sh *strictHandler) ListOutbounds(w http.ResponseWriter, r *http.Request, params ListOutboundsParams) {
+	var request ListOutboundsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListOutbounds(ctx, request.(ListOutboundsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListOutbounds")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListOutboundsResponseObject); ok {
+		if err := validResponse.VisitListOutboundsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetOutbound operation middleware
+func (sh *strictHandler) GetOutbound(w http.ResponseWriter, r *http.Request, id Id) {
+	var request GetOutboundRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetOutbound(ctx, request.(GetOutboundRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetOutbound")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetOutboundResponseObject); ok {
+		if err := validResponse.VisitGetOutboundResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// DropOutboundLine operation middleware
+func (sh *strictHandler) DropOutboundLine(w http.ResponseWriter, r *http.Request, id Id, lineId OutboundLineId, params DropOutboundLineParams) {
+	var request DropOutboundLineRequestObject
+
+	request.Id = id
+	request.LineId = lineId
+	request.Params = params
+
+	var body DropOutboundLineJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.DropOutboundLine(ctx, request.(DropOutboundLineRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DropOutboundLine")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(DropOutboundLineResponseObject); ok {
+		if err := validResponse.VisitDropOutboundLineResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// RecordOutboundQc operation middleware
+func (sh *strictHandler) RecordOutboundQc(w http.ResponseWriter, r *http.Request, id Id, lineId OutboundLineId, params RecordOutboundQcParams) {
+	var request RecordOutboundQcRequestObject
+
+	request.Id = id
+	request.LineId = lineId
+	request.Params = params
+
+	var body RecordOutboundQcJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.RecordOutboundQc(ctx, request.(RecordOutboundQcRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RecordOutboundQc")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(RecordOutboundQcResponseObject); ok {
+		if err := validResponse.VisitRecordOutboundQcResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ReallocateOutboundLine operation middleware
+func (sh *strictHandler) ReallocateOutboundLine(w http.ResponseWriter, r *http.Request, id Id, lineId OutboundLineId, params ReallocateOutboundLineParams) {
+	var request ReallocateOutboundLineRequestObject
+
+	request.Id = id
+	request.LineId = lineId
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ReallocateOutboundLine(ctx, request.(ReallocateOutboundLineRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ReallocateOutboundLine")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ReallocateOutboundLineResponseObject); ok {
+		if err := validResponse.VisitReallocateOutboundLineResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PackOutbound operation middleware
+func (sh *strictHandler) PackOutbound(w http.ResponseWriter, r *http.Request, id Id, params PackOutboundParams) {
+	var request PackOutboundRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body PackOutboundJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PackOutbound(ctx, request.(PackOutboundRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PackOutbound")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PackOutboundResponseObject); ok {
+		if err := validResponse.VisitPackOutboundResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PickOutbound operation middleware
+func (sh *strictHandler) PickOutbound(w http.ResponseWriter, r *http.Request, id Id, params PickOutboundParams) {
+	var request PickOutboundRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body PickOutboundJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PickOutbound(ctx, request.(PickOutboundRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PickOutbound")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PickOutboundResponseObject); ok {
+		if err := validResponse.VisitPickOutboundResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
