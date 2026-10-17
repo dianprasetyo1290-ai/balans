@@ -1690,6 +1690,329 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/v1/internal-usages": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Pemakaian Internal — daftar (INV-05, HR-02)
+     * @description Permission `inventory.internal_usage.read`.
+     */
+    get: operations["listInternalUsages"]
+    put?: never
+    /**
+     * Membuat draft Pemakaian Internal (S-221, S-227)
+     * @description Tujuan marketing/sampling sales/event wajib kode kampanye (A-11); sampel karyawan tanpa kampanye (A-12). Event
+     *     wajib lokasi Event dan tanggal selesai; batas pencatatan sisa = H+1. Permission `inventory.internal_usage.write`.
+     */
+    post: operations["createInternalUsage"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/internal-usages/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail Pemakaian Internal beserta batch yang keluar dan aksi yang diizinkan */
+    get: operations["getInternalUsage"]
+    /** Mengubah draft Pemakaian Internal */
+    put: operations["updateInternalUsage"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/internal-usages/{id}/actions/{action}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Aksi Pemakaian Internal (submit, revise, release, handover, post, cancel)
+     * @description `submit` (S) memberi nomor PU dan mengajukan approval `internal_usage` sebesar taksiran HPP FEFO; `release` (P,
+     *     Logistik Leader) mengalokasikan stok asal FEFO; `handover` (W, divisi peminta) mengonfirmasi serah terima —
+     *     non-event: stok keluar + jurnal A-11/A-12, event: stok pindah ke lokasi Event tanpa jurnal; `post` (P) event
+     *     setelah sisa dicatat: qty terpakai keluar dari lokasi Event + jurnal A-11; `revise`, `cancel` (W).
+     */
+    post: operations["runInternalUsageAction"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/internal-usages/{id}/settle": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Mencatat sisa barang event (maks. H+1); sisa kembali ke Inbound berstatus Karantina */
+    post: operations["settleInternalUsage"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/internal-usage-options/{kind}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Divisi atau kampanye aktif untuk form Pemakaian Internal */
+    get: operations["listInternalUsageDimensionOptions"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/repackings": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Repacking — daftar (INV-06) */
+    get: operations["listRepackings"]
+    put?: never
+    /**
+     * Membuat draft Repacking (S-222)
+     * @description Bahan: barang retur (Produk Jadi dari lokasi Retur) dan packaging baru (dari lokasi RM); tepat satu baris hasil FG
+     *     dengan batch baru di lokasi FG Non-Ecommerce. Permission `inventory.repacking.write`.
+     */
+    post: operations["createRepacking"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/repackings/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail Repacking */
+    get: operations["getRepacking"]
+    /** Mengubah draft Repacking */
+    put: operations["updateRepacking"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/repackings/{id}/actions/{action}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Aksi Repacking (start, post, cancel)
+     * @description `start` (P) memberi nomor RPK dan mengalokasikan bahan; `post` (P) mengeluarkan bahan (HPP FIFO), menerima FG batch
+     *     baru bernilai HPP retur + packaging, dan menjurnal A-26 (Dr 1311; Cr 1314, Cr 1301); `cancel` (W) melepas alokasi.
+     */
+    post: operations["runRepackingAction"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/disposals": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Pemusnahan — daftar (INV-12) */
+    get: operations["listDisposals"]
+    put?: never
+    /**
+     * Membuat draft Pemusnahan (S-223)
+     * @description Alasan `return` hanya dari lokasi Retur (A-26 Dr 6403, Cr 1314); `expired`/`damaged` dari lokasi FG, E-commerce,
+     *     Petty Stock, Inbound, atau Event (A-27 Dr 6402, Cr 1311). Foto berita acara diunggah lebih dulu ke filestore
+     *     (`ownerType=disposal`). Permission `inventory.disposal.write`.
+     */
+    post: operations["createDisposal"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/disposals/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail Pemusnahan (juga isi Berita Acara cetak) */
+    get: operations["getDisposal"]
+    /** Mengubah draft Pemusnahan */
+    put: operations["updateDisposal"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/disposals/{id}/report": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Mengisi Berita Acara Pemusnahan (tanggal, metode, saksi, foto) sebelum posting */
+    put: operations["updateDisposalReport"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/disposals/{id}/actions/{action}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Aksi Pemusnahan (submit, revise, post, cancel)
+     * @description `submit` (S) memberi nomor MUS dan mengajukan approval `disposal` (Head Logistik → Head F&A → Direksi bila > Rp10 jt)
+     *     sebesar taksiran HPP; `post` (P) wajib berita acara lengkap (metode, ≥ 1 saksi, ≥ 1 foto), mengeluarkan stok, dan
+     *     menjurnal A-26/A-27.
+     */
+    post: operations["runDisposalAction"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/return-dispositions": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Disposisi Retur — daftar (WMS-07)
+     * @description Permission `warehouse.return_disposition.read`.
+     */
+    get: operations["listReturnDispositions"]
+    put?: never
+    /**
+     * Membuat draft Disposisi Retur dari barang di Gudang Retur (S-220)
+     * @description Per baris: hasil QC dan disposisi; disposisi kosong diisi usulan alasan retur. Permission
+     *     `warehouse.return_disposition.write`.
+     */
+    post: operations["createReturnDisposition"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/return-dispositions/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail Disposisi Retur */
+    get: operations["getReturnDisposition"]
+    /** Mengubah draft Disposisi Retur */
+    put: operations["updateReturnDisposition"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/return-dispositions/{id}/actions/{action}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Aksi Disposisi Retur (submit, revise, post, cancel)
+     * @description `submit` (S) memberi nomor DRT dan mengajukan approval `return_disposition` (flag `has_disposal`, nominal = nilai
+     *     pemusnahan); `post` (W) mengeksekusi per baris: restock → FG, reprocess → GM (jurnal A-26), repack → draft
+     *     Repacking, sampel → Pemakaian Internal disetujui, musnah → Pemusnahan disetujui.
+     */
+    post: operations["runReturnDispositionAction"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/recost-runs": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Riwayat recost HPP akibat penerimaan bertanggal mundur (S-224) */
+    get: operations["listRecostRuns"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/v1/customers": {
     parameters: {
       query?: never
@@ -2441,7 +2764,7 @@ export interface components {
      */
     ReturnReasonAppliesTo: "sales_return" | "purchase_return" | "both"
     /**
-     * @description Disposisi barang retur (Disposisi Retur, WMS-07).
+     * @description Disposisi barang retur (Disposisi Retur, WMS-07); dipakai master Alasan Retur dan dokumen Disposisi Retur.
      * @enum {string}
      */
     ReturnDisposition:
@@ -3634,6 +3957,422 @@ export interface components {
     }
     BundleAvailabilityList: {
       items: components["schemas"]["BundleAvailability"][]
+    }
+    /**
+     * @description Status dokumen persediaan (Desain Status Dokumen bagian 1).
+     * @enum {string}
+     */
+    InventoryDocStatus:
+      | "draft"
+      | "pending_approval"
+      | "approved"
+      | "rejected"
+      | "in_progress"
+      | "awaiting_settlement"
+      | "posted"
+      | "cancelled"
+    /**
+     * @description `marketing` Marketing, `event` Event, `employee_sample` Sampel Karyawan, `sales_sampling` Sampling Sales.
+     * @enum {string}
+     */
+    InternalUsagePurpose:
+      "marketing" | "event" | "employee_sample" | "sales_sampling"
+    InventoryDimensionRef: {
+      /** Format: uuid */
+      id: string
+      code: string
+      name: string
+    }
+    InventoryActorRef: {
+      /** Format: uuid */
+      userId: string
+      name: string
+    }
+    InventoryDocStep: {
+      /** Format: uuid */
+      userId: string
+      name: string
+      /** Format: date-time */
+      at: string
+    }
+    InternalUsageLine: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      product: components["schemas"]["StockProductRef"]
+      qty: components["schemas"]["StockQuantity"]
+      returnedQty: components["schemas"]["StockQuantity"]
+      consumedQty: components["schemas"]["StockQuantity"]
+      costAmount: components["schemas"]["Money"]
+      note: string
+    }
+    InventoryBatchRef: {
+      /** Format: uuid */
+      id: string
+      number: string
+      expiryDate?: components["schemas"]["BusinessDate"]
+    }
+    /** @description Mutasi stok dokumen (batch yang dialokasikan, dikirim, atau keluar). */
+    InventoryDocMovement: {
+      /** Format: uuid */
+      id: string
+      /** Format: uuid */
+      sourceLineId?: string
+      movementType: components["schemas"]["StockMovementType"]
+      movementTypeLabel: string
+      product: components["schemas"]["StockProductRef"]
+      location: components["schemas"]["StockLocationRef"]
+      batch?: components["schemas"]["InventoryBatchRef"]
+      status: components["schemas"]["StockStatus"]
+      statusLabel: string
+      qty: components["schemas"]["StockQuantity"]
+      costAmount: components["schemas"]["Money"]
+    }
+    /**
+     * @description Aksi yang boleh dilakukan user pada dokumen (allowedActions).
+     * @enum {string}
+     */
+    InventoryDocAction:
+      | "edit"
+      | "submit"
+      | "revise"
+      | "release"
+      | "handover"
+      | "settle"
+      | "start"
+      | "report"
+      | "post"
+      | "cancel"
+    InternalUsage: {
+      /** Format: uuid */
+      id: string
+      number?: string
+      purpose: components["schemas"]["InternalUsagePurpose"]
+      purposeLabel: string
+      division: components["schemas"]["InventoryDimensionRef"]
+      campaign?: components["schemas"]["InventoryDimensionRef"]
+      sourceLocation: components["schemas"]["StockLocationRef"]
+      eventLocation?: components["schemas"]["StockLocationRef"]
+      eventEndDate?: components["schemas"]["BusinessDate"]
+      settleDueDate?: components["schemas"]["BusinessDate"]
+      businessDate: components["schemas"]["BusinessDate"]
+      note: string
+      status: components["schemas"]["InventoryDocStatus"]
+      statusLabel: string
+      estimatedCost: components["schemas"]["Money"]
+      costAmount: components["schemas"]["Money"]
+      /** Format: uuid */
+      journalId?: string
+      /** Format: uuid */
+      returnDispositionId?: string
+      requestedBy: components["schemas"]["InventoryActorRef"]
+      released?: components["schemas"]["InventoryDocStep"]
+      handedOver?: components["schemas"]["InventoryDocStep"]
+      settled?: components["schemas"]["InventoryDocStep"]
+      posted?: components["schemas"]["InventoryDocStep"]
+      lines: components["schemas"]["InternalUsageLine"][]
+      movements: components["schemas"]["InventoryDocMovement"][]
+      allowedActions: components["schemas"]["InventoryDocAction"][]
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    InternalUsageList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["InternalUsage"][]
+    }
+    InternalUsageInput: {
+      purpose: components["schemas"]["InternalUsagePurpose"]
+      /** Format: uuid */
+      divisionId: string
+      /** Format: uuid */
+      campaignId?: string
+      /** Format: uuid */
+      sourceLocationId: string
+      /** Format: uuid */
+      eventLocationId?: string
+      eventEndDate?: components["schemas"]["BusinessDate"]
+      businessDate: components["schemas"]["BusinessDate"]
+      note?: string
+      lines: {
+        /** Format: uuid */
+        productId: string
+        qty: components["schemas"]["StockQuantity"]
+        note?: string
+      }[]
+    }
+    InternalUsageUpdate: components["schemas"]["InternalUsageInput"] &
+      components["schemas"]["VersionInput"]
+    /** @enum {string} */
+    InternalUsageAction:
+      "submit" | "revise" | "release" | "handover" | "post" | "cancel"
+    InternalUsageSettleInput: {
+      version: number
+      /** @description Qty sisa per baris; baris yang tidak dikirim berarti tanpa sisa. */
+      lines: {
+        /** Format: uuid */
+        lineId: string
+        returnedQty: components["schemas"]["StockQuantity"]
+      }[]
+    }
+    InventoryDimensionOption: components["schemas"]["InventoryDimensionRef"] & {
+      validFrom?: components["schemas"]["BusinessDate"]
+      validTo?: components["schemas"]["BusinessDate"]
+    }
+    InventoryDimensionOptionList: {
+      items: components["schemas"]["InventoryDimensionOption"][]
+    }
+    /** @enum {string} */
+    RepackDirection: "input" | "output"
+    /**
+     * @description Status stok baris dokumen (Tersedia atau Karantina).
+     * @enum {string}
+     */
+    InventoryDocStockStatus: "available" | "quarantine"
+    RepackingLine: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      direction: components["schemas"]["RepackDirection"]
+      product: components["schemas"]["StockProductRef"]
+      location: components["schemas"]["StockLocationRef"]
+      stockStatus: components["schemas"]["InventoryDocStockStatus"]
+      batch?: components["schemas"]["InventoryBatchRef"]
+      /** @description Nomor batch baru baris hasil. */
+      batchNumber: string
+      productionDate?: components["schemas"]["BusinessDate"]
+      expiryDate?: components["schemas"]["BusinessDate"]
+      qty: components["schemas"]["StockQuantity"]
+      costAmount: components["schemas"]["Money"]
+      note: string
+    }
+    Repacking: {
+      /** Format: uuid */
+      id: string
+      number?: string
+      businessDate: components["schemas"]["BusinessDate"]
+      note: string
+      status: components["schemas"]["InventoryDocStatus"]
+      statusLabel: string
+      costAmount: components["schemas"]["Money"]
+      /** Format: uuid */
+      journalId?: string
+      /** Format: uuid */
+      returnDispositionId?: string
+      createdBy: components["schemas"]["InventoryActorRef"]
+      started?: components["schemas"]["InventoryDocStep"]
+      posted?: components["schemas"]["InventoryDocStep"]
+      lines: components["schemas"]["RepackingLine"][]
+      movements: components["schemas"]["InventoryDocMovement"][]
+      allowedActions: components["schemas"]["InventoryDocAction"][]
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    RepackingList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["Repacking"][]
+    }
+    RepackingInput: {
+      businessDate: components["schemas"]["BusinessDate"]
+      note?: string
+      lines: {
+        direction: components["schemas"]["RepackDirection"]
+        /** Format: uuid */
+        productId: string
+        /** Format: uuid */
+        locationId: string
+        stockStatus?: components["schemas"]["InventoryDocStockStatus"]
+        /** Format: uuid */
+        batchId?: string
+        batchNumber?: string
+        productionDate?: components["schemas"]["BusinessDate"]
+        expiryDate?: components["schemas"]["BusinessDate"]
+        qty: components["schemas"]["StockQuantity"]
+        note?: string
+      }[]
+    }
+    RepackingUpdate: components["schemas"]["RepackingInput"] &
+      components["schemas"]["VersionInput"]
+    /** @enum {string} */
+    RepackingAction: "start" | "post" | "cancel"
+    /**
+     * @description `expired` Kedaluwarsa, `damaged` Rusak, `return` Barang Retur.
+     * @enum {string}
+     */
+    DisposalReason: "expired" | "damaged" | "return"
+    DisposalPhoto: {
+      /** Format: uuid */
+      id: string
+      name: string
+    }
+    DisposalLine: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      product: components["schemas"]["StockProductRef"]
+      batch?: components["schemas"]["InventoryBatchRef"]
+      location: components["schemas"]["StockLocationRef"]
+      stockStatus: components["schemas"]["InventoryDocStockStatus"]
+      qty: components["schemas"]["StockQuantity"]
+      costAmount: components["schemas"]["Money"]
+      note: string
+    }
+    Disposal: {
+      /** Format: uuid */
+      id: string
+      number?: string
+      reason: components["schemas"]["DisposalReason"]
+      reasonLabel: string
+      disposalDate: components["schemas"]["BusinessDate"]
+      method: string
+      witnesses: string[]
+      photos: components["schemas"]["DisposalPhoto"][]
+      note: string
+      status: components["schemas"]["InventoryDocStatus"]
+      statusLabel: string
+      estimatedCost: components["schemas"]["Money"]
+      costAmount: components["schemas"]["Money"]
+      postingRuleCode: string
+      /** Format: uuid */
+      journalId?: string
+      /** Format: uuid */
+      returnDispositionId?: string
+      createdBy: components["schemas"]["InventoryActorRef"]
+      submitted?: components["schemas"]["InventoryDocStep"]
+      posted?: components["schemas"]["InventoryDocStep"]
+      lines: components["schemas"]["DisposalLine"][]
+      movements: components["schemas"]["InventoryDocMovement"][]
+      allowedActions: components["schemas"]["InventoryDocAction"][]
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    DisposalList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["Disposal"][]
+    }
+    DisposalReportFields: {
+      disposalDate: components["schemas"]["BusinessDate"]
+      method?: string
+      witnesses?: string[]
+      photoFileIds?: string[]
+    }
+    DisposalInput: components["schemas"]["DisposalReportFields"] & {
+      reason: components["schemas"]["DisposalReason"]
+      note?: string
+      lines: {
+        /** Format: uuid */
+        productId: string
+        /** Format: uuid */
+        batchId?: string
+        /** Format: uuid */
+        locationId: string
+        stockStatus?: components["schemas"]["InventoryDocStockStatus"]
+        qty: components["schemas"]["StockQuantity"]
+        note?: string
+      }[]
+    }
+    DisposalUpdate: components["schemas"]["DisposalInput"] &
+      components["schemas"]["VersionInput"]
+    DisposalReportInput: components["schemas"]["DisposalReportFields"] &
+      components["schemas"]["VersionInput"]
+    /** @enum {string} */
+    DisposalAction: "submit" | "revise" | "post" | "cancel"
+    ReturnDispositionDocumentLine: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      product: components["schemas"]["StockProductRef"]
+      batch?: components["schemas"]["InventoryBatchRef"]
+      stockStatus: components["schemas"]["InventoryDocStockStatus"]
+      qty: components["schemas"]["StockQuantity"]
+      reason?: components["schemas"]["InventoryDimensionRef"]
+      disposition: components["schemas"]["ReturnDisposition"]
+      dispositionLabel: string
+      qcNote: string
+      estimatedCost: components["schemas"]["Money"]
+      costAmount: components["schemas"]["Money"]
+      /** @description Dokumen lanjutan hasil eksekusi (`repacking`, `disposal`, `internal_usage`). */
+      targetType?: string
+      /** Format: uuid */
+      targetId?: string
+    }
+    ReturnDispositionDocument: {
+      /** Format: uuid */
+      id: string
+      number?: string
+      location: components["schemas"]["StockLocationRef"]
+      businessDate: components["schemas"]["BusinessDate"]
+      note: string
+      status: components["schemas"]["InventoryDocStatus"]
+      statusLabel: string
+      disposalValue: components["schemas"]["Money"]
+      costAmount: components["schemas"]["Money"]
+      /** Format: uuid */
+      journalId?: string
+      createdBy: components["schemas"]["InventoryActorRef"]
+      submitted?: components["schemas"]["InventoryDocStep"]
+      posted?: components["schemas"]["InventoryDocStep"]
+      lines: components["schemas"]["ReturnDispositionDocumentLine"][]
+      movements: components["schemas"]["InventoryDocMovement"][]
+      allowedActions: components["schemas"]["InventoryDocAction"][]
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    ReturnDispositionDocumentList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["ReturnDispositionDocument"][]
+    }
+    ReturnDispositionDocumentInput: {
+      /** Format: uuid */
+      locationId: string
+      businessDate: components["schemas"]["BusinessDate"]
+      note?: string
+      lines: {
+        /** Format: uuid */
+        productId: string
+        /** Format: uuid */
+        batchId?: string
+        stockStatus?: components["schemas"]["InventoryDocStockStatus"]
+        qty: components["schemas"]["StockQuantity"]
+        /** Format: uuid */
+        reasonId?: string
+        disposition?: components["schemas"]["ReturnDisposition"]
+        qcNote?: string
+      }[]
+    }
+    ReturnDispositionDocumentUpdate: components["schemas"]["ReturnDispositionDocumentInput"] &
+      components["schemas"]["VersionInput"]
+    /** @enum {string} */
+    ReturnDispositionAction: "submit" | "revise" | "post" | "cancel"
+    RecostRun: {
+      /** Format: uuid */
+      id: string
+      product: components["schemas"]["StockProductRef"]
+      /** Format: uuid */
+      batchId?: string
+      fromBusinessDate: components["schemas"]["BusinessDate"]
+      triggerSourceType: string
+      triggerSourceLabel: string
+      /** @enum {string} */
+      status: "pending" | "completed" | "failed"
+      adjustmentAmount: components["schemas"]["Money"]
+      /** Format: uuid */
+      journalId?: string
+      error: string
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      completedAt?: string
+    }
+    RecostRunList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["RecostRun"][]
     }
     /** @enum {string} */
     CustomerType: "retail" | "b2b" | "reseller" | "employee"
@@ -7380,6 +8119,668 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["BundleAvailabilityList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listInternalUsages: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["InventoryDocStatus"]
+        purpose?: components["schemas"]["InternalUsagePurpose"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar Pemakaian Internal */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["InternalUsageList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createInternalUsage: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["InternalUsageInput"]
+      }
+    }
+    responses: {
+      /** @description Draft dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["InternalUsage"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getInternalUsage: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Pemakaian Internal */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["InternalUsage"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateInternalUsage: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["InternalUsageUpdate"]
+      }
+    }
+    responses: {
+      /** @description Draft diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["InternalUsage"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  runInternalUsageAction: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+        action: components["schemas"]["InternalUsageAction"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Aksi dijalankan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["InternalUsage"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  settleInternalUsage: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["InternalUsageSettleInput"]
+      }
+    }
+    responses: {
+      /** @description Sisa dicatat */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["InternalUsage"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listInternalUsageDimensionOptions: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        kind: "division" | "campaign"
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Pilihan dimensi */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["InventoryDimensionOptionList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listRepackings: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["InventoryDocStatus"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar Repacking */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["RepackingList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createRepacking: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RepackingInput"]
+      }
+    }
+    responses: {
+      /** @description Draft dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Repacking"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getRepacking: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Repacking */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Repacking"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateRepacking: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RepackingUpdate"]
+      }
+    }
+    responses: {
+      /** @description Draft diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Repacking"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  runRepackingAction: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+        action: components["schemas"]["RepackingAction"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Aksi dijalankan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Repacking"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listDisposals: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["InventoryDocStatus"]
+        reason?: components["schemas"]["DisposalReason"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar Pemusnahan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DisposalList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createDisposal: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DisposalInput"]
+      }
+    }
+    responses: {
+      /** @description Draft dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Disposal"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getDisposal: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Pemusnahan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Disposal"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateDisposal: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DisposalUpdate"]
+      }
+    }
+    responses: {
+      /** @description Draft diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Disposal"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateDisposalReport: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DisposalReportInput"]
+      }
+    }
+    responses: {
+      /** @description Berita acara diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Disposal"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  runDisposalAction: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+        action: components["schemas"]["DisposalAction"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Aksi dijalankan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Disposal"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listReturnDispositions: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["InventoryDocStatus"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar Disposisi Retur */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ReturnDispositionDocumentList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createReturnDisposition: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ReturnDispositionDocumentInput"]
+      }
+    }
+    responses: {
+      /** @description Draft dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ReturnDispositionDocument"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getReturnDisposition: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Disposisi Retur */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ReturnDispositionDocument"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateReturnDisposition: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ReturnDispositionDocumentUpdate"]
+      }
+    }
+    responses: {
+      /** @description Draft diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ReturnDispositionDocument"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  runReturnDispositionAction: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+        action: components["schemas"]["ReturnDispositionAction"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Aksi dijalankan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ReturnDispositionDocument"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listRecostRuns: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        productId?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Riwayat recost */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["RecostRunList"]
         }
       }
       default: components["responses"]["Problem"]

@@ -44,6 +44,7 @@ export const SOURCE_TYPE_LABELS: Record<string, string> = {
   internal_usage: "Pemakaian Internal",
   repacking: "Repacking",
   disposal: "Pemusnahan",
+  return_disposition: "Disposisi Retur",
   purchase_return: "Retur Pembelian",
   sales_return: "Retur Penjualan",
   sales_order: "Sales Order",
