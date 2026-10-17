@@ -42,10 +42,13 @@ const (
 	TypePNG  = "image/png"
 	TypeWebP = "image/webp"
 	TypeXLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+	// TypeCSV dipakai file mutasi bank (S-402); isinya terdeteksi sebagai teks biasa.
+	TypeCSV = "text/csv"
 )
 
-// sniffedAs adalah hasil http.DetectContentType untuk tipe yang tidak dikenali langsung (xlsx = arsip zip).
-var sniffedAs = map[string]string{TypeXLSX: "application/zip"}
+// sniffedAs adalah hasil http.DetectContentType untuk tipe yang tidak dikenali langsung (xlsx = arsip zip,
+// csv = teks biasa).
+var sniffedAs = map[string]string{TypeXLSX: "application/zip", TypeCSV: "text/plain"}
 
 // contentMatches memeriksa isi file (hasil deteksi) sesuai tipe yang dideklarasikan.
 func contentMatches(declared, sniffed string) bool {
@@ -155,7 +158,7 @@ func NewUpload(in UploadInput, p OwnerPolicy) (File, error) {
 }
 
 func describeTypes(types []string) string {
-	labels := map[string]string{TypePDF: "PDF", TypeJPEG: "JPG", TypePNG: "PNG", TypeWebP: "WebP", TypeXLSX: "Excel (.xlsx)"}
+	labels := map[string]string{TypePDF: "PDF", TypeJPEG: "JPG", TypePNG: "PNG", TypeWebP: "WebP", TypeXLSX: "Excel (.xlsx)", TypeCSV: "CSV"}
 	out := make([]string, 0, len(types))
 	for _, t := range types {
 		if l, ok := labels[t]; ok {

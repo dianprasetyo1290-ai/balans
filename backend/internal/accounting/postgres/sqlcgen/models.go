@@ -128,6 +128,68 @@ type AuditLog struct {
 	CreatedAt   time.Time
 }
 
+type BankAccount struct {
+	ID                 uuid.UUID
+	Code               string
+	Name               string
+	Kind               string
+	BankName           string
+	AccountNumberEnc   string
+	AccountNumberLast4 string
+	AccountHolder      string
+	AccountID          uuid.UUID
+	IsActive           bool
+	Description        string
+	CreatedAt          time.Time
+	CreatedBy          uuid.UUID
+	UpdatedAt          time.Time
+	UpdatedBy          uuid.UUID
+	Version            int32
+	DeletedAt          *time.Time
+	DeletedBy          uuid.NullUUID
+}
+
+type BankStatement struct {
+	ID            uuid.UUID
+	BankAccountID uuid.UUID
+	FileID        uuid.UUID
+	FileName      string
+	PeriodFrom    clock.BusinessDate
+	PeriodTo      clock.BusinessDate
+	LineCount     int32
+	TotalIn       decimal.Decimal
+	TotalOut      decimal.Decimal
+	CreatedAt     time.Time
+	CreatedBy     uuid.UUID
+	UpdatedAt     time.Time
+	UpdatedBy     uuid.UUID
+	Version       int32
+}
+
+type BankStatementLine struct {
+	ID                  uuid.UUID
+	StatementID         uuid.UUID
+	LineNo              int32
+	TransactionDate     clock.BusinessDate
+	Description         string
+	Reference           string
+	Amount              decimal.Decimal
+	Balance             decimal.NullDecimal
+	Status              string
+	MatchKind           string
+	MatchRule           string
+	JournalLineID       uuid.NullUUID
+	JournalEntryID      uuid.NullUUID
+	CandidateSource     string
+	CandidateDocumentID uuid.NullUUID
+	CandidateLabel      string
+	PaymentID           uuid.NullUUID
+	MatchedAt           *time.Time
+	MatchedBy           uuid.NullUUID
+	UpdatedAt           time.Time
+	Version             int32
+}
+
 type Batch struct {
 	ID             uuid.UUID
 	ProductID      uuid.UUID
@@ -305,6 +367,58 @@ type Employee struct {
 	DeletedBy        uuid.NullUUID
 }
 
+type ExpenseClaim struct {
+	ID                uuid.UUID
+	Number            pgtype.Text
+	ClaimType         string
+	RequesterID       uuid.UUID
+	DivisionID        uuid.UUID
+	CampaignID        uuid.NullUUID
+	PayeeType         string
+	PayeeID           uuid.NullUUID
+	PayeeName         string
+	PayeeTaxIDEnc     string
+	ClaimDate         clock.BusinessDate
+	Description       string
+	TotalAmount       decimal.Decimal
+	WithholdingAmount decimal.Decimal
+	PayableAmount     decimal.Decimal
+	Status            string
+	SubmittedAt       *time.Time
+	DecidedAt         *time.Time
+	DecisionNote      string
+	VerifiedAt        *time.Time
+	VerifiedBy        uuid.NullUUID
+	VerifyDate        pgtype.Date
+	JournalEntryID    uuid.NullUUID
+	PaymentID         uuid.NullUUID
+	PaidAt            *time.Time
+	CancelReason      string
+	CreatedAt         time.Time
+	CreatedBy         uuid.UUID
+	UpdatedAt         time.Time
+	UpdatedBy         uuid.UUID
+	Version           int32
+	DeletedAt         *time.Time
+	DeletedBy         uuid.NullUUID
+}
+
+type ExpenseClaimLine struct {
+	ID                uuid.UUID
+	ClaimID           uuid.UUID
+	LineNo            int32
+	ExpenseTypeID     uuid.UUID
+	Description       string
+	Amount            decimal.Decimal
+	ReceiptFileID     uuid.NullUUID
+	WithholdingType   string
+	ObjectCode        string
+	WithholdingRate   decimal.Decimal
+	WithholdingAmount decimal.Decimal
+	CreatedAt         time.Time
+	CreatedBy         uuid.UUID
+}
+
 type ExpenseType struct {
 	ID               uuid.UUID
 	Code             string
@@ -359,6 +473,31 @@ type FileObject struct {
 	Version      int32
 	DeletedAt    *time.Time
 	DeletedBy    uuid.NullUUID
+}
+
+type FinalTaxRun struct {
+	ID                 uuid.UUID
+	TaxYear            int32
+	TaxMonth           int32
+	GrossRevenueAmount decimal.Decimal
+	RateID             uuid.UUID
+	RatePercent        decimal.Decimal
+	TaxAmount          decimal.Decimal
+	JournalEntryID     uuid.NullUUID
+	DepositID          uuid.NullUUID
+	CreatedAt          time.Time
+	CreatedBy          uuid.UUID
+}
+
+type FinalTaxSetting struct {
+	ID              uuid.UUID
+	ValidFrom       clock.BusinessDate
+	IsEnabled       bool
+	OpeningYear     pgtype.Int4
+	OpeningTurnover decimal.Decimal
+	Note            string
+	CreatedAt       time.Time
+	CreatedBy       uuid.UUID
 }
 
 type FiscalPeriod struct {
@@ -664,6 +803,39 @@ type PasswordToken struct {
 	CreatedBy uuid.UUID
 }
 
+type Payment struct {
+	ID               uuid.UUID
+	Number           pgtype.Text
+	Direction        string
+	BankAccountID    uuid.UUID
+	PaymentDate      clock.BusinessDate
+	Amount           decimal.Decimal
+	CounterAccountID uuid.UUID
+	PartyType        string
+	PartyID          uuid.NullUUID
+	PartyName        string
+	Reference        string
+	Description      string
+	ProofFileID      uuid.NullUUID
+	SourceType       string
+	SourceID         uuid.NullUUID
+	SourceLabel      string
+	Status           string
+	JournalEntryID   uuid.NullUUID
+	PostedAt         *time.Time
+	PostedBy         uuid.NullUUID
+	CancelledAt      *time.Time
+	CancelledBy      uuid.NullUUID
+	CancelReason     string
+	CreatedAt        time.Time
+	CreatedBy        uuid.UUID
+	UpdatedAt        time.Time
+	UpdatedBy        uuid.UUID
+	Version          int32
+	DeletedAt        *time.Time
+	DeletedBy        uuid.NullUUID
+}
+
 type Permission struct {
 	ID             uuid.UUID
 	Code           string
@@ -671,6 +843,49 @@ type Permission struct {
 	Description    string
 	RequiresReauth bool
 	CreatedAt      time.Time
+}
+
+type PettyCashFund struct {
+	ID            uuid.UUID
+	Code          string
+	Name          string
+	HolderUserID  uuid.UUID
+	DivisionID    uuid.UUID
+	CeilingAmount decimal.Decimal
+	BalanceAmount decimal.Decimal
+	IsActive      bool
+	Description   string
+	CreatedAt     time.Time
+	CreatedBy     uuid.UUID
+	UpdatedAt     time.Time
+	UpdatedBy     uuid.UUID
+	Version       int32
+}
+
+type PettyCashTransaction struct {
+	ID              uuid.UUID
+	Number          pgtype.Text
+	FundID          uuid.UUID
+	TransactionType string
+	BusinessDate    clock.BusinessDate
+	ExpenseTypeID   uuid.NullUUID
+	DivisionID      uuid.UUID
+	CampaignID      uuid.NullUUID
+	Description     string
+	Amount          decimal.Decimal
+	ReceiptFileID   uuid.NullUUID
+	BankAccountID   uuid.NullUUID
+	Status          string
+	DecisionNote    string
+	JournalEntryID  uuid.NullUUID
+	PostedAt        *time.Time
+	PostedBy        uuid.NullUUID
+	CancelReason    string
+	CreatedAt       time.Time
+	CreatedBy       uuid.UUID
+	UpdatedAt       time.Time
+	UpdatedBy       uuid.UUID
+	Version         int32
 }
 
 type PostingRule struct {
@@ -1269,6 +1484,22 @@ type Supplier struct {
 	DeletedBy          uuid.NullUUID
 }
 
+type TaxDeposit struct {
+	ID             uuid.UUID
+	Number         string
+	TaxType        string
+	TaxYear        int32
+	TaxMonth       int32
+	BankAccountID  uuid.UUID
+	DepositDate    clock.BusinessDate
+	Amount         decimal.Decimal
+	BillingCode    string
+	Ntpn           string
+	JournalEntryID uuid.UUID
+	CreatedAt      time.Time
+	CreatedBy      uuid.UUID
+}
+
 type TieredPrice struct {
 	ID          uuid.UUID
 	PriceListID uuid.NullUUID
@@ -1341,4 +1572,55 @@ type WebhookEvent struct {
 	Payload     []byte
 	ReceivedAt  time.Time
 	ProcessedAt *time.Time
+}
+
+type Withholding struct {
+	ID               uuid.UUID
+	SourceType       string
+	SourceID         uuid.UUID
+	SourceLabel      string
+	BusinessDate     clock.BusinessDate
+	TaxYear          int32
+	TaxMonth         int32
+	TaxType          string
+	ObjectCode       string
+	ObjectName       string
+	RateID           uuid.UUID
+	TaxpayerType     string
+	TaxpayerID       uuid.NullUUID
+	TaxpayerName     string
+	TaxpayerTaxIDEnc string
+	HasTaxID         bool
+	GrossAmount      decimal.Decimal
+	TaxableBase      decimal.Decimal
+	RatePercent      decimal.Decimal
+	TaxAmount        decimal.Decimal
+	Status           string
+	DepositID        uuid.NullUUID
+	SlipNumber       string
+	CreatedAt        time.Time
+	CreatedBy        uuid.UUID
+	UpdatedAt        time.Time
+	UpdatedBy        uuid.UUID
+	Version          int32
+}
+
+type WithholdingTaxRate struct {
+	ID                      uuid.UUID
+	TaxType                 string
+	ObjectCode              string
+	Name                    string
+	RatePercent             decimal.Decimal
+	Brackets                []byte
+	BasePercent             decimal.Decimal
+	NoTaxIDSurchargePercent decimal.Decimal
+	IsDefault               bool
+	ValidFrom               clock.BusinessDate
+	ValidTo                 pgtype.Date
+	Note                    string
+	CreatedAt               time.Time
+	CreatedBy               uuid.UUID
+	UpdatedAt               time.Time
+	UpdatedBy               uuid.UUID
+	Version                 int32
 }

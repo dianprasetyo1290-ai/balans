@@ -42,6 +42,14 @@ WithholdingType:
   type: string
   description: Jenis PPh yang dipotong (pemasok, jenis biaya); tarif di master tarif PPh.
   enum: [none, pph21, pph23, pph4_2]
+TaxType:
+  type: string
+  description: Jenis pajak kalkulator tax (PPh potong 21/23/4(2) dan PPh Final UMKM); tarif di master tarif PPh.
+  enum: [pph21, pph23, pph4_2, final_umkm]
+PaymentDirection:
+  type: string
+  description: Arah pembayaran kas/bank — `incoming` penerimaan, `outgoing` pengeluaran.
+  enum: [incoming, outgoing]
 PurchaseOrderType:
   type: string
   description: |

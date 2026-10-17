@@ -39,10 +39,9 @@ func devApprovalSamples() []devApprovalSample {
 			Summary: summary, Amount: money.FromInt(amount), Flags: flags,
 		}
 	}
-	// PR/PO tidak lagi disemai: modul procurement mendaftarkan handler-nya sendiri dan menolak dokumen yang
-	// tidak ada di tabelnya.
+	// PR/PO dan pengajuan biaya tidak lagi disemai: modul procurement dan accounting mendaftarkan handler-nya
+	// sendiri dan menolak dokumen yang tidak ada di tabelnya.
 	return []devApprovalSample{
-		{"marketing", sample(approval.SubjectExpenseClaim, "EXP/2026/10/90001", "Biaya booth event Jakarta Fair", 3_200_000)},
 		{"warehouse_staff", sample(approval.SubjectReturnDisposition, "RJ/2026/10/90001", "Retur MT · 3 baris pemusnahan", 1_750_000, approval.ConditionHasDisposal)},
 	}
 }

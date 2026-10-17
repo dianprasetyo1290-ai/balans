@@ -1496,6 +1496,825 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/v1/cash-bank-accounts": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Kas & Bank › Rekening
+     * @description Butuh `accounting.payment.read` (atau hak baca rekonsiliasi, kas kecil, pajak, verifikasi biaya untuk dropdown). Nomor rekening tersamar.
+     */
+    get: operations["listCashBankAccounts"]
+    put?: never
+    /**
+     * Menambah rekening kas/bank
+     * @description Akun GL wajib akun Kas & Bank 11xx yang bisa diposting (bukan 1102 Kas Kecil); satu akun hanya untuk satu rekening. Nomor rekening disimpan terenkripsi.
+     */
+    post: operations["createCashBankAccount"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/cash-bank-accounts/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail rekening (nomor rekening lengkap) */
+    get: operations["getCashBankAccount"]
+    /**
+     * Mengubah rekening
+     * @description Akun GL tidak bisa diganti setelah rekening dipakai transaksi.
+     */
+    put: operations["updateCashBankAccount"]
+    post?: never
+    /** Menghapus rekening (soft delete) */
+    delete: operations["deleteCashBankAccount"]
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/cash-bank-accounts/{id}/restore": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Memulihkan rekening terhapus (Admin Sistem) */
+    post: operations["restoreCashBankAccount"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/cash-bank-accounts/{id}/mutations": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Mutasi rekening dengan saldo berjalan
+     * @description Baris jurnal akun GL rekening (semua sumber: pembayaran, kas kecil, pajak, jurnal umum) urut tanggal; `balance` = saldo awal + kumulatif.
+     */
+    get: operations["listCashBankMutations"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/cash-payments": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Kas & Bank › Pembayaran masuk/keluar */
+    get: operations["listCashPayments"]
+    put?: never
+    /**
+     * Menyimpan draft pembayaran manual
+     * @description Akun lawan wajib akun yang boleh dipakai jurnal manual (bukan akun kontrol piutang/utang).
+     */
+    post: operations["createCashPayment"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/cash-payments/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail pembayaran */
+    get: operations["getCashPayment"]
+    /** Mengubah draft pembayaran */
+    put: operations["updateCashPayment"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/cash-payments/{id}/post": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Posting pembayaran (nomor BYR, jurnal A-PB)
+     * @description Pembayaran keluar butuh re-autentikasi `accounting.payment.post` (★, `AUTH_REAUTH_REQUIRED`).
+     */
+    post: operations["postCashPayment"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/cash-payments/{id}/cancel": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Membatalkan pembayaran
+     * @description Draft dibatalkan biasa; pembayaran manual Diposting yang belum direkonsiliasi dibatalkan dengan jurnal pembalik.
+     */
+    post: operations["cancelCashPayment"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/bank-statements": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Rekonsiliasi Bank › File mutasi */
+    get: operations["listBankStatements"]
+    put?: never
+    /**
+     * Impor file mutasi rekening (CSV/Excel)
+     * @description Unggah file lebih dulu ke filestore dengan ownerType `bank_statement`. Kolom dikenali dari judul umum (Tanggal, Keterangan, Referensi, Debit/Kredit atau Nominal + D/K, Saldo). Pencocokan otomatis dijalankan setelah impor. Butuh `accounting.bank_reconciliation.import`.
+     */
+    post: operations["importBankStatement"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/bank-statements/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail file mutasi beserta baris dan usulan */
+    get: operations["getBankStatement"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/bank-statements/{id}/auto-match": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Jalankan ulang pencocokan otomatis
+     * @description Aturan berurutan: referensi persis → nominal + tanggal (±3 hari) → manual. Usulan lama baris belum direkonsiliasi diganti.
+     */
+    post: operations["autoMatchBankStatement"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/bank-statements/{id}/confirm-suggestions": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Konfirmasi semua usulan pencocokan */
+    post: operations["confirmBankStatementSuggestions"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/bank-statement-lines/{id}/candidates": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Calon pasangan manual satu baris mutasi */
+    get: operations["listBankStatementLineCandidates"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/bank-statement-lines/{id}/confirm": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Konfirmasi usulan satu baris */
+    post: operations["confirmBankStatementLine"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/bank-statement-lines/{id}/match": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Cocokkan manual
+     * @description Isi `journalLineId` (baris jurnal akun rekening, nominal sama) atau `source` + `documentId` (dokumen terbuka penyedia kandidat; pembayaran BYR dibuat otomatis).
+     */
+    post: operations["matchBankStatementLine"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/bank-statement-lines/{id}/create-entry": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Buat jurnal dari baris tak cocok
+     * @description Membuat pembayaran Diposting (A-PB) ke akun lawan (mis. 7202 Beban Bank, 7101 Pendapatan Lain-lain) lalu menandai baris direkonsiliasi.
+     */
+    post: operations["createBankStatementLineEntry"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/bank-statement-lines/{id}/unmatch": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Lepas pencocokan */
+    post: operations["unmatchBankStatementLine"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/expense-claims/options": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Pilihan form pengajuan (divisi, kampanye, jenis biaya)
+     * @description Butuh `accounting.expense_claim.read` saja agar semua divisi bisa mengajukan.
+     */
+    get: operations["getExpenseClaimOptions"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/expense-claims": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Biaya Operasional › Pengajuan biaya
+     * @description Pengaju tanpa hak verifikasi/approve hanya melihat pengajuannya sendiri.
+     */
+    get: operations["listExpenseClaims"]
+    put?: never
+    /** Menyimpan draft pengajuan biaya */
+    post: operations["createExpenseClaim"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/expense-claims/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail pengajuan biaya */
+    get: operations["getExpenseClaim"]
+    /** Mengubah draft (hanya pengaju) */
+    put: operations["updateExpenseClaim"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/expense-claims/{id}/submit": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Ajukan (nomor EXP, approval `expense_claim`)
+     * @description Bukti wajib untuk jenis biaya yang mewajibkan; kampanye wajib untuk jenis biaya bertanda kampanye. Approval berjenjang per nominal & divisi.
+     */
+    post: operations["submitExpenseClaim"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/expense-claims/{id}/revise": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Revisi pengajuan ditolak menjadi draft */
+    post: operations["reviseExpenseClaim"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/expense-claims/{id}/cancel": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Batalkan draft/pengajuan ditolak */
+    post: operations["cancelExpenseClaim"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/expense-claims/{id}/verify-preview": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Pratinjau PPh verifikasi F&A
+     * @description Menghitung PPh per jenis + objek pajak dengan tarif berlaku hari ini tanpa menyimpan. Butuh `accounting.expense_claim.post`.
+     */
+    post: operations["previewExpenseClaimVerification"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/expense-claims/{id}/verify": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Verifikasi F&A (bukti + PPh, jurnal A-15)
+     * @description Pengajuan Disetujui → Menunggu Pembayaran. Jurnal A-15: Dr beban jenis biaya / Cr 2103 Utang Biaya + utang PPh; data bukti potong dicatat.
+     */
+    post: operations["verifyExpenseClaim"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/expense-claims/{id}/pay": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Bayar pengajuan (BYR, A-PB Dr 2103 / Cr bank)
+     * @description Butuh re-autentikasi `accounting.payment.post` (★).
+     */
+    post: operations["payExpenseClaim"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/petty-cash-funds": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Kas Kecil › Dana kas kecil (rekap saldo) */
+    get: operations["listPettyCashFunds"]
+    put?: never
+    /**
+     * Menambah dana kas kecil
+     * @description Saldo awal nol; diisi lewat pengisian kembali.
+     */
+    post: operations["createPettyCashFund"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/petty-cash-funds/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /**
+     * Mengubah dana kas kecil
+     * @description Plafon tidak boleh di bawah saldo.
+     */
+    put: operations["updatePettyCashFund"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/petty-cash-transactions": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Kas Kecil › Transaksi */
+    get: operations["listPettyCashTransactions"]
+    put?: never
+    /**
+     * Menyimpan draft pengeluaran/pengisian kembali
+     * @description Divisi kosong = divisi dana; nominal pengisian kosong = plafon − saldo.
+     */
+    post: operations["createPettyCashTransaction"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/petty-cash-transactions/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail transaksi kas kecil */
+    get: operations["getPettyCashTransaction"]
+    /** Mengubah draft transaksi kas kecil */
+    put: operations["updatePettyCashTransaction"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/petty-cash-transactions/{id}/submit": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Ajukan pengisian kembali (approval `petty_cash_replenishment`) */
+    post: operations["submitPettyCashTransaction"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/petty-cash-transactions/{id}/revise": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Revisi pengisian ditolak menjadi draft */
+    post: operations["revisePettyCashTransaction"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/petty-cash-transactions/{id}/cancel": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Batalkan transaksi kas kecil yang belum diposting */
+    post: operations["cancelPettyCashTransaction"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/petty-cash-transactions/{id}/post": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Posting transaksi kas kecil
+     * @description Pengeluaran: bukti wajib, maks. per transaksi, saldo cukup, jurnal A-17. Pengisian kembali (sudah disetujui): rekening sumber wajib, re-autentikasi, jurnal A-16.
+     */
+    post: operations["postPettyCashTransaction"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/withholding-tax-rates": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Pajak & Bukti Potong › Tarif (effective-dated) */
+    get: operations["listTaxRates"]
+    put?: never
+    /**
+     * Menambah versi tarif
+     * @description Versi terakhir objek pajak yang sama ditutup sehari sebelum tanggal berlaku versi baru.
+     */
+    post: operations["createTaxRate"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/withholding-slips": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Rekap bukti potong satu masa */
+    get: operations["listWithholdingSlips"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/withholding-slips/summary": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Ringkasan utang PPh potong per masa setahun */
+    get: operations["listWithholdingSummary"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/withholding-slips/{id}/slip-number": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Catat nomor bukti potong dari Coretax */
+    put: operations["setWithholdingSlipNumber"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/withholding-slips/export": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Ekspor rekap bukti potong (Excel) untuk Coretax
+     * @description Sheet per jenis PPh; mengembalikan tautan unduhan bertanda tangan (5 menit). Butuh `accounting.withholding.export`.
+     */
+    post: operations["exportWithholdingRecap"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/tax-deposits": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Penyetoran pajak setahun */
+    get: operations["listTaxDeposits"]
+    put?: never
+    /**
+     * Setor pajak satu jenis satu masa (A-29)
+     * @description Nominal = PPh dipotong belum disetor (atau PPh Final masa itu). Re-autentikasi (★) karena dana keluar.
+     */
+    post: operations["createTaxDeposit"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/final-tax": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** PPh Final UMKM: omzet bulanan, perhitungan, batas Rp4,8 M */
+    get: operations["getFinalTaxSummary"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/final-tax/settings": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Aktifkan/nonaktifkan PPh Final UMKM mulai tanggal tertentu */
+    post: operations["createFinalTaxSetting"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/final-tax/runs": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Hitung PPh Final satu masa (A-30)
+     * @description Masa harus sudah berakhir dan PPh Final aktif. Omzet bruto = kredit − debit akun pendapatan 4xxx masa itu.
+     */
+    post: operations["runFinalTax"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/v1/document-sequences": {
     parameters: {
       query?: never
@@ -4485,6 +5304,788 @@ export interface components {
       periodCredit: components["schemas"]["Money"]
       closingBalance: components["schemas"]["Money"]
       items: components["schemas"]["GeneralLedgerLine"][]
+    }
+    /** @enum {string} */
+    CashBankAccountKind: "bank" | "cash"
+    /** @enum {string} */
+    FinanceAction:
+      | "edit"
+      | "post"
+      | "cancel"
+      | "submit"
+      | "revise"
+      | "verify"
+      | "pay"
+      | "delete"
+      | "restore"
+    CashBankAccount: {
+      /** Format: uuid */
+      id: string
+      code: string
+      name: string
+      kind: components["schemas"]["CashBankAccountKind"]
+      bankName: string
+      accountNumberMasked: string
+      /** @description Hanya di detail. */
+      accountNumber?: string
+      accountHolder: string
+      /** Format: uuid */
+      accountId: string
+      accountCode: string
+      accountName: string
+      isActive: boolean
+      description: string
+      /** Format: date-time */
+      deletedAt?: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+      allowedActions: components["schemas"]["FinanceAction"][]
+    }
+    CashBankAccountInput: {
+      code: string
+      name: string
+      kind: components["schemas"]["CashBankAccountKind"]
+      bankName?: string
+      /** @description Wajib untuk rekening bank (5–30 angka). */
+      accountNumber?: string
+      accountHolder?: string
+      /** Format: uuid */
+      accountId: string
+      isActive: boolean
+      description?: string
+    }
+    CashBankAccountUpdate: {
+      version: number
+      name: string
+      kind: components["schemas"]["CashBankAccountKind"]
+      bankName?: string
+      /** @description Wajib untuk rekening bank (5–30 angka). */
+      accountNumber?: string
+      accountHolder?: string
+      /** Format: uuid */
+      accountId: string
+      isActive: boolean
+      description?: string
+    }
+    BankMutation: {
+      /** Format: uuid */
+      journalLineId: string
+      /** Format: uuid */
+      journalEntryId: string
+      journalNumber: string
+      businessDate: components["schemas"]["BusinessDate"]
+      description: string
+      sourceType: string
+      sourceLabel: string
+      memo: string
+      /** @description Masuk positif, keluar negatif. */
+      amount: components["schemas"]["Money"]
+      balance: components["schemas"]["Money"]
+      reconciled: boolean
+    }
+    BankMutationList: components["schemas"]["Pagination"] & {
+      account: components["schemas"]["CashBankAccount"]
+      openingBalance: components["schemas"]["Money"]
+      items: components["schemas"]["BankMutation"][]
+    }
+    /**
+     * @description Arah pembayaran kas/bank — `incoming` penerimaan, `outgoing` pengeluaran.
+     * @enum {string}
+     */
+    PaymentDirection: "incoming" | "outgoing"
+    /** @enum {string} */
+    CashPaymentStatus: "draft" | "posted" | "cancelled"
+    CashPayment: {
+      /** Format: uuid */
+      id: string
+      number?: string
+      direction: components["schemas"]["PaymentDirection"]
+      /** Format: uuid */
+      bankAccountId: string
+      bankAccountCode: string
+      bankAccountName: string
+      paymentDate: components["schemas"]["BusinessDate"]
+      amount: components["schemas"]["Money"]
+      /** Format: uuid */
+      counterAccountId: string
+      counterAccountCode: string
+      counterAccountName: string
+      partyType?: string
+      /** Format: uuid */
+      partyId?: string
+      partyName: string
+      reference: string
+      description: string
+      /** Format: uuid */
+      proofFileId?: string
+      sourceType: string
+      /** Format: uuid */
+      sourceId?: string
+      sourceLabel: string
+      status: components["schemas"]["CashPaymentStatus"]
+      /** Format: uuid */
+      journalEntryId?: string
+      journalNumber?: string
+      /** Format: date-time */
+      postedAt?: string
+      cancelReason: string
+      reconciled: boolean
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+      allowedActions: components["schemas"]["FinanceAction"][]
+    }
+    CashPaymentList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["CashPayment"][]
+    }
+    CashPaymentInput: {
+      direction: components["schemas"]["PaymentDirection"]
+      /** Format: uuid */
+      bankAccountId: string
+      paymentDate: components["schemas"]["BusinessDate"]
+      amount: components["schemas"]["Money"]
+      /** Format: uuid */
+      counterAccountId: string
+      partyName?: string
+      reference?: string
+      description?: string
+      /** Format: uuid */
+      proofFileId?: string
+    }
+    CashPaymentUpdate: {
+      version: number
+      direction: components["schemas"]["PaymentDirection"]
+      /** Format: uuid */
+      bankAccountId: string
+      paymentDate: components["schemas"]["BusinessDate"]
+      amount: components["schemas"]["Money"]
+      /** Format: uuid */
+      counterAccountId: string
+      partyName?: string
+      reference?: string
+      description?: string
+      /** Format: uuid */
+      proofFileId?: string
+    }
+    FinanceCancelInput: {
+      version: number
+      reason: string
+    }
+    BankStatement: {
+      /** Format: uuid */
+      id: string
+      /** Format: uuid */
+      bankAccountId: string
+      bankAccountCode: string
+      bankAccountName: string
+      /** Format: uuid */
+      fileId: string
+      fileName: string
+      periodFrom: components["schemas"]["BusinessDate"]
+      periodTo: components["schemas"]["BusinessDate"]
+      lineCount: number
+      totalIn: components["schemas"]["Money"]
+      totalOut: components["schemas"]["Money"]
+      matchedCount: number
+      suggestedCount: number
+      /** Format: date-time */
+      createdAt: string
+    }
+    BankStatementList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["BankStatement"][]
+    }
+    BankStatementImportInput: {
+      /** Format: uuid */
+      bankAccountId: string
+      /** Format: uuid */
+      fileId: string
+    }
+    /** @enum {string} */
+    BankLineStatus: "unmatched" | "suggested" | "matched"
+    /** @enum {string} */
+    BankMatchKind: "journal_line" | "document" | "new_entry"
+    /** @enum {string} */
+    BankMatchRule: "reference" | "amount_date" | "manual"
+    /** @enum {string} */
+    BankLineAction: "confirm" | "match" | "create_entry" | "unmatch"
+    BankStatementLine: {
+      /** Format: uuid */
+      id: string
+      /** Format: uuid */
+      statementId: string
+      lineNo: number
+      transactionDate: components["schemas"]["BusinessDate"]
+      description: string
+      reference: string
+      /** @description Masuk positif, keluar negatif. */
+      amount: components["schemas"]["Money"]
+      balance?: components["schemas"]["Money"]
+      status: components["schemas"]["BankLineStatus"]
+      matchKind?: components["schemas"]["BankMatchKind"]
+      matchRule?: components["schemas"]["BankMatchRule"]
+      /** Format: uuid */
+      journalLineId?: string
+      /** Format: uuid */
+      journalEntryId?: string
+      journalNumber?: string
+      candidateSource?: string
+      /** Format: uuid */
+      candidateDocumentId?: string
+      candidateLabel: string
+      /** Format: uuid */
+      paymentId?: string
+      /** Format: date-time */
+      matchedAt?: string
+      version: number
+      allowedActions: components["schemas"]["BankLineAction"][]
+    }
+    BankStatementDetail: components["schemas"]["BankStatement"] & {
+      lines: components["schemas"]["BankStatementLine"][]
+    }
+    BankConfirmResult: {
+      confirmed: number
+      statement: components["schemas"]["BankStatementDetail"]
+    }
+    BankMatchCandidate: {
+      kind: components["schemas"]["BankMatchKind"]
+      /** Format: uuid */
+      journalLineId?: string
+      /** Format: uuid */
+      journalEntryId?: string
+      source?: string
+      /** Format: uuid */
+      documentId?: string
+      label: string
+      date: components["schemas"]["BusinessDate"]
+      amount: components["schemas"]["Money"]
+    }
+    BankLineMatchInput: {
+      version: number
+      /** Format: uuid */
+      journalLineId?: string
+      source?: string
+      /** Format: uuid */
+      documentId?: string
+    }
+    BankLineEntryInput: {
+      version: number
+      /** Format: uuid */
+      counterAccountId: string
+      description?: string
+    }
+    ExpenseClaimOption: {
+      /** Format: uuid */
+      id: string
+      code: string
+      name: string
+    }
+    ExpenseClaimTypeOption: {
+      /** Format: uuid */
+      id: string
+      code: string
+      name: string
+      withholdingType: components["schemas"]["WithholdingType"]
+      requiresReceipt: boolean
+      requiresCampaign: boolean
+      expenseAccountCode: string
+    }
+    ExpenseClaimOptions: {
+      divisions: components["schemas"]["ExpenseClaimOption"][]
+      campaigns: components["schemas"]["ExpenseClaimOption"][]
+      expenseTypes: components["schemas"]["ExpenseClaimTypeOption"][]
+    }
+    /** @enum {string} */
+    ExpenseClaimStatus:
+      | "draft"
+      | "pending_approval"
+      | "approved"
+      | "rejected"
+      | "awaiting_payment"
+      | "paid"
+      | "cancelled"
+    /** @enum {string} */
+    ExpenseClaimType: "expense" | "reimbursement"
+    /**
+     * @description `employee` = pengaju sendiri (reimbursement); `supplier` = pemasok; `other` = pihak lain.
+     * @enum {string}
+     */
+    ExpenseClaimPayeeType: "employee" | "supplier" | "other"
+    ExpenseClaimSummary: {
+      /** Format: uuid */
+      id: string
+      number?: string
+      claimType: components["schemas"]["ExpenseClaimType"]
+      /** Format: uuid */
+      requesterId: string
+      requesterName: string
+      /** Format: uuid */
+      divisionId: string
+      divisionName: string
+      /** Format: uuid */
+      campaignId?: string
+      campaignName?: string
+      payeeType: components["schemas"]["ExpenseClaimPayeeType"]
+      payeeName: string
+      claimDate: components["schemas"]["BusinessDate"]
+      description: string
+      totalAmount: components["schemas"]["Money"]
+      withholdingAmount: components["schemas"]["Money"]
+      payableAmount: components["schemas"]["Money"]
+      status: components["schemas"]["ExpenseClaimStatus"]
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    ExpenseClaimList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["ExpenseClaimSummary"][]
+    }
+    ExpenseClaimLineInput: {
+      /** Format: uuid */
+      expenseTypeId: string
+      description?: string
+      amount: components["schemas"]["Money"]
+      /** Format: uuid */
+      receiptFileId?: string
+    }
+    ExpenseClaimInput: {
+      claimType: components["schemas"]["ExpenseClaimType"]
+      /** Format: uuid */
+      divisionId: string
+      /** Format: uuid */
+      campaignId?: string
+      payeeType: components["schemas"]["ExpenseClaimPayeeType"]
+      /** Format: uuid */
+      payeeId?: string
+      payeeName?: string
+      /** @description NPWP/NIK penerima (opsional, terenkripsi). */
+      payeeTaxId?: string
+      claimDate: components["schemas"]["BusinessDate"]
+      description?: string
+      lines: components["schemas"]["ExpenseClaimLineInput"][]
+    }
+    /**
+     * @description Persentase desimal maks. 4 angka di belakang koma, mis. `2` atau `0.5`.
+     * @example 2
+     */
+    TaxPercent: string
+    ExpenseClaimLine: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      /** Format: uuid */
+      expenseTypeId: string
+      expenseTypeCode: string
+      expenseTypeName: string
+      expenseAccountCode: string
+      description: string
+      amount: components["schemas"]["Money"]
+      /** Format: uuid */
+      receiptFileId?: string
+      receiptFileName?: string
+      withholdingType: components["schemas"]["WithholdingType"]
+      objectCode: string
+      withholdingRate: components["schemas"]["TaxPercent"]
+      withholdingAmount: components["schemas"]["Money"]
+    }
+    /**
+     * @description Jenis pajak kalkulator tax (PPh potong 21/23/4(2) dan PPh Final UMKM); tarif di master tarif PPh.
+     * @enum {string}
+     */
+    TaxType: "pph21" | "pph23" | "pph4_2" | "final_umkm"
+    /** @enum {string} */
+    WithholdingSlipStatus: "recorded" | "deposited" | "cancelled"
+    WithholdingSlip: {
+      /** Format: uuid */
+      id?: string
+      sourceType: string
+      /** Format: uuid */
+      sourceId: string
+      sourceLabel: string
+      businessDate: components["schemas"]["BusinessDate"]
+      taxYear: number
+      taxMonth: number
+      taxType: components["schemas"]["TaxType"]
+      objectCode: string
+      objectName: string
+      taxpayerName: string
+      taxpayerTaxIdMasked: string
+      hasTaxId: boolean
+      grossAmount: components["schemas"]["Money"]
+      taxableBase: components["schemas"]["Money"]
+      ratePercent: components["schemas"]["TaxPercent"]
+      taxAmount: components["schemas"]["Money"]
+      status: components["schemas"]["WithholdingSlipStatus"]
+      /** Format: uuid */
+      depositId?: string
+      depositNumber?: string
+      slipNumber: string
+      version: number
+    }
+    ExpenseClaimDetail: components["schemas"]["ExpenseClaimSummary"] & {
+      /** Format: uuid */
+      payeeId?: string
+      payeeTaxIdMasked?: string
+      payeeHasTaxId: boolean
+      lines: components["schemas"]["ExpenseClaimLine"][]
+      /** Format: date-time */
+      submittedAt?: string
+      /** Format: date-time */
+      decidedAt?: string
+      decisionNote: string
+      /** Format: date-time */
+      verifiedAt?: string
+      verifyDate?: components["schemas"]["BusinessDate"]
+      /** Format: uuid */
+      journalEntryId?: string
+      journalNumber?: string
+      /** Format: uuid */
+      paymentId?: string
+      paymentNumber?: string
+      /** Format: date-time */
+      paidAt?: string
+      cancelReason: string
+      withholdings: components["schemas"]["WithholdingSlip"][]
+      allowedActions: components["schemas"]["FinanceAction"][]
+    }
+    ExpenseClaimUpdate: {
+      version: number
+      claimType: components["schemas"]["ExpenseClaimType"]
+      /** Format: uuid */
+      divisionId: string
+      /** Format: uuid */
+      campaignId?: string
+      payeeType: components["schemas"]["ExpenseClaimPayeeType"]
+      /** Format: uuid */
+      payeeId?: string
+      payeeName?: string
+      /** @description NPWP/NIK penerima (opsional, terenkripsi). */
+      payeeTaxId?: string
+      claimDate: components["schemas"]["BusinessDate"]
+      description?: string
+      lines: components["schemas"]["ExpenseClaimLineInput"][]
+    }
+    ExpenseClaimTaxChoice: {
+      /** Format: uuid */
+      lineId: string
+      withholdingType: components["schemas"]["WithholdingType"]
+      objectCode?: string
+    }
+    ExpenseClaimVerifyInput: {
+      version: number
+      payeeTaxId?: string
+      lines: components["schemas"]["ExpenseClaimTaxChoice"][]
+    }
+    ExpenseClaimVerifyPreview: {
+      withholdings: components["schemas"]["WithholdingSlip"][]
+      totalWithholding: components["schemas"]["Money"]
+      payableAmount: components["schemas"]["Money"]
+    }
+    ExpenseClaimPayInput: {
+      version: number
+      /** Format: uuid */
+      bankAccountId: string
+      paymentDate: components["schemas"]["BusinessDate"]
+      reference?: string
+      /** Format: uuid */
+      proofFileId?: string
+    }
+    PettyCashFund: {
+      /** Format: uuid */
+      id: string
+      code: string
+      name: string
+      /** Format: uuid */
+      holderUserId: string
+      holderName: string
+      /** Format: uuid */
+      divisionId: string
+      divisionName: string
+      ceilingAmount: components["schemas"]["Money"]
+      balanceAmount: components["schemas"]["Money"]
+      shortfallAmount: components["schemas"]["Money"]
+      isActive: boolean
+      description: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    PettyCashFundList: {
+      items: components["schemas"]["PettyCashFund"][]
+      maxPerTransaction: components["schemas"]["Money"]
+      defaultCeiling: components["schemas"]["Money"]
+    }
+    PettyCashFundInput: {
+      code: string
+      name: string
+      /** Format: uuid */
+      holderUserId: string
+      /** Format: uuid */
+      divisionId: string
+      ceilingAmount?: components["schemas"]["Money"]
+      isActive: boolean
+      description?: string
+    }
+    PettyCashFundUpdate: {
+      version: number
+      name: string
+      /** Format: uuid */
+      holderUserId: string
+      /** Format: uuid */
+      divisionId: string
+      ceilingAmount: components["schemas"]["Money"]
+      isActive: boolean
+      description?: string
+    }
+    /** @enum {string} */
+    PettyCashType: "expense" | "replenishment"
+    /** @enum {string} */
+    PettyCashStatus:
+      | "draft"
+      | "pending_approval"
+      | "approved"
+      | "rejected"
+      | "posted"
+      | "cancelled"
+    PettyCashTransaction: {
+      /** Format: uuid */
+      id: string
+      number?: string
+      /** Format: uuid */
+      fundId: string
+      fundCode: string
+      fundName: string
+      type: components["schemas"]["PettyCashType"]
+      businessDate: components["schemas"]["BusinessDate"]
+      /** Format: uuid */
+      expenseTypeId?: string
+      expenseTypeCode: string
+      expenseTypeName: string
+      /** Format: uuid */
+      divisionId: string
+      divisionName: string
+      /** Format: uuid */
+      campaignId?: string
+      campaignName: string
+      description: string
+      amount: components["schemas"]["Money"]
+      /** Format: uuid */
+      receiptFileId?: string
+      receiptFileName?: string
+      /** Format: uuid */
+      bankAccountId?: string
+      bankAccountName?: string
+      status: components["schemas"]["PettyCashStatus"]
+      decisionNote: string
+      /** Format: uuid */
+      journalEntryId?: string
+      journalNumber?: string
+      /** Format: date-time */
+      postedAt?: string
+      cancelReason: string
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+      allowedActions: components["schemas"]["FinanceAction"][]
+    }
+    PettyCashTransactionList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["PettyCashTransaction"][]
+    }
+    PettyCashTransactionInput: {
+      type: components["schemas"]["PettyCashType"]
+      /** Format: uuid */
+      fundId: string
+      businessDate: components["schemas"]["BusinessDate"]
+      /** Format: uuid */
+      expenseTypeId?: string
+      /** Format: uuid */
+      divisionId?: string
+      /** Format: uuid */
+      campaignId?: string
+      description?: string
+      amount?: components["schemas"]["Money"]
+      /** Format: uuid */
+      receiptFileId?: string
+    }
+    PettyCashTransactionUpdate: {
+      version: number
+      businessDate: components["schemas"]["BusinessDate"]
+      /** Format: uuid */
+      expenseTypeId?: string
+      /** Format: uuid */
+      divisionId?: string
+      /** Format: uuid */
+      campaignId?: string
+      description?: string
+      amount: components["schemas"]["Money"]
+      /** Format: uuid */
+      receiptFileId?: string
+    }
+    PettyCashPostInput: {
+      version: number
+      /** Format: uuid */
+      bankAccountId?: string
+    }
+    TaxRateBracket: {
+      /** @description Kosong = lapisan teratas tanpa batas. */
+      upTo?: components["schemas"]["Money"]
+      ratePercent: components["schemas"]["TaxPercent"]
+    }
+    TaxRate: {
+      /** Format: uuid */
+      id: string
+      taxType: components["schemas"]["TaxType"]
+      objectCode: string
+      name: string
+      ratePercent: components["schemas"]["TaxPercent"]
+      brackets: components["schemas"]["TaxRateBracket"][]
+      basePercent: components["schemas"]["TaxPercent"]
+      noTaxIdSurchargePercent: components["schemas"]["TaxPercent"]
+      isDefault: boolean
+      validFrom: components["schemas"]["BusinessDate"]
+      note: string
+      validTo?: components["schemas"]["BusinessDate"]
+      version: number
+    }
+    TaxRateInput: {
+      taxType: components["schemas"]["TaxType"]
+      objectCode: string
+      name: string
+      ratePercent?: components["schemas"]["TaxPercent"]
+      brackets?: components["schemas"]["TaxRateBracket"][]
+      basePercent?: components["schemas"]["TaxPercent"]
+      noTaxIdSurchargePercent?: components["schemas"]["TaxPercent"]
+      isDefault: boolean
+      validFrom: components["schemas"]["BusinessDate"]
+      note?: string
+    }
+    WithholdingSlipList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["WithholdingSlip"][]
+    }
+    WithholdingSummaryRow: {
+      taxType: components["schemas"]["TaxType"]
+      taxYear: number
+      taxMonth: number
+      slipCount: number
+      openAmount: components["schemas"]["Money"]
+      depositedAmount: components["schemas"]["Money"]
+    }
+    WithholdingSlipNumberInput: {
+      version: number
+      slipNumber: string
+    }
+    WithholdingExportInput: {
+      year: number
+      month: number
+      taxType?: components["schemas"]["TaxType"]
+    }
+    FinanceDownloadLink: {
+      /** Format: uuid */
+      fileId: string
+      url: string
+      /** Format: date-time */
+      expiresAt: string
+    }
+    TaxDeposit: {
+      /** Format: uuid */
+      id: string
+      number: string
+      taxType: components["schemas"]["TaxType"]
+      taxYear: number
+      taxMonth: number
+      /** Format: uuid */
+      bankAccountId: string
+      bankAccountName: string
+      depositDate: components["schemas"]["BusinessDate"]
+      amount: components["schemas"]["Money"]
+      billingCode: string
+      ntpn: string
+      /** Format: uuid */
+      journalEntryId: string
+      journalNumber: string
+      /** Format: date-time */
+      createdAt: string
+    }
+    TaxDepositInput: {
+      taxType: components["schemas"]["TaxType"]
+      taxYear: number
+      taxMonth: number
+      /** Format: uuid */
+      bankAccountId: string
+      depositDate: components["schemas"]["BusinessDate"]
+      billingCode?: string
+      ntpn?: string
+    }
+    FinalTaxSetting: {
+      /** Format: uuid */
+      id: string
+      validFrom: components["schemas"]["BusinessDate"]
+      isEnabled: boolean
+      openingYear?: number
+      openingTurnover: components["schemas"]["Money"]
+      note: string
+      /** Format: date-time */
+      createdAt: string
+    }
+    FinalTaxRun: {
+      /** Format: uuid */
+      id: string
+      taxYear: number
+      taxMonth: number
+      grossRevenue: components["schemas"]["Money"]
+      ratePercent: components["schemas"]["TaxPercent"]
+      taxAmount: components["schemas"]["Money"]
+      /** Format: uuid */
+      journalEntryId?: string
+      journalNumber?: string
+      /** Format: uuid */
+      depositId?: string
+      /** Format: date-time */
+      createdAt: string
+    }
+    FinalTaxMonth: {
+      taxYear: number
+      taxMonth: number
+      grossRevenue: components["schemas"]["Money"]
+      cumulative: components["schemas"]["Money"]
+      run?: components["schemas"]["FinalTaxRun"]
+    }
+    /** @enum {string} */
+    FinalTaxThresholdStatus: "below" | "approaching" | "exceeded"
+    FinalTaxThreshold: {
+      cumulative: components["schemas"]["Money"]
+      limit: components["schemas"]["Money"]
+      remaining: components["schemas"]["Money"]
+      usedPercent: string
+      status: components["schemas"]["FinalTaxThresholdStatus"]
+    }
+    FinalTaxSummary: {
+      year: number
+      enabled: boolean
+      setting?: components["schemas"]["FinalTaxSetting"]
+      settings: components["schemas"]["FinalTaxSetting"][]
+      ratePercent?: components["schemas"]["TaxPercent"]
+      openingTurnover: components["schemas"]["Money"]
+      months: components["schemas"]["FinalTaxMonth"][]
+      threshold: components["schemas"]["FinalTaxThreshold"]
+    }
+    FinalTaxSettingInput: {
+      validFrom: components["schemas"]["BusinessDate"]
+      isEnabled: boolean
+      openingYear?: number
+      /** @description Omzet bruto kumulatif tahun `openingYear` sebelum cut-over. */
+      openingTurnover?: components["schemas"]["Money"]
+      note?: string
+    }
+    FinalTaxRunInput: {
+      year: number
+      month: number
     }
     DocumentSequence: {
       /** @example JV */
@@ -9253,6 +10854,1549 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["GeneralLedger"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listCashBankAccounts: {
+    parameters: {
+      query?: {
+        includeInactive?: boolean
+        /** @description Daftar Dihapus */
+        deleted?: boolean
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CashBankAccount"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createCashBankAccount: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CashBankAccountInput"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CashBankAccount"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getCashBankAccount: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CashBankAccount"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateCashBankAccount: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CashBankAccountUpdate"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CashBankAccount"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  deleteCashBankAccount: {
+    parameters: {
+      query: {
+        /** @description Versi terakhir yang dilihat user (optimistic locking). */
+        version: components["parameters"]["Version"]
+      }
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Rekening dihapus */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  restoreCashBankAccount: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Rekening dipulihkan */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listCashBankMutations: {
+    parameters: {
+      query: {
+        dateFrom: components["schemas"]["BusinessDate"]
+        dateTo: components["schemas"]["BusinessDate"]
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+      }
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["BankMutationList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listCashPayments: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        bankAccountId?: string
+        direction?: components["schemas"]["PaymentDirection"]
+        status?: components["schemas"]["CashPaymentStatus"]
+        dateFrom?: components["schemas"]["BusinessDate"]
+        dateTo?: components["schemas"]["BusinessDate"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CashPaymentList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createCashPayment: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CashPaymentInput"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CashPayment"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getCashPayment: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CashPayment"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateCashPayment: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CashPaymentUpdate"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CashPayment"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  postCashPayment: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CashPayment"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  cancelCashPayment: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["FinanceCancelInput"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CashPayment"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listBankStatements: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        bankAccountId?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["BankStatementList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  importBankStatement: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["BankStatementImportInput"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["BankStatementDetail"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getBankStatement: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["BankStatementDetail"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  autoMatchBankStatement: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["BankStatementDetail"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  confirmBankStatementSuggestions: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["BankConfirmResult"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listBankStatementLineCandidates: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["BankMatchCandidate"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  confirmBankStatementLine: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["BankStatementLine"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  matchBankStatementLine: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["BankLineMatchInput"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["BankStatementLine"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createBankStatementLineEntry: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["BankLineEntryInput"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["BankStatementLine"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  unmatchBankStatementLine: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["BankStatementLine"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getExpenseClaimOptions: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ExpenseClaimOptions"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listExpenseClaims: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["ExpenseClaimStatus"]
+        divisionId?: string
+        dateFrom?: components["schemas"]["BusinessDate"]
+        dateTo?: components["schemas"]["BusinessDate"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ExpenseClaimList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createExpenseClaim: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ExpenseClaimInput"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ExpenseClaimDetail"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getExpenseClaim: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ExpenseClaimDetail"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateExpenseClaim: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ExpenseClaimUpdate"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ExpenseClaimDetail"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  submitExpenseClaim: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ExpenseClaimDetail"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  reviseExpenseClaim: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ExpenseClaimDetail"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  cancelExpenseClaim: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["FinanceCancelInput"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ExpenseClaimDetail"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  previewExpenseClaimVerification: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ExpenseClaimVerifyInput"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ExpenseClaimVerifyPreview"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  verifyExpenseClaim: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ExpenseClaimVerifyInput"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ExpenseClaimDetail"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  payExpenseClaim: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ExpenseClaimPayInput"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ExpenseClaimDetail"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listPettyCashFunds: {
+    parameters: {
+      query?: {
+        includeInactive?: boolean
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PettyCashFundList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createPettyCashFund: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PettyCashFundInput"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PettyCashFund"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updatePettyCashFund: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PettyCashFundUpdate"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PettyCashFund"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listPettyCashTransactions: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        fundId?: string
+        type?: components["schemas"]["PettyCashType"]
+        status?: components["schemas"]["PettyCashStatus"]
+        dateFrom?: components["schemas"]["BusinessDate"]
+        dateTo?: components["schemas"]["BusinessDate"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PettyCashTransactionList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createPettyCashTransaction: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PettyCashTransactionInput"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PettyCashTransaction"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getPettyCashTransaction: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PettyCashTransaction"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updatePettyCashTransaction: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PettyCashTransactionUpdate"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PettyCashTransaction"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  submitPettyCashTransaction: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PettyCashTransaction"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  revisePettyCashTransaction: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PettyCashTransaction"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  cancelPettyCashTransaction: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["FinanceCancelInput"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PettyCashTransaction"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  postPettyCashTransaction: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PettyCashPostInput"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PettyCashTransaction"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listTaxRates: {
+    parameters: {
+      query?: {
+        taxType?: components["schemas"]["TaxType"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["TaxRate"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createTaxRate: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TaxRateInput"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["TaxRate"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listWithholdingSlips: {
+    parameters: {
+      query: {
+        year: number
+        month: number
+        taxType?: components["schemas"]["TaxType"]
+        includeCancelled?: boolean
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["WithholdingSlipList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listWithholdingSummary: {
+    parameters: {
+      query: {
+        year: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["WithholdingSummaryRow"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  setWithholdingSlipNumber: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["WithholdingSlipNumberInput"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["WithholdingSlip"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  exportWithholdingRecap: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["WithholdingExportInput"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["FinanceDownloadLink"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listTaxDeposits: {
+    parameters: {
+      query: {
+        year: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["TaxDeposit"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createTaxDeposit: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TaxDepositInput"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["TaxDeposit"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getFinalTaxSummary: {
+    parameters: {
+      query: {
+        year: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["FinalTaxSummary"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createFinalTaxSetting: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["FinalTaxSettingInput"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["FinalTaxSetting"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  runFinalTax: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["FinalTaxRunInput"]
+      }
+    }
+    responses: {
+      /** @description OK */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["FinalTaxRun"]
         }
       }
       default: components["responses"]["Problem"]

@@ -199,6 +199,92 @@ paths:
     $ref: "./paths/accounting.yaml#/journalEntryReverse"
   /api/v1/general-ledger:
     $ref: "./paths/accounting.yaml#/generalLedger"
+  /api/v1/cash-bank-accounts:
+    $ref: "./paths/accounting_finance.yaml#/cashBankAccounts"
+  /api/v1/cash-bank-accounts/{id}:
+    $ref: "./paths/accounting_finance.yaml#/cashBankAccount"
+  /api/v1/cash-bank-accounts/{id}/restore:
+    $ref: "./paths/accounting_finance.yaml#/cashBankAccountRestore"
+  /api/v1/cash-bank-accounts/{id}/mutations:
+    $ref: "./paths/accounting_finance.yaml#/cashBankMutations"
+  /api/v1/cash-payments:
+    $ref: "./paths/accounting_finance.yaml#/cashPayments"
+  /api/v1/cash-payments/{id}:
+    $ref: "./paths/accounting_finance.yaml#/cashPayment"
+  /api/v1/cash-payments/{id}/post:
+    $ref: "./paths/accounting_finance.yaml#/cashPaymentPost"
+  /api/v1/cash-payments/{id}/cancel:
+    $ref: "./paths/accounting_finance.yaml#/cashPaymentCancel"
+  /api/v1/bank-statements:
+    $ref: "./paths/accounting_finance.yaml#/bankStatements"
+  /api/v1/bank-statements/{id}:
+    $ref: "./paths/accounting_finance.yaml#/bankStatement"
+  /api/v1/bank-statements/{id}/auto-match:
+    $ref: "./paths/accounting_finance.yaml#/bankStatementAutoMatch"
+  /api/v1/bank-statements/{id}/confirm-suggestions:
+    $ref: "./paths/accounting_finance.yaml#/bankStatementConfirm"
+  /api/v1/bank-statement-lines/{id}/candidates:
+    $ref: "./paths/accounting_finance.yaml#/bankStatementLineCandidates"
+  /api/v1/bank-statement-lines/{id}/confirm:
+    $ref: "./paths/accounting_finance.yaml#/bankStatementLineConfirm"
+  /api/v1/bank-statement-lines/{id}/match:
+    $ref: "./paths/accounting_finance.yaml#/bankStatementLineMatch"
+  /api/v1/bank-statement-lines/{id}/create-entry:
+    $ref: "./paths/accounting_finance.yaml#/bankStatementLineEntry"
+  /api/v1/bank-statement-lines/{id}/unmatch:
+    $ref: "./paths/accounting_finance.yaml#/bankStatementLineUnmatch"
+  /api/v1/expense-claims/options:
+    $ref: "./paths/accounting_finance.yaml#/expenseClaimOptions"
+  /api/v1/expense-claims:
+    $ref: "./paths/accounting_finance.yaml#/expenseClaims"
+  /api/v1/expense-claims/{id}:
+    $ref: "./paths/accounting_finance.yaml#/expenseClaim"
+  /api/v1/expense-claims/{id}/submit:
+    $ref: "./paths/accounting_finance.yaml#/expenseClaimSubmit"
+  /api/v1/expense-claims/{id}/revise:
+    $ref: "./paths/accounting_finance.yaml#/expenseClaimRevise"
+  /api/v1/expense-claims/{id}/cancel:
+    $ref: "./paths/accounting_finance.yaml#/expenseClaimCancel"
+  /api/v1/expense-claims/{id}/verify-preview:
+    $ref: "./paths/accounting_finance.yaml#/expenseClaimVerifyPreview"
+  /api/v1/expense-claims/{id}/verify:
+    $ref: "./paths/accounting_finance.yaml#/expenseClaimVerify"
+  /api/v1/expense-claims/{id}/pay:
+    $ref: "./paths/accounting_finance.yaml#/expenseClaimPay"
+  /api/v1/petty-cash-funds:
+    $ref: "./paths/accounting_finance.yaml#/pettyCashFunds"
+  /api/v1/petty-cash-funds/{id}:
+    $ref: "./paths/accounting_finance.yaml#/pettyCashFund"
+  /api/v1/petty-cash-transactions:
+    $ref: "./paths/accounting_finance.yaml#/pettyCashTransactions"
+  /api/v1/petty-cash-transactions/{id}:
+    $ref: "./paths/accounting_finance.yaml#/pettyCashTransaction"
+  /api/v1/petty-cash-transactions/{id}/submit:
+    $ref: "./paths/accounting_finance.yaml#/pettyCashSubmit"
+  /api/v1/petty-cash-transactions/{id}/revise:
+    $ref: "./paths/accounting_finance.yaml#/pettyCashRevise"
+  /api/v1/petty-cash-transactions/{id}/cancel:
+    $ref: "./paths/accounting_finance.yaml#/pettyCashCancel"
+  /api/v1/petty-cash-transactions/{id}/post:
+    $ref: "./paths/accounting_finance.yaml#/pettyCashPost"
+  /api/v1/withholding-tax-rates:
+    $ref: "./paths/accounting_finance.yaml#/taxRates"
+  /api/v1/withholding-slips:
+    $ref: "./paths/accounting_finance.yaml#/withholdings"
+  /api/v1/withholding-slips/summary:
+    $ref: "./paths/accounting_finance.yaml#/withholdingSummary"
+  /api/v1/withholding-slips/{id}/slip-number:
+    $ref: "./paths/accounting_finance.yaml#/withholdingSlipNumber"
+  /api/v1/withholding-slips/export:
+    $ref: "./paths/accounting_finance.yaml#/withholdingExport"
+  /api/v1/tax-deposits:
+    $ref: "./paths/accounting_finance.yaml#/taxDeposits"
+  /api/v1/final-tax:
+    $ref: "./paths/accounting_finance.yaml#/finalTax"
+  /api/v1/final-tax/settings:
+    $ref: "./paths/accounting_finance.yaml#/finalTaxSettings"
+  /api/v1/final-tax/runs:
+    $ref: "./paths/accounting_finance.yaml#/finalTaxRuns"
   /api/v1/document-sequences:
     $ref: "./paths/document.yaml#/documentSequences"
   /api/v1/locations/{id}:

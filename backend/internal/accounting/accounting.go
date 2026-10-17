@@ -21,6 +21,7 @@ import (
 	"balans/internal/platform/db"
 	"balans/internal/platform/httpx"
 	"balans/internal/platform/jobqueue"
+	"balans/internal/platform/pii"
 	"balans/internal/platform/tabular"
 )
 
@@ -100,6 +101,9 @@ type Deps struct {
 	Responder *httpx.Responder
 	Audit     audit.Recorder
 	Numberer  Numberer
+	// Cipher mengenkripsi nomor rekening dan NPWP penerima bukti potong (R1.4). Nil = fitur keuangan R1.4 tidak
+	// bisa menyimpan data terenkripsi.
+	Cipher *pii.Cipher
 }
 
 // Module adalah modul accounting.
@@ -115,6 +119,7 @@ var _ Poster = (*Module)(nil)
 func New(d Deps) *Module {
 	svc := service.New(service.Deps{
 		Store: postgres.NewStore(d.Pool), Tx: d.Tx, Numberer: d.Numberer, Audit: d.Audit, Clock: d.Clock, Log: d.Log,
+		FinanceDeps: service.FinanceDeps{Finance: postgres.NewFinanceStore(d.Pool, d.Cipher)},
 	})
 	return &Module{svc: svc, rs: d.Responder, h: accountinghttp.NewHandler(svc)}
 }

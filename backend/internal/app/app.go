@@ -196,9 +196,13 @@ func (a *App) buildModules() error {
 		if a.document == nil {
 			return errors.New("modul accounting membutuhkan modul document untuk nomor jurnal JV")
 		}
+		cipher, err := a.piiCipher()
+		if err != nil {
+			return err
+		}
 		a.accounting = accounting.New(accounting.Deps{
 			Pool: a.Pool, Tx: a.Tx, Clock: a.Clock, Log: a.Log, Responder: a.Responder, Audit: a.audit,
-			Numberer: journalNumberer{documents: a.document},
+			Numberer: journalNumberer{documents: a.document}, Cipher: cipher,
 		})
 		a.modules = append(a.modules, a.accounting)
 		registerAccountingAuditEntities(a.audit)
@@ -241,6 +245,7 @@ func (a *App) buildModules() error {
 	if err := a.buildProcurement(mailer); err != nil {
 		return err
 	}
+	a.connectFinance(mailer)
 	if cfg.IsEnabled(sales.Name) {
 		if cfg.PaymentGateway != config.ProviderMock {
 			return providerNotAvailable("PAYMENT_GATEWAY", cfg.PaymentGateway)

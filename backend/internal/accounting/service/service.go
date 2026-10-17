@@ -99,12 +99,21 @@ type Deps struct {
 	Audit    audit.Recorder
 	Clock    clock.Clock
 	Log      *slog.Logger
+	// FinanceDeps berisi dependensi Kas & Bank, rekonsiliasi, biaya, kas kecil, dan pajak (R1.4).
+	FinanceDeps
 }
 
 // Service adalah use case modul accounting.
 type Service struct {
 	Deps
+	providers *providerRegistry
 }
 
-// New membuat Service.
-func New(d Deps) *Service { return &Service{Deps: d} }
+// New membuat Service dan mendaftarkan penyedia kandidat pembayaran bawaan (pengajuan biaya).
+func New(d Deps) *Service {
+	s := &Service{Deps: d, providers: newProviderRegistry()}
+	if d.Finance != nil {
+		s.RegisterPaymentCandidates(claimCandidates{s: s})
+	}
+	return s
+}
