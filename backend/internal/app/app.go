@@ -34,6 +34,7 @@ import (
 	"balans/internal/platform/jobqueue"
 	"balans/internal/platform/pii"
 	"balans/internal/platform/webhook"
+	"balans/internal/pricing"
 	"balans/internal/sales"
 	"balans/internal/system"
 	"balans/internal/warehouse"
@@ -62,6 +63,7 @@ type App struct {
 	filestore   *filestore.Module
 	party       *party.Module
 	hris        *hris.Module
+	pricing     *pricing.Module
 	cipher      *pii.Cipher
 	modules     []module
 	console     *mockconsole.Console
@@ -206,6 +208,9 @@ func (a *App) buildModules() error {
 		registerAuditEntities(a.audit, warehouse.AuditEntities())
 	}
 	if err := a.buildMasterData(); err != nil {
+		return err
+	}
+	if err := a.buildPricing(); err != nil {
 		return err
 	}
 	if cfg.IsEnabled(sales.Name) {

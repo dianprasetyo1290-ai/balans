@@ -204,6 +204,23 @@ type CustomerAddress struct {
 	DeletedBy     uuid.NullUUID
 }
 
+type DiscountLimit struct {
+	ID                         uuid.UUID
+	RoleCode                   string
+	MaxLineDiscountPercent     decimal.Decimal
+	MaxDocumentDiscountPercent decimal.Decimal
+	ValidFrom                  clock.BusinessDate
+	ValidTo                    pgtype.Date
+	Notes                      string
+	CreatedAt                  time.Time
+	CreatedBy                  uuid.UUID
+	UpdatedAt                  time.Time
+	UpdatedBy                  uuid.UUID
+	Version                    int32
+	DeletedAt                  *time.Time
+	DeletedBy                  uuid.NullUUID
+}
+
 type Division struct {
 	ID        uuid.UUID
 	Code      string
@@ -562,6 +579,58 @@ type PostingRuleAccount struct {
 	Version         int32
 }
 
+type PriceList struct {
+	ID                   uuid.UUID
+	Code                 string
+	Name                 string
+	PriceListType        string
+	ChannelID            uuid.NullUUID
+	SubChannelID         uuid.NullUUID
+	PartnerID            uuid.NullUUID
+	ResellerLevel        string
+	Basis                string
+	ReferencePriceListID uuid.NullUUID
+	Description          string
+	IsActive             bool
+	CreatedAt            time.Time
+	CreatedBy            uuid.UUID
+	UpdatedAt            time.Time
+	UpdatedBy            uuid.UUID
+	Version              int32
+	DeletedAt            *time.Time
+	DeletedBy            uuid.NullUUID
+}
+
+type PriceListItem struct {
+	ID                   uuid.UUID
+	PriceListVersionID   uuid.UUID
+	ProductID            uuid.UUID
+	PriceAmount          decimal.Decimal
+	MaxRetailPriceAmount decimal.NullDecimal
+	CreatedAt            time.Time
+	CreatedBy            uuid.UUID
+}
+
+type PriceListVersion struct {
+	ID          uuid.UUID
+	PriceListID uuid.UUID
+	VersionNo   int32
+	ValidFrom   clock.BusinessDate
+	ValidTo     pgtype.Date
+	Status      string
+	Percent     decimal.NullDecimal
+	Notes       string
+	SubmittedAt *time.Time
+	SubmittedBy uuid.NullUUID
+	DecidedAt   *time.Time
+	DecidedBy   uuid.NullUUID
+	CreatedAt   time.Time
+	CreatedBy   uuid.UUID
+	UpdatedAt   time.Time
+	UpdatedBy   uuid.UUID
+	Version     int32
+}
+
 type Product struct {
 	ID             uuid.UUID
 	Sku            string
@@ -616,6 +685,35 @@ type ProductCategory struct {
 	Version   int32
 	DeletedAt *time.Time
 	DeletedBy uuid.NullUUID
+}
+
+type Promotion struct {
+	ID           uuid.UUID
+	Code         string
+	Name         string
+	ChannelID    uuid.NullUUID
+	SubChannelID uuid.NullUUID
+	ValidFrom    clock.BusinessDate
+	ValidTo      clock.BusinessDate
+	IsActive     bool
+	Description  string
+	CreatedAt    time.Time
+	CreatedBy    uuid.UUID
+	UpdatedAt    time.Time
+	UpdatedBy    uuid.UUID
+	Version      int32
+	DeletedAt    *time.Time
+	DeletedBy    uuid.NullUUID
+}
+
+type PromotionItem struct {
+	ID              uuid.UUID
+	PromotionID     uuid.UUID
+	ProductID       uuid.UUID
+	PriceAmount     decimal.NullDecimal
+	DiscountPercent decimal.NullDecimal
+	CreatedAt       time.Time
+	CreatedBy       uuid.UUID
 }
 
 type ReturnReason struct {
@@ -674,6 +772,24 @@ type Session struct {
 	CreatedAt        time.Time
 }
 
+type SpecialPrice struct {
+	ID          uuid.UUID
+	PartyType   string
+	PartyID     uuid.UUID
+	ProductID   uuid.UUID
+	PriceAmount decimal.Decimal
+	ValidFrom   clock.BusinessDate
+	ValidTo     pgtype.Date
+	Notes       string
+	CreatedAt   time.Time
+	CreatedBy   uuid.UUID
+	UpdatedAt   time.Time
+	UpdatedBy   uuid.UUID
+	Version     int32
+	DeletedAt   *time.Time
+	DeletedBy   uuid.NullUUID
+}
+
 type SubChannel struct {
 	ID        uuid.UUID
 	ChannelID uuid.UUID
@@ -712,6 +828,24 @@ type Supplier struct {
 	Version            int32
 	DeletedAt          *time.Time
 	DeletedBy          uuid.NullUUID
+}
+
+type TieredPrice struct {
+	ID          uuid.UUID
+	PriceListID uuid.NullUUID
+	ProductID   uuid.UUID
+	MinQty      decimal.Decimal
+	PriceAmount decimal.Decimal
+	ValidFrom   clock.BusinessDate
+	ValidTo     pgtype.Date
+	Notes       string
+	CreatedAt   time.Time
+	CreatedBy   uuid.UUID
+	UpdatedAt   time.Time
+	UpdatedBy   uuid.UUID
+	Version     int32
+	DeletedAt   *time.Time
+	DeletedBy   uuid.NullUUID
 }
 
 type User struct {

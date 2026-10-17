@@ -42,6 +42,16 @@ WithholdingType:
   type: string
   description: Jenis PPh yang dipotong (pemasok, jenis biaya); tarif di master tarif PPh.
   enum: [none, pph21, pph23, pph4_2]
+PriceRule:
+  type: string
+  description: |
+    Aturan harga yang menghasilkan harga baris transaksi (BRD 5.18, disimpan sebagai `price_rule`): harga khusus,
+    promo, harga bertingkat, daftar harga channel/mitra/karyawan, atau Harga Dasar & HET.
+  enum: [special_price, promotion, tiered_price, price_list, base_price]
+DiscountKind:
+  type: string
+  description: Bentuk diskon manual (MD-05) — persen dari dasar atau nominal rupiah.
+  enum: [percent, amount]
 VersionInput:
   type: object
   required: [version]

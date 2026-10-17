@@ -38,6 +38,8 @@ tags:
     description: Data karyawan dasar (R1.1)
   - name: filestore
     description: Upload dan unduhan file bertanda tangan (R1.1)
+  - name: pricing
+    description: Daftar harga & versi, harga khusus, promo, harga bertingkat, batas diskon, resolver harga (R1.1)
 paths:
   /healthz:
     get:
@@ -3344,6 +3346,748 @@ paths:
               schema:
                 type: string
                 format: binary
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/price-lists:
+    get:
+      operationId: listPriceLists
+      tags:
+        - pricing
+      summary: Data Master › Daftar Harga
+      description: |
+        Butuh `pricing.price_list.read` (atau `pricing.price_list.approve` untuk approver). Harga Dasar & HET selalu
+        paling atas. `deleted=true` hanya menampilkan daftar harga terhapus (untuk dipulihkan Admin Sistem).
+      parameters:
+        - $ref: '#/components/parameters/Search'
+        - name: priceListType
+          in: query
+          schema:
+            $ref: '#/components/schemas/PriceListType'
+        - name: includeInactive
+          in: query
+          schema:
+            type: boolean
+            default: false
+        - name: deleted
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Daftar harga beserta versi yang berlaku, versi terjadwal, dan versi yang sedang disiapkan
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PriceList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createPriceList
+      tags:
+        - pricing
+      summary: Menambah daftar harga
+      description: Harga diisi lewat versi yang diajukan untuk approval (Head Sales → Head Finance & Accounting).
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PriceListInput'
+      responses:
+        '201':
+          description: Daftar harga dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceListDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/price-lists/options:
+    get:
+      operationId: listPriceListOptions
+      tags:
+        - pricing
+      summary: Pilihan daftar harga aktif (acuan persentase, harga bertingkat)
+      responses:
+        '200':
+          description: Daftar harga aktif yang belum dihapus
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PriceListOption'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/price-lists/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      operationId: getPriceList
+      tags:
+        - pricing
+      summary: Detail daftar harga dan riwayat versi
+      responses:
+        '200':
+          description: Daftar harga
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceListDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      operationId: updatePriceList
+      tags:
+        - pricing
+      summary: Mengubah header daftar harga (kode dan jenis tetap)
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PriceListUpdate'
+      responses:
+        '200':
+          description: Daftar harga diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceListDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+    delete:
+      operationId: deletePriceList
+      tags:
+        - pricing
+      summary: Menghapus (soft delete) daftar harga
+      description: Harga Dasar & HET tidak bisa dihapus. Transaksi lama tetap menyimpan harga dan versinya.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/PricingVersion'
+      responses:
+        '204':
+          description: Daftar harga dihapus
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/price-lists/{id}/restore:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      operationId: restorePriceList
+      tags:
+        - pricing
+      summary: Memulihkan daftar harga yang dihapus (hanya Admin Sistem)
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Daftar harga dipulihkan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceListDetail'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/price-lists/{id}/versions:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      operationId: createPriceListVersion
+      tags:
+        - pricing
+      summary: Menyiapkan versi draft baru
+      description: |
+        `copyFromVersionId` menyalin harga versi lain bila `items` kosong. Paling banyak satu versi draft/diajukan per
+        daftar harga. Tanggal mulai berlaku tidak boleh sebelum hari ini.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PriceListVersionInput'
+      responses:
+        '201':
+          description: Versi draft dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceListVersion'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/price-list-versions/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      operationId: getPriceListVersion
+      tags:
+        - pricing
+      summary: Detail versi beserta harga per produk
+      responses:
+        '200':
+          description: Versi daftar harga
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceListVersion'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      operationId: updatePriceListVersion
+      tags:
+        - pricing
+      summary: Mengubah versi draft (seluruh item diganti)
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PriceListVersionUpdate'
+      responses:
+        '200':
+          description: Versi diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceListVersion'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/price-list-versions/{id}/submit:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      operationId: submitPriceListVersion
+      tags:
+        - pricing
+      summary: Mengajukan versi untuk approval price_list_version
+      description: Versi berlaku setelah disetujui Head Sales lalu Head Finance & Accounting.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Versi diajukan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceListVersion'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/price-list-versions/{id}/withdraw:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      operationId: withdrawPriceListVersion
+      tags:
+        - pricing
+      summary: Menarik kembali pengajuan menjadi draft
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Pengajuan ditarik
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceListVersion'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/price-list-versions/{id}/cancel:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      operationId: cancelPriceListVersion
+      tags:
+        - pricing
+      summary: Membatalkan versi draft
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Versi dibatalkan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceListVersion'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/special-prices:
+    get:
+      operationId: listSpecialPrices
+      tags:
+        - pricing
+      summary: Data Master › Aturan Harga › Harga Khusus
+      parameters:
+        - name: partyType
+          in: query
+          schema:
+            $ref: '#/components/schemas/SpecialPricePartyType'
+        - name: partyId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: productId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/PricingIncludeEnded'
+      responses:
+        '200':
+          description: Harga khusus
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SpecialPrice'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createSpecialPrice
+      tags:
+        - pricing
+      summary: Menambah harga khusus pelanggan/mitra
+      description: Harga khusus lama tanpa tanggal berakhir untuk pihak & produk yang sama ditutup otomatis.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpecialPriceInput'
+      responses:
+        '201':
+          description: Harga khusus dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpecialPrice'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/special-prices/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    delete:
+      operationId: deleteSpecialPrice
+      tags:
+        - pricing
+      summary: Menghapus harga khusus yang belum pernah berlaku
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/PricingVersion'
+      responses:
+        '204':
+          description: Harga khusus dihapus
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/special-prices/{id}/end:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      operationId: endSpecialPrice
+      tags:
+        - pricing
+      summary: Mengisi tanggal berakhir harga khusus
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PricingEndInput'
+      responses:
+        '200':
+          description: Harga khusus diakhiri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpecialPrice'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/promotions:
+    get:
+      operationId: listPromotions
+      tags:
+        - pricing
+      summary: Data Master › Aturan Harga › Promo
+      parameters:
+        - $ref: '#/components/parameters/Search'
+        - name: channelId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/PricingIncludeEnded'
+        - name: deleted
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Promo tanpa item, terbaru dulu
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Promotion'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createPromotion
+      tags:
+        - pricing
+      summary: Menambah promo periode
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PromotionInput'
+      responses:
+        '201':
+          description: Promo dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Promotion'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/promotions/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      operationId: getPromotion
+      tags:
+        - pricing
+      summary: Detail promo beserta item
+      responses:
+        '200':
+          description: Promo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Promotion'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      operationId: updatePromotion
+      tags:
+        - pricing
+      summary: Mengubah promo
+      description: |
+        Promo yang sudah berjalan hanya boleh diubah nama, keterangan, status, dan tanggal selesai (paling cepat
+        kemarin); `items` harus sama dengan yang tersimpan atau dikosongkan.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PromotionUpdate'
+      responses:
+        '200':
+          description: Promo diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Promotion'
+        default:
+          $ref: '#/components/responses/Problem'
+    delete:
+      operationId: deletePromotion
+      tags:
+        - pricing
+      summary: Menghapus promo yang belum berjalan
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/PricingVersion'
+      responses:
+        '204':
+          description: Promo dihapus
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/tiered-prices:
+    get:
+      operationId: listTieredPrices
+      tags:
+        - pricing
+      summary: Data Master › Aturan Harga › Harga Bertingkat
+      parameters:
+        - name: productId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: priceListId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/PricingIncludeEnded'
+      responses:
+        '200':
+          description: Harga bertingkat
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TieredPrice'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createTieredPrice
+      tags:
+        - pricing
+      summary: Menambah harga bertingkat per qty minimum
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TieredPriceInput'
+      responses:
+        '201':
+          description: Harga bertingkat dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TieredPrice'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/tiered-prices/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    delete:
+      operationId: deleteTieredPrice
+      tags:
+        - pricing
+      summary: Menghapus harga bertingkat yang belum pernah berlaku
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/PricingVersion'
+      responses:
+        '204':
+          description: Harga bertingkat dihapus
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/tiered-prices/{id}/end:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      operationId: endTieredPrice
+      tags:
+        - pricing
+      summary: Mengisi tanggal berakhir harga bertingkat
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PricingEndInput'
+      responses:
+        '200':
+          description: Harga bertingkat diakhiri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TieredPrice'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/discount-limits:
+    get:
+      operationId: listDiscountLimits
+      tags:
+        - pricing
+      summary: Penjualan › Harga & Diskon › Batas Diskon per Role
+      parameters:
+        - $ref: '#/components/parameters/PricingIncludeEnded'
+      responses:
+        '200':
+          description: Batas diskon per role
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DiscountLimit'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createDiscountLimit
+      tags:
+        - pricing
+      summary: Menetapkan batas diskon role mulai tanggal tertentu
+      description: Batas lama tanpa tanggal berakhir ditutup otomatis sehari sebelum batas baru berlaku.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscountLimitInput'
+      responses:
+        '201':
+          description: Batas diskon dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscountLimit'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/discount-limits/roles:
+    get:
+      operationId: listDiscountLimitRoles
+      tags:
+        - pricing
+      summary: Pilihan role untuk batas diskon
+      responses:
+        '200':
+          description: Role pembuat dokumen penjualan
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DiscountLimitRole'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/discount-limits/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    delete:
+      operationId: deleteDiscountLimit
+      tags:
+        - pricing
+      summary: Menghapus batas diskon yang belum pernah berlaku
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/PricingVersion'
+      responses:
+        '204':
+          description: Batas diskon dihapus
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/discount-limits/{id}/end:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      operationId: endDiscountLimit
+      tags:
+        - pricing
+      summary: Mengisi tanggal berakhir batas diskon
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PricingEndInput'
+      responses:
+        '200':
+          description: Batas diskon diakhiri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscountLimit'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/pricing/quote:
+    post:
+      operationId: quotePrice
+      tags:
+        - pricing
+      summary: Simulasi harga (resolver 5 aturan BRD 5.18)
+      description: |
+        Menjalankan resolver yang sama dengan transaksi: harga khusus → promo → harga bertingkat → daftar harga
+        channel/mitra/karyawan → Harga Dasar & HET, berdasarkan tanggal transaksi. Tidak menyimpan data, sehingga
+        tidak memakai Idempotency-Key.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PriceQuoteRequest'
+      responses:
+        '200':
+          description: Harga dan aturan yang dipakai
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceQuote'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/pricing/discount-check:
+    post:
+      operationId: checkDiscount
+      tags:
+        - pricing
+      summary: Simulasi diskon manual terhadap batas diskon role user yang login
+      description: |
+        Subtotal dokumen = total bruto baris dikurangi diskon baris. Diskon di atas batas berarti Sales Order butuh
+        approval `sales_order_discount` (Head Sales). Tidak menyimpan data.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscountCheckRequest'
+      responses:
+        '200':
+          description: Hasil pemeriksaan diskon
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscountCheckResult'
         default:
           $ref: '#/components/responses/Problem'
 components:
@@ -7021,6 +7765,944 @@ components:
         expiresAt:
           type: string
           format: date-time
+    PriceListType:
+      type: string
+      description: |
+        Cakupan daftar harga (BRD 5.18): `base` Harga Dasar & HET, `channel` per channel/sub-channel, `partner` per
+        mitra, `reseller` per level reseller (Fase 2), `employee` harga karyawan, `vending` per channel vending/mesin.
+      enum:
+        - base
+        - channel
+        - partner
+        - reseller
+        - employee
+        - vending
+    PriceListBasis:
+      type: string
+      description: '`fixed` harga per produk; `percent` persentase dari daftar harga acuan.'
+      enum:
+        - fixed
+        - percent
+    PriceListVersionStatus:
+      type: string
+      enum:
+        - draft
+        - pending_approval
+        - active
+        - rejected
+        - cancelled
+    PricingPercent:
+      type: string
+      description: Persen desimal maks. 4 angka di belakang koma, mis. `12.5`.
+      pattern: ^[0-9]{1,4}(\.[0-9]{1,4})?$
+      example: '10'
+    PriceListVersionSummary:
+      type: object
+      required:
+        - id
+        - versionNo
+        - status
+        - validFrom
+        - itemCount
+        - notes
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        versionNo:
+          type: integer
+        status:
+          $ref: '#/components/schemas/PriceListVersionStatus'
+        validFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        validTo:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
+        percent:
+          allOf:
+            - $ref: '#/components/schemas/PricingPercent'
+          nullable: true
+        itemCount:
+          type: integer
+        notes:
+          type: string
+        submittedAt:
+          type: string
+          format: date-time
+          nullable: true
+        decidedAt:
+          type: string
+          format: date-time
+          nullable: true
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    PriceList:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - priceListType
+        - resellerLevel
+        - basis
+        - description
+        - isActive
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: MT-BELI-PUTUS
+        name:
+          type: string
+        priceListType:
+          $ref: '#/components/schemas/PriceListType'
+        channelId:
+          type: string
+          format: uuid
+          nullable: true
+        subChannelId:
+          type: string
+          format: uuid
+          nullable: true
+        partnerId:
+          type: string
+          format: uuid
+          nullable: true
+        partnerName:
+          type: string
+          nullable: true
+        resellerLevel:
+          type: string
+        basis:
+          $ref: '#/components/schemas/PriceListBasis'
+        referencePriceListId:
+          type: string
+          format: uuid
+          nullable: true
+        referencePriceListName:
+          type: string
+          nullable: true
+        description:
+          type: string
+        isActive:
+          type: boolean
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+        currentVersion:
+          allOf:
+            - $ref: '#/components/schemas/PriceListVersionSummary'
+          nullable: true
+          description: Versi yang berlaku hari ini.
+        nextVersion:
+          allOf:
+            - $ref: '#/components/schemas/PriceListVersionSummary'
+          nullable: true
+          description: Versi aktif terdekat yang mulai berlaku setelah hari ini.
+        openVersion:
+          allOf:
+            - $ref: '#/components/schemas/PriceListVersionSummary'
+          nullable: true
+          description: Versi draft atau yang sedang diajukan.
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    PriceListFields:
+      type: object
+      required:
+        - name
+        - isActive
+      properties:
+        name:
+          type: string
+          maxLength: 120
+        channelId:
+          type: string
+          format: uuid
+          nullable: true
+        subChannelId:
+          type: string
+          format: uuid
+          nullable: true
+        partnerId:
+          type: string
+          format: uuid
+          nullable: true
+        resellerLevel:
+          type: string
+          maxLength: 30
+        basis:
+          $ref: '#/components/schemas/PriceListBasis'
+        referencePriceListId:
+          type: string
+          format: uuid
+          nullable: true
+        description:
+          type: string
+          maxLength: 500
+        isActive:
+          type: boolean
+    PriceListInput:
+      allOf:
+        - $ref: '#/components/schemas/PriceListFields'
+        - type: object
+          required:
+            - code
+            - priceListType
+          properties:
+            code:
+              type: string
+              maxLength: 30
+            priceListType:
+              $ref: '#/components/schemas/PriceListType'
+    PriceListDetail:
+      allOf:
+        - $ref: '#/components/schemas/PriceList'
+        - type: object
+          required:
+            - versions
+            - allowedActions
+          properties:
+            versions:
+              type: array
+              description: Riwayat versi, terbaru dulu.
+              items:
+                $ref: '#/components/schemas/PriceListVersionSummary'
+            allowedActions:
+              type: array
+              description: update, create_version, delete, restore
+              items:
+                type: string
+    PriceListOption:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - priceListType
+        - basis
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        priceListType:
+          $ref: '#/components/schemas/PriceListType'
+        basis:
+          $ref: '#/components/schemas/PriceListBasis'
+    PriceListUpdate:
+      allOf:
+        - $ref: '#/components/schemas/PriceListFields'
+        - $ref: '#/components/schemas/VersionInput'
+    PriceListItemInput:
+      type: object
+      required:
+        - productId
+        - priceAmount
+      properties:
+        productId:
+          type: string
+          format: uuid
+        priceAmount:
+          $ref: '#/components/schemas/Money'
+        maxRetailPriceAmount:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          nullable: true
+    PriceListVersionFields:
+      type: object
+      required:
+        - validFrom
+        - items
+      properties:
+        validFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        validTo:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
+        percent:
+          allOf:
+            - $ref: '#/components/schemas/PricingPercent'
+          nullable: true
+          description: Wajib untuk daftar harga basis percent.
+        notes:
+          type: string
+          maxLength: 1000
+        items:
+          type: array
+          maxItems: 2000
+          items:
+            $ref: '#/components/schemas/PriceListItemInput'
+    PriceListVersionInput:
+      allOf:
+        - $ref: '#/components/schemas/PriceListVersionFields'
+        - type: object
+          properties:
+            copyFromVersionId:
+              type: string
+              format: uuid
+              nullable: true
+    PriceListItem:
+      type: object
+      required:
+        - productId
+        - productSku
+        - productName
+        - priceAmount
+      properties:
+        productId:
+          type: string
+          format: uuid
+        productSku:
+          type: string
+        productName:
+          type: string
+        priceAmount:
+          $ref: '#/components/schemas/Money'
+        maxRetailPriceAmount:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          nullable: true
+          description: HET, hanya di Harga Dasar & HET.
+    PriceListVersion:
+      allOf:
+        - $ref: '#/components/schemas/PriceListVersionSummary'
+        - type: object
+          required:
+            - priceListId
+            - priceListCode
+            - priceListName
+            - priceListType
+            - basis
+            - items
+            - allowedActions
+          properties:
+            priceListId:
+              type: string
+              format: uuid
+            priceListCode:
+              type: string
+            priceListName:
+              type: string
+            priceListType:
+              $ref: '#/components/schemas/PriceListType'
+            basis:
+              $ref: '#/components/schemas/PriceListBasis'
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/PriceListItem'
+            allowedActions:
+              type: array
+              description: update, cancel, submit, withdraw
+              items:
+                type: string
+    PriceListVersionUpdate:
+      allOf:
+        - $ref: '#/components/schemas/PriceListVersionFields'
+        - $ref: '#/components/schemas/VersionInput'
+    SpecialPricePartyType:
+      type: string
+      enum:
+        - customer
+        - partner
+    PricingPeriodStatus:
+      type: string
+      description: Posisi periode berlaku terhadap hari ini.
+      enum:
+        - scheduled
+        - active
+        - expired
+    SpecialPrice:
+      type: object
+      required:
+        - id
+        - partyType
+        - partyId
+        - partyCode
+        - partyName
+        - productId
+        - productSku
+        - productName
+        - priceAmount
+        - validFrom
+        - status
+        - notes
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        partyType:
+          $ref: '#/components/schemas/SpecialPricePartyType'
+        partyId:
+          type: string
+          format: uuid
+        partyCode:
+          type: string
+        partyName:
+          type: string
+        productId:
+          type: string
+          format: uuid
+        productSku:
+          type: string
+        productName:
+          type: string
+        priceAmount:
+          $ref: '#/components/schemas/Money'
+        validFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        validTo:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
+        status:
+          $ref: '#/components/schemas/PricingPeriodStatus'
+        notes:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    SpecialPriceInput:
+      type: object
+      required:
+        - partyType
+        - partyId
+        - productId
+        - priceAmount
+        - validFrom
+      properties:
+        partyType:
+          $ref: '#/components/schemas/SpecialPricePartyType'
+        partyId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        priceAmount:
+          $ref: '#/components/schemas/Money'
+        validFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        validTo:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
+        notes:
+          type: string
+          maxLength: 500
+    PricingEndInput:
+      type: object
+      required:
+        - validTo
+        - version
+      properties:
+        validTo:
+          $ref: '#/components/schemas/BusinessDate'
+        version:
+          type: integer
+    PromotionItem:
+      type: object
+      required:
+        - productId
+        - productSku
+        - productName
+      properties:
+        productId:
+          type: string
+          format: uuid
+        productSku:
+          type: string
+        productName:
+          type: string
+        priceAmount:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          nullable: true
+        discountPercent:
+          allOf:
+            - $ref: '#/components/schemas/PricingPercent'
+          nullable: true
+    Promotion:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - validFrom
+        - validTo
+        - isActive
+        - description
+        - status
+        - itemCount
+        - allowedActions
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: PROMO-1111
+        name:
+          type: string
+        channelId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Kosong = semua channel.
+        subChannelId:
+          type: string
+          format: uuid
+          nullable: true
+        validFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        validTo:
+          $ref: '#/components/schemas/BusinessDate'
+        isActive:
+          type: boolean
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/PricingPeriodStatus'
+        itemCount:
+          type: integer
+        items:
+          type: array
+          description: Hanya di detail.
+          items:
+            $ref: '#/components/schemas/PromotionItem'
+        allowedActions:
+          type: array
+          description: update, delete
+          items:
+            type: string
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    PromotionItemInput:
+      type: object
+      required:
+        - productId
+      description: Isi salah satu dari harga promo atau potongan persen dari harga normal.
+      properties:
+        productId:
+          type: string
+          format: uuid
+        priceAmount:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          nullable: true
+        discountPercent:
+          allOf:
+            - $ref: '#/components/schemas/PricingPercent'
+          nullable: true
+    PromotionFields:
+      type: object
+      required:
+        - name
+        - validFrom
+        - validTo
+        - isActive
+        - items
+      properties:
+        name:
+          type: string
+          maxLength: 120
+        channelId:
+          type: string
+          format: uuid
+          nullable: true
+        subChannelId:
+          type: string
+          format: uuid
+          nullable: true
+        validFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        validTo:
+          $ref: '#/components/schemas/BusinessDate'
+        isActive:
+          type: boolean
+        description:
+          type: string
+          maxLength: 500
+        items:
+          type: array
+          maxItems: 2000
+          items:
+            $ref: '#/components/schemas/PromotionItemInput'
+    PromotionInput:
+      allOf:
+        - $ref: '#/components/schemas/PromotionFields'
+        - type: object
+          required:
+            - code
+          properties:
+            code:
+              type: string
+              maxLength: 30
+    PromotionUpdate:
+      allOf:
+        - $ref: '#/components/schemas/PromotionFields'
+        - $ref: '#/components/schemas/VersionInput'
+    PricingQuantity:
+      type: string
+      description: Kuantitas desimal maks. 3 angka di belakang koma.
+      pattern: ^[0-9]{1,15}(\.[0-9]{1,3})?$
+      example: '12'
+    TieredPrice:
+      type: object
+      required:
+        - id
+        - productId
+        - productSku
+        - productName
+        - minQty
+        - priceAmount
+        - validFrom
+        - status
+        - notes
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        priceListId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Kosong = berlaku untuk semua daftar harga.
+        priceListCode:
+          type: string
+          nullable: true
+        priceListName:
+          type: string
+          nullable: true
+        productId:
+          type: string
+          format: uuid
+        productSku:
+          type: string
+        productName:
+          type: string
+        minQty:
+          $ref: '#/components/schemas/PricingQuantity'
+        priceAmount:
+          $ref: '#/components/schemas/Money'
+        validFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        validTo:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
+        status:
+          $ref: '#/components/schemas/PricingPeriodStatus'
+        notes:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    TieredPriceInput:
+      type: object
+      required:
+        - productId
+        - minQty
+        - priceAmount
+        - validFrom
+      properties:
+        priceListId:
+          type: string
+          format: uuid
+          nullable: true
+        productId:
+          type: string
+          format: uuid
+        minQty:
+          $ref: '#/components/schemas/PricingQuantity'
+        priceAmount:
+          $ref: '#/components/schemas/Money'
+        validFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        validTo:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
+        notes:
+          type: string
+          maxLength: 500
+    DiscountLimit:
+      type: object
+      required:
+        - id
+        - roleCode
+        - roleName
+        - maxLineDiscountPercent
+        - maxDocumentDiscountPercent
+        - validFrom
+        - status
+        - notes
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        roleCode:
+          type: string
+        roleName:
+          type: string
+        maxLineDiscountPercent:
+          $ref: '#/components/schemas/PricingPercent'
+        maxDocumentDiscountPercent:
+          $ref: '#/components/schemas/PricingPercent'
+        validFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        validTo:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
+        status:
+          $ref: '#/components/schemas/PricingPeriodStatus'
+        notes:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    DiscountLimitInput:
+      type: object
+      required:
+        - roleCode
+        - maxLineDiscountPercent
+        - maxDocumentDiscountPercent
+        - validFrom
+      properties:
+        roleCode:
+          type: string
+        maxLineDiscountPercent:
+          $ref: '#/components/schemas/PricingPercent'
+        maxDocumentDiscountPercent:
+          $ref: '#/components/schemas/PricingPercent'
+        validFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        validTo:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
+        notes:
+          type: string
+          maxLength: 500
+    DiscountLimitRole:
+      type: object
+      required:
+        - code
+        - name
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+    PriceQuoteRequest:
+      type: object
+      required:
+        - productId
+        - qty
+        - date
+      properties:
+        productId:
+          type: string
+          format: uuid
+        qty:
+          $ref: '#/components/schemas/PricingQuantity'
+        channelId:
+          type: string
+          format: uuid
+          nullable: true
+        subChannelId:
+          type: string
+          format: uuid
+          nullable: true
+        customerId:
+          type: string
+          format: uuid
+          nullable: true
+        partnerId:
+          type: string
+          format: uuid
+          nullable: true
+        date:
+          $ref: '#/components/schemas/BusinessDate'
+    PriceRule:
+      type: string
+      description: |
+        Aturan harga yang menghasilkan harga baris transaksi (BRD 5.18, disimpan sebagai `price_rule`): harga khusus,
+        promo, harga bertingkat, daftar harga channel/mitra/karyawan, atau Harga Dasar & HET.
+      enum:
+        - special_price
+        - promotion
+        - tiered_price
+        - price_list
+        - base_price
+    PriceQuote:
+      type: object
+      required:
+        - unitPrice
+        - rule
+        - sourceId
+        - description
+      properties:
+        unitPrice:
+          $ref: '#/components/schemas/Money'
+        rule:
+          $ref: '#/components/schemas/PriceRule'
+        sourceId:
+          type: string
+          format: uuid
+          description: Disimpan di baris transaksi sebagai `price_source_id`.
+        priceListId:
+          type: string
+          format: uuid
+          nullable: true
+        priceListVersionId:
+          type: string
+          format: uuid
+          nullable: true
+        promotionId:
+          type: string
+          format: uuid
+          nullable: true
+        specialPriceId:
+          type: string
+          format: uuid
+          nullable: true
+        tieredPriceId:
+          type: string
+          format: uuid
+          nullable: true
+        regularPrice:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          nullable: true
+          description: Harga tanpa promo (dasar potongan persen promo).
+        maxRetailPrice:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          nullable: true
+          description: HET bila harga berasal dari Harga Dasar & HET.
+        description:
+          type: string
+    DiscountKind:
+      type: string
+      description: Bentuk diskon manual (MD-05) — persen dari dasar atau nominal rupiah.
+      enum:
+        - percent
+        - amount
+    DiscountValue:
+      type: object
+      required:
+        - kind
+        - value
+      properties:
+        kind:
+          $ref: '#/components/schemas/DiscountKind'
+        value:
+          type: string
+          description: Persen (maks. 4 desimal) atau nominal rupiah (maks. 2 desimal) sebagai string desimal.
+          pattern: ^[0-9]{1,16}(\.[0-9]{1,4})?$
+    DiscountCheckLine:
+      type: object
+      required:
+        - grossAmount
+      properties:
+        grossAmount:
+          $ref: '#/components/schemas/Money'
+        discount:
+          allOf:
+            - $ref: '#/components/schemas/DiscountValue'
+          nullable: true
+    DiscountCheckRequest:
+      type: object
+      required:
+        - lines
+      properties:
+        lines:
+          type: array
+          maxItems: 500
+          items:
+            $ref: '#/components/schemas/DiscountCheckLine'
+        documentDiscount:
+          allOf:
+            - $ref: '#/components/schemas/DiscountValue'
+          nullable: true
+    DiscountCheckOutcome:
+      type: object
+      required:
+        - discountAmount
+        - discountPercent
+        - exceedsLimit
+      properties:
+        discountAmount:
+          $ref: '#/components/schemas/Money'
+        discountPercent:
+          $ref: '#/components/schemas/PricingPercent'
+        exceedsLimit:
+          type: boolean
+    DiscountCheckResult:
+      type: object
+      required:
+        - maxLineDiscountPercent
+        - maxDocumentDiscountPercent
+        - lines
+        - document
+        - subtotalAmount
+        - totalDiscountAmount
+        - requiresApproval
+      properties:
+        maxLineDiscountPercent:
+          $ref: '#/components/schemas/PricingPercent'
+        maxDocumentDiscountPercent:
+          $ref: '#/components/schemas/PricingPercent'
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiscountCheckOutcome'
+        document:
+          $ref: '#/components/schemas/DiscountCheckOutcome'
+        subtotalAmount:
+          $ref: '#/components/schemas/Money'
+        totalDiscountAmount:
+          $ref: '#/components/schemas/Money'
+        requiresApproval:
+          type: boolean
+          description: Diskon di atas batas → Sales Order butuh approval `sales_order_discount` (Head Sales).
   parameters:
     Search:
       name: q
@@ -7103,6 +8785,20 @@ components:
       required: true
       schema:
         type: string
+    PricingVersion:
+      name: version
+      in: query
+      required: true
+      description: Versi terakhir yang dilihat user (optimistic locking).
+      schema:
+        type: integer
+    PricingIncludeEnded:
+      name: includeEnded
+      in: query
+      description: Tampilkan juga data yang periodenya sudah berakhir (riwayat).
+      schema:
+        type: boolean
+        default: false
   responses:
     Problem:
       description: Error standar (problem+json)
