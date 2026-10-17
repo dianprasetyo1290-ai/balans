@@ -1,6 +1,6 @@
 # Postgres 18 dengan WAL-G untuk full backup harian + WAL kontinu ke object storage di luar VPS
-# (NFR-07, Technical Guideline 14.7). Tag image ini terpisah dari tag aplikasi agar deploy aplikasi
-# tidak me-restart database.
+# (NFR-07, Technical Guideline 14.7), plus arsip harian folder filestore (backup-files). Tag image ini terpisah
+# dari tag aplikasi agar deploy aplikasi tidak me-restart database.
 FROM postgres:18.0-bookworm
 
 ARG WALG_VERSION=v3.0.8
@@ -16,4 +16,5 @@ RUN apt-get update \
 
 COPY backup-loop.sh /usr/local/bin/backup-loop
 COPY backup-now.sh /usr/local/bin/backup-now
-RUN chmod 0755 /usr/local/bin/backup-loop /usr/local/bin/backup-now
+COPY backup-files.sh /usr/local/bin/backup-files
+RUN chmod 0755 /usr/local/bin/backup-loop /usr/local/bin/backup-now /usr/local/bin/backup-files

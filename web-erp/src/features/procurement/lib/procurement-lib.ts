@@ -77,3 +77,14 @@ export function terbilang(value: string): string {
   })
   return `${words.join(" ")} rupiah`
 }
+
+/**
+ * Selisih harga tagihan terhadap harga PO dalam persen untuk pratinjau 3-way match (hasil final dari server).
+ * Harga PO nol: tagihan berharga dianggap selisih 100%.
+ */
+export function priceVariancePercent(price: string, po: string): Big {
+  const p = toBig(price)
+  const base = toBig(po)
+  if (base.eq(0)) return p.eq(0) ? new Big(0) : new Big(100)
+  return p.minus(base).times(100).div(base)
+}

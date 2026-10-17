@@ -42,6 +42,10 @@ WithholdingType:
   type: string
   description: Jenis PPh yang dipotong (pemasok, jenis biaya); tarif di master tarif PPh.
   enum: [none, pph21, pph23, pph4_2]
+ReturnDisposition:
+  type: string
+  description: Disposisi barang retur (Disposisi Retur, WMS-07); dipakai master Alasan Retur dan dokumen Disposisi Retur.
+  enum: [restock, repack, reprocess, marketing_sample, dispose]
 PurchaseOrderType:
   type: string
   description: |
@@ -58,6 +62,16 @@ DiscountKind:
   type: string
   description: Bentuk diskon manual (MD-05) — persen dari dasar atau nominal rupiah.
   enum: [percent, amount]
+SalesOrderType:
+  type: string
+  description: |
+    Jenis pesanan (satu model Sales Order untuk semua channel): `modern_trade` MT beli putus, `b2b` B2B/corporate,
+    `social_commerce` WhatsApp/Instagram, `marketplace` penjualan marketplace, `employee` penjualan karyawan.
+  enum: [modern_trade, b2b, social_commerce, marketplace, employee]
+SalesDocumentStatus:
+  type: string
+  description: Status Sales Order, Proforma Invoice, Invoice, dan pembayaran pelanggan (Desain Status Dokumen 1).
+  enum: [draft, pending_approval, awaiting_payment, partially_paid, paid, in_progress, in_transit, completed, cancelled, expired, posted]
 VersionInput:
   type: object
   required: [version]

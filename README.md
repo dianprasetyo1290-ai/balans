@@ -7,7 +7,7 @@ Monorepo Unified Business Platform Balans Nutrition: ERP back-office, Finance & 
 | `backend/` | Go modular monolith: binary `api`, `worker`, `migrate`, `cutover`, `storefront`, `healthcheck` |
 | `web-erp/` | ERP Vite + React + shadcn (preset Balans), TanStack Router/Query |
 | `web-store/` | Website e-commerce (dibangun menjelang rilis website) |
-| `deploy/` | Docker Compose, Caddy, image Postgres + WAL-G, skrip deploy/backup/monitoring |
+| `deploy/` | Docker Compose, Caddy, image Postgres + WAL-G, skrip deploy/backup/monitoring, uji restore (`scripts/restore-test.sh`, `systemd/`), uji beban k6 (`loadtest/`) |
 | `docs/` | BRD, Roadmap, PRD, Technical Guideline, desain, runbook — dokumen proyek, tidak dipublikasikan di repo ini; minta ke tim proyek |
 | `scripts/` | Generate kode, gate coverage, proteksi branch |
 

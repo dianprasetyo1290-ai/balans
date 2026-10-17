@@ -22,6 +22,7 @@ import (
 	"balans/internal/platform/httpx"
 	"balans/internal/platform/idempotency"
 	"balans/internal/platform/jobqueue"
+	"balans/internal/platform/money"
 	"balans/internal/platform/paging"
 )
 
@@ -114,24 +115,32 @@ func TestCutoverDryRunThenCommitIdempotent(t *testing.T) {
 		},
 		"Piutang Terbuka": {
 			{"Nomor Invoice Lama *", "Tanggal Invoice *", "Jatuh Tempo *", "Kode Pelanggan/Mitra *", "Channel *", "Nilai Invoice *", "Sisa Belum Dibayar *"},
-			{"INV-LAMA-1", "2026-12-15", "2027-01-14", "PLG-CUT", "B2B", "1500000", "1000000"},
+			{"INV-LAMA-1", "2026-01-15", "2026-02-14", "PLG-CUT", "B2B", "1500000", "1000000"},
 		},
 		"Utang Terbuka": {
 			{"Nomor Tagihan Pemasok *", "Kode Pemasok *", "Tanggal Tagihan *", "Jatuh Tempo *", "Nilai Tagihan *", "Sisa Belum Dibayar *"},
-			{"BILL-LAMA-1", "SUP-CUT", "2026-12-20", "2027-01-19", "500000", "500000"},
+			{"BILL-LAMA-1", "SUP-CUT", "2026-01-20", "2026-02-19", "500000", "500000"},
 		},
 		"Saldo Stok": {
 			{"Kode Lokasi *", "SKU/Kode *", "Nomor Batch *", "Tanggal Produksi", "Tanggal Kedaluwarsa *", "Qty *", "HPP per Unit *"},
-			{"UTAMA-FG", "MS-COK-30", "CUT2612", "2026-06-01", "2027-12-12", "10", "1000"},
+			{"UTAMA-FG", "MS-COK-30", "CUT2612", "2025-06-01", "2027-12-12", "10", "1000"},
 		},
 		"Aset Tetap": {
 			{"Kode Aset *", "Nama Aset *", "Kelas Aset *", "Tanggal Perolehan *", "Harga Perolehan *", "Umur Manfaat (bulan) *", "Nilai Sisa", "Akumulasi Penyusutan per Cut-over *", "Lokasi / Mitra"},
-			{"AST-CUT-1", "Laptop lama", "Peralatan Kantor & Komputer", "2026-01-01", "4800000", "48", "0", "1200000", "Kantor"},
+			{"AST-CUT-1", "Laptop lama", "Peralatan Kantor & Komputer", "2025-01-01", "4800000", "48", "0", "1200000", "Kantor"},
 		},
 	})
+	// Cut-over Jan 2026 (posting rule berlaku mulai 2026) agar jurnal test lain (bertanggal Okt 2026) tidak ikut GL per cut-over; stok yang sudah ada
+	// per tanggal itu tetap dikurangkan dari nilai persediaan.
+	cutover := clock.NewBusinessDate(2026, time.January, 31)
+	base := stockValuer{inventory: a.inventory, catalog: a.catalog, warehouse: a.warehouse}
+	baseline, err := base.InventoryValueByAccount(ctx, cutover)
+	require.NoError(t, err)
+	a.accounting.SetStockValuer(baselineValuer{inner: base, baseline: baseline})
+
 	var out bytes.Buffer
 	opts := CutoverOptions{
-		Files: []string{path}, UserEmail: "finance@balans.local", CutoverDate: clock.NewBusinessDate(2026, time.December, 31),
+		Files: []string{path}, UserEmail: "finance@balans.local", CutoverDate: clock.NewBusinessDate(2026, time.January, 31),
 		Post: true, Out: &out,
 	}
 
@@ -141,6 +150,7 @@ func TestCutoverDryRunThenCommitIdempotent(t *testing.T) {
 	_, _, ok, err := a.accounting.CutoverDate(ctx)
 	require.NoError(t, err)
 	assert.False(t, ok, "dry-run tidak menyimpan apa pun")
+	_ = cutover
 
 	out.Reset()
 	opts.Commit = true
@@ -149,7 +159,7 @@ func TestCutoverDryRunThenCommitIdempotent(t *testing.T) {
 	date, posted, ok, err := a.accounting.CutoverDate(ctx)
 	require.NoError(t, err)
 	assert.True(t, ok && posted)
-	assert.Equal(t, "2026-12-31", date.String())
+	assert.Equal(t, "2026-01-31", date.String())
 
 	items, err := a.accounting.OpeningItems(ctx, accounting.OpeningItemQuery{}, paging.New(nil, nil))
 	require.NoError(t, err)
@@ -165,4 +175,24 @@ func TestCutoverDryRunThenCommitIdempotent(t *testing.T) {
 	out.Reset()
 	opts.UserEmail = "nobody@balans.local"
 	assert.Error(t, a.Cutover(ctx, opts))
+}
+
+// baselineValuer mengurangi nilai persediaan yang sudah ada sebelum test.
+type baselineValuer struct {
+	inner    stockValuer
+	baseline map[string]money.Amount
+}
+
+func (b baselineValuer) InventoryValueByAccount(ctx context.Context, asOf clock.BusinessDate) (map[string]money.Amount, error) {
+	cur, err := b.inner.InventoryValueByAccount(ctx, asOf)
+	if err != nil {
+		return nil, err
+	}
+	out := map[string]money.Amount{}
+	for k, v := range cur {
+		if d := v.Sub(b.baseline[k]); !d.IsZero() {
+			out[k] = d
+		}
+	}
+	return out, nil
 }

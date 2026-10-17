@@ -43,7 +43,6 @@ func devApprovalSamples() []devApprovalSample {
 	// tidak ada di tabelnya.
 	return []devApprovalSample{
 		{"marketing", sample(approval.SubjectExpenseClaim, "EXP/2026/10/90001", "Biaya booth event Jakarta Fair", 3_200_000)},
-		{"warehouse_staff", sample(approval.SubjectReturnDisposition, "RJ/2026/10/90001", "Retur MT · 3 baris pemusnahan", 1_750_000, approval.ConditionHasDisposal)},
 	}
 }
 
