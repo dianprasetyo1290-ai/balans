@@ -17,6 +17,120 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
+// Defines values for ConsignmentBorneBy.
+const (
+	ConsignmentBorneByBalans  ConsignmentBorneBy = "balans"
+	ConsignmentBorneByPartner ConsignmentBorneBy = "partner"
+)
+
+// Valid indicates whether the value is a known member of the ConsignmentBorneBy enum.
+func (e ConsignmentBorneBy) Valid() bool {
+	switch e {
+	case ConsignmentBorneByBalans:
+		return true
+	case ConsignmentBorneByPartner:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ConsignmentDeliveryStatus.
+const (
+	ConsignmentDeliveryStatusCancelled ConsignmentDeliveryStatus = "cancelled"
+	ConsignmentDeliveryStatusCompleted ConsignmentDeliveryStatus = "completed"
+	ConsignmentDeliveryStatusDraft     ConsignmentDeliveryStatus = "draft"
+	ConsignmentDeliveryStatusInTransit ConsignmentDeliveryStatus = "in_transit"
+)
+
+// Valid indicates whether the value is a known member of the ConsignmentDeliveryStatus enum.
+func (e ConsignmentDeliveryStatus) Valid() bool {
+	switch e {
+	case ConsignmentDeliveryStatusCancelled:
+		return true
+	case ConsignmentDeliveryStatusCompleted:
+		return true
+	case ConsignmentDeliveryStatusDraft:
+		return true
+	case ConsignmentDeliveryStatusInTransit:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ConsignmentDeliveryType.
+const (
+	Consignment   ConsignmentDeliveryType = "consignment"
+	VendingBuffer ConsignmentDeliveryType = "vending_buffer"
+)
+
+// Valid indicates whether the value is a known member of the ConsignmentDeliveryType enum.
+func (e ConsignmentDeliveryType) Valid() bool {
+	switch e {
+	case Consignment:
+		return true
+	case VendingBuffer:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ConsignmentReconciliationStatus.
+const (
+	ConsignmentReconciliationStatusCancelled       ConsignmentReconciliationStatus = "cancelled"
+	ConsignmentReconciliationStatusDraft           ConsignmentReconciliationStatus = "draft"
+	ConsignmentReconciliationStatusInProgress      ConsignmentReconciliationStatus = "in_progress"
+	ConsignmentReconciliationStatusPendingApproval ConsignmentReconciliationStatus = "pending_approval"
+	ConsignmentReconciliationStatusPosted          ConsignmentReconciliationStatus = "posted"
+	ConsignmentReconciliationStatusRejected        ConsignmentReconciliationStatus = "rejected"
+)
+
+// Valid indicates whether the value is a known member of the ConsignmentReconciliationStatus enum.
+func (e ConsignmentReconciliationStatus) Valid() bool {
+	switch e {
+	case ConsignmentReconciliationStatusCancelled:
+		return true
+	case ConsignmentReconciliationStatusDraft:
+		return true
+	case ConsignmentReconciliationStatusInProgress:
+		return true
+	case ConsignmentReconciliationStatusPendingApproval:
+		return true
+	case ConsignmentReconciliationStatusPosted:
+		return true
+	case ConsignmentReconciliationStatusRejected:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ConsignmentVarianceCause.
+const (
+	Lost          ConsignmentVarianceCause = "lost"
+	NearExpiry    ConsignmentVarianceCause = "near_expiry"
+	PartnerDamage ConsignmentVarianceCause = "partner_damage"
+	ProductDefect ConsignmentVarianceCause = "product_defect"
+)
+
+// Valid indicates whether the value is a known member of the ConsignmentVarianceCause enum.
+func (e ConsignmentVarianceCause) Valid() bool {
+	switch e {
+	case Lost:
+		return true
+	case NearExpiry:
+		return true
+	case PartnerDamage:
+		return true
+	case ProductDefect:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for CreditNoteAllowedActions.
 const (
 	CreditNoteAllowedActionsApply     CreditNoteAllowedActions = "apply"
@@ -490,16 +604,16 @@ func (e SalesOrderType) Valid() bool {
 
 // Defines values for SalesPartyType.
 const (
-	Customer SalesPartyType = "customer"
-	Partner  SalesPartyType = "partner"
+	SalesPartyTypeCustomer SalesPartyType = "customer"
+	SalesPartyTypePartner  SalesPartyType = "partner"
 )
 
 // Valid indicates whether the value is a known member of the SalesPartyType enum.
 func (e SalesPartyType) Valid() bool {
 	switch e {
-	case Customer:
+	case SalesPartyTypeCustomer:
 		return true
-	case Partner:
+	case SalesPartyTypePartner:
 		return true
 	default:
 		return false
@@ -615,6 +729,372 @@ func (e SalesReturnStatus) Valid() bool {
 //
 // Example: 2026-10-19
 type BusinessDate = openapi_types.Date
+
+// ConsignmentBorneBy defines model for ConsignmentBorneBy.
+type ConsignmentBorneBy string
+
+// ConsignmentDelivery defines model for ConsignmentDelivery.
+type ConsignmentDelivery struct {
+	AgreementNumber string   `json:"agreementNumber"`
+	AllowedActions  []string `json:"allowedActions"`
+
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate `json:"businessDate"`
+	CancelReason string       `json:"cancelReason"`
+	ChannelName  string       `json:"channelName"`
+
+	// CostAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	CostAmount    Money     `json:"costAmount"`
+	CreatedAt     time.Time `json:"createdAt"`
+	CreatedByName string    `json:"createdByName"`
+
+	// DeliveryType `consignment` ke lokasi konsinyasi mitra (A-07), `vending_buffer` ke buffer vending (A-24).
+	DeliveryType   ConsignmentDeliveryType   `json:"deliveryType"`
+	FromLocation   SalesLocationRef          `json:"fromLocation"`
+	Id             openapi_types.UUID        `json:"id"`
+	Lines          []ConsignmentDeliveryLine `json:"lines"`
+	Note           string                    `json:"note"`
+	Number         *string                   `json:"number,omitempty"`
+	PartnerCode    string                    `json:"partnerCode"`
+	PartnerId      openapi_types.UUID        `json:"partnerId"`
+	PartnerName    string                    `json:"partnerName"`
+	ReceivedAt     *time.Time                `json:"receivedAt,omitempty"`
+	ShippedAt      *time.Time                `json:"shippedAt,omitempty"`
+	SourceType     string                    `json:"sourceType"`
+	Status         ConsignmentDeliveryStatus `json:"status"`
+	SubChannelName string                    `json:"subChannelName"`
+	ToLocation     SalesLocationRef          `json:"toLocation"`
+	TransferId     *openapi_types.UUID       `json:"transferId,omitempty"`
+	TransferNumber string                    `json:"transferNumber"`
+	UpdatedAt      time.Time                 `json:"updatedAt"`
+	Version        int                       `json:"version"`
+}
+
+// ConsignmentDeliveryFields defines model for ConsignmentDeliveryFields.
+type ConsignmentDeliveryFields struct {
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate   BusinessDate                   `json:"businessDate"`
+	FromLocationId openapi_types.UUID             `json:"fromLocationId"`
+	Lines          []ConsignmentDeliveryLineInput `json:"lines"`
+	Note           *string                        `json:"note,omitempty"`
+}
+
+// ConsignmentDeliveryInput defines model for ConsignmentDeliveryInput.
+type ConsignmentDeliveryInput struct {
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate `json:"businessDate"`
+
+	// DeliveryType `consignment` ke lokasi konsinyasi mitra (A-07), `vending_buffer` ke buffer vending (A-24).
+	DeliveryType   ConsignmentDeliveryType        `json:"deliveryType"`
+	FromLocationId openapi_types.UUID             `json:"fromLocationId"`
+	Lines          []ConsignmentDeliveryLineInput `json:"lines"`
+	Note           *string                        `json:"note,omitempty"`
+	PartnerId      openapi_types.UUID             `json:"partnerId"`
+}
+
+// ConsignmentDeliveryLine defines model for ConsignmentDeliveryLine.
+type ConsignmentDeliveryLine struct {
+	BatchId *openapi_types.UUID `json:"batchId,omitempty"`
+
+	// CostAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	CostAmount Money              `json:"costAmount"`
+	Id         openapi_types.UUID `json:"id"`
+	LineNo     int                `json:"lineNo"`
+	Note       string             `json:"note"`
+	Product    SalesProductRef    `json:"product"`
+	Qty        string             `json:"qty"`
+}
+
+// ConsignmentDeliveryLineInput defines model for ConsignmentDeliveryLineInput.
+type ConsignmentDeliveryLineInput struct {
+	Note      *string            `json:"note,omitempty"`
+	ProductId openapi_types.UUID `json:"productId"`
+
+	// Qty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 12.000
+	Qty SalesQuantity `json:"qty"`
+}
+
+// ConsignmentDeliveryList defines model for ConsignmentDeliveryList.
+type ConsignmentDeliveryList struct {
+	Items      []ConsignmentDeliverySummary `json:"items"`
+	Page       int                          `json:"page"`
+	PageSize   int                          `json:"pageSize"`
+	TotalItems int64                        `json:"totalItems"`
+	TotalPages int                          `json:"totalPages"`
+}
+
+// ConsignmentDeliveryStatus defines model for ConsignmentDeliveryStatus.
+type ConsignmentDeliveryStatus string
+
+// ConsignmentDeliverySummary defines model for ConsignmentDeliverySummary.
+type ConsignmentDeliverySummary struct {
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate `json:"businessDate"`
+
+	// CostAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	CostAmount Money `json:"costAmount"`
+
+	// DeliveryType `consignment` ke lokasi konsinyasi mitra (A-07), `vending_buffer` ke buffer vending (A-24).
+	DeliveryType   ConsignmentDeliveryType   `json:"deliveryType"`
+	Id             openapi_types.UUID        `json:"id"`
+	Number         *string                   `json:"number,omitempty"`
+	PartnerCode    string                    `json:"partnerCode"`
+	PartnerId      openapi_types.UUID        `json:"partnerId"`
+	PartnerName    string                    `json:"partnerName"`
+	Status         ConsignmentDeliveryStatus `json:"status"`
+	TransferNumber string                    `json:"transferNumber"`
+	Version        int                       `json:"version"`
+}
+
+// ConsignmentDeliveryType `consignment` ke lokasi konsinyasi mitra (A-07), `vending_buffer` ke buffer vending (A-24).
+type ConsignmentDeliveryType string
+
+// ConsignmentDeliveryUpdate defines model for ConsignmentDeliveryUpdate.
+type ConsignmentDeliveryUpdate struct {
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate   BusinessDate                   `json:"businessDate"`
+	FromLocationId openapi_types.UUID             `json:"fromLocationId"`
+	Lines          []ConsignmentDeliveryLineInput `json:"lines"`
+	Note           *string                        `json:"note,omitempty"`
+
+	// Version Versi terakhir yang dilihat user (optimistic locking).
+	Version int `json:"version"`
+}
+
+// ConsignmentReconciliation defines model for ConsignmentReconciliation.
+type ConsignmentReconciliation struct {
+	// AbsorbedVarianceCost Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	AbsorbedVarianceCost Money               `json:"absorbedVarianceCost"`
+	AgreementNumber      string              `json:"agreementNumber"`
+	AllowedActions       []string            `json:"allowedActions"`
+	BaFileId             *openapi_types.UUID `json:"baFileId,omitempty"`
+	BaFileName           string              `json:"baFileName"`
+
+	// BilledVarianceAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	BilledVarianceAmount Money  `json:"billedVarianceAmount"`
+	CancelReason         string `json:"cancelReason"`
+	ChannelName          string `json:"channelName"`
+
+	// CostAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	CostAmount    Money     `json:"costAmount"`
+	CreatedAt     time.Time `json:"createdAt"`
+	CreatedByName string    `json:"createdByName"`
+
+	// CutOffDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	CutOffDate            BusinessDate                    `json:"cutOffDate"`
+	DecidedAt             *time.Time                      `json:"decidedAt,omitempty"`
+	DecisionNote          string                          `json:"decisionNote"`
+	Id                    openapi_types.UUID              `json:"id"`
+	InvoiceId             *openapi_types.UUID             `json:"invoiceId,omitempty"`
+	InvoiceNumber         string                          `json:"invoiceNumber"`
+	Lines                 []ConsignmentReconciliationLine `json:"lines"`
+	Location              SalesLocationRef                `json:"location"`
+	MarginPercent         *string                         `json:"marginPercent,omitempty"`
+	Note                  string                          `json:"note"`
+	Number                *string                         `json:"number,omitempty"`
+	PartnerAddress        string                          `json:"partnerAddress"`
+	PartnerCode           string                          `json:"partnerCode"`
+	PartnerId             openapi_types.UUID              `json:"partnerId"`
+	PartnerName           string                          `json:"partnerName"`
+	PartnerReportFileId   *openapi_types.UUID             `json:"partnerReportFileId,omitempty"`
+	PartnerReportFileName string                          `json:"partnerReportFileName"`
+	PaymentTermDays       int                             `json:"paymentTermDays"`
+	PeriodStart           *BusinessDate                   `json:"periodStart,omitempty"`
+	PostedAt              *time.Time                      `json:"postedAt,omitempty"`
+
+	// SalesAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	SalesAmount           Money                           `json:"salesAmount"`
+	Status                ConsignmentReconciliationStatus `json:"status"`
+	StockCountId          openapi_types.UUID              `json:"stockCountId"`
+	StockCountNumber      string                          `json:"stockCountNumber"`
+	SubChannelName        string                          `json:"subChannelName"`
+	SubmittedAt           *time.Time                      `json:"submittedAt,omitempty"`
+	UpdatedAt             time.Time                       `json:"updatedAt"`
+	VarianceInvoiceId     *openapi_types.UUID             `json:"varianceInvoiceId,omitempty"`
+	VarianceInvoiceNumber string                          `json:"varianceInvoiceNumber"`
+	VarianceRules         ConsignmentVarianceRules        `json:"varianceRules"`
+	Version               int                             `json:"version"`
+}
+
+// ConsignmentReconciliationDraftUpdate defines model for ConsignmentReconciliationDraftUpdate.
+type ConsignmentReconciliationDraftUpdate struct {
+	// CutOffDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	CutOffDate   BusinessDate       `json:"cutOffDate"`
+	Note         *string            `json:"note,omitempty"`
+	StockCountId openapi_types.UUID `json:"stockCountId"`
+
+	// Version Versi terakhir yang dilihat user (optimistic locking).
+	Version int `json:"version"`
+}
+
+// ConsignmentReconciliationFields defines model for ConsignmentReconciliationFields.
+type ConsignmentReconciliationFields struct {
+	// CutOffDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	CutOffDate   BusinessDate       `json:"cutOffDate"`
+	Note         *string            `json:"note,omitempty"`
+	StockCountId openapi_types.UUID `json:"stockCountId"`
+}
+
+// ConsignmentReconciliationInput defines model for ConsignmentReconciliationInput.
+type ConsignmentReconciliationInput struct {
+	// CutOffDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	CutOffDate   BusinessDate       `json:"cutOffDate"`
+	Note         *string            `json:"note,omitempty"`
+	PartnerId    openapi_types.UUID `json:"partnerId"`
+	StockCountId openapi_types.UUID `json:"stockCountId"`
+}
+
+// ConsignmentReconciliationLine defines model for ConsignmentReconciliationLine.
+type ConsignmentReconciliationLine struct {
+	BorneBy *ConsignmentBorneBy `json:"borneBy,omitempty"`
+
+	// CostAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	CostAmount       Money              `json:"costAmount"`
+	CountedQty       string             `json:"countedQty"`
+	DeliveredQty     string             `json:"deliveredQty"`
+	Id               openapi_types.UUID `json:"id"`
+	LineNo           int                `json:"lineNo"`
+	Note             string             `json:"note"`
+	OpeningQty       string             `json:"openingQty"`
+	PriceDescription string             `json:"priceDescription"`
+	PriceRule        string             `json:"priceRule"`
+	Product          SalesProductRef    `json:"product"`
+	ReportedQty      string             `json:"reportedQty"`
+	ReturnedQty      string             `json:"returnedQty"`
+
+	// SalesAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	SalesAmount Money `json:"salesAmount"`
+
+	// SoldQty Terjual sistem = stok awal + kiriman − tarikan − sisa fisik.
+	SoldQty string `json:"soldQty"`
+
+	// UnitPrice Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	UnitPrice Money `json:"unitPrice"`
+
+	// VarianceAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	VarianceAmount Money                     `json:"varianceAmount"`
+	VarianceCause  *ConsignmentVarianceCause `json:"varianceCause,omitempty"`
+
+	// VarianceCostAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	VarianceCostAmount Money  `json:"varianceCostAmount"`
+	VarianceQty        string `json:"varianceQty"`
+}
+
+// ConsignmentReconciliationLineEntry defines model for ConsignmentReconciliationLineEntry.
+type ConsignmentReconciliationLineEntry struct {
+	LineId openapi_types.UUID `json:"lineId"`
+	Note   *string            `json:"note,omitempty"`
+
+	// ReportedQty Qty terjual menurut laporan penjualan mitra.
+	ReportedQty   string                    `json:"reportedQty"`
+	VarianceCause *ConsignmentVarianceCause `json:"varianceCause,omitempty"`
+}
+
+// ConsignmentReconciliationList defines model for ConsignmentReconciliationList.
+type ConsignmentReconciliationList struct {
+	Items      []ConsignmentReconciliationSummary `json:"items"`
+	Page       int                                `json:"page"`
+	PageSize   int                                `json:"pageSize"`
+	TotalItems int64                              `json:"totalItems"`
+	TotalPages int                                `json:"totalPages"`
+}
+
+// ConsignmentReconciliationStatus defines model for ConsignmentReconciliationStatus.
+type ConsignmentReconciliationStatus string
+
+// ConsignmentReconciliationSummary defines model for ConsignmentReconciliationSummary.
+type ConsignmentReconciliationSummary struct {
+	// BilledVarianceAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	BilledVarianceAmount Money `json:"billedVarianceAmount"`
+
+	// CutOffDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	CutOffDate  BusinessDate       `json:"cutOffDate"`
+	Id          openapi_types.UUID `json:"id"`
+	Number      *string            `json:"number,omitempty"`
+	PartnerCode string             `json:"partnerCode"`
+	PartnerId   openapi_types.UUID `json:"partnerId"`
+	PartnerName string             `json:"partnerName"`
+	PeriodStart *BusinessDate      `json:"periodStart,omitempty"`
+
+	// SalesAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	SalesAmount      Money                           `json:"salesAmount"`
+	Status           ConsignmentReconciliationStatus `json:"status"`
+	StockCountNumber string                          `json:"stockCountNumber"`
+	Version          int                             `json:"version"`
+}
+
+// ConsignmentReconciliationUpdate defines model for ConsignmentReconciliationUpdate.
+type ConsignmentReconciliationUpdate struct {
+	BaFileId            *openapi_types.UUID                   `json:"baFileId,omitempty"`
+	Lines               *[]ConsignmentReconciliationLineEntry `json:"lines,omitempty"`
+	Note                *string                               `json:"note,omitempty"`
+	PartnerReportFileId *openapi_types.UUID                   `json:"partnerReportFileId,omitempty"`
+
+	// SetFiles true = laporan mitra dan BA diganti dengan nilai di bawah (kosong = dilepas).
+	SetFiles *bool `json:"setFiles,omitempty"`
+	Version  int   `json:"version"`
+}
+
+// ConsignmentVarianceCause Penyebab selisih (BRD U-02).
+type ConsignmentVarianceCause string
+
+// ConsignmentVarianceRules defines model for ConsignmentVarianceRules.
+type ConsignmentVarianceRules struct {
+	Lost          ConsignmentBorneBy `json:"lost"`
+	NearExpiry    ConsignmentBorneBy `json:"nearExpiry"`
+	PartnerDamage ConsignmentBorneBy `json:"partnerDamage"`
+	ProductDefect ConsignmentBorneBy `json:"productDefect"`
+}
 
 // CreditNote defines model for CreditNote.
 type CreditNote struct {
@@ -2244,6 +2724,97 @@ type UpdateReturnReasonParams struct {
 	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
 }
 
+// ListConsignmentDeliveriesParams defines parameters for ListConsignmentDeliveries.
+type ListConsignmentDeliveriesParams struct {
+	Page         *Page                      `form:"page,omitempty" json:"page,omitempty"`
+	PageSize     *PageSize                  `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+	Q            *Search                    `form:"q,omitempty" json:"q,omitempty"`
+	Status       *ConsignmentDeliveryStatus `form:"status,omitempty" json:"status,omitempty"`
+	DeliveryType *ConsignmentDeliveryType   `form:"deliveryType,omitempty" json:"deliveryType,omitempty"`
+	PartnerId    *openapi_types.UUID        `form:"partnerId,omitempty" json:"partnerId,omitempty"`
+}
+
+// CreateConsignmentDeliveryParams defines parameters for CreateConsignmentDelivery.
+type CreateConsignmentDeliveryParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// UpdateConsignmentDeliveryParams defines parameters for UpdateConsignmentDelivery.
+type UpdateConsignmentDeliveryParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// CancelConsignmentDeliveryParams defines parameters for CancelConsignmentDelivery.
+type CancelConsignmentDeliveryParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// ReceiveConsignmentDeliveryParams defines parameters for ReceiveConsignmentDelivery.
+type ReceiveConsignmentDeliveryParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// ShipConsignmentDeliveryParams defines parameters for ShipConsignmentDelivery.
+type ShipConsignmentDeliveryParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// ListConsignmentReconciliationsParams defines parameters for ListConsignmentReconciliations.
+type ListConsignmentReconciliationsParams struct {
+	Page      *Page                            `form:"page,omitempty" json:"page,omitempty"`
+	PageSize  *PageSize                        `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+	Q         *Search                          `form:"q,omitempty" json:"q,omitempty"`
+	Status    *ConsignmentReconciliationStatus `form:"status,omitempty" json:"status,omitempty"`
+	PartnerId *openapi_types.UUID              `form:"partnerId,omitempty" json:"partnerId,omitempty"`
+}
+
+// CreateConsignmentReconciliationParams defines parameters for CreateConsignmentReconciliation.
+type CreateConsignmentReconciliationParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// UpdateConsignmentReconciliationDraftParams defines parameters for UpdateConsignmentReconciliationDraft.
+type UpdateConsignmentReconciliationDraftParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// CancelConsignmentReconciliationParams defines parameters for CancelConsignmentReconciliation.
+type CancelConsignmentReconciliationParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// UpdateConsignmentReconciliationParams defines parameters for UpdateConsignmentReconciliation.
+type UpdateConsignmentReconciliationParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// ReviseConsignmentReconciliationParams defines parameters for ReviseConsignmentReconciliation.
+type ReviseConsignmentReconciliationParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// StartConsignmentReconciliationParams defines parameters for StartConsignmentReconciliation.
+type StartConsignmentReconciliationParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// SubmitConsignmentReconciliationParams defines parameters for SubmitConsignmentReconciliation.
+type SubmitConsignmentReconciliationParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
 // ListCreditNotesParams defines parameters for ListCreditNotes.
 type ListCreditNotesParams struct {
 	Page             *Page                 `form:"page,omitempty" json:"page,omitempty"`
@@ -2459,6 +3030,42 @@ type CreateReturnReasonJSONRequestBody = ReturnReasonInput
 // UpdateReturnReasonJSONRequestBody defines body for UpdateReturnReason for application/json ContentType.
 type UpdateReturnReasonJSONRequestBody = ReturnReasonUpdate
 
+// CreateConsignmentDeliveryJSONRequestBody defines body for CreateConsignmentDelivery for application/json ContentType.
+type CreateConsignmentDeliveryJSONRequestBody = ConsignmentDeliveryInput
+
+// UpdateConsignmentDeliveryJSONRequestBody defines body for UpdateConsignmentDelivery for application/json ContentType.
+type UpdateConsignmentDeliveryJSONRequestBody = ConsignmentDeliveryUpdate
+
+// CancelConsignmentDeliveryJSONRequestBody defines body for CancelConsignmentDelivery for application/json ContentType.
+type CancelConsignmentDeliveryJSONRequestBody = SalesCancelInput
+
+// ReceiveConsignmentDeliveryJSONRequestBody defines body for ReceiveConsignmentDelivery for application/json ContentType.
+type ReceiveConsignmentDeliveryJSONRequestBody = VersionInput
+
+// ShipConsignmentDeliveryJSONRequestBody defines body for ShipConsignmentDelivery for application/json ContentType.
+type ShipConsignmentDeliveryJSONRequestBody = VersionInput
+
+// CreateConsignmentReconciliationJSONRequestBody defines body for CreateConsignmentReconciliation for application/json ContentType.
+type CreateConsignmentReconciliationJSONRequestBody = ConsignmentReconciliationInput
+
+// UpdateConsignmentReconciliationDraftJSONRequestBody defines body for UpdateConsignmentReconciliationDraft for application/json ContentType.
+type UpdateConsignmentReconciliationDraftJSONRequestBody = ConsignmentReconciliationDraftUpdate
+
+// CancelConsignmentReconciliationJSONRequestBody defines body for CancelConsignmentReconciliation for application/json ContentType.
+type CancelConsignmentReconciliationJSONRequestBody = SalesCancelInput
+
+// UpdateConsignmentReconciliationJSONRequestBody defines body for UpdateConsignmentReconciliation for application/json ContentType.
+type UpdateConsignmentReconciliationJSONRequestBody = ConsignmentReconciliationUpdate
+
+// ReviseConsignmentReconciliationJSONRequestBody defines body for ReviseConsignmentReconciliation for application/json ContentType.
+type ReviseConsignmentReconciliationJSONRequestBody = VersionInput
+
+// StartConsignmentReconciliationJSONRequestBody defines body for StartConsignmentReconciliation for application/json ContentType.
+type StartConsignmentReconciliationJSONRequestBody = VersionInput
+
+// SubmitConsignmentReconciliationJSONRequestBody defines body for SubmitConsignmentReconciliation for application/json ContentType.
+type SubmitConsignmentReconciliationJSONRequestBody = VersionInput
+
 // ApplyCreditNoteJSONRequestBody defines body for ApplyCreditNote for application/json ContentType.
 type ApplyCreditNoteJSONRequestBody = CreditNoteApplyInput
 
@@ -2539,6 +3146,54 @@ type ServerInterface interface {
 	// ListSalesChannelOptions Channel & sub-channel aktif untuk form pesanan
 	// (GET /api/v1/sales/channel-options)
 	ListSalesChannelOptions(w http.ResponseWriter, r *http.Request)
+	// ListConsignmentDeliveries Daftar pengiriman konsinyasi & buffer vending (Penjualan › Konsinyasi, S-303)
+	// (GET /api/v1/sales/consignment-deliveries)
+	ListConsignmentDeliveries(w http.ResponseWriter, r *http.Request, params ListConsignmentDeliveriesParams)
+	// CreateConsignmentDelivery Menyimpan draft pengiriman konsinyasi / buffer vending
+	// (POST /api/v1/sales/consignment-deliveries)
+	CreateConsignmentDelivery(w http.ResponseWriter, r *http.Request, params CreateConsignmentDeliveryParams)
+	// GetConsignmentDelivery Detail pengiriman konsinyasi
+	// (GET /api/v1/sales/consignment-deliveries/{id})
+	GetConsignmentDelivery(w http.ResponseWriter, r *http.Request, id Id)
+	// UpdateConsignmentDelivery Mengubah draft pengiriman konsinyasi
+	// (PUT /api/v1/sales/consignment-deliveries/{id})
+	UpdateConsignmentDelivery(w http.ResponseWriter, r *http.Request, id Id, params UpdateConsignmentDeliveryParams)
+	// CancelConsignmentDelivery Batalkan draft pengiriman konsinyasi
+	// (POST /api/v1/sales/consignment-deliveries/{id}/cancel)
+	CancelConsignmentDelivery(w http.ResponseWriter, r *http.Request, id Id, params CancelConsignmentDeliveryParams)
+	// ReceiveConsignmentDelivery Barang titipan diterima mitra (stok Tersedia di lokasi mitra)
+	// (POST /api/v1/sales/consignment-deliveries/{id}/receive)
+	ReceiveConsignmentDelivery(w http.ResponseWriter, r *http.Request, id Id, params ReceiveConsignmentDeliveryParams)
+	// ShipConsignmentDelivery Kirim barang titipan (nomor DO, Transfer Stok, jurnal A-07 / A-24)
+	// (POST /api/v1/sales/consignment-deliveries/{id}/ship)
+	ShipConsignmentDelivery(w http.ResponseWriter, r *http.Request, id Id, params ShipConsignmentDeliveryParams)
+	// ListConsignmentReconciliations Daftar Rekonsiliasi Konsinyasi (S-304)
+	// (GET /api/v1/sales/consignment-reconciliations)
+	ListConsignmentReconciliations(w http.ResponseWriter, r *http.Request, params ListConsignmentReconciliationsParams)
+	// CreateConsignmentReconciliation Menyimpan draft rekonsiliasi (mitra, cut-off, stock count lokasi mitra)
+	// (POST /api/v1/sales/consignment-reconciliations)
+	CreateConsignmentReconciliation(w http.ResponseWriter, r *http.Request, params CreateConsignmentReconciliationParams)
+	// GetConsignmentReconciliation Detail rekonsiliasi (dan data cetak Berita Acara Rekonsiliasi)
+	// (GET /api/v1/sales/consignment-reconciliations/{id})
+	GetConsignmentReconciliation(w http.ResponseWriter, r *http.Request, id Id)
+	// UpdateConsignmentReconciliationDraft Mengubah draft rekonsiliasi
+	// (PUT /api/v1/sales/consignment-reconciliations/{id})
+	UpdateConsignmentReconciliationDraft(w http.ResponseWriter, r *http.Request, id Id, params UpdateConsignmentReconciliationDraftParams)
+	// CancelConsignmentReconciliation Batalkan rekonsiliasi Draft/Diproses
+	// (POST /api/v1/sales/consignment-reconciliations/{id}/cancel)
+	CancelConsignmentReconciliation(w http.ResponseWriter, r *http.Request, id Id, params CancelConsignmentReconciliationParams)
+	// UpdateConsignmentReconciliation Isi laporan penjualan mitra per SKU, penyebab selisih, file laporan mitra & BA bertanda tangan
+	// (PUT /api/v1/sales/consignment-reconciliations/{id}/entries)
+	UpdateConsignmentReconciliation(w http.ResponseWriter, r *http.Request, id Id, params UpdateConsignmentReconciliationParams)
+	// ReviseConsignmentReconciliation Revisi rekonsiliasi yang ditolak
+	// (POST /api/v1/sales/consignment-reconciliations/{id}/revise)
+	ReviseConsignmentReconciliation(w http.ResponseWriter, r *http.Request, id Id, params ReviseConsignmentReconciliationParams)
+	// StartConsignmentReconciliation Mulai rekonsiliasi (nomor KSN; hitung stok awal, kiriman, tarikan, sisa fisik, terjual sistem)
+	// (POST /api/v1/sales/consignment-reconciliations/{id}/start)
+	StartConsignmentReconciliation(w http.ResponseWriter, r *http.Request, id Id, params StartConsignmentReconciliationParams)
+	// SubmitConsignmentReconciliation Ajukan Berita Acara Rekonsiliasi ke approval (Sales MT → Head Finance & Accounting)
+	// (POST /api/v1/sales/consignment-reconciliations/{id}/submit)
+	SubmitConsignmentReconciliation(w http.ResponseWriter, r *http.Request, id Id, params SubmitConsignmentReconciliationParams)
 	// ListCreditNotes Daftar Nota Kredit
 	// (GET /api/v1/sales/credit-notes)
 	ListCreditNotes(w http.ResponseWriter, r *http.Request, params ListCreditNotesParams)
@@ -2692,6 +3347,102 @@ func (_ Unimplemented) ListSalesCashBankAccounts(w http.ResponseWriter, r *http.
 // ListSalesChannelOptions Channel & sub-channel aktif untuk form pesanan
 // (GET /api/v1/sales/channel-options)
 func (_ Unimplemented) ListSalesChannelOptions(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListConsignmentDeliveries Daftar pengiriman konsinyasi & buffer vending (Penjualan › Konsinyasi, S-303)
+// (GET /api/v1/sales/consignment-deliveries)
+func (_ Unimplemented) ListConsignmentDeliveries(w http.ResponseWriter, r *http.Request, params ListConsignmentDeliveriesParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// CreateConsignmentDelivery Menyimpan draft pengiriman konsinyasi / buffer vending
+// (POST /api/v1/sales/consignment-deliveries)
+func (_ Unimplemented) CreateConsignmentDelivery(w http.ResponseWriter, r *http.Request, params CreateConsignmentDeliveryParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetConsignmentDelivery Detail pengiriman konsinyasi
+// (GET /api/v1/sales/consignment-deliveries/{id})
+func (_ Unimplemented) GetConsignmentDelivery(w http.ResponseWriter, r *http.Request, id Id) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// UpdateConsignmentDelivery Mengubah draft pengiriman konsinyasi
+// (PUT /api/v1/sales/consignment-deliveries/{id})
+func (_ Unimplemented) UpdateConsignmentDelivery(w http.ResponseWriter, r *http.Request, id Id, params UpdateConsignmentDeliveryParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// CancelConsignmentDelivery Batalkan draft pengiriman konsinyasi
+// (POST /api/v1/sales/consignment-deliveries/{id}/cancel)
+func (_ Unimplemented) CancelConsignmentDelivery(w http.ResponseWriter, r *http.Request, id Id, params CancelConsignmentDeliveryParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ReceiveConsignmentDelivery Barang titipan diterima mitra (stok Tersedia di lokasi mitra)
+// (POST /api/v1/sales/consignment-deliveries/{id}/receive)
+func (_ Unimplemented) ReceiveConsignmentDelivery(w http.ResponseWriter, r *http.Request, id Id, params ReceiveConsignmentDeliveryParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ShipConsignmentDelivery Kirim barang titipan (nomor DO, Transfer Stok, jurnal A-07 / A-24)
+// (POST /api/v1/sales/consignment-deliveries/{id}/ship)
+func (_ Unimplemented) ShipConsignmentDelivery(w http.ResponseWriter, r *http.Request, id Id, params ShipConsignmentDeliveryParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListConsignmentReconciliations Daftar Rekonsiliasi Konsinyasi (S-304)
+// (GET /api/v1/sales/consignment-reconciliations)
+func (_ Unimplemented) ListConsignmentReconciliations(w http.ResponseWriter, r *http.Request, params ListConsignmentReconciliationsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// CreateConsignmentReconciliation Menyimpan draft rekonsiliasi (mitra, cut-off, stock count lokasi mitra)
+// (POST /api/v1/sales/consignment-reconciliations)
+func (_ Unimplemented) CreateConsignmentReconciliation(w http.ResponseWriter, r *http.Request, params CreateConsignmentReconciliationParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetConsignmentReconciliation Detail rekonsiliasi (dan data cetak Berita Acara Rekonsiliasi)
+// (GET /api/v1/sales/consignment-reconciliations/{id})
+func (_ Unimplemented) GetConsignmentReconciliation(w http.ResponseWriter, r *http.Request, id Id) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// UpdateConsignmentReconciliationDraft Mengubah draft rekonsiliasi
+// (PUT /api/v1/sales/consignment-reconciliations/{id})
+func (_ Unimplemented) UpdateConsignmentReconciliationDraft(w http.ResponseWriter, r *http.Request, id Id, params UpdateConsignmentReconciliationDraftParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// CancelConsignmentReconciliation Batalkan rekonsiliasi Draft/Diproses
+// (POST /api/v1/sales/consignment-reconciliations/{id}/cancel)
+func (_ Unimplemented) CancelConsignmentReconciliation(w http.ResponseWriter, r *http.Request, id Id, params CancelConsignmentReconciliationParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// UpdateConsignmentReconciliation Isi laporan penjualan mitra per SKU, penyebab selisih, file laporan mitra & BA bertanda tangan
+// (PUT /api/v1/sales/consignment-reconciliations/{id}/entries)
+func (_ Unimplemented) UpdateConsignmentReconciliation(w http.ResponseWriter, r *http.Request, id Id, params UpdateConsignmentReconciliationParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ReviseConsignmentReconciliation Revisi rekonsiliasi yang ditolak
+// (POST /api/v1/sales/consignment-reconciliations/{id}/revise)
+func (_ Unimplemented) ReviseConsignmentReconciliation(w http.ResponseWriter, r *http.Request, id Id, params ReviseConsignmentReconciliationParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// StartConsignmentReconciliation Mulai rekonsiliasi (nomor KSN; hitung stok awal, kiriman, tarikan, sisa fisik, terjual sistem)
+// (POST /api/v1/sales/consignment-reconciliations/{id}/start)
+func (_ Unimplemented) StartConsignmentReconciliation(w http.ResponseWriter, r *http.Request, id Id, params StartConsignmentReconciliationParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// SubmitConsignmentReconciliation Ajukan Berita Acara Rekonsiliasi ke approval (Sales MT → Head Finance & Accounting)
+// (POST /api/v1/sales/consignment-reconciliations/{id}/submit)
+func (_ Unimplemented) SubmitConsignmentReconciliation(w http.ResponseWriter, r *http.Request, id Id, params SubmitConsignmentReconciliationParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -3176,6 +3927,871 @@ func (siw *ServerInterfaceWrapper) ListSalesChannelOptions(w http.ResponseWriter
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.ListSalesChannelOptions(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListConsignmentDeliveries operation middleware
+func (siw *ServerInterfaceWrapper) ListConsignmentDeliveries(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListConsignmentDeliveriesParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", r.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "page"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "pageSize", r.URL.Query(), &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "pageSize"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "q" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "q", r.URL.Query(), &params.Q, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "q"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "q", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "status" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "status", r.URL.Query(), &params.Status, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "status"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "status", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "deliveryType" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "deliveryType", r.URL.Query(), &params.DeliveryType, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "deliveryType"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "deliveryType", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "partnerId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "partnerId", r.URL.Query(), &params.PartnerId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "partnerId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "partnerId", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListConsignmentDeliveries(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateConsignmentDelivery operation middleware
+func (siw *ServerInterfaceWrapper) CreateConsignmentDelivery(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateConsignmentDeliveryParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateConsignmentDelivery(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetConsignmentDelivery operation middleware
+func (siw *ServerInterfaceWrapper) GetConsignmentDelivery(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetConsignmentDelivery(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateConsignmentDelivery operation middleware
+func (siw *ServerInterfaceWrapper) UpdateConsignmentDelivery(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params UpdateConsignmentDeliveryParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateConsignmentDelivery(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CancelConsignmentDelivery operation middleware
+func (siw *ServerInterfaceWrapper) CancelConsignmentDelivery(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CancelConsignmentDeliveryParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CancelConsignmentDelivery(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ReceiveConsignmentDelivery operation middleware
+func (siw *ServerInterfaceWrapper) ReceiveConsignmentDelivery(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ReceiveConsignmentDeliveryParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ReceiveConsignmentDelivery(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ShipConsignmentDelivery operation middleware
+func (siw *ServerInterfaceWrapper) ShipConsignmentDelivery(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ShipConsignmentDeliveryParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ShipConsignmentDelivery(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListConsignmentReconciliations operation middleware
+func (siw *ServerInterfaceWrapper) ListConsignmentReconciliations(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListConsignmentReconciliationsParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", r.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "page"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "pageSize", r.URL.Query(), &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "pageSize"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "q" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "q", r.URL.Query(), &params.Q, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "q"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "q", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "status" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "status", r.URL.Query(), &params.Status, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "status"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "status", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "partnerId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "partnerId", r.URL.Query(), &params.PartnerId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "partnerId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "partnerId", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListConsignmentReconciliations(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateConsignmentReconciliation operation middleware
+func (siw *ServerInterfaceWrapper) CreateConsignmentReconciliation(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateConsignmentReconciliationParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateConsignmentReconciliation(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetConsignmentReconciliation operation middleware
+func (siw *ServerInterfaceWrapper) GetConsignmentReconciliation(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetConsignmentReconciliation(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateConsignmentReconciliationDraft operation middleware
+func (siw *ServerInterfaceWrapper) UpdateConsignmentReconciliationDraft(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params UpdateConsignmentReconciliationDraftParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateConsignmentReconciliationDraft(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CancelConsignmentReconciliation operation middleware
+func (siw *ServerInterfaceWrapper) CancelConsignmentReconciliation(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CancelConsignmentReconciliationParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CancelConsignmentReconciliation(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateConsignmentReconciliation operation middleware
+func (siw *ServerInterfaceWrapper) UpdateConsignmentReconciliation(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params UpdateConsignmentReconciliationParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateConsignmentReconciliation(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ReviseConsignmentReconciliation operation middleware
+func (siw *ServerInterfaceWrapper) ReviseConsignmentReconciliation(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ReviseConsignmentReconciliationParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ReviseConsignmentReconciliation(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// StartConsignmentReconciliation operation middleware
+func (siw *ServerInterfaceWrapper) StartConsignmentReconciliation(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params StartConsignmentReconciliationParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.StartConsignmentReconciliation(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// SubmitConsignmentReconciliation operation middleware
+func (siw *ServerInterfaceWrapper) SubmitConsignmentReconciliation(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params SubmitConsignmentReconciliationParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.SubmitConsignmentReconciliation(w, r, id, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -5495,6 +7111,54 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/api/v1/sales/credit-notes/{id}/pay-refund", wrapper.PayCreditNoteRefund)
 	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/sales/consignment-deliveries", wrapper.ListConsignmentDeliveries)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/sales/consignment-deliveries", wrapper.CreateConsignmentDelivery)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/sales/consignment-deliveries/{id}", wrapper.GetConsignmentDelivery)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/sales/consignment-deliveries/{id}", wrapper.UpdateConsignmentDelivery)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/sales/consignment-deliveries/{id}/ship", wrapper.ShipConsignmentDelivery)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/sales/consignment-deliveries/{id}/receive", wrapper.ReceiveConsignmentDelivery)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/sales/consignment-deliveries/{id}/cancel", wrapper.CancelConsignmentDelivery)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/sales/consignment-reconciliations", wrapper.ListConsignmentReconciliations)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/sales/consignment-reconciliations", wrapper.CreateConsignmentReconciliation)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/sales/consignment-reconciliations/{id}", wrapper.GetConsignmentReconciliation)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/sales/consignment-reconciliations/{id}", wrapper.UpdateConsignmentReconciliationDraft)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/sales/consignment-reconciliations/{id}/start", wrapper.StartConsignmentReconciliation)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/sales/consignment-reconciliations/{id}/entries", wrapper.UpdateConsignmentReconciliation)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/sales/consignment-reconciliations/{id}/submit", wrapper.SubmitConsignmentReconciliation)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/sales/consignment-reconciliations/{id}/revise", wrapper.ReviseConsignmentReconciliation)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/sales/consignment-reconciliations/{id}/cancel", wrapper.CancelConsignmentReconciliation)
+	})
 
 	return r
 }
@@ -5720,6 +7384,652 @@ type ListSalesChannelOptionsdefaultApplicationProblemPlusJSONResponse struct {
 }
 
 func (response ListSalesChannelOptionsdefaultApplicationProblemPlusJSONResponse) VisitListSalesChannelOptionsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListConsignmentDeliveriesRequestObject struct {
+	Params ListConsignmentDeliveriesParams
+}
+
+type ListConsignmentDeliveriesResponseObject interface {
+	VisitListConsignmentDeliveriesResponse(w http.ResponseWriter) error
+}
+
+type ListConsignmentDeliveries200JSONResponse ConsignmentDeliveryList
+
+func (response ListConsignmentDeliveries200JSONResponse) VisitListConsignmentDeliveriesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListConsignmentDeliveriesdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListConsignmentDeliveriesdefaultApplicationProblemPlusJSONResponse) VisitListConsignmentDeliveriesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateConsignmentDeliveryRequestObject struct {
+	Params CreateConsignmentDeliveryParams
+	Body   *CreateConsignmentDeliveryJSONRequestBody
+}
+
+type CreateConsignmentDeliveryResponseObject interface {
+	VisitCreateConsignmentDeliveryResponse(w http.ResponseWriter) error
+}
+
+type CreateConsignmentDelivery201JSONResponse ConsignmentDelivery
+
+func (response CreateConsignmentDelivery201JSONResponse) VisitCreateConsignmentDeliveryResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateConsignmentDeliverydefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response CreateConsignmentDeliverydefaultApplicationProblemPlusJSONResponse) VisitCreateConsignmentDeliveryResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetConsignmentDeliveryRequestObject struct {
+	Id Id `json:"id"`
+}
+
+type GetConsignmentDeliveryResponseObject interface {
+	VisitGetConsignmentDeliveryResponse(w http.ResponseWriter) error
+}
+
+type GetConsignmentDelivery200JSONResponse ConsignmentDelivery
+
+func (response GetConsignmentDelivery200JSONResponse) VisitGetConsignmentDeliveryResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetConsignmentDeliverydefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetConsignmentDeliverydefaultApplicationProblemPlusJSONResponse) VisitGetConsignmentDeliveryResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateConsignmentDeliveryRequestObject struct {
+	Id     Id `json:"id"`
+	Params UpdateConsignmentDeliveryParams
+	Body   *UpdateConsignmentDeliveryJSONRequestBody
+}
+
+type UpdateConsignmentDeliveryResponseObject interface {
+	VisitUpdateConsignmentDeliveryResponse(w http.ResponseWriter) error
+}
+
+type UpdateConsignmentDelivery200JSONResponse ConsignmentDelivery
+
+func (response UpdateConsignmentDelivery200JSONResponse) VisitUpdateConsignmentDeliveryResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateConsignmentDeliverydefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response UpdateConsignmentDeliverydefaultApplicationProblemPlusJSONResponse) VisitUpdateConsignmentDeliveryResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CancelConsignmentDeliveryRequestObject struct {
+	Id     Id `json:"id"`
+	Params CancelConsignmentDeliveryParams
+	Body   *CancelConsignmentDeliveryJSONRequestBody
+}
+
+type CancelConsignmentDeliveryResponseObject interface {
+	VisitCancelConsignmentDeliveryResponse(w http.ResponseWriter) error
+}
+
+type CancelConsignmentDelivery200JSONResponse ConsignmentDelivery
+
+func (response CancelConsignmentDelivery200JSONResponse) VisitCancelConsignmentDeliveryResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CancelConsignmentDeliverydefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response CancelConsignmentDeliverydefaultApplicationProblemPlusJSONResponse) VisitCancelConsignmentDeliveryResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ReceiveConsignmentDeliveryRequestObject struct {
+	Id     Id `json:"id"`
+	Params ReceiveConsignmentDeliveryParams
+	Body   *ReceiveConsignmentDeliveryJSONRequestBody
+}
+
+type ReceiveConsignmentDeliveryResponseObject interface {
+	VisitReceiveConsignmentDeliveryResponse(w http.ResponseWriter) error
+}
+
+type ReceiveConsignmentDelivery200JSONResponse ConsignmentDelivery
+
+func (response ReceiveConsignmentDelivery200JSONResponse) VisitReceiveConsignmentDeliveryResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ReceiveConsignmentDeliverydefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ReceiveConsignmentDeliverydefaultApplicationProblemPlusJSONResponse) VisitReceiveConsignmentDeliveryResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ShipConsignmentDeliveryRequestObject struct {
+	Id     Id `json:"id"`
+	Params ShipConsignmentDeliveryParams
+	Body   *ShipConsignmentDeliveryJSONRequestBody
+}
+
+type ShipConsignmentDeliveryResponseObject interface {
+	VisitShipConsignmentDeliveryResponse(w http.ResponseWriter) error
+}
+
+type ShipConsignmentDelivery200JSONResponse ConsignmentDelivery
+
+func (response ShipConsignmentDelivery200JSONResponse) VisitShipConsignmentDeliveryResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ShipConsignmentDeliverydefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ShipConsignmentDeliverydefaultApplicationProblemPlusJSONResponse) VisitShipConsignmentDeliveryResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListConsignmentReconciliationsRequestObject struct {
+	Params ListConsignmentReconciliationsParams
+}
+
+type ListConsignmentReconciliationsResponseObject interface {
+	VisitListConsignmentReconciliationsResponse(w http.ResponseWriter) error
+}
+
+type ListConsignmentReconciliations200JSONResponse ConsignmentReconciliationList
+
+func (response ListConsignmentReconciliations200JSONResponse) VisitListConsignmentReconciliationsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListConsignmentReconciliationsdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListConsignmentReconciliationsdefaultApplicationProblemPlusJSONResponse) VisitListConsignmentReconciliationsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateConsignmentReconciliationRequestObject struct {
+	Params CreateConsignmentReconciliationParams
+	Body   *CreateConsignmentReconciliationJSONRequestBody
+}
+
+type CreateConsignmentReconciliationResponseObject interface {
+	VisitCreateConsignmentReconciliationResponse(w http.ResponseWriter) error
+}
+
+type CreateConsignmentReconciliation201JSONResponse ConsignmentReconciliation
+
+func (response CreateConsignmentReconciliation201JSONResponse) VisitCreateConsignmentReconciliationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateConsignmentReconciliationdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response CreateConsignmentReconciliationdefaultApplicationProblemPlusJSONResponse) VisitCreateConsignmentReconciliationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetConsignmentReconciliationRequestObject struct {
+	Id Id `json:"id"`
+}
+
+type GetConsignmentReconciliationResponseObject interface {
+	VisitGetConsignmentReconciliationResponse(w http.ResponseWriter) error
+}
+
+type GetConsignmentReconciliation200JSONResponse ConsignmentReconciliation
+
+func (response GetConsignmentReconciliation200JSONResponse) VisitGetConsignmentReconciliationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetConsignmentReconciliationdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetConsignmentReconciliationdefaultApplicationProblemPlusJSONResponse) VisitGetConsignmentReconciliationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateConsignmentReconciliationDraftRequestObject struct {
+	Id     Id `json:"id"`
+	Params UpdateConsignmentReconciliationDraftParams
+	Body   *UpdateConsignmentReconciliationDraftJSONRequestBody
+}
+
+type UpdateConsignmentReconciliationDraftResponseObject interface {
+	VisitUpdateConsignmentReconciliationDraftResponse(w http.ResponseWriter) error
+}
+
+type UpdateConsignmentReconciliationDraft200JSONResponse ConsignmentReconciliation
+
+func (response UpdateConsignmentReconciliationDraft200JSONResponse) VisitUpdateConsignmentReconciliationDraftResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateConsignmentReconciliationDraftdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response UpdateConsignmentReconciliationDraftdefaultApplicationProblemPlusJSONResponse) VisitUpdateConsignmentReconciliationDraftResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CancelConsignmentReconciliationRequestObject struct {
+	Id     Id `json:"id"`
+	Params CancelConsignmentReconciliationParams
+	Body   *CancelConsignmentReconciliationJSONRequestBody
+}
+
+type CancelConsignmentReconciliationResponseObject interface {
+	VisitCancelConsignmentReconciliationResponse(w http.ResponseWriter) error
+}
+
+type CancelConsignmentReconciliation200JSONResponse ConsignmentReconciliation
+
+func (response CancelConsignmentReconciliation200JSONResponse) VisitCancelConsignmentReconciliationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CancelConsignmentReconciliationdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response CancelConsignmentReconciliationdefaultApplicationProblemPlusJSONResponse) VisitCancelConsignmentReconciliationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateConsignmentReconciliationRequestObject struct {
+	Id     Id `json:"id"`
+	Params UpdateConsignmentReconciliationParams
+	Body   *UpdateConsignmentReconciliationJSONRequestBody
+}
+
+type UpdateConsignmentReconciliationResponseObject interface {
+	VisitUpdateConsignmentReconciliationResponse(w http.ResponseWriter) error
+}
+
+type UpdateConsignmentReconciliation200JSONResponse ConsignmentReconciliation
+
+func (response UpdateConsignmentReconciliation200JSONResponse) VisitUpdateConsignmentReconciliationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateConsignmentReconciliationdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response UpdateConsignmentReconciliationdefaultApplicationProblemPlusJSONResponse) VisitUpdateConsignmentReconciliationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ReviseConsignmentReconciliationRequestObject struct {
+	Id     Id `json:"id"`
+	Params ReviseConsignmentReconciliationParams
+	Body   *ReviseConsignmentReconciliationJSONRequestBody
+}
+
+type ReviseConsignmentReconciliationResponseObject interface {
+	VisitReviseConsignmentReconciliationResponse(w http.ResponseWriter) error
+}
+
+type ReviseConsignmentReconciliation200JSONResponse ConsignmentReconciliation
+
+func (response ReviseConsignmentReconciliation200JSONResponse) VisitReviseConsignmentReconciliationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ReviseConsignmentReconciliationdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ReviseConsignmentReconciliationdefaultApplicationProblemPlusJSONResponse) VisitReviseConsignmentReconciliationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type StartConsignmentReconciliationRequestObject struct {
+	Id     Id `json:"id"`
+	Params StartConsignmentReconciliationParams
+	Body   *StartConsignmentReconciliationJSONRequestBody
+}
+
+type StartConsignmentReconciliationResponseObject interface {
+	VisitStartConsignmentReconciliationResponse(w http.ResponseWriter) error
+}
+
+type StartConsignmentReconciliation200JSONResponse ConsignmentReconciliation
+
+func (response StartConsignmentReconciliation200JSONResponse) VisitStartConsignmentReconciliationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type StartConsignmentReconciliationdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response StartConsignmentReconciliationdefaultApplicationProblemPlusJSONResponse) VisitStartConsignmentReconciliationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SubmitConsignmentReconciliationRequestObject struct {
+	Id     Id `json:"id"`
+	Params SubmitConsignmentReconciliationParams
+	Body   *SubmitConsignmentReconciliationJSONRequestBody
+}
+
+type SubmitConsignmentReconciliationResponseObject interface {
+	VisitSubmitConsignmentReconciliationResponse(w http.ResponseWriter) error
+}
+
+type SubmitConsignmentReconciliation200JSONResponse ConsignmentReconciliation
+
+func (response SubmitConsignmentReconciliation200JSONResponse) VisitSubmitConsignmentReconciliationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SubmitConsignmentReconciliationdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response SubmitConsignmentReconciliationdefaultApplicationProblemPlusJSONResponse) VisitSubmitConsignmentReconciliationResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
@@ -7278,6 +9588,54 @@ type StrictServerInterface interface {
 	// ListSalesChannelOptions Channel & sub-channel aktif untuk form pesanan
 	// (GET /api/v1/sales/channel-options)
 	ListSalesChannelOptions(ctx context.Context, request ListSalesChannelOptionsRequestObject) (ListSalesChannelOptionsResponseObject, error)
+	// ListConsignmentDeliveries Daftar pengiriman konsinyasi & buffer vending (Penjualan › Konsinyasi, S-303)
+	// (GET /api/v1/sales/consignment-deliveries)
+	ListConsignmentDeliveries(ctx context.Context, request ListConsignmentDeliveriesRequestObject) (ListConsignmentDeliveriesResponseObject, error)
+	// CreateConsignmentDelivery Menyimpan draft pengiriman konsinyasi / buffer vending
+	// (POST /api/v1/sales/consignment-deliveries)
+	CreateConsignmentDelivery(ctx context.Context, request CreateConsignmentDeliveryRequestObject) (CreateConsignmentDeliveryResponseObject, error)
+	// GetConsignmentDelivery Detail pengiriman konsinyasi
+	// (GET /api/v1/sales/consignment-deliveries/{id})
+	GetConsignmentDelivery(ctx context.Context, request GetConsignmentDeliveryRequestObject) (GetConsignmentDeliveryResponseObject, error)
+	// UpdateConsignmentDelivery Mengubah draft pengiriman konsinyasi
+	// (PUT /api/v1/sales/consignment-deliveries/{id})
+	UpdateConsignmentDelivery(ctx context.Context, request UpdateConsignmentDeliveryRequestObject) (UpdateConsignmentDeliveryResponseObject, error)
+	// CancelConsignmentDelivery Batalkan draft pengiriman konsinyasi
+	// (POST /api/v1/sales/consignment-deliveries/{id}/cancel)
+	CancelConsignmentDelivery(ctx context.Context, request CancelConsignmentDeliveryRequestObject) (CancelConsignmentDeliveryResponseObject, error)
+	// ReceiveConsignmentDelivery Barang titipan diterima mitra (stok Tersedia di lokasi mitra)
+	// (POST /api/v1/sales/consignment-deliveries/{id}/receive)
+	ReceiveConsignmentDelivery(ctx context.Context, request ReceiveConsignmentDeliveryRequestObject) (ReceiveConsignmentDeliveryResponseObject, error)
+	// ShipConsignmentDelivery Kirim barang titipan (nomor DO, Transfer Stok, jurnal A-07 / A-24)
+	// (POST /api/v1/sales/consignment-deliveries/{id}/ship)
+	ShipConsignmentDelivery(ctx context.Context, request ShipConsignmentDeliveryRequestObject) (ShipConsignmentDeliveryResponseObject, error)
+	// ListConsignmentReconciliations Daftar Rekonsiliasi Konsinyasi (S-304)
+	// (GET /api/v1/sales/consignment-reconciliations)
+	ListConsignmentReconciliations(ctx context.Context, request ListConsignmentReconciliationsRequestObject) (ListConsignmentReconciliationsResponseObject, error)
+	// CreateConsignmentReconciliation Menyimpan draft rekonsiliasi (mitra, cut-off, stock count lokasi mitra)
+	// (POST /api/v1/sales/consignment-reconciliations)
+	CreateConsignmentReconciliation(ctx context.Context, request CreateConsignmentReconciliationRequestObject) (CreateConsignmentReconciliationResponseObject, error)
+	// GetConsignmentReconciliation Detail rekonsiliasi (dan data cetak Berita Acara Rekonsiliasi)
+	// (GET /api/v1/sales/consignment-reconciliations/{id})
+	GetConsignmentReconciliation(ctx context.Context, request GetConsignmentReconciliationRequestObject) (GetConsignmentReconciliationResponseObject, error)
+	// UpdateConsignmentReconciliationDraft Mengubah draft rekonsiliasi
+	// (PUT /api/v1/sales/consignment-reconciliations/{id})
+	UpdateConsignmentReconciliationDraft(ctx context.Context, request UpdateConsignmentReconciliationDraftRequestObject) (UpdateConsignmentReconciliationDraftResponseObject, error)
+	// CancelConsignmentReconciliation Batalkan rekonsiliasi Draft/Diproses
+	// (POST /api/v1/sales/consignment-reconciliations/{id}/cancel)
+	CancelConsignmentReconciliation(ctx context.Context, request CancelConsignmentReconciliationRequestObject) (CancelConsignmentReconciliationResponseObject, error)
+	// UpdateConsignmentReconciliation Isi laporan penjualan mitra per SKU, penyebab selisih, file laporan mitra & BA bertanda tangan
+	// (PUT /api/v1/sales/consignment-reconciliations/{id}/entries)
+	UpdateConsignmentReconciliation(ctx context.Context, request UpdateConsignmentReconciliationRequestObject) (UpdateConsignmentReconciliationResponseObject, error)
+	// ReviseConsignmentReconciliation Revisi rekonsiliasi yang ditolak
+	// (POST /api/v1/sales/consignment-reconciliations/{id}/revise)
+	ReviseConsignmentReconciliation(ctx context.Context, request ReviseConsignmentReconciliationRequestObject) (ReviseConsignmentReconciliationResponseObject, error)
+	// StartConsignmentReconciliation Mulai rekonsiliasi (nomor KSN; hitung stok awal, kiriman, tarikan, sisa fisik, terjual sistem)
+	// (POST /api/v1/sales/consignment-reconciliations/{id}/start)
+	StartConsignmentReconciliation(ctx context.Context, request StartConsignmentReconciliationRequestObject) (StartConsignmentReconciliationResponseObject, error)
+	// SubmitConsignmentReconciliation Ajukan Berita Acara Rekonsiliasi ke approval (Sales MT → Head Finance & Accounting)
+	// (POST /api/v1/sales/consignment-reconciliations/{id}/submit)
+	SubmitConsignmentReconciliation(ctx context.Context, request SubmitConsignmentReconciliationRequestObject) (SubmitConsignmentReconciliationResponseObject, error)
 	// ListCreditNotes Daftar Nota Kredit
 	// (GET /api/v1/sales/credit-notes)
 	ListCreditNotes(ctx context.Context, request ListCreditNotesRequestObject) (ListCreditNotesResponseObject, error)
@@ -7594,6 +9952,516 @@ func (sh *strictHandler) ListSalesChannelOptions(w http.ResponseWriter, r *http.
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(ListSalesChannelOptionsResponseObject); ok {
 		if err := validResponse.VisitListSalesChannelOptionsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListConsignmentDeliveries operation middleware
+func (sh *strictHandler) ListConsignmentDeliveries(w http.ResponseWriter, r *http.Request, params ListConsignmentDeliveriesParams) {
+	var request ListConsignmentDeliveriesRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListConsignmentDeliveries(ctx, request.(ListConsignmentDeliveriesRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListConsignmentDeliveries")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListConsignmentDeliveriesResponseObject); ok {
+		if err := validResponse.VisitListConsignmentDeliveriesResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreateConsignmentDelivery operation middleware
+func (sh *strictHandler) CreateConsignmentDelivery(w http.ResponseWriter, r *http.Request, params CreateConsignmentDeliveryParams) {
+	var request CreateConsignmentDeliveryRequestObject
+
+	request.Params = params
+
+	var body CreateConsignmentDeliveryJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CreateConsignmentDelivery(ctx, request.(CreateConsignmentDeliveryRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateConsignmentDelivery")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreateConsignmentDeliveryResponseObject); ok {
+		if err := validResponse.VisitCreateConsignmentDeliveryResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetConsignmentDelivery operation middleware
+func (sh *strictHandler) GetConsignmentDelivery(w http.ResponseWriter, r *http.Request, id Id) {
+	var request GetConsignmentDeliveryRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetConsignmentDelivery(ctx, request.(GetConsignmentDeliveryRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetConsignmentDelivery")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetConsignmentDeliveryResponseObject); ok {
+		if err := validResponse.VisitGetConsignmentDeliveryResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateConsignmentDelivery operation middleware
+func (sh *strictHandler) UpdateConsignmentDelivery(w http.ResponseWriter, r *http.Request, id Id, params UpdateConsignmentDeliveryParams) {
+	var request UpdateConsignmentDeliveryRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body UpdateConsignmentDeliveryJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateConsignmentDelivery(ctx, request.(UpdateConsignmentDeliveryRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateConsignmentDelivery")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdateConsignmentDeliveryResponseObject); ok {
+		if err := validResponse.VisitUpdateConsignmentDeliveryResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CancelConsignmentDelivery operation middleware
+func (sh *strictHandler) CancelConsignmentDelivery(w http.ResponseWriter, r *http.Request, id Id, params CancelConsignmentDeliveryParams) {
+	var request CancelConsignmentDeliveryRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body CancelConsignmentDeliveryJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CancelConsignmentDelivery(ctx, request.(CancelConsignmentDeliveryRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CancelConsignmentDelivery")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CancelConsignmentDeliveryResponseObject); ok {
+		if err := validResponse.VisitCancelConsignmentDeliveryResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ReceiveConsignmentDelivery operation middleware
+func (sh *strictHandler) ReceiveConsignmentDelivery(w http.ResponseWriter, r *http.Request, id Id, params ReceiveConsignmentDeliveryParams) {
+	var request ReceiveConsignmentDeliveryRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body ReceiveConsignmentDeliveryJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ReceiveConsignmentDelivery(ctx, request.(ReceiveConsignmentDeliveryRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ReceiveConsignmentDelivery")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ReceiveConsignmentDeliveryResponseObject); ok {
+		if err := validResponse.VisitReceiveConsignmentDeliveryResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ShipConsignmentDelivery operation middleware
+func (sh *strictHandler) ShipConsignmentDelivery(w http.ResponseWriter, r *http.Request, id Id, params ShipConsignmentDeliveryParams) {
+	var request ShipConsignmentDeliveryRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body ShipConsignmentDeliveryJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ShipConsignmentDelivery(ctx, request.(ShipConsignmentDeliveryRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ShipConsignmentDelivery")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ShipConsignmentDeliveryResponseObject); ok {
+		if err := validResponse.VisitShipConsignmentDeliveryResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListConsignmentReconciliations operation middleware
+func (sh *strictHandler) ListConsignmentReconciliations(w http.ResponseWriter, r *http.Request, params ListConsignmentReconciliationsParams) {
+	var request ListConsignmentReconciliationsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListConsignmentReconciliations(ctx, request.(ListConsignmentReconciliationsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListConsignmentReconciliations")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListConsignmentReconciliationsResponseObject); ok {
+		if err := validResponse.VisitListConsignmentReconciliationsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreateConsignmentReconciliation operation middleware
+func (sh *strictHandler) CreateConsignmentReconciliation(w http.ResponseWriter, r *http.Request, params CreateConsignmentReconciliationParams) {
+	var request CreateConsignmentReconciliationRequestObject
+
+	request.Params = params
+
+	var body CreateConsignmentReconciliationJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CreateConsignmentReconciliation(ctx, request.(CreateConsignmentReconciliationRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateConsignmentReconciliation")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreateConsignmentReconciliationResponseObject); ok {
+		if err := validResponse.VisitCreateConsignmentReconciliationResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetConsignmentReconciliation operation middleware
+func (sh *strictHandler) GetConsignmentReconciliation(w http.ResponseWriter, r *http.Request, id Id) {
+	var request GetConsignmentReconciliationRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetConsignmentReconciliation(ctx, request.(GetConsignmentReconciliationRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetConsignmentReconciliation")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetConsignmentReconciliationResponseObject); ok {
+		if err := validResponse.VisitGetConsignmentReconciliationResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateConsignmentReconciliationDraft operation middleware
+func (sh *strictHandler) UpdateConsignmentReconciliationDraft(w http.ResponseWriter, r *http.Request, id Id, params UpdateConsignmentReconciliationDraftParams) {
+	var request UpdateConsignmentReconciliationDraftRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body UpdateConsignmentReconciliationDraftJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateConsignmentReconciliationDraft(ctx, request.(UpdateConsignmentReconciliationDraftRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateConsignmentReconciliationDraft")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdateConsignmentReconciliationDraftResponseObject); ok {
+		if err := validResponse.VisitUpdateConsignmentReconciliationDraftResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CancelConsignmentReconciliation operation middleware
+func (sh *strictHandler) CancelConsignmentReconciliation(w http.ResponseWriter, r *http.Request, id Id, params CancelConsignmentReconciliationParams) {
+	var request CancelConsignmentReconciliationRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body CancelConsignmentReconciliationJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CancelConsignmentReconciliation(ctx, request.(CancelConsignmentReconciliationRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CancelConsignmentReconciliation")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CancelConsignmentReconciliationResponseObject); ok {
+		if err := validResponse.VisitCancelConsignmentReconciliationResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateConsignmentReconciliation operation middleware
+func (sh *strictHandler) UpdateConsignmentReconciliation(w http.ResponseWriter, r *http.Request, id Id, params UpdateConsignmentReconciliationParams) {
+	var request UpdateConsignmentReconciliationRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body UpdateConsignmentReconciliationJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateConsignmentReconciliation(ctx, request.(UpdateConsignmentReconciliationRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateConsignmentReconciliation")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdateConsignmentReconciliationResponseObject); ok {
+		if err := validResponse.VisitUpdateConsignmentReconciliationResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ReviseConsignmentReconciliation operation middleware
+func (sh *strictHandler) ReviseConsignmentReconciliation(w http.ResponseWriter, r *http.Request, id Id, params ReviseConsignmentReconciliationParams) {
+	var request ReviseConsignmentReconciliationRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body ReviseConsignmentReconciliationJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ReviseConsignmentReconciliation(ctx, request.(ReviseConsignmentReconciliationRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ReviseConsignmentReconciliation")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ReviseConsignmentReconciliationResponseObject); ok {
+		if err := validResponse.VisitReviseConsignmentReconciliationResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// StartConsignmentReconciliation operation middleware
+func (sh *strictHandler) StartConsignmentReconciliation(w http.ResponseWriter, r *http.Request, id Id, params StartConsignmentReconciliationParams) {
+	var request StartConsignmentReconciliationRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body StartConsignmentReconciliationJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.StartConsignmentReconciliation(ctx, request.(StartConsignmentReconciliationRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "StartConsignmentReconciliation")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(StartConsignmentReconciliationResponseObject); ok {
+		if err := validResponse.VisitStartConsignmentReconciliationResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// SubmitConsignmentReconciliation operation middleware
+func (sh *strictHandler) SubmitConsignmentReconciliation(w http.ResponseWriter, r *http.Request, id Id, params SubmitConsignmentReconciliationParams) {
+	var request SubmitConsignmentReconciliationRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body SubmitConsignmentReconciliationJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.SubmitConsignmentReconciliation(ctx, request.(SubmitConsignmentReconciliationRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "SubmitConsignmentReconciliation")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(SubmitConsignmentReconciliationResponseObject); ok {
+		if err := validResponse.VisitSubmitConsignmentReconciliationResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

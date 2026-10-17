@@ -26,6 +26,7 @@ const (
 	StatusCancelled       Status = "cancelled"
 	StatusExpired         Status = "expired"
 	StatusPosted          Status = "posted"
+	StatusRejected        Status = "rejected"
 )
 
 var statusLabels = map[Status]string{
@@ -33,6 +34,7 @@ var statusLabels = map[Status]string{
 	StatusPartiallyPaid: "Dibayar Sebagian", StatusPaid: "Lunas", StatusInProgress: "Diproses",
 	StatusInTransit: "Dalam Pengiriman", StatusCompleted: "Selesai", StatusCancelled: "Dibatalkan",
 	StatusExpired: "Kedaluwarsa", StatusPosted: "Diposting", StatusSubmitted: "Diajukan", StatusVerified: "Terverifikasi",
+	StatusRejected: "Ditolak",
 }
 
 // Label mengembalikan label UI status.

@@ -6,6 +6,11 @@
 // penjualan/HPP per channel (A-05, A-06, A-10, A-PB). Logistik (DO, Outbound, kurir) memanggil ShippableOrder,
 // MarkShipped/MarkHandedOver, dan MarkDelivered di transaksi dokumennya; rekonsiliasi bank memakai
 // IncomingPayments/Payment.
+//
+// Konsinyasi (S-303 – S-305, S-313): pengiriman titipan ke lokasi konsinyasi / buffer vending mitra hanya dengan PKS
+// konsinyasi berlaku (Transfer Stok + jurnal A-07/A-24), dan Rekonsiliasi Konsinyasi bulanan (KSN) yang disetujui
+// Sales MT → Head F&A lalu menerbitkan invoice konsinyasi (A-08) dan memproses selisih (A-23). Modul logistics (DO
+// konsinyasi) memanggil ShipConsignment/ConfirmConsignmentReceived di transaksi DO-nya.
 package sales
 
 import (
@@ -82,6 +87,31 @@ type (
 	// Invoice adalah invoice NON-PKP / piutang per invoice.
 	Invoice = domain.Invoice
 
+	// ConsignmentDelivery adalah pengiriman titipan ke lokasi konsinyasi / buffer vending mitra.
+	ConsignmentDelivery = domain.ConsignmentDelivery
+	// ConsignmentShipmentInput adalah input ShipConsignment (DO konsinyasi dari logistics).
+	ConsignmentShipmentInput = service.ConsignmentShipmentInput
+	// DeliveryLineInput adalah baris pengiriman titipan.
+	DeliveryLineInput = domain.DeliveryLineInput
+	// DeliveryType adalah jenis pengiriman titipan.
+	DeliveryType = domain.DeliveryType
+	// Reconciliation adalah Rekonsiliasi Konsinyasi (KSN).
+	Reconciliation = domain.Reconciliation
+	// VarianceRules adalah ketentuan selisih PKS per penyebab.
+	VarianceRules = domain.VarianceRules
+	// BorneBy adalah penanggung selisih.
+	BorneBy = domain.BorneBy
+
+	ConsignmentStock    = service.ConsignmentStock
+	Agreements          = service.Agreements
+	StockFlows          = service.StockFlows
+	AgreementRef        = service.AgreementRef
+	StockTransferInput  = service.StockTransferInput
+	StockTransferResult = service.StockTransferResult
+	TransferredLine     = service.TransferredLine
+	StockCountRef       = service.StockCountRef
+	CountedLine         = service.CountedLine
+
 	Catalog   = service.Catalog
 	Parties   = service.Parties
 	Locations = service.Locations
@@ -140,6 +170,21 @@ const (
 	DocInvoice    = service.DocInvoice
 	DocPayment    = service.DocPayment
 
+	DocDeliveryOrder  = service.DocDeliveryOrder
+	DocReconciliation = service.DocReconciliation
+
+	DeliveryConsignment   = domain.DeliveryConsignment
+	DeliveryVendingBuffer = domain.DeliveryVendingBuffer
+	BorneByPartner        = domain.BorneByPartner
+	BorneByBalans         = domain.BorneByBalans
+
+	PermReconciliationRead = service.PermReconciliationRead
+	// SourceReconciliation adalah source_type issue stok & jurnal A-08/A-23 Rekonsiliasi Konsinyasi.
+	SourceReconciliation = service.SourceReconciliation
+	// FileOwnerConsignmentBA dan FileOwnerConsignmentReport: BA bertanda tangan dan laporan penjualan mitra.
+	FileOwnerConsignmentBA     = service.FileOwnerConsignmentBA
+	FileOwnerConsignmentReport = service.FileOwnerConsignmentReport
+
 	PartyCustomer = domain.PartyCustomer
 	PartyPartner  = domain.PartyPartner
 
@@ -185,6 +230,10 @@ type Deps struct {
 	Numberer  Numberer
 	Files     Files
 	Users     Users
+	// Consignment, Agreements, Flows: dependensi konsinyasi (warehouse, party, inventory).
+	Consignment ConsignmentStock
+	Agreements  Agreements
+	Flows       StockFlows
 	// ProformaValidDays: masa berlaku Proforma Invoice (0 = 14 hari).
 	ProformaValidDays int
 	// BaseURL adalah URL ERP untuk tautan invoice di teks WhatsApp.
@@ -212,7 +261,8 @@ func New(d Deps) *Module {
 		docs: service.NewDocumentService(service.Deps{
 			Store: store, Tx: d.Tx, Audit: d.Audit, Clock: d.Clock, Log: d.Log, Catalog: d.Catalog, Parties: d.Parties,
 			Locations: d.Locations, Pricing: d.Pricing, Stock: d.Stock, Ledger: d.Ledger, Approvals: d.Approvals,
-			Numberer: d.Numberer, Files: d.Files, Users: d.Users, ProformaValidDays: d.ProformaValidDays, BaseURL: d.BaseURL,
+			Numberer: d.Numberer, Files: d.Files, Users: d.Users, Consignment: d.Consignment, Agreements: d.Agreements,
+			Flows: d.Flows, ProformaValidDays: d.ProformaValidDays, BaseURL: d.BaseURL,
 		}),
 		rs: d.Responder,
 	}
@@ -253,6 +303,9 @@ func AuditEntities() map[string]string {
 		service.EntityProforma:         service.PermProformaRead,
 		service.EntityInvoice:          service.PermInvoiceRead,
 		service.EntityCustomerPayment:  service.PermPaymentRead,
+		// Pengiriman konsinyasi dibaca dengan sales.sales_order.read (Logistik membuka lewat dokumen DO).
+		service.EntityConsignmentDelivery: service.PermOrderRead,
+		service.EntityReconciliation:      service.PermReconciliationRead,
 	}
 }
 
@@ -261,12 +314,33 @@ type ApprovalRegistrar interface {
 	RegisterHandler(t approval.SubjectType, readPermission string, h approval.Handler)
 }
 
-// RegisterApprovalHandlers mendaftarkan handler approval `sales_order_discount` (diskon di atas batas role).
-// Dipanggil SETELAH handler dev agar menggantikannya.
+// RegisterApprovalHandlers mendaftarkan handler approval `sales_order_discount` (diskon di atas batas role) dan
+// `consignment_reconciliation` (disetujui → invoice + jurnal A-08/A-23; ditolak → bisa direvisi). Dipanggil
+// SETELAH handler dev agar menggantikannya.
 func (m *Module) RegisterApprovalHandlers(r ApprovalRegistrar) {
 	r.RegisterHandler(approval.SubjectSalesOrderDiscount, service.PermOrderRead, approval.Handler{
 		OnApproved: m.docs.OnDiscountApproved, OnRejected: m.docs.OnDiscountRejected,
 	})
+	r.RegisterHandler(approval.SubjectConsignmentReconciliation, service.PermReconciliationRead, approval.Handler{
+		OnApproved: m.docs.OnReconciliationApproved, OnRejected: m.docs.OnReconciliationRejected,
+	})
+}
+
+// --- API untuk logistics: DO konsinyasi / buffer vending (integrasi S-303 ↔ S-309) ----------
+
+// ShipConsignment mencatat barang titipan keluar lewat dokumen logistik (DO konsinyasi/buffer vending ship) di
+// transaksi pemanggil: PKS konsinyasi wajib berlaku pada tanggal kirim, stok FEFO dipindah ke lokasi konsinyasi /
+// buffer vending mitra lewat warehouse.TransferStock (Dalam Pengiriman), dan jurnal A-07 (Dr 1312 Cr 1311) atau
+// A-24 (Dr 1313 Cr 1311) sebesar nilai FIFO dibuat dengan dimensi channel konsinyasi/vending + sub-channel mitra.
+// Idempotent per (SourceType, SourceID). Logistik TIDAK memindah stok atau memposting jurnal sendiri.
+func (m *Module) ShipConsignment(ctx context.Context, in ConsignmentShipmentInput) (ConsignmentDelivery, error) {
+	return m.docs.ShipConsignment(ctx, in)
+}
+
+// ConfirmConsignmentReceived menandai pengiriman titipan diterima mitra (DO deliver): transfer Dalam Pengiriman →
+// Tersedia di lokasi mitra.
+func (m *Module) ConfirmConsignmentReceived(ctx context.Context, deliveryID uuid.UUID) (ConsignmentDelivery, error) {
+	return m.docs.ConfirmConsignmentReceived(ctx, deliveryID)
 }
 
 // ReturnReason membaca alasan retur (belum dihapus) untuk dokumen retur penjualan/pembelian; NOT_FOUND bila

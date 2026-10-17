@@ -1209,6 +1209,403 @@ paths:
                 $ref: '#/components/schemas/CreditNote'
         default:
           $ref: '#/components/responses/Problem'
+  /api/v1/sales/consignment-deliveries:
+    get:
+      operationId: listConsignmentDeliveries
+      tags:
+        - sales
+      summary: Daftar pengiriman konsinyasi & buffer vending (Penjualan › Konsinyasi, S-303)
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Search'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/ConsignmentDeliveryStatus'
+        - name: deliveryType
+          in: query
+          schema:
+            $ref: '#/components/schemas/ConsignmentDeliveryType'
+        - name: partnerId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Pengiriman terbaru lebih dulu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentDeliveryList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createConsignmentDelivery
+      tags:
+        - sales
+      summary: Menyimpan draft pengiriman konsinyasi / buffer vending
+      description: |
+        Hanya bila mitra punya PKS konsinyasi berlaku pada tanggal kirim (`party.RequireActiveAgreement`). Tujuan =
+        lokasi konsinyasi (atau buffer vending) milik mitra; lokasi asal FG Non-Ecommerce.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsignmentDeliveryInput'
+      responses:
+        '201':
+          description: Draft pengiriman
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentDelivery'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/consignment-deliveries/{id}:
+    get:
+      operationId: getConsignmentDelivery
+      tags:
+        - sales
+      summary: Detail pengiriman konsinyasi
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Pengiriman
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentDelivery'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      operationId: updateConsignmentDelivery
+      tags:
+        - sales
+      summary: Mengubah draft pengiriman konsinyasi
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsignmentDeliveryUpdate'
+      responses:
+        '200':
+          description: Pengiriman
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentDelivery'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/consignment-deliveries/{id}/ship:
+    post:
+      operationId: shipConsignmentDelivery
+      tags:
+        - sales
+      summary: Kirim barang titipan (nomor DO, Transfer Stok, jurnal A-07 / A-24)
+      description: |
+        Logistik (`logistics.delivery_order.post`). PKS diperiksa ulang; stok FEFO pindah ke lokasi mitra berstatus
+        Dalam Pengiriman; jurnal A-07 (Dr 1312 Cr 1311) atau A-24 (Dr 1313 Cr 1311) sebesar nilai FIFO dengan dimensi
+        channel konsinyasi/vending + sub-channel mitra.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Pengiriman Dalam Pengiriman
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentDelivery'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/consignment-deliveries/{id}/receive:
+    post:
+      operationId: receiveConsignmentDelivery
+      tags:
+        - sales
+      summary: Barang titipan diterima mitra (stok Tersedia di lokasi mitra)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Pengiriman Selesai
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentDelivery'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/consignment-deliveries/{id}/cancel:
+    post:
+      operationId: cancelConsignmentDelivery
+      tags:
+        - sales
+      summary: Batalkan draft pengiriman konsinyasi
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesCancelInput'
+      responses:
+        '200':
+          description: Pengiriman dibatalkan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentDelivery'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/consignment-reconciliations:
+    get:
+      operationId: listConsignmentReconciliations
+      tags:
+        - sales
+      summary: Daftar Rekonsiliasi Konsinyasi (S-304)
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Search'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/ConsignmentReconciliationStatus'
+        - name: partnerId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Cut-off terbaru lebih dulu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentReconciliationList'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createConsignmentReconciliation
+      tags:
+        - sales
+      summary: Menyimpan draft rekonsiliasi (mitra, cut-off, stock count lokasi mitra)
+      description: |
+        Stock count harus berjenis konsinyasi, Selesai, di lokasi konsinyasi mitra, dan bertanggal paling jauh 7 hari
+        dari cut-off. Satu rekonsiliasi terbuka per mitra.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsignmentReconciliationInput'
+      responses:
+        '201':
+          description: Draft rekonsiliasi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentReconciliation'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/consignment-reconciliations/{id}:
+    get:
+      operationId: getConsignmentReconciliation
+      tags:
+        - sales
+      summary: Detail rekonsiliasi (dan data cetak Berita Acara Rekonsiliasi)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Rekonsiliasi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentReconciliation'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      operationId: updateConsignmentReconciliationDraft
+      tags:
+        - sales
+      summary: Mengubah draft rekonsiliasi
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsignmentReconciliationDraftUpdate'
+      responses:
+        '200':
+          description: Rekonsiliasi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentReconciliation'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/consignment-reconciliations/{id}/start:
+    post:
+      operationId: startConsignmentReconciliation
+      tags:
+        - sales
+      summary: Mulai rekonsiliasi (nomor KSN; hitung stok awal, kiriman, tarikan, sisa fisik, terjual sistem)
+      description: |
+        PKS konsinyasi berlaku pada cut-off disalin (harga, termin, ketentuan selisih). Periode = hari setelah cut-off
+        rekonsiliasi Diposting sebelumnya (atau tanggal 1 bulan cut-off) s.d. cut-off. Terjual sistem = stok awal +
+        kiriman − tarikan − sisa fisik. Harga konsinyasi dari resolver harga (daftar harga PKS).
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Rekonsiliasi Diproses
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentReconciliation'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/consignment-reconciliations/{id}/entries:
+    put:
+      operationId: updateConsignmentReconciliation
+      tags:
+        - sales
+      summary: Isi laporan penjualan mitra per SKU, penyebab selisih, file laporan mitra & BA bertanda tangan
+      description: |
+        File diunggah lewat `/api/v1/files` dengan `ownerType=sales.consignment_partner_report` (laporan mitra) atau
+        `sales.consignment_ba` (BA bertanda tangan). Ditanggung oleh dihitung dari ketentuan selisih PKS.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsignmentReconciliationUpdate'
+      responses:
+        '200':
+          description: Rekonsiliasi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentReconciliation'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/consignment-reconciliations/{id}/submit:
+    post:
+      operationId: submitConsignmentReconciliation
+      tags:
+        - sales
+      summary: Ajukan Berita Acara Rekonsiliasi ke approval (Sales MT → Head Finance & Accounting)
+      description: |
+        Wajib BA bertanda tangan, sisa fisik ≤ saldo sistem, dan penyebab untuk setiap selisih. Disetujui level
+        terakhir → stok terjual & selisih keluar dari lokasi mitra, invoice konsinyasi (A-08) dan invoice selisih yang
+        ditagih ke mitra (A-23), selisih ditanggung Balans ke Beban Kehilangan Persediaan (A-23), status Diposting.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Menunggu Persetujuan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentReconciliation'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/consignment-reconciliations/{id}/revise:
+    post:
+      operationId: reviseConsignmentReconciliation
+      tags:
+        - sales
+      summary: Revisi rekonsiliasi yang ditolak
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Rekonsiliasi Diproses
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentReconciliation'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/sales/consignment-reconciliations/{id}/cancel:
+    post:
+      operationId: cancelConsignmentReconciliation
+      tags:
+        - sales
+      summary: Batalkan rekonsiliasi Draft/Diproses
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesCancelInput'
+      responses:
+        '200':
+          description: Rekonsiliasi dibatalkan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsignmentReconciliation'
+        default:
+          $ref: '#/components/responses/Problem'
   /api/v1/webhooks/biteship:
     post:
       operationId: receiveBiteshipWebhook
@@ -11982,6 +12379,554 @@ components:
         reference:
           type: string
           maxLength: 200
+    ConsignmentDeliveryStatus:
+      type: string
+      enum:
+        - draft
+        - in_transit
+        - completed
+        - cancelled
+    ConsignmentDeliveryType:
+      type: string
+      description: '`consignment` ke lokasi konsinyasi mitra (A-07), `vending_buffer` ke buffer vending (A-24).'
+      enum:
+        - consignment
+        - vending_buffer
+    ConsignmentDeliverySummary:
+      type: object
+      required:
+        - id
+        - deliveryType
+        - partnerId
+        - partnerCode
+        - partnerName
+        - businessDate
+        - status
+        - transferNumber
+        - costAmount
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+          nullable: true
+        deliveryType:
+          $ref: '#/components/schemas/ConsignmentDeliveryType'
+        partnerId:
+          type: string
+          format: uuid
+        partnerCode:
+          type: string
+        partnerName:
+          type: string
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        status:
+          $ref: '#/components/schemas/ConsignmentDeliveryStatus'
+        transferNumber:
+          type: string
+        costAmount:
+          $ref: '#/components/schemas/Money'
+        version:
+          type: integer
+    ConsignmentDeliveryList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/ConsignmentDeliverySummary'
+    ConsignmentDeliveryLineInput:
+      type: object
+      required:
+        - productId
+        - qty
+      properties:
+        productId:
+          type: string
+          format: uuid
+        qty:
+          $ref: '#/components/schemas/SalesQuantity'
+        note:
+          type: string
+          maxLength: 200
+    ConsignmentDeliveryFields:
+      type: object
+      required:
+        - fromLocationId
+        - businessDate
+        - lines
+      properties:
+        fromLocationId:
+          type: string
+          format: uuid
+        businessDate:
+          $ref: '#/components/schemas/BusinessDate'
+        note:
+          type: string
+          maxLength: 1000
+        lines:
+          type: array
+          minItems: 1
+          maxItems: 200
+          items:
+            $ref: '#/components/schemas/ConsignmentDeliveryLineInput'
+    ConsignmentDeliveryInput:
+      allOf:
+        - $ref: '#/components/schemas/ConsignmentDeliveryFields'
+        - type: object
+          required:
+            - deliveryType
+            - partnerId
+          properties:
+            deliveryType:
+              $ref: '#/components/schemas/ConsignmentDeliveryType'
+            partnerId:
+              type: string
+              format: uuid
+    ConsignmentDeliveryLine:
+      type: object
+      required:
+        - id
+        - lineNo
+        - product
+        - qty
+        - costAmount
+        - note
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        product:
+          $ref: '#/components/schemas/SalesProductRef'
+        batchId:
+          type: string
+          format: uuid
+          nullable: true
+        qty:
+          type: string
+        costAmount:
+          $ref: '#/components/schemas/Money'
+        note:
+          type: string
+    ConsignmentDelivery:
+      allOf:
+        - $ref: '#/components/schemas/ConsignmentDeliverySummary'
+        - type: object
+          required:
+            - agreementNumber
+            - fromLocation
+            - toLocation
+            - channelName
+            - subChannelName
+            - sourceType
+            - note
+            - cancelReason
+            - createdAt
+            - createdByName
+            - updatedAt
+            - lines
+            - allowedActions
+          properties:
+            agreementNumber:
+              type: string
+            fromLocation:
+              $ref: '#/components/schemas/SalesLocationRef'
+            toLocation:
+              $ref: '#/components/schemas/SalesLocationRef'
+            channelName:
+              type: string
+            subChannelName:
+              type: string
+            sourceType:
+              type: string
+            transferId:
+              type: string
+              format: uuid
+              nullable: true
+            note:
+              type: string
+            cancelReason:
+              type: string
+            shippedAt:
+              type: string
+              format: date-time
+              nullable: true
+            receivedAt:
+              type: string
+              format: date-time
+              nullable: true
+            createdAt:
+              type: string
+              format: date-time
+            createdByName:
+              type: string
+            updatedAt:
+              type: string
+              format: date-time
+            lines:
+              type: array
+              items:
+                $ref: '#/components/schemas/ConsignmentDeliveryLine'
+            allowedActions:
+              type: array
+              items:
+                type: string
+    ConsignmentDeliveryUpdate:
+      allOf:
+        - $ref: '#/components/schemas/ConsignmentDeliveryFields'
+        - $ref: '#/components/schemas/VersionInput'
+    ConsignmentReconciliationStatus:
+      type: string
+      enum:
+        - draft
+        - in_progress
+        - pending_approval
+        - rejected
+        - posted
+        - cancelled
+    ConsignmentReconciliationSummary:
+      type: object
+      required:
+        - id
+        - partnerId
+        - partnerCode
+        - partnerName
+        - cutOffDate
+        - stockCountNumber
+        - status
+        - salesAmount
+        - billedVarianceAmount
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+          nullable: true
+        partnerId:
+          type: string
+          format: uuid
+        partnerCode:
+          type: string
+        partnerName:
+          type: string
+        periodStart:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
+        cutOffDate:
+          $ref: '#/components/schemas/BusinessDate'
+        stockCountNumber:
+          type: string
+        status:
+          $ref: '#/components/schemas/ConsignmentReconciliationStatus'
+        salesAmount:
+          $ref: '#/components/schemas/Money'
+        billedVarianceAmount:
+          $ref: '#/components/schemas/Money'
+        version:
+          type: integer
+    ConsignmentReconciliationList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/ConsignmentReconciliationSummary'
+    ConsignmentReconciliationFields:
+      type: object
+      required:
+        - cutOffDate
+        - stockCountId
+      properties:
+        cutOffDate:
+          $ref: '#/components/schemas/BusinessDate'
+        stockCountId:
+          type: string
+          format: uuid
+        note:
+          type: string
+          maxLength: 1000
+    ConsignmentReconciliationInput:
+      allOf:
+        - $ref: '#/components/schemas/ConsignmentReconciliationFields'
+        - type: object
+          required:
+            - partnerId
+          properties:
+            partnerId:
+              type: string
+              format: uuid
+    ConsignmentBorneBy:
+      type: string
+      enum:
+        - partner
+        - balans
+    ConsignmentVarianceRules:
+      type: object
+      required:
+        - lost
+        - partnerDamage
+        - productDefect
+        - nearExpiry
+      properties:
+        lost:
+          $ref: '#/components/schemas/ConsignmentBorneBy'
+        partnerDamage:
+          $ref: '#/components/schemas/ConsignmentBorneBy'
+        productDefect:
+          $ref: '#/components/schemas/ConsignmentBorneBy'
+        nearExpiry:
+          $ref: '#/components/schemas/ConsignmentBorneBy'
+    ConsignmentVarianceCause:
+      type: string
+      description: Penyebab selisih (BRD U-02).
+      enum:
+        - lost
+        - partner_damage
+        - product_defect
+        - near_expiry
+    ConsignmentReconciliationLine:
+      type: object
+      required:
+        - id
+        - lineNo
+        - product
+        - openingQty
+        - deliveredQty
+        - returnedQty
+        - countedQty
+        - soldQty
+        - reportedQty
+        - varianceQty
+        - unitPrice
+        - priceRule
+        - priceDescription
+        - salesAmount
+        - varianceAmount
+        - costAmount
+        - varianceCostAmount
+        - note
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        product:
+          $ref: '#/components/schemas/SalesProductRef'
+        openingQty:
+          type: string
+        deliveredQty:
+          type: string
+        returnedQty:
+          type: string
+        countedQty:
+          type: string
+        soldQty:
+          type: string
+          description: Terjual sistem = stok awal + kiriman − tarikan − sisa fisik.
+        reportedQty:
+          type: string
+        varianceQty:
+          type: string
+        varianceCause:
+          allOf:
+            - $ref: '#/components/schemas/ConsignmentVarianceCause'
+          nullable: true
+        borneBy:
+          allOf:
+            - $ref: '#/components/schemas/ConsignmentBorneBy'
+          nullable: true
+        unitPrice:
+          $ref: '#/components/schemas/Money'
+        priceRule:
+          type: string
+        priceDescription:
+          type: string
+        salesAmount:
+          $ref: '#/components/schemas/Money'
+        varianceAmount:
+          $ref: '#/components/schemas/Money'
+        costAmount:
+          $ref: '#/components/schemas/Money'
+        varianceCostAmount:
+          $ref: '#/components/schemas/Money'
+        note:
+          type: string
+    ConsignmentReconciliation:
+      allOf:
+        - $ref: '#/components/schemas/ConsignmentReconciliationSummary'
+        - type: object
+          required:
+            - partnerAddress
+            - agreementNumber
+            - paymentTermDays
+            - varianceRules
+            - location
+            - channelName
+            - subChannelName
+            - stockCountId
+            - partnerReportFileName
+            - baFileName
+            - note
+            - absorbedVarianceCost
+            - costAmount
+            - invoiceNumber
+            - varianceInvoiceNumber
+            - decisionNote
+            - cancelReason
+            - createdAt
+            - createdByName
+            - updatedAt
+            - lines
+            - allowedActions
+          properties:
+            partnerAddress:
+              type: string
+            agreementNumber:
+              type: string
+            paymentTermDays:
+              type: integer
+            marginPercent:
+              type: string
+              nullable: true
+            varianceRules:
+              $ref: '#/components/schemas/ConsignmentVarianceRules'
+            location:
+              $ref: '#/components/schemas/SalesLocationRef'
+            channelName:
+              type: string
+            subChannelName:
+              type: string
+            stockCountId:
+              type: string
+              format: uuid
+            partnerReportFileId:
+              type: string
+              format: uuid
+              nullable: true
+            partnerReportFileName:
+              type: string
+            baFileId:
+              type: string
+              format: uuid
+              nullable: true
+            baFileName:
+              type: string
+            note:
+              type: string
+            absorbedVarianceCost:
+              $ref: '#/components/schemas/Money'
+            costAmount:
+              $ref: '#/components/schemas/Money'
+            invoiceId:
+              type: string
+              format: uuid
+              nullable: true
+            invoiceNumber:
+              type: string
+            varianceInvoiceId:
+              type: string
+              format: uuid
+              nullable: true
+            varianceInvoiceNumber:
+              type: string
+            submittedAt:
+              type: string
+              format: date-time
+              nullable: true
+            decidedAt:
+              type: string
+              format: date-time
+              nullable: true
+            decisionNote:
+              type: string
+            postedAt:
+              type: string
+              format: date-time
+              nullable: true
+            cancelReason:
+              type: string
+            createdAt:
+              type: string
+              format: date-time
+            createdByName:
+              type: string
+            updatedAt:
+              type: string
+              format: date-time
+            lines:
+              type: array
+              items:
+                $ref: '#/components/schemas/ConsignmentReconciliationLine'
+            allowedActions:
+              type: array
+              items:
+                type: string
+    ConsignmentReconciliationDraftUpdate:
+      allOf:
+        - $ref: '#/components/schemas/ConsignmentReconciliationFields'
+        - $ref: '#/components/schemas/VersionInput'
+    ConsignmentReconciliationLineEntry:
+      type: object
+      required:
+        - lineId
+        - reportedQty
+      properties:
+        lineId:
+          type: string
+          format: uuid
+        reportedQty:
+          type: string
+          description: Qty terjual menurut laporan penjualan mitra.
+        varianceCause:
+          allOf:
+            - $ref: '#/components/schemas/ConsignmentVarianceCause'
+          nullable: true
+        note:
+          type: string
+          maxLength: 200
+    ConsignmentReconciliationUpdate:
+      type: object
+      required:
+        - version
+      properties:
+        version:
+          type: integer
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsignmentReconciliationLineEntry'
+        setFiles:
+          type: boolean
+          description: true = laporan mitra dan BA diganti dengan nilai di bawah (kosong = dilepas).
+        partnerReportFileId:
+          type: string
+          format: uuid
+          nullable: true
+        baFileId:
+          type: string
+          format: uuid
+          nullable: true
+        note:
+          type: string
+          maxLength: 1000
+          nullable: true
     BiteshipNotification:
       type: object
       description: Payload webhook status order Biteship (nama field milik Biteship).
