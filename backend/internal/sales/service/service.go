@@ -165,6 +165,7 @@ type Stock interface {
 	Post(ctx context.Context, p inventory.Posting) (inventory.PostingResult, error)
 	Reserve(ctx context.Context, r inventory.ReserveRequest) (inventory.PostingResult, error)
 	Release(ctx context.Context, r inventory.ReleaseRequest) (inventory.PostingResult, error)
+	Batch(ctx context.Context, id uuid.UUID) (inventory.Batch, error)
 }
 
 // Ledger membaca dimensi & akun dan membuat jurnal otomatis (modul accounting).

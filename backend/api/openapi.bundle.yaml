@@ -6440,6 +6440,13 @@ components:
           type: string
           format: uuid
           nullable: true
+        batchNumber:
+          type: string
+          nullable: true
+        expiryDate:
+          allOf:
+            - $ref: '#/components/schemas/BusinessDate'
+          nullable: true
         qty:
           $ref: '#/components/schemas/SalesQuantity'
     SalesOrderAllocation:

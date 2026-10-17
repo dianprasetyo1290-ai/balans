@@ -56,6 +56,7 @@ const DATA_EXCHANGE_PERMISSIONS = [
   "hris.employee",
   "accounting.account",
   "warehouse.location",
+  "sales.marketplace_order",
 ].flatMap((r) => [`${r}.import`, `${r}.export`])
 
 const items = (...labels: string[]): MenuItem[] =>
@@ -291,19 +292,50 @@ export const MENU: MenuGroup[] = [
     icon: ShoppingBagIcon,
     modules: ["sales", "pricing"],
     items: [
-      ...items(
-        "Sales Order",
-        "Modern Trade",
-        "Konsinyasi",
-        "Penjualan Marketplace",
-        "Pesanan WhatsApp/Instagram",
-        "Penjualan Karyawan",
-        "Proforma Invoice",
-        "Invoice",
-        "Retur Penjualan",
-        "Nota Kredit",
-        "Rekonsiliasi Konsinyasi"
-      ),
+      {
+        label: "Sales Order",
+        to: "/sales/orders",
+        permission: ["sales.sales_order.read", "sales.marketplace_order.read"],
+        module: "sales",
+      },
+      {
+        label: "Modern Trade",
+        to: "/sales/modern-trade",
+        permission: "sales.sales_order.read",
+        module: "sales",
+      },
+      { label: "Konsinyasi" },
+      {
+        label: "Penjualan Marketplace",
+        to: "/sales/marketplace",
+        permission: "sales.marketplace_order.read",
+        module: "sales",
+      },
+      {
+        label: "Pesanan WhatsApp/Instagram",
+        to: "/sales/social-commerce",
+        permission: "sales.sales_order.read",
+        module: "sales",
+      },
+      {
+        label: "Penjualan Karyawan",
+        to: "/sales/employee-sales",
+        permission: "sales.sales_order.read",
+        module: "sales",
+      },
+      {
+        label: "Proforma Invoice",
+        to: "/sales/proforma-invoices",
+        permission: ["sales.proforma_invoice.read", "sales.invoice.read"],
+        module: "sales",
+      },
+      {
+        label: "Invoice",
+        to: "/sales/invoices",
+        permission: ["sales.invoice.read", "accounting.payment.read"],
+        module: "sales",
+      },
+      ...items("Retur Penjualan", "Nota Kredit", "Rekonsiliasi Konsinyasi"),
       {
         label: "Harga & Diskon",
         to: "/sales/pricing",
@@ -452,8 +484,13 @@ export const MENU: MenuGroup[] = [
         permission: "accounting.journal.read",
         module: "accounting",
       },
+      {
+        label: "Piutang Usaha",
+        to: "/finance/receivables",
+        permission: ["accounting.payment.read", "sales.invoice.read"],
+        module: "sales",
+      },
       ...items(
-        "Piutang Usaha",
         "Utang Usaha",
         "Kas & Bank",
         "Rekonsiliasi Bank",
@@ -483,25 +520,34 @@ export const MENU: MenuGroup[] = [
       "storefront",
       "logistics",
     ],
-    items: items(
-      "Laporan Stok",
-      "Laporan Mutasi Stok",
-      "Laporan Stock Count",
-      "Laporan HPP",
-      "Laporan Kedaluwarsa",
-      "Laporan Penjualan",
-      "Laporan Konsinyasi",
-      "Laporan Retur",
-      "Laporan Pemakaian Internal",
-      "Laporan Pengiriman",
-      "Laporan Piutang",
-      "Laporan Utang",
-      "Laporan Laba Rugi per Dimensi",
-      "Laporan Pajak",
-      "Laporan Pipeline",
-      "Laporan HR",
-      "Laporan E-commerce"
-    ),
+    items: [
+      ...items(
+        "Laporan Stok",
+        "Laporan Mutasi Stok",
+        "Laporan Stock Count",
+        "Laporan HPP",
+        "Laporan Kedaluwarsa",
+        "Laporan Penjualan",
+        "Laporan Konsinyasi",
+        "Laporan Retur",
+        "Laporan Pemakaian Internal",
+        "Laporan Pengiriman"
+      ),
+      {
+        label: "Laporan Piutang",
+        to: "/reports/receivable-aging",
+        permission: ["accounting.payment.read", "sales.invoice.read"],
+        module: "sales",
+      },
+      ...items(
+        "Laporan Utang",
+        "Laporan Laba Rugi per Dimensi",
+        "Laporan Pajak",
+        "Laporan Pipeline",
+        "Laporan HR",
+        "Laporan E-commerce"
+      ),
+    ],
   },
   {
     label: "Integrasi",

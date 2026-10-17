@@ -815,7 +815,9 @@ type SalesAccountOption struct {
 
 // SalesAllocationBatch defines model for SalesAllocationBatch.
 type SalesAllocationBatch struct {
-	BatchId *openapi_types.UUID `json:"batchId,omitempty"`
+	BatchId     *openapi_types.UUID `json:"batchId,omitempty"`
+	BatchNumber *string             `json:"batchNumber,omitempty"`
+	ExpiryDate  *BusinessDate       `json:"expiryDate,omitempty"`
 
 	// Qty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
 	//

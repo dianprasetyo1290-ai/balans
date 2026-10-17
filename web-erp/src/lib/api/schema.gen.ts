@@ -3812,6 +3812,8 @@ export interface components {
     SalesAllocationBatch: {
       /** Format: uuid */
       batchId?: string | null
+      batchNumber?: string | null
+      expiryDate?: components["schemas"]["BusinessDate"] | null
       qty: components["schemas"]["SalesQuantity"]
     }
     SalesOrderAllocation: {

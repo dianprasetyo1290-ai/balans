@@ -417,6 +417,8 @@ func TestSalesModernTradePrepaidFlow(t *testing.T) {
 	first := items(allocs[0], "batches")
 	require.Len(t, first, 2, "12 coklat terpecah ke dua batch FEFO")
 	assert.Equal(t, "10.000", first[0]["qty"])
+	assert.Equal(t, h.tag+"C1", first[0]["batchNumber"], "batch kedaluwarsa terdekat lebih dulu (FEFO)")
+	assert.NotNil(t, first[0]["expiryDate"])
 
 	so = h.confirmPayment(so)["salesOrder"].(map[string]any)
 	require.Equal(t, "in_progress", so["status"])

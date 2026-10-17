@@ -210,4 +210,36 @@ describe("menu", () => {
       "Data Master › Daftar Harga"
     )
   })
+  it("menampilkan halaman penjualan & piutang R1.3 sesuai permission", () => {
+    const labels = (modules: string[], perms: string[]) =>
+      visibleMenu(modules, [], perms).flatMap((g) =>
+        g.items.map((i) => `${g.label} › ${i.label}`)
+      )
+    const all = ["sales", "accounting"]
+    expect(
+      labels(all, ["sales.sales_order.read", "sales.proforma_invoice.read"])
+    ).toEqual(
+      expect.arrayContaining([
+        "Penjualan › Sales Order",
+        "Penjualan › Modern Trade",
+        "Penjualan › Pesanan WhatsApp/Instagram",
+        "Penjualan › Penjualan Karyawan",
+        "Penjualan › Proforma Invoice",
+      ])
+    )
+    const ecommerce = labels(all, ["sales.marketplace_order.read"])
+    expect(ecommerce).toContain("Penjualan › Penjualan Marketplace")
+    expect(ecommerce).toContain("Penjualan › Sales Order")
+    expect(ecommerce).not.toContain("Penjualan › Modern Trade")
+    expect(labels(all, ["accounting.payment.read"])).toEqual(
+      expect.arrayContaining([
+        "Keuangan & Akuntansi › Piutang Usaha",
+        "Laporan › Laporan Piutang",
+        "Penjualan › Invoice",
+      ])
+    )
+    expect(labels(["accounting"], ["accounting.payment.read"])).not.toContain(
+      "Keuangan & Akuntansi › Piutang Usaha"
+    )
+  })
 })

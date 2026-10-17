@@ -203,6 +203,15 @@ func toOrder(ctx context.Context, v service.OrderView) SalesOrder {
 		batches := make([]SalesAllocationBatch, len(a.Batches))
 		for i, b := range a.Batches {
 			batches[i] = SalesAllocationBatch{BatchId: b.BatchID, Qty: qty(b.Qty)}
+			if b.BatchID != nil {
+				if info, ok := v.Batches[*b.BatchID]; ok {
+					batches[i].BatchNumber = optStr(info.Number)
+					if info.ExpiryDate != nil {
+						d := toDate(*info.ExpiryDate)
+						batches[i].ExpiryDate = &d
+					}
+				}
+			}
 		}
 		out.Allocations = append(out.Allocations, SalesOrderAllocation{
 			Id: a.ID, LineId: a.LineID, Product: productRef(a.ProductID, v.Products), Location: locationRef(a.LocationID, v.Location),

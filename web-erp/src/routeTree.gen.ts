@@ -20,6 +20,7 @@ import { Route as AppApprovalsRouteImport } from './routes/_app/approvals'
 import { Route as AppFinanceAccountsRouteImport } from './routes/_app/finance/accounts'
 import { Route as AppFinanceFiscalPeriodsRouteImport } from './routes/_app/finance/fiscal-periods'
 import { Route as AppFinanceGeneralLedgerRouteImport } from './routes/_app/finance/general-ledger'
+import { Route as AppFinanceReceivablesRouteImport } from './routes/_app/finance/receivables'
 import { Route as AppHrisEmployeesRouteImport } from './routes/_app/hris/employees'
 import { Route as AppIntegrationsDataExchangeRouteImport } from './routes/_app/integrations/data-exchange'
 import { Route as AppInventoryBatchAllocationRouteImport } from './routes/_app/inventory/batch-allocation'
@@ -42,7 +43,12 @@ import { Route as AppMasterSuppliersRouteImport } from './routes/_app/master/sup
 import { Route as AppProcurementApprovalsRouteImport } from './routes/_app/procurement/approvals'
 import { Route as AppProcurementReprocessOrdersRouteImport } from './routes/_app/procurement/reprocess-orders'
 import { Route as AppProcurementTollOrdersRouteImport } from './routes/_app/procurement/toll-orders'
+import { Route as AppReportsReceivableAgingRouteImport } from './routes/_app/reports/receivable-aging'
+import { Route as AppSalesEmployeeSalesRouteImport } from './routes/_app/sales/employee-sales'
+import { Route as AppSalesMarketplaceRouteImport } from './routes/_app/sales/marketplace'
+import { Route as AppSalesModernTradeRouteImport } from './routes/_app/sales/modern-trade'
 import { Route as AppSalesPricingRouteImport } from './routes/_app/sales/pricing'
+import { Route as AppSalesSocialCommerceRouteImport } from './routes/_app/sales/social-commerce'
 import { Route as AppSettingsApprovalPoliciesRouteImport } from './routes/_app/settings/approval-policies'
 import { Route as AppSettingsAuditLogsRouteImport } from './routes/_app/settings/audit-logs'
 import { Route as AppSettingsDocumentSequencesRouteImport } from './routes/_app/settings/document-sequences'
@@ -63,6 +69,10 @@ import { Route as AppProcurementPurchaseOrdersIndexRouteImport } from './routes/
 import { Route as AppProcurementPurchaseOrdersNewRouteImport } from './routes/_app/procurement/purchase-orders/new'
 import { Route as AppProcurementPurchaseRequestsIndexRouteImport } from './routes/_app/procurement/purchase-requests/index'
 import { Route as AppProcurementPurchaseRequestsNewRouteImport } from './routes/_app/procurement/purchase-requests/new'
+import { Route as AppSalesInvoicesIndexRouteImport } from './routes/_app/sales/invoices/index'
+import { Route as AppSalesOrdersIndexRouteImport } from './routes/_app/sales/orders/index'
+import { Route as AppSalesOrdersNewRouteImport } from './routes/_app/sales/orders/new'
+import { Route as AppSalesProformaInvoicesIndexRouteImport } from './routes/_app/sales/proforma-invoices/index'
 import { Route as AppFinanceJournalsIdIndexRouteImport } from './routes/_app/finance/journals/$id.index'
 import { Route as AppFinanceJournalsIdEditRouteImport } from './routes/_app/finance/journals/$id.edit'
 import { Route as AppProcurementPurchaseOrdersIdIndexRouteImport } from './routes/_app/procurement/purchase-orders/$id.index'
@@ -70,6 +80,12 @@ import { Route as AppProcurementPurchaseOrdersIdEditRouteImport } from './routes
 import { Route as AppProcurementPurchaseOrdersIdPrintRouteImport } from './routes/_app/procurement/purchase-orders/$id.print'
 import { Route as AppProcurementPurchaseRequestsIdIndexRouteImport } from './routes/_app/procurement/purchase-requests/$id.index'
 import { Route as AppProcurementPurchaseRequestsIdEditRouteImport } from './routes/_app/procurement/purchase-requests/$id.edit'
+import { Route as AppSalesInvoicesIdIndexRouteImport } from './routes/_app/sales/invoices/$id.index'
+import { Route as AppSalesInvoicesIdPrintRouteImport } from './routes/_app/sales/invoices/$id.print'
+import { Route as AppSalesOrdersIdIndexRouteImport } from './routes/_app/sales/orders/$id.index'
+import { Route as AppSalesOrdersIdEditRouteImport } from './routes/_app/sales/orders/$id.edit'
+import { Route as AppSalesProformaInvoicesIdIndexRouteImport } from './routes/_app/sales/proforma-invoices/$id.index'
+import { Route as AppSalesProformaInvoicesIdPrintRouteImport } from './routes/_app/sales/proforma-invoices/$id.print'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
@@ -123,6 +139,11 @@ const AppFinanceFiscalPeriodsRoute = AppFinanceFiscalPeriodsRouteImport.update({
 const AppFinanceGeneralLedgerRoute = AppFinanceGeneralLedgerRouteImport.update({
   id: '/finance/general-ledger',
   path: '/finance/general-ledger',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFinanceReceivablesRoute = AppFinanceReceivablesRouteImport.update({
+  id: '/finance/receivables',
+  path: '/finance/receivables',
   getParentRoute: () => AppRoute,
 } as any)
 const AppHrisEmployeesRoute = AppHrisEmployeesRouteImport.update({
@@ -242,9 +263,35 @@ const AppProcurementTollOrdersRoute =
     path: '/procurement/toll-orders',
     getParentRoute: () => AppRoute,
   } as any)
+const AppReportsReceivableAgingRoute =
+  AppReportsReceivableAgingRouteImport.update({
+    id: '/reports/receivable-aging',
+    path: '/reports/receivable-aging',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppSalesEmployeeSalesRoute = AppSalesEmployeeSalesRouteImport.update({
+  id: '/sales/employee-sales',
+  path: '/sales/employee-sales',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSalesMarketplaceRoute = AppSalesMarketplaceRouteImport.update({
+  id: '/sales/marketplace',
+  path: '/sales/marketplace',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSalesModernTradeRoute = AppSalesModernTradeRouteImport.update({
+  id: '/sales/modern-trade',
+  path: '/sales/modern-trade',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppSalesPricingRoute = AppSalesPricingRouteImport.update({
   id: '/sales/pricing',
   path: '/sales/pricing',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSalesSocialCommerceRoute = AppSalesSocialCommerceRouteImport.update({
+  id: '/sales/social-commerce',
+  path: '/sales/social-commerce',
   getParentRoute: () => AppRoute,
 } as any)
 const AppSettingsApprovalPoliciesRoute =
@@ -359,6 +406,27 @@ const AppProcurementPurchaseRequestsNewRoute =
     path: '/procurement/purchase-requests/new',
     getParentRoute: () => AppRoute,
   } as any)
+const AppSalesInvoicesIndexRoute = AppSalesInvoicesIndexRouteImport.update({
+  id: '/sales/invoices/',
+  path: '/sales/invoices/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSalesOrdersIndexRoute = AppSalesOrdersIndexRouteImport.update({
+  id: '/sales/orders/',
+  path: '/sales/orders/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSalesOrdersNewRoute = AppSalesOrdersNewRouteImport.update({
+  id: '/sales/orders/new',
+  path: '/sales/orders/new',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSalesProformaInvoicesIndexRoute =
+  AppSalesProformaInvoicesIndexRouteImport.update({
+    id: '/sales/proforma-invoices/',
+    path: '/sales/proforma-invoices/',
+    getParentRoute: () => AppRoute,
+  } as any)
 const AppFinanceJournalsIdIndexRoute =
   AppFinanceJournalsIdIndexRouteImport.update({
     id: '/finance/journals/$id/',
@@ -401,6 +469,38 @@ const AppProcurementPurchaseRequestsIdEditRoute =
     path: '/procurement/purchase-requests/$id/edit',
     getParentRoute: () => AppRoute,
   } as any)
+const AppSalesInvoicesIdIndexRoute = AppSalesInvoicesIdIndexRouteImport.update({
+  id: '/sales/invoices/$id/',
+  path: '/sales/invoices/$id/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSalesInvoicesIdPrintRoute = AppSalesInvoicesIdPrintRouteImport.update({
+  id: '/sales/invoices/$id/print',
+  path: '/sales/invoices/$id/print',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSalesOrdersIdIndexRoute = AppSalesOrdersIdIndexRouteImport.update({
+  id: '/sales/orders/$id/',
+  path: '/sales/orders/$id/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSalesOrdersIdEditRoute = AppSalesOrdersIdEditRouteImport.update({
+  id: '/sales/orders/$id/edit',
+  path: '/sales/orders/$id/edit',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSalesProformaInvoicesIdIndexRoute =
+  AppSalesProformaInvoicesIdIndexRouteImport.update({
+    id: '/sales/proforma-invoices/$id/',
+    path: '/sales/proforma-invoices/$id/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppSalesProformaInvoicesIdPrintRoute =
+  AppSalesProformaInvoicesIdPrintRouteImport.update({
+    id: '/sales/proforma-invoices/$id/print',
+    path: '/sales/proforma-invoices/$id/print',
+    getParentRoute: () => AppRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
@@ -413,6 +513,7 @@ export interface FileRoutesByFullPath {
   '/finance/accounts': typeof AppFinanceAccountsRoute
   '/finance/fiscal-periods': typeof AppFinanceFiscalPeriodsRoute
   '/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
+  '/finance/receivables': typeof AppFinanceReceivablesRoute
   '/hris/employees': typeof AppHrisEmployeesRoute
   '/integrations/data-exchange': typeof AppIntegrationsDataExchangeRoute
   '/inventory/batch-allocation': typeof AppInventoryBatchAllocationRoute
@@ -435,7 +536,12 @@ export interface FileRoutesByFullPath {
   '/procurement/approvals': typeof AppProcurementApprovalsRoute
   '/procurement/reprocess-orders': typeof AppProcurementReprocessOrdersRoute
   '/procurement/toll-orders': typeof AppProcurementTollOrdersRoute
+  '/reports/receivable-aging': typeof AppReportsReceivableAgingRoute
+  '/sales/employee-sales': typeof AppSalesEmployeeSalesRoute
+  '/sales/marketplace': typeof AppSalesMarketplaceRoute
+  '/sales/modern-trade': typeof AppSalesModernTradeRoute
   '/sales/pricing': typeof AppSalesPricingRoute
+  '/sales/social-commerce': typeof AppSalesSocialCommerceRoute
   '/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/settings/audit-logs': typeof AppSettingsAuditLogsRoute
   '/settings/document-sequences': typeof AppSettingsDocumentSequencesRoute
@@ -449,6 +555,7 @@ export interface FileRoutesByFullPath {
   '/procurement/purchase-advances/$id': typeof AppProcurementPurchaseAdvancesIdRoute
   '/procurement/purchase-orders/new': typeof AppProcurementPurchaseOrdersNewRoute
   '/procurement/purchase-requests/new': typeof AppProcurementPurchaseRequestsNewRoute
+  '/sales/orders/new': typeof AppSalesOrdersNewRoute
   '/finance/journals/': typeof AppFinanceJournalsIndexRoute
   '/master-data/products/': typeof AppMasterDataProductsIndexRoute
   '/master-data/warehouses/': typeof AppMasterDataWarehousesIndexRoute
@@ -456,13 +563,22 @@ export interface FileRoutesByFullPath {
   '/procurement/purchase-advances/': typeof AppProcurementPurchaseAdvancesIndexRoute
   '/procurement/purchase-orders/': typeof AppProcurementPurchaseOrdersIndexRoute
   '/procurement/purchase-requests/': typeof AppProcurementPurchaseRequestsIndexRoute
+  '/sales/invoices/': typeof AppSalesInvoicesIndexRoute
+  '/sales/orders/': typeof AppSalesOrdersIndexRoute
+  '/sales/proforma-invoices/': typeof AppSalesProformaInvoicesIndexRoute
   '/finance/journals/$id/edit': typeof AppFinanceJournalsIdEditRoute
   '/procurement/purchase-orders/$id/edit': typeof AppProcurementPurchaseOrdersIdEditRoute
   '/procurement/purchase-orders/$id/print': typeof AppProcurementPurchaseOrdersIdPrintRoute
   '/procurement/purchase-requests/$id/edit': typeof AppProcurementPurchaseRequestsIdEditRoute
+  '/sales/invoices/$id/print': typeof AppSalesInvoicesIdPrintRoute
+  '/sales/orders/$id/edit': typeof AppSalesOrdersIdEditRoute
+  '/sales/proforma-invoices/$id/print': typeof AppSalesProformaInvoicesIdPrintRoute
   '/finance/journals/$id/': typeof AppFinanceJournalsIdIndexRoute
   '/procurement/purchase-orders/$id/': typeof AppProcurementPurchaseOrdersIdIndexRoute
   '/procurement/purchase-requests/$id/': typeof AppProcurementPurchaseRequestsIdIndexRoute
+  '/sales/invoices/$id/': typeof AppSalesInvoicesIdIndexRoute
+  '/sales/orders/$id/': typeof AppSalesOrdersIdIndexRoute
+  '/sales/proforma-invoices/$id/': typeof AppSalesProformaInvoicesIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/forbidden': typeof ForbiddenRoute
@@ -475,6 +591,7 @@ export interface FileRoutesByTo {
   '/finance/accounts': typeof AppFinanceAccountsRoute
   '/finance/fiscal-periods': typeof AppFinanceFiscalPeriodsRoute
   '/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
+  '/finance/receivables': typeof AppFinanceReceivablesRoute
   '/hris/employees': typeof AppHrisEmployeesRoute
   '/integrations/data-exchange': typeof AppIntegrationsDataExchangeRoute
   '/inventory/batch-allocation': typeof AppInventoryBatchAllocationRoute
@@ -497,7 +614,12 @@ export interface FileRoutesByTo {
   '/procurement/approvals': typeof AppProcurementApprovalsRoute
   '/procurement/reprocess-orders': typeof AppProcurementReprocessOrdersRoute
   '/procurement/toll-orders': typeof AppProcurementTollOrdersRoute
+  '/reports/receivable-aging': typeof AppReportsReceivableAgingRoute
+  '/sales/employee-sales': typeof AppSalesEmployeeSalesRoute
+  '/sales/marketplace': typeof AppSalesMarketplaceRoute
+  '/sales/modern-trade': typeof AppSalesModernTradeRoute
   '/sales/pricing': typeof AppSalesPricingRoute
+  '/sales/social-commerce': typeof AppSalesSocialCommerceRoute
   '/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/settings/audit-logs': typeof AppSettingsAuditLogsRoute
   '/settings/document-sequences': typeof AppSettingsDocumentSequencesRoute
@@ -511,6 +633,7 @@ export interface FileRoutesByTo {
   '/procurement/purchase-advances/$id': typeof AppProcurementPurchaseAdvancesIdRoute
   '/procurement/purchase-orders/new': typeof AppProcurementPurchaseOrdersNewRoute
   '/procurement/purchase-requests/new': typeof AppProcurementPurchaseRequestsNewRoute
+  '/sales/orders/new': typeof AppSalesOrdersNewRoute
   '/finance/journals': typeof AppFinanceJournalsIndexRoute
   '/master-data/products': typeof AppMasterDataProductsIndexRoute
   '/master-data/warehouses': typeof AppMasterDataWarehousesIndexRoute
@@ -518,13 +641,22 @@ export interface FileRoutesByTo {
   '/procurement/purchase-advances': typeof AppProcurementPurchaseAdvancesIndexRoute
   '/procurement/purchase-orders': typeof AppProcurementPurchaseOrdersIndexRoute
   '/procurement/purchase-requests': typeof AppProcurementPurchaseRequestsIndexRoute
+  '/sales/invoices': typeof AppSalesInvoicesIndexRoute
+  '/sales/orders': typeof AppSalesOrdersIndexRoute
+  '/sales/proforma-invoices': typeof AppSalesProformaInvoicesIndexRoute
   '/finance/journals/$id/edit': typeof AppFinanceJournalsIdEditRoute
   '/procurement/purchase-orders/$id/edit': typeof AppProcurementPurchaseOrdersIdEditRoute
   '/procurement/purchase-orders/$id/print': typeof AppProcurementPurchaseOrdersIdPrintRoute
   '/procurement/purchase-requests/$id/edit': typeof AppProcurementPurchaseRequestsIdEditRoute
+  '/sales/invoices/$id/print': typeof AppSalesInvoicesIdPrintRoute
+  '/sales/orders/$id/edit': typeof AppSalesOrdersIdEditRoute
+  '/sales/proforma-invoices/$id/print': typeof AppSalesProformaInvoicesIdPrintRoute
   '/finance/journals/$id': typeof AppFinanceJournalsIdIndexRoute
   '/procurement/purchase-orders/$id': typeof AppProcurementPurchaseOrdersIdIndexRoute
   '/procurement/purchase-requests/$id': typeof AppProcurementPurchaseRequestsIdIndexRoute
+  '/sales/invoices/$id': typeof AppSalesInvoicesIdIndexRoute
+  '/sales/orders/$id': typeof AppSalesOrdersIdIndexRoute
+  '/sales/proforma-invoices/$id': typeof AppSalesProformaInvoicesIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -539,6 +671,7 @@ export interface FileRoutesById {
   '/_app/finance/accounts': typeof AppFinanceAccountsRoute
   '/_app/finance/fiscal-periods': typeof AppFinanceFiscalPeriodsRoute
   '/_app/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
+  '/_app/finance/receivables': typeof AppFinanceReceivablesRoute
   '/_app/hris/employees': typeof AppHrisEmployeesRoute
   '/_app/integrations/data-exchange': typeof AppIntegrationsDataExchangeRoute
   '/_app/inventory/batch-allocation': typeof AppInventoryBatchAllocationRoute
@@ -561,7 +694,12 @@ export interface FileRoutesById {
   '/_app/procurement/approvals': typeof AppProcurementApprovalsRoute
   '/_app/procurement/reprocess-orders': typeof AppProcurementReprocessOrdersRoute
   '/_app/procurement/toll-orders': typeof AppProcurementTollOrdersRoute
+  '/_app/reports/receivable-aging': typeof AppReportsReceivableAgingRoute
+  '/_app/sales/employee-sales': typeof AppSalesEmployeeSalesRoute
+  '/_app/sales/marketplace': typeof AppSalesMarketplaceRoute
+  '/_app/sales/modern-trade': typeof AppSalesModernTradeRoute
   '/_app/sales/pricing': typeof AppSalesPricingRoute
+  '/_app/sales/social-commerce': typeof AppSalesSocialCommerceRoute
   '/_app/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/_app/settings/audit-logs': typeof AppSettingsAuditLogsRoute
   '/_app/settings/document-sequences': typeof AppSettingsDocumentSequencesRoute
@@ -575,6 +713,7 @@ export interface FileRoutesById {
   '/_app/procurement/purchase-advances/$id': typeof AppProcurementPurchaseAdvancesIdRoute
   '/_app/procurement/purchase-orders/new': typeof AppProcurementPurchaseOrdersNewRoute
   '/_app/procurement/purchase-requests/new': typeof AppProcurementPurchaseRequestsNewRoute
+  '/_app/sales/orders/new': typeof AppSalesOrdersNewRoute
   '/_app/finance/journals/': typeof AppFinanceJournalsIndexRoute
   '/_app/master-data/products/': typeof AppMasterDataProductsIndexRoute
   '/_app/master-data/warehouses/': typeof AppMasterDataWarehousesIndexRoute
@@ -582,13 +721,22 @@ export interface FileRoutesById {
   '/_app/procurement/purchase-advances/': typeof AppProcurementPurchaseAdvancesIndexRoute
   '/_app/procurement/purchase-orders/': typeof AppProcurementPurchaseOrdersIndexRoute
   '/_app/procurement/purchase-requests/': typeof AppProcurementPurchaseRequestsIndexRoute
+  '/_app/sales/invoices/': typeof AppSalesInvoicesIndexRoute
+  '/_app/sales/orders/': typeof AppSalesOrdersIndexRoute
+  '/_app/sales/proforma-invoices/': typeof AppSalesProformaInvoicesIndexRoute
   '/_app/finance/journals/$id/edit': typeof AppFinanceJournalsIdEditRoute
   '/_app/procurement/purchase-orders/$id/edit': typeof AppProcurementPurchaseOrdersIdEditRoute
   '/_app/procurement/purchase-orders/$id/print': typeof AppProcurementPurchaseOrdersIdPrintRoute
   '/_app/procurement/purchase-requests/$id/edit': typeof AppProcurementPurchaseRequestsIdEditRoute
+  '/_app/sales/invoices/$id/print': typeof AppSalesInvoicesIdPrintRoute
+  '/_app/sales/orders/$id/edit': typeof AppSalesOrdersIdEditRoute
+  '/_app/sales/proforma-invoices/$id/print': typeof AppSalesProformaInvoicesIdPrintRoute
   '/_app/finance/journals/$id/': typeof AppFinanceJournalsIdIndexRoute
   '/_app/procurement/purchase-orders/$id/': typeof AppProcurementPurchaseOrdersIdIndexRoute
   '/_app/procurement/purchase-requests/$id/': typeof AppProcurementPurchaseRequestsIdIndexRoute
+  '/_app/sales/invoices/$id/': typeof AppSalesInvoicesIdIndexRoute
+  '/_app/sales/orders/$id/': typeof AppSalesOrdersIdIndexRoute
+  '/_app/sales/proforma-invoices/$id/': typeof AppSalesProformaInvoicesIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -603,6 +751,7 @@ export interface FileRouteTypes {
     | '/finance/accounts'
     | '/finance/fiscal-periods'
     | '/finance/general-ledger'
+    | '/finance/receivables'
     | '/hris/employees'
     | '/integrations/data-exchange'
     | '/inventory/batch-allocation'
@@ -625,7 +774,12 @@ export interface FileRouteTypes {
     | '/procurement/approvals'
     | '/procurement/reprocess-orders'
     | '/procurement/toll-orders'
+    | '/reports/receivable-aging'
+    | '/sales/employee-sales'
+    | '/sales/marketplace'
+    | '/sales/modern-trade'
     | '/sales/pricing'
+    | '/sales/social-commerce'
     | '/settings/approval-policies'
     | '/settings/audit-logs'
     | '/settings/document-sequences'
@@ -639,6 +793,7 @@ export interface FileRouteTypes {
     | '/procurement/purchase-advances/$id'
     | '/procurement/purchase-orders/new'
     | '/procurement/purchase-requests/new'
+    | '/sales/orders/new'
     | '/finance/journals/'
     | '/master-data/products/'
     | '/master-data/warehouses/'
@@ -646,13 +801,22 @@ export interface FileRouteTypes {
     | '/procurement/purchase-advances/'
     | '/procurement/purchase-orders/'
     | '/procurement/purchase-requests/'
+    | '/sales/invoices/'
+    | '/sales/orders/'
+    | '/sales/proforma-invoices/'
     | '/finance/journals/$id/edit'
     | '/procurement/purchase-orders/$id/edit'
     | '/procurement/purchase-orders/$id/print'
     | '/procurement/purchase-requests/$id/edit'
+    | '/sales/invoices/$id/print'
+    | '/sales/orders/$id/edit'
+    | '/sales/proforma-invoices/$id/print'
     | '/finance/journals/$id/'
     | '/procurement/purchase-orders/$id/'
     | '/procurement/purchase-requests/$id/'
+    | '/sales/invoices/$id/'
+    | '/sales/orders/$id/'
+    | '/sales/proforma-invoices/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/forbidden'
@@ -665,6 +829,7 @@ export interface FileRouteTypes {
     | '/finance/accounts'
     | '/finance/fiscal-periods'
     | '/finance/general-ledger'
+    | '/finance/receivables'
     | '/hris/employees'
     | '/integrations/data-exchange'
     | '/inventory/batch-allocation'
@@ -687,7 +852,12 @@ export interface FileRouteTypes {
     | '/procurement/approvals'
     | '/procurement/reprocess-orders'
     | '/procurement/toll-orders'
+    | '/reports/receivable-aging'
+    | '/sales/employee-sales'
+    | '/sales/marketplace'
+    | '/sales/modern-trade'
     | '/sales/pricing'
+    | '/sales/social-commerce'
     | '/settings/approval-policies'
     | '/settings/audit-logs'
     | '/settings/document-sequences'
@@ -701,6 +871,7 @@ export interface FileRouteTypes {
     | '/procurement/purchase-advances/$id'
     | '/procurement/purchase-orders/new'
     | '/procurement/purchase-requests/new'
+    | '/sales/orders/new'
     | '/finance/journals'
     | '/master-data/products'
     | '/master-data/warehouses'
@@ -708,13 +879,22 @@ export interface FileRouteTypes {
     | '/procurement/purchase-advances'
     | '/procurement/purchase-orders'
     | '/procurement/purchase-requests'
+    | '/sales/invoices'
+    | '/sales/orders'
+    | '/sales/proforma-invoices'
     | '/finance/journals/$id/edit'
     | '/procurement/purchase-orders/$id/edit'
     | '/procurement/purchase-orders/$id/print'
     | '/procurement/purchase-requests/$id/edit'
+    | '/sales/invoices/$id/print'
+    | '/sales/orders/$id/edit'
+    | '/sales/proforma-invoices/$id/print'
     | '/finance/journals/$id'
     | '/procurement/purchase-orders/$id'
     | '/procurement/purchase-requests/$id'
+    | '/sales/invoices/$id'
+    | '/sales/orders/$id'
+    | '/sales/proforma-invoices/$id'
   id:
     | '__root__'
     | '/_app'
@@ -728,6 +908,7 @@ export interface FileRouteTypes {
     | '/_app/finance/accounts'
     | '/_app/finance/fiscal-periods'
     | '/_app/finance/general-ledger'
+    | '/_app/finance/receivables'
     | '/_app/hris/employees'
     | '/_app/integrations/data-exchange'
     | '/_app/inventory/batch-allocation'
@@ -750,7 +931,12 @@ export interface FileRouteTypes {
     | '/_app/procurement/approvals'
     | '/_app/procurement/reprocess-orders'
     | '/_app/procurement/toll-orders'
+    | '/_app/reports/receivable-aging'
+    | '/_app/sales/employee-sales'
+    | '/_app/sales/marketplace'
+    | '/_app/sales/modern-trade'
     | '/_app/sales/pricing'
+    | '/_app/sales/social-commerce'
     | '/_app/settings/approval-policies'
     | '/_app/settings/audit-logs'
     | '/_app/settings/document-sequences'
@@ -764,6 +950,7 @@ export interface FileRouteTypes {
     | '/_app/procurement/purchase-advances/$id'
     | '/_app/procurement/purchase-orders/new'
     | '/_app/procurement/purchase-requests/new'
+    | '/_app/sales/orders/new'
     | '/_app/finance/journals/'
     | '/_app/master-data/products/'
     | '/_app/master-data/warehouses/'
@@ -771,13 +958,22 @@ export interface FileRouteTypes {
     | '/_app/procurement/purchase-advances/'
     | '/_app/procurement/purchase-orders/'
     | '/_app/procurement/purchase-requests/'
+    | '/_app/sales/invoices/'
+    | '/_app/sales/orders/'
+    | '/_app/sales/proforma-invoices/'
     | '/_app/finance/journals/$id/edit'
     | '/_app/procurement/purchase-orders/$id/edit'
     | '/_app/procurement/purchase-orders/$id/print'
     | '/_app/procurement/purchase-requests/$id/edit'
+    | '/_app/sales/invoices/$id/print'
+    | '/_app/sales/orders/$id/edit'
+    | '/_app/sales/proforma-invoices/$id/print'
     | '/_app/finance/journals/$id/'
     | '/_app/procurement/purchase-orders/$id/'
     | '/_app/procurement/purchase-requests/$id/'
+    | '/_app/sales/invoices/$id/'
+    | '/_app/sales/orders/$id/'
+    | '/_app/sales/proforma-invoices/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -866,6 +1062,13 @@ declare module '@tanstack/react-router' {
       path: '/finance/general-ledger'
       fullPath: '/finance/general-ledger'
       preLoaderRoute: typeof AppFinanceGeneralLedgerRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/finance/receivables': {
+      id: '/_app/finance/receivables'
+      path: '/finance/receivables'
+      fullPath: '/finance/receivables'
+      preLoaderRoute: typeof AppFinanceReceivablesRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/hris/employees': {
@@ -1022,11 +1225,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProcurementTollOrdersRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/reports/receivable-aging': {
+      id: '/_app/reports/receivable-aging'
+      path: '/reports/receivable-aging'
+      fullPath: '/reports/receivable-aging'
+      preLoaderRoute: typeof AppReportsReceivableAgingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/sales/employee-sales': {
+      id: '/_app/sales/employee-sales'
+      path: '/sales/employee-sales'
+      fullPath: '/sales/employee-sales'
+      preLoaderRoute: typeof AppSalesEmployeeSalesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/sales/marketplace': {
+      id: '/_app/sales/marketplace'
+      path: '/sales/marketplace'
+      fullPath: '/sales/marketplace'
+      preLoaderRoute: typeof AppSalesMarketplaceRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/sales/modern-trade': {
+      id: '/_app/sales/modern-trade'
+      path: '/sales/modern-trade'
+      fullPath: '/sales/modern-trade'
+      preLoaderRoute: typeof AppSalesModernTradeRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/sales/pricing': {
       id: '/_app/sales/pricing'
       path: '/sales/pricing'
       fullPath: '/sales/pricing'
       preLoaderRoute: typeof AppSalesPricingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/sales/social-commerce': {
+      id: '/_app/sales/social-commerce'
+      path: '/sales/social-commerce'
+      fullPath: '/sales/social-commerce'
+      preLoaderRoute: typeof AppSalesSocialCommerceRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/settings/approval-policies': {
@@ -1169,6 +1407,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProcurementPurchaseRequestsNewRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/sales/invoices/': {
+      id: '/_app/sales/invoices/'
+      path: '/sales/invoices'
+      fullPath: '/sales/invoices/'
+      preLoaderRoute: typeof AppSalesInvoicesIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/sales/orders/': {
+      id: '/_app/sales/orders/'
+      path: '/sales/orders'
+      fullPath: '/sales/orders/'
+      preLoaderRoute: typeof AppSalesOrdersIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/sales/orders/new': {
+      id: '/_app/sales/orders/new'
+      path: '/sales/orders/new'
+      fullPath: '/sales/orders/new'
+      preLoaderRoute: typeof AppSalesOrdersNewRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/sales/proforma-invoices/': {
+      id: '/_app/sales/proforma-invoices/'
+      path: '/sales/proforma-invoices'
+      fullPath: '/sales/proforma-invoices/'
+      preLoaderRoute: typeof AppSalesProformaInvoicesIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/finance/journals/$id/': {
       id: '/_app/finance/journals/$id/'
       path: '/finance/journals/$id'
@@ -1218,6 +1484,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProcurementPurchaseRequestsIdEditRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/sales/invoices/$id/': {
+      id: '/_app/sales/invoices/$id/'
+      path: '/sales/invoices/$id'
+      fullPath: '/sales/invoices/$id/'
+      preLoaderRoute: typeof AppSalesInvoicesIdIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/sales/invoices/$id/print': {
+      id: '/_app/sales/invoices/$id/print'
+      path: '/sales/invoices/$id/print'
+      fullPath: '/sales/invoices/$id/print'
+      preLoaderRoute: typeof AppSalesInvoicesIdPrintRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/sales/orders/$id/': {
+      id: '/_app/sales/orders/$id/'
+      path: '/sales/orders/$id'
+      fullPath: '/sales/orders/$id/'
+      preLoaderRoute: typeof AppSalesOrdersIdIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/sales/orders/$id/edit': {
+      id: '/_app/sales/orders/$id/edit'
+      path: '/sales/orders/$id/edit'
+      fullPath: '/sales/orders/$id/edit'
+      preLoaderRoute: typeof AppSalesOrdersIdEditRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/sales/proforma-invoices/$id/': {
+      id: '/_app/sales/proforma-invoices/$id/'
+      path: '/sales/proforma-invoices/$id'
+      fullPath: '/sales/proforma-invoices/$id/'
+      preLoaderRoute: typeof AppSalesProformaInvoicesIdIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/sales/proforma-invoices/$id/print': {
+      id: '/_app/sales/proforma-invoices/$id/print'
+      path: '/sales/proforma-invoices/$id/print'
+      fullPath: '/sales/proforma-invoices/$id/print'
+      preLoaderRoute: typeof AppSalesProformaInvoicesIdPrintRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
@@ -1227,6 +1535,7 @@ interface AppRouteChildren {
   AppFinanceAccountsRoute: typeof AppFinanceAccountsRoute
   AppFinanceFiscalPeriodsRoute: typeof AppFinanceFiscalPeriodsRoute
   AppFinanceGeneralLedgerRoute: typeof AppFinanceGeneralLedgerRoute
+  AppFinanceReceivablesRoute: typeof AppFinanceReceivablesRoute
   AppHrisEmployeesRoute: typeof AppHrisEmployeesRoute
   AppIntegrationsDataExchangeRoute: typeof AppIntegrationsDataExchangeRoute
   AppInventoryBatchAllocationRoute: typeof AppInventoryBatchAllocationRoute
@@ -1249,7 +1558,12 @@ interface AppRouteChildren {
   AppProcurementApprovalsRoute: typeof AppProcurementApprovalsRoute
   AppProcurementReprocessOrdersRoute: typeof AppProcurementReprocessOrdersRoute
   AppProcurementTollOrdersRoute: typeof AppProcurementTollOrdersRoute
+  AppReportsReceivableAgingRoute: typeof AppReportsReceivableAgingRoute
+  AppSalesEmployeeSalesRoute: typeof AppSalesEmployeeSalesRoute
+  AppSalesMarketplaceRoute: typeof AppSalesMarketplaceRoute
+  AppSalesModernTradeRoute: typeof AppSalesModernTradeRoute
   AppSalesPricingRoute: typeof AppSalesPricingRoute
+  AppSalesSocialCommerceRoute: typeof AppSalesSocialCommerceRoute
   AppSettingsApprovalPoliciesRoute: typeof AppSettingsApprovalPoliciesRoute
   AppSettingsAuditLogsRoute: typeof AppSettingsAuditLogsRoute
   AppSettingsDocumentSequencesRoute: typeof AppSettingsDocumentSequencesRoute
@@ -1263,6 +1577,7 @@ interface AppRouteChildren {
   AppProcurementPurchaseAdvancesIdRoute: typeof AppProcurementPurchaseAdvancesIdRoute
   AppProcurementPurchaseOrdersNewRoute: typeof AppProcurementPurchaseOrdersNewRoute
   AppProcurementPurchaseRequestsNewRoute: typeof AppProcurementPurchaseRequestsNewRoute
+  AppSalesOrdersNewRoute: typeof AppSalesOrdersNewRoute
   AppFinanceJournalsIndexRoute: typeof AppFinanceJournalsIndexRoute
   AppMasterDataProductsIndexRoute: typeof AppMasterDataProductsIndexRoute
   AppMasterDataWarehousesIndexRoute: typeof AppMasterDataWarehousesIndexRoute
@@ -1270,13 +1585,22 @@ interface AppRouteChildren {
   AppProcurementPurchaseAdvancesIndexRoute: typeof AppProcurementPurchaseAdvancesIndexRoute
   AppProcurementPurchaseOrdersIndexRoute: typeof AppProcurementPurchaseOrdersIndexRoute
   AppProcurementPurchaseRequestsIndexRoute: typeof AppProcurementPurchaseRequestsIndexRoute
+  AppSalesInvoicesIndexRoute: typeof AppSalesInvoicesIndexRoute
+  AppSalesOrdersIndexRoute: typeof AppSalesOrdersIndexRoute
+  AppSalesProformaInvoicesIndexRoute: typeof AppSalesProformaInvoicesIndexRoute
   AppFinanceJournalsIdEditRoute: typeof AppFinanceJournalsIdEditRoute
   AppProcurementPurchaseOrdersIdEditRoute: typeof AppProcurementPurchaseOrdersIdEditRoute
   AppProcurementPurchaseOrdersIdPrintRoute: typeof AppProcurementPurchaseOrdersIdPrintRoute
   AppProcurementPurchaseRequestsIdEditRoute: typeof AppProcurementPurchaseRequestsIdEditRoute
+  AppSalesInvoicesIdPrintRoute: typeof AppSalesInvoicesIdPrintRoute
+  AppSalesOrdersIdEditRoute: typeof AppSalesOrdersIdEditRoute
+  AppSalesProformaInvoicesIdPrintRoute: typeof AppSalesProformaInvoicesIdPrintRoute
   AppFinanceJournalsIdIndexRoute: typeof AppFinanceJournalsIdIndexRoute
   AppProcurementPurchaseOrdersIdIndexRoute: typeof AppProcurementPurchaseOrdersIdIndexRoute
   AppProcurementPurchaseRequestsIdIndexRoute: typeof AppProcurementPurchaseRequestsIdIndexRoute
+  AppSalesInvoicesIdIndexRoute: typeof AppSalesInvoicesIdIndexRoute
+  AppSalesOrdersIdIndexRoute: typeof AppSalesOrdersIdIndexRoute
+  AppSalesProformaInvoicesIdIndexRoute: typeof AppSalesProformaInvoicesIdIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -1285,6 +1609,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppFinanceAccountsRoute: AppFinanceAccountsRoute,
   AppFinanceFiscalPeriodsRoute: AppFinanceFiscalPeriodsRoute,
   AppFinanceGeneralLedgerRoute: AppFinanceGeneralLedgerRoute,
+  AppFinanceReceivablesRoute: AppFinanceReceivablesRoute,
   AppHrisEmployeesRoute: AppHrisEmployeesRoute,
   AppIntegrationsDataExchangeRoute: AppIntegrationsDataExchangeRoute,
   AppInventoryBatchAllocationRoute: AppInventoryBatchAllocationRoute,
@@ -1307,7 +1632,12 @@ const AppRouteChildren: AppRouteChildren = {
   AppProcurementApprovalsRoute: AppProcurementApprovalsRoute,
   AppProcurementReprocessOrdersRoute: AppProcurementReprocessOrdersRoute,
   AppProcurementTollOrdersRoute: AppProcurementTollOrdersRoute,
+  AppReportsReceivableAgingRoute: AppReportsReceivableAgingRoute,
+  AppSalesEmployeeSalesRoute: AppSalesEmployeeSalesRoute,
+  AppSalesMarketplaceRoute: AppSalesMarketplaceRoute,
+  AppSalesModernTradeRoute: AppSalesModernTradeRoute,
   AppSalesPricingRoute: AppSalesPricingRoute,
+  AppSalesSocialCommerceRoute: AppSalesSocialCommerceRoute,
   AppSettingsApprovalPoliciesRoute: AppSettingsApprovalPoliciesRoute,
   AppSettingsAuditLogsRoute: AppSettingsAuditLogsRoute,
   AppSettingsDocumentSequencesRoute: AppSettingsDocumentSequencesRoute,
@@ -1322,6 +1652,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppProcurementPurchaseOrdersNewRoute: AppProcurementPurchaseOrdersNewRoute,
   AppProcurementPurchaseRequestsNewRoute:
     AppProcurementPurchaseRequestsNewRoute,
+  AppSalesOrdersNewRoute: AppSalesOrdersNewRoute,
   AppFinanceJournalsIndexRoute: AppFinanceJournalsIndexRoute,
   AppMasterDataProductsIndexRoute: AppMasterDataProductsIndexRoute,
   AppMasterDataWarehousesIndexRoute: AppMasterDataWarehousesIndexRoute,
@@ -1332,6 +1663,9 @@ const AppRouteChildren: AppRouteChildren = {
     AppProcurementPurchaseOrdersIndexRoute,
   AppProcurementPurchaseRequestsIndexRoute:
     AppProcurementPurchaseRequestsIndexRoute,
+  AppSalesInvoicesIndexRoute: AppSalesInvoicesIndexRoute,
+  AppSalesOrdersIndexRoute: AppSalesOrdersIndexRoute,
+  AppSalesProformaInvoicesIndexRoute: AppSalesProformaInvoicesIndexRoute,
   AppFinanceJournalsIdEditRoute: AppFinanceJournalsIdEditRoute,
   AppProcurementPurchaseOrdersIdEditRoute:
     AppProcurementPurchaseOrdersIdEditRoute,
@@ -1339,11 +1673,17 @@ const AppRouteChildren: AppRouteChildren = {
     AppProcurementPurchaseOrdersIdPrintRoute,
   AppProcurementPurchaseRequestsIdEditRoute:
     AppProcurementPurchaseRequestsIdEditRoute,
+  AppSalesInvoicesIdPrintRoute: AppSalesInvoicesIdPrintRoute,
+  AppSalesOrdersIdEditRoute: AppSalesOrdersIdEditRoute,
+  AppSalesProformaInvoicesIdPrintRoute: AppSalesProformaInvoicesIdPrintRoute,
   AppFinanceJournalsIdIndexRoute: AppFinanceJournalsIdIndexRoute,
   AppProcurementPurchaseOrdersIdIndexRoute:
     AppProcurementPurchaseOrdersIdIndexRoute,
   AppProcurementPurchaseRequestsIdIndexRoute:
     AppProcurementPurchaseRequestsIdIndexRoute,
+  AppSalesInvoicesIdIndexRoute: AppSalesInvoicesIdIndexRoute,
+  AppSalesOrdersIdIndexRoute: AppSalesOrdersIdIndexRoute,
+  AppSalesProformaInvoicesIdIndexRoute: AppSalesProformaInvoicesIdIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

@@ -38,6 +38,8 @@ type OrderView struct {
 	Shipments        []domain.Shipment
 	CreatedByName    string
 	PaymentProofName string
+	// Batches adalah nomor & kedaluwarsa batch alokasi.
+	Batches map[uuid.UUID]inventory.Batch
 }
 
 // OrderSummary adalah baris daftar pesanan.
@@ -340,6 +342,22 @@ func (s *DocumentService) orderView(ctx context.Context, o domain.Order) (OrderV
 		return OrderView{}, err
 	}
 	v.Channel, v.SubChannel = labels[o.ChannelID], labels[o.SubChannelID]
+	v.Batches = map[uuid.UUID]inventory.Batch{}
+	for _, a := range o.Allocations {
+		for _, b := range a.Batches {
+			if b.BatchID == nil {
+				continue
+			}
+			if _, ok := v.Batches[*b.BatchID]; ok {
+				continue
+			}
+			batch, err := s.Stock.Batch(ctx, *b.BatchID)
+			if err != nil {
+				return OrderView{}, err
+			}
+			v.Batches[*b.BatchID] = batch
+		}
+	}
 	if v.Proformas, err = s.Store.ProformasByOrder(ctx, o.ID); err != nil {
 		return OrderView{}, err
 	}
