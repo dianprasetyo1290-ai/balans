@@ -23,13 +23,20 @@ import (
 
 // AccountingHandler mengimplementasikan StrictServerInterface hasil generate.
 type AccountingHandler struct {
-	svc *service.Service
+	svc     *service.Service
+	reports *service.ReportService
 }
 
 var _ StrictServerInterface = (*AccountingHandler)(nil)
 
 // NewHandler membuat handler.
 func NewHandler(svc *service.Service) *AccountingHandler { return &AccountingHandler{svc: svc} }
+
+// WithReports memasang service laporan (S-409, S-416, S-417, S-418).
+func (h *AccountingHandler) WithReports(r *service.ReportService) *AccountingHandler {
+	h.reports = r
+	return h
+}
 
 // Register mendaftarkan route modul ke router.
 func Register(r chi.Router, h *AccountingHandler, rs *httpx.Responder) {

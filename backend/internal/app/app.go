@@ -249,6 +249,7 @@ func (a *App) buildModules() error {
 	if gateway != nil {
 		console.Payments = gateway
 	}
+	a.connectReports()
 	a.connectFinance(mailer)
 	if cfg.IsEnabled(logistics.Name) {
 		if cfg.ShipmentProvider != config.ProviderMock {

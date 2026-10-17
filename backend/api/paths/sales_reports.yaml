@@ -1,0 +1,469 @@
+salesReport:
+  get:
+    operationId: getSalesReport
+    tags: [sales]
+    summary: Laporan Penjualan & margin kotor per channel/sub-channel/produk/kategori/periode (RPT-05, RPT-15)
+    description: |
+      Dari read model `rm_sales_lines` (di-refresh job `accounting.refresh_read_models`). Neto = jurnal 4101 − 4102,
+      HPP = HPP pengiriman (A-06/A-10). Butuh `sales.sales_order.read`, `sales.marketplace_order.read`,
+      `sales.invoice.read`, atau `accounting.report.read`.
+    parameters:
+      - name: groupBy
+        in: query
+        schema:
+          $ref: "../components/common.yaml#/ReportGroupBy"
+      - name: dateFrom
+        in: query
+        required: true
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+      - name: dateTo
+        in: query
+        required: true
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+      - name: channelId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: subChannelId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: productId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: orderType
+        in: query
+        description: Jenis pesanan (modern_trade, b2b, social_commerce, marketplace, employee, consignment).
+        schema:
+          type: string
+    responses:
+      "200":
+        description: Laporan penjualan
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SalesReport"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+consignmentReport:
+  get:
+    operationId: getConsignmentReport
+    tags: [sales]
+    summary: Laporan Konsinyasi — invoice konsinyasi & selisih per mitra (RPT-06)
+    parameters:
+      - name: dateFrom
+        in: query
+        required: true
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+      - name: dateTo
+        in: query
+        required: true
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+    responses:
+      "200":
+        description: Rekap konsinyasi
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConsignmentReport"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+settlementFormats:
+  get:
+    operationId: listSettlementFormats
+    tags: [sales]
+    summary: Format laporan settlement per marketplace (jenis data impor dan kolom)
+    responses:
+      "200":
+        description: Format settlement
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [items]
+              properties:
+                items:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/SettlementFormat"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+marketplaceSettlements:
+  get:
+    operationId: listMarketplaceSettlements
+    tags: [sales]
+    summary: Daftar settlement marketplace (S-403)
+    description: Settlement dibuat lewat impor laporan settlement (Import/Export Excel). Butuh `accounting.settlement.read`.
+    parameters:
+      - name: status
+        in: query
+        schema:
+          $ref: "#/components/schemas/SettlementStatus"
+      - name: subChannelId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+    responses:
+      "200":
+        description: Daftar settlement
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MarketplaceSettlementList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+marketplaceSettlement:
+  get:
+    operationId: getMarketplaceSettlement
+    tags: [sales]
+    summary: Detail settlement marketplace beserta order yang dicocokkan
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+    responses:
+      "200":
+        description: Settlement
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MarketplaceSettlement"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+marketplaceSettlementPost:
+  post:
+    operationId: postMarketplaceSettlement
+    tags: [sales]
+    summary: Posting settlement — jurnal A-10s (Dr Bank + Fee 6105 + Promo 6107, Cr Piutang Marketplace 121x)
+    description: Butuh `accounting.settlement.post`.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../components/common.yaml#/VersionInput"
+    responses:
+      "200":
+        description: Settlement diposting
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MarketplaceSettlement"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+marketplaceSettlementCancel:
+  post:
+    operationId: cancelMarketplaceSettlement
+    tags: [sales]
+    summary: Batalkan settlement draft (order bisa diimpor ulang)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/SettlementCancelInput"
+    responses:
+      "200":
+        description: Settlement dibatalkan
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MarketplaceSettlement"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+marketplaceReceivables:
+  get:
+    operationId: listMarketplaceReceivables
+    tags: [sales]
+    summary: Sisa piutang marketplace per order (F1-402)
+    description: Butuh `accounting.settlement.read` atau `sales.marketplace_order.read`.
+    parameters:
+      - name: subChannelId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: openOnly
+        in: query
+        schema:
+          type: boolean
+          default: true
+      - $ref: "../components/common.yaml#/parameters/Search"
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+    responses:
+      "200":
+        description: Sisa piutang marketplace
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MarketplaceReceivableList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+components:
+  schemas:
+    SalesReportLine:
+      type: object
+      required: [key, code, name, qty, gross, discount, net, cogs, grossProfit, marginPercent]
+      properties:
+        key:
+          type: string
+        code:
+          type: string
+        name:
+          type: string
+        qty:
+          type: string
+        gross:
+          $ref: "../components/common.yaml#/Money"
+        discount:
+          $ref: "../components/common.yaml#/Money"
+        net:
+          $ref: "../components/common.yaml#/Money"
+        cogs:
+          $ref: "../components/common.yaml#/Money"
+        grossProfit:
+          $ref: "../components/common.yaml#/Money"
+        marginPercent:
+          type: string
+    SalesReport:
+      type: object
+      required: [groupBy, dateFrom, dateTo, lines, total]
+      properties:
+        groupBy:
+          $ref: "../components/common.yaml#/ReportGroupBy"
+        dateFrom:
+          $ref: "../components/common.yaml#/BusinessDate"
+        dateTo:
+          $ref: "../components/common.yaml#/BusinessDate"
+        lines:
+          type: array
+          items:
+            $ref: "#/components/schemas/SalesReportLine"
+        total:
+          $ref: "#/components/schemas/SalesReportLine"
+    ConsignmentReportRow:
+      type: object
+      required: [partnerId, partnerCode, partnerName, invoiceType, invoiceCount, gross, discount, total, paid, outstanding]
+      properties:
+        partnerId:
+          type: string
+          format: uuid
+        partnerCode:
+          type: string
+        partnerName:
+          type: string
+        invoiceType:
+          type: string
+          enum: [consignment, variance]
+        invoiceCount:
+          type: integer
+        gross:
+          $ref: "../components/common.yaml#/Money"
+        discount:
+          $ref: "../components/common.yaml#/Money"
+        total:
+          $ref: "../components/common.yaml#/Money"
+        paid:
+          $ref: "../components/common.yaml#/Money"
+        outstanding:
+          $ref: "../components/common.yaml#/Money"
+    ConsignmentReport:
+      type: object
+      required: [dateFrom, dateTo, items]
+      properties:
+        dateFrom:
+          $ref: "../components/common.yaml#/BusinessDate"
+        dateTo:
+          $ref: "../components/common.yaml#/BusinessDate"
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConsignmentReportRow"
+    SettlementFormatColumn:
+      type: object
+      required: [key, header, required]
+      properties:
+        key:
+          type: string
+        header:
+          type: string
+        required:
+          type: boolean
+    SettlementFormat:
+      type: object
+      required: [marketplace, label, kind, columns]
+      properties:
+        marketplace:
+          type: string
+        label:
+          type: string
+        kind:
+          type: string
+          description: Jenis data impor dataexchange.
+        columns:
+          type: array
+          items:
+            $ref: "#/components/schemas/SettlementFormatColumn"
+    SettlementStatus:
+      type: string
+      enum: [draft, posted, cancelled]
+    SettlementCancelInput:
+      type: object
+      required: [version, reason]
+      properties:
+        version:
+          type: integer
+        reason:
+          type: string
+    MarketplaceSettlementLine:
+      type: object
+      required: [lineNo, salesOrderId, externalOrderId, orderNumber, receivable, fee, promo, net, settled, outstanding]
+      properties:
+        lineNo:
+          type: integer
+        salesOrderId:
+          type: string
+          format: uuid
+        externalOrderId:
+          type: string
+        orderNumber:
+          type: string
+        receivable:
+          $ref: "../components/common.yaml#/Money"
+        fee:
+          $ref: "../components/common.yaml#/Money"
+        promo:
+          $ref: "../components/common.yaml#/Money"
+        net:
+          $ref: "../components/common.yaml#/Money"
+        settled:
+          $ref: "../components/common.yaml#/Money"
+        outstanding:
+          $ref: "../components/common.yaml#/Money"
+    MarketplaceSettlementSummary:
+      type: object
+      required: [id, marketplaceCode, marketplaceName, payoutReference, settlementDate, bankAccountCode, status, statusLabel, lineCount, settled, fee, promo, net, version, updatedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        marketplaceCode:
+          type: string
+        marketplaceName:
+          type: string
+        payoutReference:
+          type: string
+        settlementDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        bankAccountCode:
+          type: string
+        status:
+          $ref: "#/components/schemas/SettlementStatus"
+        statusLabel:
+          type: string
+        lineCount:
+          type: integer
+        settled:
+          $ref: "../components/common.yaml#/Money"
+        fee:
+          $ref: "../components/common.yaml#/Money"
+        promo:
+          $ref: "../components/common.yaml#/Money"
+        net:
+          $ref: "../components/common.yaml#/Money"
+        journalEntryId:
+          type: string
+          format: uuid
+        postedAt:
+          type: string
+          format: date-time
+        cancelReason:
+          type: string
+        version:
+          type: integer
+        updatedAt:
+          type: string
+          format: date-time
+    MarketplaceSettlement:
+      allOf:
+        - $ref: "#/components/schemas/MarketplaceSettlementSummary"
+        - type: object
+          required: [lines, allowedActions]
+          properties:
+            lines:
+              type: array
+              items:
+                $ref: "#/components/schemas/MarketplaceSettlementLine"
+            allowedActions:
+              type: array
+              items:
+                type: string
+    MarketplaceSettlementList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/MarketplaceSettlementSummary"
+    MarketplaceReceivable:
+      type: object
+      required: [salesOrderId, number, externalOrderId, marketplaceName, orderDate, handedOverDate, buyerName, receivable, settled, draft, outstanding]
+      properties:
+        salesOrderId:
+          type: string
+          format: uuid
+        number:
+          type: string
+        externalOrderId:
+          type: string
+        marketplaceName:
+          type: string
+        orderDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        handedOverDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        buyerName:
+          type: string
+        receivable:
+          $ref: "../components/common.yaml#/Money"
+        settled:
+          $ref: "../components/common.yaml#/Money"
+        draft:
+          $ref: "../components/common.yaml#/Money"
+        outstanding:
+          $ref: "../components/common.yaml#/Money"
+    MarketplaceReceivableList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items, totalReceivable, totalSettled, totalOutstanding]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/MarketplaceReceivable"
+            totalReceivable:
+              $ref: "../components/common.yaml#/Money"
+            totalSettled:
+              $ref: "../components/common.yaml#/Money"
+            totalOutstanding:
+              $ref: "../components/common.yaml#/Money"

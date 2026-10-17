@@ -1,0 +1,377 @@
+stockPositionReport:
+  get:
+    operationId: getStockPositionReport
+    tags: [inventory]
+    summary: Laporan Stok — posisi & nilai per SKU, lokasi, batch (RPT-01)
+    description: |
+      Dari read model `rm_stock_values` (di-refresh job `accounting.refresh_read_models`). Nilai = HPP FIFO
+      mutasi per lokasi; total per jenis lokasi sama dengan saldo akun persediaan 13xx. Butuh `inventory.stock.read`
+      atau `accounting.report.read`.
+    parameters:
+      - $ref: "#/components/parameters/ReportLocationId"
+      - $ref: "#/components/parameters/ReportLocationType"
+      - $ref: "#/components/parameters/ReportProductId"
+      - name: batchId
+        in: query
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Posisi stok
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StockPositionReport"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+stockMovementReport:
+  get:
+    operationId: getStockMovementReport
+    tags: [inventory]
+    summary: Laporan Mutasi Stok — saldo awal, masuk, keluar, pindah, saldo akhir per SKU × lokasi (RPT-02)
+    parameters:
+      - $ref: "#/components/parameters/ReportDateFrom"
+      - $ref: "#/components/parameters/ReportDateTo"
+      - $ref: "#/components/parameters/ReportLocationId"
+      - $ref: "#/components/parameters/ReportLocationType"
+      - $ref: "#/components/parameters/ReportProductId"
+    responses:
+      "200":
+        description: Mutasi stok
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StockMovementReport"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+stockExpiryReport:
+  get:
+    operationId: getStockExpiryReport
+    tags: [inventory]
+    summary: Laporan Kedaluwarsa — sisa umur simpan & umur stok per batch per lokasi (RPT-19)
+    parameters:
+      - $ref: "#/components/parameters/ReportLocationId"
+      - $ref: "#/components/parameters/ReportLocationType"
+      - $ref: "#/components/parameters/ReportProductId"
+      - name: withinDays
+        in: query
+        description: Hanya batch yang kedaluwarsa dalam N hari (termasuk yang sudah lewat); kosong = semua.
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Kedaluwarsa & umur stok
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StockExpiryReport"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+internalUsageReport:
+  get:
+    operationId: getInternalUsageReport
+    tags: [inventory]
+    summary: Laporan Pemakaian Internal per kampanye, tujuan, divisi (RPT-08)
+    description: Pemakaian Internal diposting. Butuh `inventory.internal_usage.read` atau `accounting.report.read`.
+    parameters:
+      - $ref: "#/components/parameters/ReportDateFrom"
+      - $ref: "#/components/parameters/ReportDateTo"
+      - name: purpose
+        in: query
+        schema:
+          type: string
+          enum: [marketing, event, employee_sample, sales_sampling]
+      - name: campaignId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: divisionId
+        in: query
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Pemakaian internal
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InternalUsageReport"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+returnReport:
+  get:
+    operationId: getReturnReport
+    tags: [inventory]
+    summary: Laporan Retur — barang retur, alasan, dan tindak lanjut (disposisi) (RPT-09)
+    parameters:
+      - $ref: "#/components/parameters/ReportDateFrom"
+      - $ref: "#/components/parameters/ReportDateTo"
+    responses:
+      "200":
+        description: Retur & tindak lanjut
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReturnReport"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+components:
+  parameters:
+    ReportDateFrom:
+      name: dateFrom
+      in: query
+      required: true
+      schema:
+        $ref: "../components/common.yaml#/BusinessDate"
+    ReportDateTo:
+      name: dateTo
+      in: query
+      required: true
+      schema:
+        $ref: "../components/common.yaml#/BusinessDate"
+    ReportLocationId:
+      name: locationId
+      in: query
+      schema:
+        type: string
+        format: uuid
+    ReportLocationType:
+      name: locationType
+      in: query
+      description: Jenis lokasi (mis. consignment, vending_buffer, toll_manufacturer).
+      schema:
+        type: string
+    ReportProductId:
+      name: productId
+      in: query
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    ReportProductRef:
+      type: object
+      required: [id, sku, name, uom]
+      properties:
+        id:
+          type: string
+          format: uuid
+        sku:
+          type: string
+        name:
+          type: string
+        uom:
+          type: string
+    ReportLocationRef:
+      type: object
+      required: [id, code, name, warehouseName, type]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        warehouseName:
+          type: string
+        type:
+          type: string
+    StockPositionRow:
+      type: object
+      required: [product, location, batchNumber, qty, value]
+      properties:
+        product:
+          $ref: "#/components/schemas/ReportProductRef"
+        location:
+          $ref: "#/components/schemas/ReportLocationRef"
+        batchId:
+          type: string
+          format: uuid
+        batchNumber:
+          type: string
+        expiryDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        firstInDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        qty:
+          type: string
+        value:
+          $ref: "../components/common.yaml#/Money"
+    StockTypeTotal:
+      type: object
+      required: [locationType, qty, value]
+      properties:
+        locationType:
+          type: string
+        qty:
+          type: string
+        value:
+          $ref: "../components/common.yaml#/Money"
+    StockPositionReport:
+      type: object
+      required: [items, totalQty, totalValue, byLocationType]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/StockPositionRow"
+        totalQty:
+          type: string
+        totalValue:
+          $ref: "../components/common.yaml#/Money"
+        byLocationType:
+          type: array
+          items:
+            $ref: "#/components/schemas/StockTypeTotal"
+    StockMovementRow:
+      type: object
+      required: [product, location, openingQty, receiveQty, issueQty, moveInQty, moveOutQty, closingQty, openingValue, inValue, outValue, closingValue]
+      properties:
+        product:
+          $ref: "#/components/schemas/ReportProductRef"
+        location:
+          $ref: "#/components/schemas/ReportLocationRef"
+        openingQty:
+          type: string
+        receiveQty:
+          type: string
+        issueQty:
+          type: string
+        moveInQty:
+          type: string
+        moveOutQty:
+          type: string
+        closingQty:
+          type: string
+        openingValue:
+          $ref: "../components/common.yaml#/Money"
+        inValue:
+          $ref: "../components/common.yaml#/Money"
+        outValue:
+          $ref: "../components/common.yaml#/Money"
+        closingValue:
+          $ref: "../components/common.yaml#/Money"
+    StockMovementReport:
+      type: object
+      required: [dateFrom, dateTo, items]
+      properties:
+        dateFrom:
+          $ref: "../components/common.yaml#/BusinessDate"
+        dateTo:
+          $ref: "../components/common.yaml#/BusinessDate"
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/StockMovementRow"
+    StockExpiryRow:
+      type: object
+      required: [product, location, batchNumber, qty, value, bucket]
+      properties:
+        product:
+          $ref: "#/components/schemas/ReportProductRef"
+        location:
+          $ref: "#/components/schemas/ReportLocationRef"
+        batchNumber:
+          type: string
+        expiryDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        daysToExpiry:
+          type: integer
+        ageDays:
+          type: integer
+        qty:
+          type: string
+        value:
+          $ref: "../components/common.yaml#/Money"
+        bucket:
+          type: string
+          enum: [expired, near, d31_90, d91_180, over_180, no_expiry]
+    StockExpiryReport:
+      type: object
+      required: [today, nearDays, items]
+      properties:
+        today:
+          $ref: "../components/common.yaml#/BusinessDate"
+        nearDays:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/StockExpiryRow"
+    InternalUsageReportRow:
+      type: object
+      required: [usageId, number, businessDate, purpose, divisionName, campaignCode, campaignName, product, qty, returnedQty, consumedQty, cost]
+      properties:
+        usageId:
+          type: string
+          format: uuid
+        number:
+          type: string
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        purpose:
+          type: string
+        divisionName:
+          type: string
+        campaignCode:
+          type: string
+        campaignName:
+          type: string
+        product:
+          $ref: "#/components/schemas/ReportProductRef"
+        qty:
+          type: string
+        returnedQty:
+          type: string
+        consumedQty:
+          type: string
+        cost:
+          $ref: "../components/common.yaml#/Money"
+    InternalUsageReport:
+      type: object
+      required: [items, totalCost]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/InternalUsageReportRow"
+        totalCost:
+          $ref: "../components/common.yaml#/Money"
+    ReturnReportRow:
+      type: object
+      required: [dispositionId, number, businessDate, location, product, reasonCode, reasonName, disposition, qty, cost, qcNote]
+      properties:
+        dispositionId:
+          type: string
+          format: uuid
+        number:
+          type: string
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        location:
+          $ref: "#/components/schemas/ReportLocationRef"
+        product:
+          $ref: "#/components/schemas/ReportProductRef"
+        reasonCode:
+          type: string
+        reasonName:
+          type: string
+        disposition:
+          $ref: "../components/common.yaml#/ReturnDisposition"
+        qty:
+          type: string
+        cost:
+          $ref: "../components/common.yaml#/Money"
+        qcNote:
+          type: string
+    ReturnReport:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReturnReportRow"

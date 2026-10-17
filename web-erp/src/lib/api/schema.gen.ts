@@ -467,6 +467,156 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/v1/sales/reports/sales": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Laporan Penjualan & margin kotor per channel/sub-channel/produk/kategori/periode (RPT-05, RPT-15)
+     * @description Dari read model `rm_sales_lines` (di-refresh job `accounting.refresh_read_models`). Neto = jurnal 4101 − 4102,
+     *     HPP = HPP pengiriman (A-06/A-10). Butuh `sales.sales_order.read`, `sales.marketplace_order.read`,
+     *     `sales.invoice.read`, atau `accounting.report.read`.
+     */
+    get: operations["getSalesReport"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/reports/consignment": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Laporan Konsinyasi — invoice konsinyasi & selisih per mitra (RPT-06) */
+    get: operations["getConsignmentReport"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/settlement-formats": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Format laporan settlement per marketplace (jenis data impor dan kolom) */
+    get: operations["listSettlementFormats"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/marketplace-settlements": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Daftar settlement marketplace (S-403)
+     * @description Settlement dibuat lewat impor laporan settlement (Import/Export Excel). Butuh `accounting.settlement.read`.
+     */
+    get: operations["listMarketplaceSettlements"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/marketplace-settlements/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail settlement marketplace beserta order yang dicocokkan */
+    get: operations["getMarketplaceSettlement"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/marketplace-settlements/{id}/post": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Posting settlement — jurnal A-10s (Dr Bank + Fee 6105 + Promo 6107, Cr Piutang Marketplace 121x)
+     * @description Butuh `accounting.settlement.post`.
+     */
+    post: operations["postMarketplaceSettlement"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/marketplace-settlements/{id}/cancel": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Batalkan settlement draft (order bisa diimpor ulang) */
+    post: operations["cancelMarketplaceSettlement"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/marketplace-receivables": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Sisa piutang marketplace per order (F1-402)
+     * @description Butuh `accounting.settlement.read` atau `sales.marketplace_order.read`.
+     */
+    get: operations["listMarketplaceReceivables"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/v1/sales/return-sources": {
     parameters: {
       query?: never
@@ -2601,6 +2751,126 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/v1/reports/financial-statements": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Neraca, Laba Rugi, atau Arus Kas (S-409, RPT-12)
+     * @description Disusun dari read model `rm_gl_daily` yang di-refresh job `accounting.refresh_read_models` tiap 15 menit
+     *     (lihat `refreshedAt`). Neraca memakai `dateTo` sebagai tanggal posisi (laba tahun berjalan sejak 1 Januari).
+     *     Laba Rugi boleh difilter per dimensi. Arus Kas metode tidak langsung. Butuh `accounting.report.read`.
+     */
+    get: operations["getFinancialStatement"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/reports/profit-loss-by-dimension": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Laba rugi per channel, sub-channel, divisi, atau kampanye (S-417, RPT-15)
+     * @description Kolom per nilai dimensi; jurnal tanpa dimensi tersebut masuk kolom "Tanpa …" sehingga jumlah kolom sama dengan
+     *     Laba Rugi total. Butuh `accounting.report.read`.
+     */
+    get: operations["getProfitLossByDimension"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/reports/tax-summary": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Rekap PPh dipotong, PPh Final, dan pemantauan omzet terhadap Rp4,8 M (S-416, RPT-18)
+     * @description Butuh `accounting.report.read` atau `accounting.withholding.read`.
+     */
+    get: operations["getTaxSummary"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/reports/executive-dashboard": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Dashboard eksekutif dasar — penjualan, margin, stok, kas (S-418, RPT-14)
+     * @description Dari materialized view yang di-refresh job. Butuh `accounting.report.read`.
+     */
+    get: operations["getExecutiveDashboard"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/reports/read-models": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Waktu refresh terakhir read model laporan */
+    get: operations["listReadModels"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/reports/read-models/refresh": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Perbarui data laporan sekarang (tanpa menunggu job 15 menit)
+     * @description Butuh `accounting.report.read`, `inventory.stock.read`, `sales.sales_order.read`, atau `sales.invoice.read`.
+     */
+    post: operations["refreshReadModels"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/v1/cash-bank-accounts": {
     parameters: {
       query?: never
@@ -4267,6 +4537,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/v1/warehouse/reports/stock-count-variances": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Laporan Stock Count — hasil hitung & selisih (RPT-03)
+     * @description Butuh `warehouse.stock_count.read` atau `accounting.report.read`.
+     */
+    get: operations["getStockCountVarianceReport"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/v1/stock-count-schedules/{id}": {
     parameters: {
       query?: never
@@ -4316,6 +4606,99 @@ export interface paths {
     }
     /** Kartu Stok per SKU (opsional lokasi, batch, status) dengan saldo qty & nilai berjalan (INV-01) */
     get: operations["getStockCard"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/inventory/reports/stock-position": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Laporan Stok — posisi & nilai per SKU, lokasi, batch (RPT-01)
+     * @description Dari read model `rm_stock_values` (di-refresh job `accounting.refresh_read_models`). Nilai = HPP FIFO
+     *     mutasi per lokasi; total per jenis lokasi sama dengan saldo akun persediaan 13xx. Butuh `inventory.stock.read`
+     *     atau `accounting.report.read`.
+     */
+    get: operations["getStockPositionReport"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/inventory/reports/stock-movements": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Laporan Mutasi Stok — saldo awal, masuk, keluar, pindah, saldo akhir per SKU × lokasi (RPT-02) */
+    get: operations["getStockMovementReport"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/inventory/reports/stock-expiry": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Laporan Kedaluwarsa — sisa umur simpan & umur stok per batch per lokasi (RPT-19) */
+    get: operations["getStockExpiryReport"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/inventory/reports/internal-usage": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Laporan Pemakaian Internal per kampanye, tujuan, divisi (RPT-08)
+     * @description Pemakaian Internal diposting. Butuh `inventory.internal_usage.read` atau `accounting.report.read`.
+     */
+    get: operations["getInternalUsageReport"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/inventory/reports/returns": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Laporan Retur — barang retur, alasan, dan tindak lanjut (disposisi) (RPT-09) */
+    get: operations["getReturnReport"]
     put?: never
     post?: never
     delete?: never
@@ -6539,6 +6922,60 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/v1/procurement/reports/outstanding-purchase-orders": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Outstanding PO — qty belum diterima & diterima belum ditagih per baris (RPT-10)
+     * @description Butuh `procurement.purchase_order.read`, `procurement.supplier_bill.read`, atau `accounting.report.read`.
+     */
+    get: operations["getOutstandingPurchaseOrders"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/procurement/reports/payable-aging": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Laporan Utang — umur utang per pemasok (RPT-11), direkonsiliasi ke akun 2101 */
+    get: operations["getPayableAging"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/procurement/reports/batch-costs": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Laporan HPP — komposisi HPP per SKU per batch dengan rincian reject (RPT-04) */
+    get: operations["getBatchCostReport"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -7163,6 +7600,132 @@ export interface components {
       asOf: components["schemas"]["BusinessDate"]
       rows: components["schemas"]["ReceivableAgingRow"][]
       totals: components["schemas"]["ReceivableAgingRow"]
+    }
+    /**
+     * @description Pengelompokan laporan penjualan & margin (RPT-05, RPT-15).
+     * @enum {string}
+     */
+    ReportGroupBy:
+      "channel" | "sub_channel" | "product" | "category" | "month" | "day"
+    SalesReportLine: {
+      key: string
+      code: string
+      name: string
+      qty: string
+      gross: components["schemas"]["Money"]
+      discount: components["schemas"]["Money"]
+      net: components["schemas"]["Money"]
+      cogs: components["schemas"]["Money"]
+      grossProfit: components["schemas"]["Money"]
+      marginPercent: string
+    }
+    SalesReport: {
+      groupBy: components["schemas"]["ReportGroupBy"]
+      dateFrom: components["schemas"]["BusinessDate"]
+      dateTo: components["schemas"]["BusinessDate"]
+      lines: components["schemas"]["SalesReportLine"][]
+      total: components["schemas"]["SalesReportLine"]
+    }
+    ConsignmentReportRow: {
+      /** Format: uuid */
+      partnerId: string
+      partnerCode: string
+      partnerName: string
+      /** @enum {string} */
+      invoiceType: "consignment" | "variance"
+      invoiceCount: number
+      gross: components["schemas"]["Money"]
+      discount: components["schemas"]["Money"]
+      total: components["schemas"]["Money"]
+      paid: components["schemas"]["Money"]
+      outstanding: components["schemas"]["Money"]
+    }
+    ConsignmentReport: {
+      dateFrom: components["schemas"]["BusinessDate"]
+      dateTo: components["schemas"]["BusinessDate"]
+      items: components["schemas"]["ConsignmentReportRow"][]
+    }
+    SettlementFormatColumn: {
+      key: string
+      header: string
+      required: boolean
+    }
+    SettlementFormat: {
+      marketplace: string
+      label: string
+      /** @description Jenis data impor dataexchange. */
+      kind: string
+      columns: components["schemas"]["SettlementFormatColumn"][]
+    }
+    /** @enum {string} */
+    SettlementStatus: "draft" | "posted" | "cancelled"
+    MarketplaceSettlementSummary: {
+      /** Format: uuid */
+      id: string
+      marketplaceCode: string
+      marketplaceName: string
+      payoutReference: string
+      settlementDate: components["schemas"]["BusinessDate"]
+      bankAccountCode: string
+      status: components["schemas"]["SettlementStatus"]
+      statusLabel: string
+      lineCount: number
+      settled: components["schemas"]["Money"]
+      fee: components["schemas"]["Money"]
+      promo: components["schemas"]["Money"]
+      net: components["schemas"]["Money"]
+      /** Format: uuid */
+      journalEntryId?: string
+      /** Format: date-time */
+      postedAt?: string
+      cancelReason?: string
+      version: number
+      /** Format: date-time */
+      updatedAt: string
+    }
+    MarketplaceSettlementList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["MarketplaceSettlementSummary"][]
+    }
+    MarketplaceSettlementLine: {
+      lineNo: number
+      /** Format: uuid */
+      salesOrderId: string
+      externalOrderId: string
+      orderNumber: string
+      receivable: components["schemas"]["Money"]
+      fee: components["schemas"]["Money"]
+      promo: components["schemas"]["Money"]
+      net: components["schemas"]["Money"]
+      settled: components["schemas"]["Money"]
+      outstanding: components["schemas"]["Money"]
+    }
+    MarketplaceSettlement: components["schemas"]["MarketplaceSettlementSummary"] & {
+      lines: components["schemas"]["MarketplaceSettlementLine"][]
+      allowedActions: string[]
+    }
+    SettlementCancelInput: {
+      version: number
+      reason: string
+    }
+    MarketplaceReceivable: {
+      /** Format: uuid */
+      salesOrderId: string
+      number: string
+      externalOrderId: string
+      marketplaceName: string
+      orderDate: components["schemas"]["BusinessDate"]
+      handedOverDate: components["schemas"]["BusinessDate"]
+      buyerName: string
+      receivable: components["schemas"]["Money"]
+      settled: components["schemas"]["Money"]
+      draft: components["schemas"]["Money"]
+      outstanding: components["schemas"]["Money"]
+    }
+    MarketplaceReceivableList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["MarketplaceReceivable"][]
+      totalReceivable: components["schemas"]["Money"]
+      totalSettled: components["schemas"]["Money"]
+      totalOutstanding: components["schemas"]["Money"]
     }
     SalesReturnSource: {
       /** Format: uuid */
@@ -8880,6 +9443,146 @@ export interface components {
       items: components["schemas"]["GeneralLedgerLine"][]
     }
     /** @enum {string} */
+    StatementKind: "balance_sheet" | "income_statement" | "cash_flow"
+    /**
+     * @description Jenis baris laporan (judul bagian, subjudul akun induk, akun, subtotal, total).
+     * @enum {string}
+     */
+    ReportRowKind: "section" | "group" | "account" | "subtotal" | "total"
+    StatementRow: {
+      kind: components["schemas"]["ReportRowKind"]
+      /** @description Kode akun (baris akun) untuk drill-down Buku Besar. */
+      code?: string
+      label: string
+      level: number
+      amount: components["schemas"]["Money"]
+    }
+    ProfitLossSummary: {
+      revenue: components["schemas"]["Money"]
+      cogs: components["schemas"]["Money"]
+      grossProfit: components["schemas"]["Money"]
+      operatingExpense: components["schemas"]["Money"]
+      operatingProfit: components["schemas"]["Money"]
+      otherNet: components["schemas"]["Money"]
+      netProfit: components["schemas"]["Money"]
+      grossMarginPercent: string
+      netMarginPercent: string
+    }
+    FinancialStatement: {
+      kind: components["schemas"]["StatementKind"]
+      title: string
+      dateFrom: components["schemas"]["BusinessDate"]
+      dateTo: components["schemas"]["BusinessDate"]
+      rows: components["schemas"]["StatementRow"][]
+      /** @description Neraca seimbang / kenaikan kas = mutasi akun Kas & Bank. */
+      balanced: boolean
+      summary: components["schemas"]["ProfitLossSummary"]
+      /** Format: date-time */
+      refreshedAt?: string
+    }
+    DimensionColumn: {
+      /**
+       * Format: uuid
+       * @description Kosong = jurnal tanpa dimensi ini.
+       */
+      id?: string
+      code: string
+      name: string
+      summary: components["schemas"]["ProfitLossSummary"]
+    }
+    DimensionAccountRow: {
+      accountCode: string
+      accountName: string
+      group: number
+      amounts: components["schemas"]["Money"][]
+      total: components["schemas"]["Money"]
+    }
+    DimensionProfitLoss: {
+      dimension: components["schemas"]["DimensionKind"]
+      dateFrom: components["schemas"]["BusinessDate"]
+      dateTo: components["schemas"]["BusinessDate"]
+      columns: components["schemas"]["DimensionColumn"][]
+      accounts: components["schemas"]["DimensionAccountRow"][]
+      total: components["schemas"]["ProfitLossSummary"]
+      /** Format: date-time */
+      refreshedAt?: string
+    }
+    TaxMonth: {
+      month: components["schemas"]["BusinessDate"]
+      pph21Withheld: components["schemas"]["Money"]
+      pph23Withheld: components["schemas"]["Money"]
+      pph42Withheld: components["schemas"]["Money"]
+      withholdingPaid: components["schemas"]["Money"]
+      finalTax: components["schemas"]["Money"]
+      finalTaxPaid: components["schemas"]["Money"]
+      turnover: components["schemas"]["Money"]
+      cumulativeTurnover: components["schemas"]["Money"]
+    }
+    TaxJournalLine: {
+      /** Format: uuid */
+      entryId: string
+      businessDate: components["schemas"]["BusinessDate"]
+      number: string
+      sourceType: string
+      sourceLabel: string
+      description: string
+      accountCode: string
+      accountName: string
+      debit: components["schemas"]["Money"]
+      credit: components["schemas"]["Money"]
+    }
+    TaxSummary: {
+      year: number
+      months: components["schemas"]["TaxMonth"][]
+      turnover: components["schemas"]["Money"]
+      limit: components["schemas"]["Money"]
+      usedPercent: string
+      /** @description Omzet kumulatif ≥ 80% batas. */
+      warning: boolean
+      limitExceeded: boolean
+      lines: components["schemas"]["TaxJournalLine"][]
+      /** Format: date-time */
+      refreshedAt?: string
+    }
+    DashboardTrendPoint: {
+      month: components["schemas"]["BusinessDate"]
+      revenue: components["schemas"]["Money"]
+      grossProfit: components["schemas"]["Money"]
+      netProfit: components["schemas"]["Money"]
+    }
+    DashboardChannel: {
+      /** Format: uuid */
+      id?: string
+      code: string
+      name: string
+      revenue: components["schemas"]["Money"]
+      grossProfit: components["schemas"]["Money"]
+      marginPercent: string
+    }
+    ExecutiveDashboard: {
+      dateFrom: components["schemas"]["BusinessDate"]
+      dateTo: components["schemas"]["BusinessDate"]
+      period: components["schemas"]["ProfitLossSummary"]
+      previous: components["schemas"]["ProfitLossSummary"]
+      cash: components["schemas"]["Money"]
+      receivables: components["schemas"]["Money"]
+      inventory: components["schemas"]["Money"]
+      payables: components["schemas"]["Money"]
+      trend: components["schemas"]["DashboardTrendPoint"][]
+      channels: components["schemas"]["DashboardChannel"][]
+      /** Format: date-time */
+      refreshedAt?: string
+    }
+    ReadModelRefresh: {
+      name: string
+      /** Format: date-time */
+      refreshedAt: string
+      durationMs: number
+    }
+    ReadModelStatus: {
+      items: components["schemas"]["ReadModelRefresh"][]
+    }
+    /** @enum {string} */
     CashBankAccountKind: "bank" | "cash"
     /** @enum {string} */
     FinanceAction:
@@ -10571,6 +11274,30 @@ export interface components {
       lastRunDate?: components["schemas"]["BusinessDate"]
       version: number
     }
+    StockCountVarianceRow: {
+      /** Format: uuid */
+      stockCountId: string
+      number: string
+      countType: string
+      businessDate: components["schemas"]["BusinessDate"]
+      status: string
+      locationCode: string
+      locationName: string
+      sku: string
+      productName: string
+      batchNumber: string
+      systemQty: string
+      countedQty?: string
+      varianceQty: string
+      varianceAmount: components["schemas"]["Money"]
+      isExtra: boolean
+    }
+    StockCountVarianceReport: {
+      items: components["schemas"]["StockCountVarianceRow"][]
+      totalVarianceAmount: components["schemas"]["Money"]
+      totalShortageAmount: components["schemas"]["Money"]
+      totalOverageAmount: components["schemas"]["Money"]
+    }
     /**
      * @description `available` Tersedia, `quarantine` Karantina, `in_transit` Dalam Pengiriman, `reserved` Dialokasikan.
      * @enum {string}
@@ -10664,6 +11391,116 @@ export interface components {
       closingQty: components["schemas"]["StockQuantity"]
       closingValue: components["schemas"]["Money"]
       items: components["schemas"]["StockCardLine"][]
+    }
+    ReportProductRef: {
+      /** Format: uuid */
+      id: string
+      sku: string
+      name: string
+      uom: string
+    }
+    ReportLocationRef: {
+      /** Format: uuid */
+      id: string
+      code: string
+      name: string
+      warehouseName: string
+      type: string
+    }
+    StockPositionRow: {
+      product: components["schemas"]["ReportProductRef"]
+      location: components["schemas"]["ReportLocationRef"]
+      /** Format: uuid */
+      batchId?: string
+      batchNumber: string
+      expiryDate?: components["schemas"]["BusinessDate"]
+      firstInDate?: components["schemas"]["BusinessDate"]
+      qty: string
+      value: components["schemas"]["Money"]
+    }
+    StockTypeTotal: {
+      locationType: string
+      qty: string
+      value: components["schemas"]["Money"]
+    }
+    StockPositionReport: {
+      items: components["schemas"]["StockPositionRow"][]
+      totalQty: string
+      totalValue: components["schemas"]["Money"]
+      byLocationType: components["schemas"]["StockTypeTotal"][]
+    }
+    StockMovementRow: {
+      product: components["schemas"]["ReportProductRef"]
+      location: components["schemas"]["ReportLocationRef"]
+      openingQty: string
+      receiveQty: string
+      issueQty: string
+      moveInQty: string
+      moveOutQty: string
+      closingQty: string
+      openingValue: components["schemas"]["Money"]
+      inValue: components["schemas"]["Money"]
+      outValue: components["schemas"]["Money"]
+      closingValue: components["schemas"]["Money"]
+    }
+    StockMovementReport: {
+      dateFrom: components["schemas"]["BusinessDate"]
+      dateTo: components["schemas"]["BusinessDate"]
+      items: components["schemas"]["StockMovementRow"][]
+    }
+    StockExpiryRow: {
+      product: components["schemas"]["ReportProductRef"]
+      location: components["schemas"]["ReportLocationRef"]
+      batchNumber: string
+      expiryDate?: components["schemas"]["BusinessDate"]
+      daysToExpiry?: number
+      ageDays?: number
+      qty: string
+      value: components["schemas"]["Money"]
+      /** @enum {string} */
+      bucket:
+        "expired" | "near" | "d31_90" | "d91_180" | "over_180" | "no_expiry"
+    }
+    StockExpiryReport: {
+      today: components["schemas"]["BusinessDate"]
+      nearDays: number
+      items: components["schemas"]["StockExpiryRow"][]
+    }
+    InternalUsageReportRow: {
+      /** Format: uuid */
+      usageId: string
+      number: string
+      businessDate: components["schemas"]["BusinessDate"]
+      purpose: string
+      divisionName: string
+      campaignCode: string
+      campaignName: string
+      product: components["schemas"]["ReportProductRef"]
+      qty: string
+      returnedQty: string
+      consumedQty: string
+      cost: components["schemas"]["Money"]
+    }
+    InternalUsageReport: {
+      items: components["schemas"]["InternalUsageReportRow"][]
+      totalCost: components["schemas"]["Money"]
+    }
+    ReturnReportRow: {
+      /** Format: uuid */
+      dispositionId: string
+      number: string
+      businessDate: components["schemas"]["BusinessDate"]
+      location: components["schemas"]["ReportLocationRef"]
+      product: components["schemas"]["ReportProductRef"]
+      reasonCode: string
+      reasonName: string
+      disposition: components["schemas"]["ReturnDisposition"]
+      qty: string
+      cost: components["schemas"]["Money"]
+      qcNote: string
+    }
+    ReturnReport: {
+      items: components["schemas"]["ReturnReportRow"][]
     }
     BatchSummary: {
       /** Format: uuid */
@@ -12901,6 +13738,86 @@ export interface components {
       ledgerBalance: components["schemas"]["Money"]
       difference: components["schemas"]["Money"]
     }
+    OutstandingPurchaseOrderLine: {
+      /** Format: uuid */
+      purchaseOrderId: string
+      number: string
+      orderType: components["schemas"]["PurchaseOrderType"]
+      supplierName: string
+      orderDate: components["schemas"]["BusinessDate"]
+      expectedDate: components["schemas"]["BusinessDate"]
+      status: string
+      lineNo: number
+      item: string
+      orderedQty: string
+      receivedQty: string
+      billedQty: string
+      openQty: string
+      unbilledQty: string
+      unitPrice: components["schemas"]["Money"]
+      openValue: components["schemas"]["Money"]
+    }
+    OutstandingPurchaseOrderReport: {
+      asOf: components["schemas"]["BusinessDate"]
+      items: components["schemas"]["OutstandingPurchaseOrderLine"][]
+      totalOpenValue: components["schemas"]["Money"]
+    }
+    PayableAgingAmounts: {
+      current: components["schemas"]["Money"]
+      d1To30: components["schemas"]["Money"]
+      d31To60: components["schemas"]["Money"]
+      d61To90: components["schemas"]["Money"]
+      over90: components["schemas"]["Money"]
+      total: components["schemas"]["Money"]
+    }
+    PayableAgingDocument: {
+      /** @enum {string} */
+      documentType: "supplier_bill" | "debit_note"
+      documentNumber: string
+      businessDate: components["schemas"]["BusinessDate"]
+      dueDate: components["schemas"]["BusinessDate"]
+      amount: components["schemas"]["Money"]
+      open: components["schemas"]["Money"]
+    }
+    PayableAgingSupplier: {
+      /** Format: uuid */
+      supplierId: string
+      supplierCode: string
+      supplierName: string
+      amounts: components["schemas"]["PayableAgingAmounts"]
+      documents: components["schemas"]["PayableAgingDocument"][]
+    }
+    PayableAgingReport: {
+      asOf: components["schemas"]["BusinessDate"]
+      items: components["schemas"]["PayableAgingSupplier"][]
+      totals: components["schemas"]["PayableAgingAmounts"]
+      ledgerBalance: components["schemas"]["Money"]
+      /** @description Saldo akun 2101 dikurangi total utang terbuka (harus nol). */
+      difference: components["schemas"]["Money"]
+    }
+    BatchCostRow: {
+      /** Format: uuid */
+      receiptId: string
+      receiptNumber: string
+      businessDate: components["schemas"]["BusinessDate"]
+      supplierName: string
+      orderType: components["schemas"]["PurchaseOrderType"]
+      sku: string
+      productName: string
+      batchNumber: string
+      goodQty: string
+      rejectQty: string
+      /** @enum {string} */
+      rejectDisposition: "return_to_supplier" | "absorbed"
+      unitPrice: components["schemas"]["Money"]
+      serviceAmount: components["schemas"]["Money"]
+      materialCost: components["schemas"]["Money"]
+      inventoryAmount: components["schemas"]["Money"]
+      unitCost: string
+    }
+    BatchCostReport: {
+      items: components["schemas"]["BatchCostRow"][]
+    }
   }
   responses: {
     /** @description Error standar (problem+json) */
@@ -12926,7 +13843,17 @@ export interface components {
     /** @description Versi terakhir yang dilihat user (optimistic locking). */
     Version: number
     IncludeInactive: boolean
+    ReportChannelId: string
+    ReportSubChannelId: string
+    ReportDivisionId: string
+    ReportCampaignId: string
     OutboundLineId: string
+    ReportLocationId: string
+    /** @description Jenis lokasi (mis. consignment, vending_buffer, toll_manufacturer). */
+    ReportLocationType: string
+    ReportProductId: string
+    ReportDateFrom: components["schemas"]["BusinessDate"]
+    ReportDateTo: components["schemas"]["BusinessDate"]
     /** @description Versi terakhir yang dilihat user (optimistic locking). */
     PartyVersion: number
     /** @description Waktu kedaluwarsa URL (Unix detik). */
@@ -13735,6 +14662,219 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["ReceivableAgingReport"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getSalesReport: {
+    parameters: {
+      query: {
+        groupBy?: components["schemas"]["ReportGroupBy"]
+        dateFrom: components["schemas"]["BusinessDate"]
+        dateTo: components["schemas"]["BusinessDate"]
+        channelId?: string
+        subChannelId?: string
+        productId?: string
+        /** @description Jenis pesanan (modern_trade, b2b, social_commerce, marketplace, employee, consignment). */
+        orderType?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Laporan penjualan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SalesReport"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getConsignmentReport: {
+    parameters: {
+      query: {
+        dateFrom: components["schemas"]["BusinessDate"]
+        dateTo: components["schemas"]["BusinessDate"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Rekap konsinyasi */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ConsignmentReport"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listSettlementFormats: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Format settlement */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": {
+            items: components["schemas"]["SettlementFormat"][]
+          }
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listMarketplaceSettlements: {
+    parameters: {
+      query?: {
+        status?: components["schemas"]["SettlementStatus"]
+        subChannelId?: string
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar settlement */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["MarketplaceSettlementList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getMarketplaceSettlement: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Settlement */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["MarketplaceSettlement"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  postMarketplaceSettlement: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Settlement diposting */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["MarketplaceSettlement"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  cancelMarketplaceSettlement: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SettlementCancelInput"]
+      }
+    }
+    responses: {
+      /** @description Settlement dibatalkan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["MarketplaceSettlement"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listMarketplaceReceivables: {
+    parameters: {
+      query?: {
+        subChannelId?: string
+        openOnly?: boolean
+        q?: components["parameters"]["Search"]
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Sisa piutang marketplace */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["MarketplaceReceivableList"]
         }
       }
       default: components["responses"]["Problem"]
@@ -17683,6 +18823,155 @@ export interface operations {
       default: components["responses"]["Problem"]
     }
   }
+  getFinancialStatement: {
+    parameters: {
+      query: {
+        kind: components["schemas"]["StatementKind"]
+        dateFrom?: components["schemas"]["BusinessDate"]
+        dateTo: components["schemas"]["BusinessDate"]
+        channelId?: components["parameters"]["ReportChannelId"]
+        subChannelId?: components["parameters"]["ReportSubChannelId"]
+        divisionId?: components["parameters"]["ReportDivisionId"]
+        campaignId?: components["parameters"]["ReportCampaignId"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Laporan keuangan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["FinancialStatement"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getProfitLossByDimension: {
+    parameters: {
+      query: {
+        dimension: components["schemas"]["DimensionKind"]
+        dateFrom: components["schemas"]["BusinessDate"]
+        dateTo: components["schemas"]["BusinessDate"]
+        channelId?: components["parameters"]["ReportChannelId"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Laba rugi per dimensi */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DimensionProfitLoss"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getTaxSummary: {
+    parameters: {
+      query: {
+        year: number
+        /** @description Masa (1–12) untuk rincian jurnal; kosong = tanpa rincian. */
+        month?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Rekap pajak */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["TaxSummary"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getExecutiveDashboard: {
+    parameters: {
+      query: {
+        dateFrom: components["schemas"]["BusinessDate"]
+        dateTo: components["schemas"]["BusinessDate"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Dashboard */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ExecutiveDashboard"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listReadModels: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Status read model */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ReadModelStatus"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  refreshReadModels: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Status read model setelah refresh */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ReadModelStatus"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
   listCashBankAccounts: {
     parameters: {
       query?: {
@@ -20664,6 +21953,33 @@ export interface operations {
       default: components["responses"]["Problem"]
     }
   }
+  getStockCountVarianceReport: {
+    parameters: {
+      query: {
+        dateFrom: components["schemas"]["BusinessDate"]
+        dateTo: components["schemas"]["BusinessDate"]
+        locationId?: string
+        productId?: string
+        varianceOnly?: boolean
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Hasil stock count */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockCountVarianceReport"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
   updateStockCountSchedule: {
     parameters: {
       query?: never
@@ -20750,6 +22066,140 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["StockCard"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getStockPositionReport: {
+    parameters: {
+      query?: {
+        locationId?: components["parameters"]["ReportLocationId"]
+        /** @description Jenis lokasi (mis. consignment, vending_buffer, toll_manufacturer). */
+        locationType?: components["parameters"]["ReportLocationType"]
+        productId?: components["parameters"]["ReportProductId"]
+        batchId?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Posisi stok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockPositionReport"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getStockMovementReport: {
+    parameters: {
+      query: {
+        dateFrom: components["parameters"]["ReportDateFrom"]
+        dateTo: components["parameters"]["ReportDateTo"]
+        locationId?: components["parameters"]["ReportLocationId"]
+        /** @description Jenis lokasi (mis. consignment, vending_buffer, toll_manufacturer). */
+        locationType?: components["parameters"]["ReportLocationType"]
+        productId?: components["parameters"]["ReportProductId"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Mutasi stok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockMovementReport"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getStockExpiryReport: {
+    parameters: {
+      query?: {
+        locationId?: components["parameters"]["ReportLocationId"]
+        /** @description Jenis lokasi (mis. consignment, vending_buffer, toll_manufacturer). */
+        locationType?: components["parameters"]["ReportLocationType"]
+        productId?: components["parameters"]["ReportProductId"]
+        /** @description Hanya batch yang kedaluwarsa dalam N hari (termasuk yang sudah lewat); kosong = semua. */
+        withinDays?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Kedaluwarsa & umur stok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["StockExpiryReport"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getInternalUsageReport: {
+    parameters: {
+      query: {
+        dateFrom: components["parameters"]["ReportDateFrom"]
+        dateTo: components["parameters"]["ReportDateTo"]
+        purpose?: "marketing" | "event" | "employee_sample" | "sales_sampling"
+        campaignId?: string
+        divisionId?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Pemakaian internal */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["InternalUsageReport"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getReturnReport: {
+    parameters: {
+      query: {
+        dateFrom: components["parameters"]["ReportDateFrom"]
+        dateTo: components["parameters"]["ReportDateTo"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Retur & tindak lanjut */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ReturnReport"]
         }
       }
       default: components["responses"]["Problem"]
@@ -25098,6 +26548,77 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["GoodsReceivedNotInvoicedReport"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getOutstandingPurchaseOrders: {
+    parameters: {
+      query?: {
+        supplierId?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Outstanding PO */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["OutstandingPurchaseOrderReport"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getPayableAging: {
+    parameters: {
+      query?: {
+        asOf?: components["schemas"]["BusinessDate"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Umur utang */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PayableAgingReport"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getBatchCostReport: {
+    parameters: {
+      query: {
+        dateFrom: components["schemas"]["BusinessDate"]
+        dateTo: components["schemas"]["BusinessDate"]
+        productId?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Komposisi HPP batch */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["BatchCostReport"]
         }
       }
       default: components["responses"]["Problem"]

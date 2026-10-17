@@ -49,7 +49,7 @@ type salesHarness struct {
 // Senin 2 Nov 2026 09.00 WIB.
 var salesNow = time.Date(2026, 11, 2, 2, 0, 0, 0, time.UTC)
 
-func newSalesHarness(t *testing.T) *salesHarness {
+func newSalesHarness(t *testing.T, extraModules ...string) *salesHarness {
 	t.Helper()
 	pool := dbtest.Pool(t)
 	log := slog.New(slog.NewTextHandler(io.Discard, nil))
@@ -62,6 +62,7 @@ func newSalesHarness(t *testing.T) *salesHarness {
 			"inventory", "filestore", "party", "hris", "pricing", "dataexchange", "sales",
 		},
 	}
+	cfg.EnabledModules = append(cfg.EnabledModules, extraModules...)
 	a := &App{
 		Config: cfg, Log: log, Pool: pool, Clock: fixed, Tx: db.NewTxManager(pool),
 		Responder: httpx.NewResponder(log, nil), idempotency: idempotency.NewStore(pool),

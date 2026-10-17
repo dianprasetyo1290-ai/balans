@@ -64,16 +64,16 @@ func (e ConsignmentDeliveryStatus) Valid() bool {
 
 // Defines values for ConsignmentDeliveryType.
 const (
-	Consignment   ConsignmentDeliveryType = "consignment"
-	VendingBuffer ConsignmentDeliveryType = "vending_buffer"
+	ConsignmentDeliveryTypeConsignment   ConsignmentDeliveryType = "consignment"
+	ConsignmentDeliveryTypeVendingBuffer ConsignmentDeliveryType = "vending_buffer"
 )
 
 // Valid indicates whether the value is a known member of the ConsignmentDeliveryType enum.
 func (e ConsignmentDeliveryType) Valid() bool {
 	switch e {
-	case Consignment:
+	case ConsignmentDeliveryTypeConsignment:
 		return true
-	case VendingBuffer:
+	case ConsignmentDeliveryTypeVendingBuffer:
 		return true
 	default:
 		return false
@@ -104,6 +104,24 @@ func (e ConsignmentReconciliationStatus) Valid() bool {
 	case ConsignmentReconciliationStatusPosted:
 		return true
 	case ConsignmentReconciliationStatusRejected:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ConsignmentReportRowInvoiceType.
+const (
+	ConsignmentReportRowInvoiceTypeConsignment ConsignmentReportRowInvoiceType = "consignment"
+	ConsignmentReportRowInvoiceTypeVariance    ConsignmentReportRowInvoiceType = "variance"
+)
+
+// Valid indicates whether the value is a known member of the ConsignmentReportRowInvoiceType enum.
+func (e ConsignmentReportRowInvoiceType) Valid() bool {
+	switch e {
+	case ConsignmentReportRowInvoiceTypeConsignment:
+		return true
+	case ConsignmentReportRowInvoiceTypeVariance:
 		return true
 	default:
 		return false
@@ -404,6 +422,36 @@ func (e ProformaInvoiceDetailAllowedActions) Valid() bool {
 	}
 }
 
+// Defines values for ReportGroupBy.
+const (
+	ReportGroupByCategory   ReportGroupBy = "category"
+	ReportGroupByChannel    ReportGroupBy = "channel"
+	ReportGroupByDay        ReportGroupBy = "day"
+	ReportGroupByMonth      ReportGroupBy = "month"
+	ReportGroupByProduct    ReportGroupBy = "product"
+	ReportGroupBySubChannel ReportGroupBy = "sub_channel"
+)
+
+// Valid indicates whether the value is a known member of the ReportGroupBy enum.
+func (e ReportGroupBy) Valid() bool {
+	switch e {
+	case ReportGroupByCategory:
+		return true
+	case ReportGroupByChannel:
+		return true
+	case ReportGroupByDay:
+		return true
+	case ReportGroupByMonth:
+		return true
+	case ReportGroupByProduct:
+		return true
+	case ReportGroupBySubChannel:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for ReturnDisposition.
 const (
 	Dispose         ReturnDisposition = "dispose"
@@ -472,16 +520,16 @@ func (e ReturnReasonScope) Valid() bool {
 
 // Defines values for SalesChannelOptionKind.
 const (
-	Channel    SalesChannelOptionKind = "channel"
-	SubChannel SalesChannelOptionKind = "sub_channel"
+	SalesChannelOptionKindChannel    SalesChannelOptionKind = "channel"
+	SalesChannelOptionKindSubChannel SalesChannelOptionKind = "sub_channel"
 )
 
 // Valid indicates whether the value is a known member of the SalesChannelOptionKind enum.
 func (e SalesChannelOptionKind) Valid() bool {
 	switch e {
-	case Channel:
+	case SalesChannelOptionKindChannel:
 		return true
-	case SubChannel:
+	case SalesChannelOptionKindSubChannel:
 		return true
 	default:
 		return false
@@ -725,6 +773,27 @@ func (e SalesReturnStatus) Valid() bool {
 	case SalesReturnStatusSubmitted:
 		return true
 	case SalesReturnStatusVerified:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for SettlementStatus.
+const (
+	SettlementStatusCancelled SettlementStatus = "cancelled"
+	SettlementStatusDraft     SettlementStatus = "draft"
+	SettlementStatusPosted    SettlementStatus = "posted"
+)
+
+// Valid indicates whether the value is a known member of the SettlementStatus enum.
+func (e SettlementStatus) Valid() bool {
+	switch e {
+	case SettlementStatusCancelled:
+		return true
+	case SettlementStatusDraft:
+		return true
+	case SettlementStatusPosted:
 		return true
 	default:
 		return false
@@ -1092,6 +1161,56 @@ type ConsignmentReconciliationUpdate struct {
 	Version  int   `json:"version"`
 }
 
+// ConsignmentReport defines model for ConsignmentReport.
+type ConsignmentReport struct {
+	// DateFrom Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	DateFrom BusinessDate `json:"dateFrom"`
+
+	// DateTo Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	DateTo BusinessDate           `json:"dateTo"`
+	Items  []ConsignmentReportRow `json:"items"`
+}
+
+// ConsignmentReportRow defines model for ConsignmentReportRow.
+type ConsignmentReportRow struct {
+	// Discount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Discount Money `json:"discount"`
+
+	// Gross Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Gross        Money                           `json:"gross"`
+	InvoiceCount int                             `json:"invoiceCount"`
+	InvoiceType  ConsignmentReportRowInvoiceType `json:"invoiceType"`
+
+	// Outstanding Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Outstanding Money `json:"outstanding"`
+
+	// Paid Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Paid        Money              `json:"paid"`
+	PartnerCode string             `json:"partnerCode"`
+	PartnerId   openapi_types.UUID `json:"partnerId"`
+	PartnerName string             `json:"partnerName"`
+
+	// Total Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Total Money `json:"total"`
+}
+
+// ConsignmentReportRowInvoiceType defines model for ConsignmentReportRow.InvoiceType.
+type ConsignmentReportRowInvoiceType string
+
 // ConsignmentVarianceCause Penyebab selisih (BRD U-02).
 type ConsignmentVarianceCause string
 
@@ -1381,6 +1500,202 @@ type DiscountKind string
 // ErrorCode Katalog kode error (Technical Guideline Lampiran A).
 type ErrorCode string
 
+// MarketplaceReceivable defines model for MarketplaceReceivable.
+type MarketplaceReceivable struct {
+	BuyerName string `json:"buyerName"`
+
+	// Draft Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Draft           Money  `json:"draft"`
+	ExternalOrderId string `json:"externalOrderId"`
+
+	// HandedOverDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	HandedOverDate  BusinessDate `json:"handedOverDate"`
+	MarketplaceName string       `json:"marketplaceName"`
+	Number          string       `json:"number"`
+
+	// OrderDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	OrderDate BusinessDate `json:"orderDate"`
+
+	// Outstanding Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Outstanding Money `json:"outstanding"`
+
+	// Receivable Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Receivable   Money              `json:"receivable"`
+	SalesOrderId openapi_types.UUID `json:"salesOrderId"`
+
+	// Settled Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Settled Money `json:"settled"`
+}
+
+// MarketplaceReceivableList defines model for MarketplaceReceivableList.
+type MarketplaceReceivableList struct {
+	Items      []MarketplaceReceivable `json:"items"`
+	Page       int                     `json:"page"`
+	PageSize   int                     `json:"pageSize"`
+	TotalItems int64                   `json:"totalItems"`
+
+	// TotalOutstanding Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	TotalOutstanding Money `json:"totalOutstanding"`
+	TotalPages       int   `json:"totalPages"`
+
+	// TotalReceivable Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	TotalReceivable Money `json:"totalReceivable"`
+
+	// TotalSettled Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	TotalSettled Money `json:"totalSettled"`
+}
+
+// MarketplaceSettlement defines model for MarketplaceSettlement.
+type MarketplaceSettlement struct {
+	AllowedActions  []string `json:"allowedActions"`
+	BankAccountCode string   `json:"bankAccountCode"`
+	CancelReason    *string  `json:"cancelReason,omitempty"`
+
+	// Fee Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Fee             Money                       `json:"fee"`
+	Id              openapi_types.UUID          `json:"id"`
+	JournalEntryId  *openapi_types.UUID         `json:"journalEntryId,omitempty"`
+	LineCount       int                         `json:"lineCount"`
+	Lines           []MarketplaceSettlementLine `json:"lines"`
+	MarketplaceCode string                      `json:"marketplaceCode"`
+	MarketplaceName string                      `json:"marketplaceName"`
+
+	// Net Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Net             Money      `json:"net"`
+	PayoutReference string     `json:"payoutReference"`
+	PostedAt        *time.Time `json:"postedAt,omitempty"`
+
+	// Promo Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Promo Money `json:"promo"`
+
+	// Settled Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Settled Money `json:"settled"`
+
+	// SettlementDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	SettlementDate BusinessDate     `json:"settlementDate"`
+	Status         SettlementStatus `json:"status"`
+	StatusLabel    string           `json:"statusLabel"`
+	UpdatedAt      time.Time        `json:"updatedAt"`
+	Version        int              `json:"version"`
+}
+
+// MarketplaceSettlementLine defines model for MarketplaceSettlementLine.
+type MarketplaceSettlementLine struct {
+	ExternalOrderId string `json:"externalOrderId"`
+
+	// Fee Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Fee    Money `json:"fee"`
+	LineNo int   `json:"lineNo"`
+
+	// Net Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Net         Money  `json:"net"`
+	OrderNumber string `json:"orderNumber"`
+
+	// Outstanding Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Outstanding Money `json:"outstanding"`
+
+	// Promo Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Promo Money `json:"promo"`
+
+	// Receivable Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Receivable   Money              `json:"receivable"`
+	SalesOrderId openapi_types.UUID `json:"salesOrderId"`
+
+	// Settled Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Settled Money `json:"settled"`
+}
+
+// MarketplaceSettlementList defines model for MarketplaceSettlementList.
+type MarketplaceSettlementList struct {
+	Items      []MarketplaceSettlementSummary `json:"items"`
+	Page       int                            `json:"page"`
+	PageSize   int                            `json:"pageSize"`
+	TotalItems int64                          `json:"totalItems"`
+	TotalPages int                            `json:"totalPages"`
+}
+
+// MarketplaceSettlementSummary defines model for MarketplaceSettlementSummary.
+type MarketplaceSettlementSummary struct {
+	BankAccountCode string  `json:"bankAccountCode"`
+	CancelReason    *string `json:"cancelReason,omitempty"`
+
+	// Fee Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Fee             Money               `json:"fee"`
+	Id              openapi_types.UUID  `json:"id"`
+	JournalEntryId  *openapi_types.UUID `json:"journalEntryId,omitempty"`
+	LineCount       int                 `json:"lineCount"`
+	MarketplaceCode string              `json:"marketplaceCode"`
+	MarketplaceName string              `json:"marketplaceName"`
+
+	// Net Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Net             Money      `json:"net"`
+	PayoutReference string     `json:"payoutReference"`
+	PostedAt        *time.Time `json:"postedAt,omitempty"`
+
+	// Promo Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Promo Money `json:"promo"`
+
+	// Settled Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Settled Money `json:"settled"`
+
+	// SettlementDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	SettlementDate BusinessDate     `json:"settlementDate"`
+	Status         SettlementStatus `json:"status"`
+	StatusLabel    string           `json:"statusLabel"`
+	UpdatedAt      time.Time        `json:"updatedAt"`
+	Version        int              `json:"version"`
+}
+
 // MidtransNotification Payload HTTP notification Midtrans (nama field milik Midtrans).
 type MidtransNotification struct {
 	FraudStatus       *string `json:"fraud_status,omitempty"`
@@ -1570,6 +1885,9 @@ type ReceivableAgingRow struct {
 	// Example: 1250000.00
 	Total Money `json:"total"`
 }
+
+// ReportGroupBy Pengelompokan laporan penjualan & margin (RPT-05, RPT-15).
+type ReportGroupBy string
 
 // ReturnDisposition Disposisi barang retur (Disposisi Retur, WMS-07); dipakai master Alasan Retur dan dokumen Disposisi Retur.
 type ReturnDisposition string
@@ -2262,6 +2580,58 @@ type SalesProductRef struct {
 // Example: 12.000
 type SalesQuantity = string
 
+// SalesReport defines model for SalesReport.
+type SalesReport struct {
+	// DateFrom Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	DateFrom BusinessDate `json:"dateFrom"`
+
+	// DateTo Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	DateTo BusinessDate `json:"dateTo"`
+
+	// GroupBy Pengelompokan laporan penjualan & margin (RPT-05, RPT-15).
+	GroupBy ReportGroupBy     `json:"groupBy"`
+	Lines   []SalesReportLine `json:"lines"`
+	Total   SalesReportLine   `json:"total"`
+}
+
+// SalesReportLine defines model for SalesReportLine.
+type SalesReportLine struct {
+	Code string `json:"code"`
+
+	// Cogs Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Cogs Money `json:"cogs"`
+
+	// Discount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Discount Money `json:"discount"`
+
+	// Gross Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Gross Money `json:"gross"`
+
+	// GrossProfit Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	GrossProfit   Money  `json:"grossProfit"`
+	Key           string `json:"key"`
+	MarginPercent string `json:"marginPercent"`
+	Name          string `json:"name"`
+
+	// Net Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Net Money  `json:"net"`
+	Qty string `json:"qty"`
+}
+
 // SalesReturn defines model for SalesReturn.
 type SalesReturn struct {
 	AllowedActions []SalesReturnAllowedActions `json:"allowedActions"`
@@ -2688,6 +3058,32 @@ type SalesShipment struct {
 	SourceType  string             `json:"sourceType"`
 }
 
+// SettlementCancelInput defines model for SettlementCancelInput.
+type SettlementCancelInput struct {
+	Reason  string `json:"reason"`
+	Version int    `json:"version"`
+}
+
+// SettlementFormat defines model for SettlementFormat.
+type SettlementFormat struct {
+	Columns []SettlementFormatColumn `json:"columns"`
+
+	// Kind Jenis data impor dataexchange.
+	Kind        string `json:"kind"`
+	Label       string `json:"label"`
+	Marketplace string `json:"marketplace"`
+}
+
+// SettlementFormatColumn defines model for SettlementFormatColumn.
+type SettlementFormatColumn struct {
+	Header   string `json:"header"`
+	Key      string `json:"key"`
+	Required bool   `json:"required"`
+}
+
+// SettlementStatus defines model for SettlementStatus.
+type SettlementStatus string
+
 // VersionInput defines model for VersionInput.
 type VersionInput struct {
 	// Version Versi terakhir yang dilihat user (optimistic locking).
@@ -2910,6 +3306,35 @@ type ListSalesLocationOptionsParams struct {
 	OrderType SalesOrderType `form:"orderType" json:"orderType"`
 }
 
+// ListMarketplaceReceivablesParams defines parameters for ListMarketplaceReceivables.
+type ListMarketplaceReceivablesParams struct {
+	SubChannelId *openapi_types.UUID `form:"subChannelId,omitempty" json:"subChannelId,omitempty"`
+	OpenOnly     *bool               `form:"openOnly,omitempty" json:"openOnly,omitempty"`
+	Q            *Search             `form:"q,omitempty" json:"q,omitempty"`
+	Page         *Page               `form:"page,omitempty" json:"page,omitempty"`
+	PageSize     *PageSize           `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+}
+
+// ListMarketplaceSettlementsParams defines parameters for ListMarketplaceSettlements.
+type ListMarketplaceSettlementsParams struct {
+	Status       *SettlementStatus   `form:"status,omitempty" json:"status,omitempty"`
+	SubChannelId *openapi_types.UUID `form:"subChannelId,omitempty" json:"subChannelId,omitempty"`
+	Page         *Page               `form:"page,omitempty" json:"page,omitempty"`
+	PageSize     *PageSize           `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+}
+
+// CancelMarketplaceSettlementParams defines parameters for CancelMarketplaceSettlement.
+type CancelMarketplaceSettlementParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// PostMarketplaceSettlementParams defines parameters for PostMarketplaceSettlement.
+type PostMarketplaceSettlementParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
 // ListSalesOrdersParams defines parameters for ListSalesOrders.
 type ListSalesOrdersParams struct {
 	Page     *Page     `form:"page,omitempty" json:"page,omitempty"`
@@ -2975,6 +3400,25 @@ type GetReceivableAgingParams struct {
 	// AsOf Tanggal posisi (default hari ini).
 	AsOf      *BusinessDate   `form:"asOf,omitempty" json:"asOf,omitempty"`
 	PartyType *SalesPartyType `form:"partyType,omitempty" json:"partyType,omitempty"`
+}
+
+// GetConsignmentReportParams defines parameters for GetConsignmentReport.
+type GetConsignmentReportParams struct {
+	DateFrom BusinessDate `form:"dateFrom" json:"dateFrom"`
+	DateTo   BusinessDate `form:"dateTo" json:"dateTo"`
+}
+
+// GetSalesReportParams defines parameters for GetSalesReport.
+type GetSalesReportParams struct {
+	GroupBy      *ReportGroupBy      `form:"groupBy,omitempty" json:"groupBy,omitempty"`
+	DateFrom     BusinessDate        `form:"dateFrom" json:"dateFrom"`
+	DateTo       BusinessDate        `form:"dateTo" json:"dateTo"`
+	ChannelId    *openapi_types.UUID `form:"channelId,omitempty" json:"channelId,omitempty"`
+	SubChannelId *openapi_types.UUID `form:"subChannelId,omitempty" json:"subChannelId,omitempty"`
+	ProductId    *openapi_types.UUID `form:"productId,omitempty" json:"productId,omitempty"`
+
+	// OrderType Jenis pesanan (modern_trade, b2b, social_commerce, marketplace, employee, consignment).
+	OrderType *string `form:"orderType,omitempty" json:"orderType,omitempty"`
 }
 
 // ListSalesReturnSourcesParams defines parameters for ListSalesReturnSources.
@@ -3102,6 +3546,12 @@ type CreateCustomerPaymentJSONRequestBody = CustomerPaymentInput
 
 // CancelCustomerPaymentJSONRequestBody defines body for CancelCustomerPayment for application/json ContentType.
 type CancelCustomerPaymentJSONRequestBody = SalesCancelInput
+
+// CancelMarketplaceSettlementJSONRequestBody defines body for CancelMarketplaceSettlement for application/json ContentType.
+type CancelMarketplaceSettlementJSONRequestBody = SettlementCancelInput
+
+// PostMarketplaceSettlementJSONRequestBody defines body for PostMarketplaceSettlement for application/json ContentType.
+type PostMarketplaceSettlementJSONRequestBody = VersionInput
 
 // CreateSalesOrderJSONRequestBody defines body for CreateSalesOrder for application/json ContentType.
 type CreateSalesOrderJSONRequestBody = SalesOrderInput
@@ -3255,6 +3705,21 @@ type ServerInterface interface {
 	// ListSalesLocationOptions Lokasi asal stok yang boleh dipakai jenis pesanan
 	// (GET /api/v1/sales/location-options)
 	ListSalesLocationOptions(w http.ResponseWriter, r *http.Request, params ListSalesLocationOptionsParams)
+	// ListMarketplaceReceivables Sisa piutang marketplace per order (F1-402)
+	// (GET /api/v1/sales/marketplace-receivables)
+	ListMarketplaceReceivables(w http.ResponseWriter, r *http.Request, params ListMarketplaceReceivablesParams)
+	// ListMarketplaceSettlements Daftar settlement marketplace (S-403)
+	// (GET /api/v1/sales/marketplace-settlements)
+	ListMarketplaceSettlements(w http.ResponseWriter, r *http.Request, params ListMarketplaceSettlementsParams)
+	// GetMarketplaceSettlement Detail settlement marketplace beserta order yang dicocokkan
+	// (GET /api/v1/sales/marketplace-settlements/{id})
+	GetMarketplaceSettlement(w http.ResponseWriter, r *http.Request, id Id)
+	// CancelMarketplaceSettlement Batalkan settlement draft (order bisa diimpor ulang)
+	// (POST /api/v1/sales/marketplace-settlements/{id}/cancel)
+	CancelMarketplaceSettlement(w http.ResponseWriter, r *http.Request, id Id, params CancelMarketplaceSettlementParams)
+	// PostMarketplaceSettlement Posting settlement — jurnal A-10s (Dr Bank + Fee 6105 + Promo 6107, Cr Piutang Marketplace 121x)
+	// (POST /api/v1/sales/marketplace-settlements/{id}/post)
+	PostMarketplaceSettlement(w http.ResponseWriter, r *http.Request, id Id, params PostMarketplaceSettlementParams)
 	// ListSalesOrders Daftar Sales Order semua channel (Sales Order, Modern Trade, Penjualan Marketplace, WA/IG, Karyawan)
 	// (GET /api/v1/sales/orders)
 	ListSalesOrders(w http.ResponseWriter, r *http.Request, params ListSalesOrdersParams)
@@ -3288,6 +3753,12 @@ type ServerInterface interface {
 	// GetReceivableAging Laporan Piutang — umur piutang per pelanggan/mitra
 	// (GET /api/v1/sales/receivable-aging)
 	GetReceivableAging(w http.ResponseWriter, r *http.Request, params GetReceivableAgingParams)
+	// GetConsignmentReport Laporan Konsinyasi — invoice konsinyasi & selisih per mitra (RPT-06)
+	// (GET /api/v1/sales/reports/consignment)
+	GetConsignmentReport(w http.ResponseWriter, r *http.Request, params GetConsignmentReportParams)
+	// GetSalesReport Laporan Penjualan & margin kotor per channel/sub-channel/produk/kategori/periode (RPT-05, RPT-15)
+	// (GET /api/v1/sales/reports/sales)
+	GetSalesReport(w http.ResponseWriter, r *http.Request, params GetSalesReportParams)
 	// ListSalesReturnPickupUsers Merchandiser aktif untuk penugasan pickup retur
 	// (GET /api/v1/sales/return-pickup-users)
 	ListSalesReturnPickupUsers(w http.ResponseWriter, r *http.Request)
@@ -3330,6 +3801,9 @@ type ServerInterface interface {
 	// VerifySalesReturn Verifikasi retur MT oleh Logistik Leader (tentukan pickup Merchandiser atau dikirim partner)
 	// (POST /api/v1/sales/returns/{id}/verify)
 	VerifySalesReturn(w http.ResponseWriter, r *http.Request, id Id, params VerifySalesReturnParams)
+	// ListSettlementFormats Format laporan settlement per marketplace (jenis data impor dan kolom)
+	// (GET /api/v1/sales/settlement-formats)
+	ListSettlementFormats(w http.ResponseWriter, r *http.Request)
 	// ReceiveMidtransWebhook Notifikasi pembayaran Midtrans
 	// (POST /api/v1/webhooks/midtrans)
 	ReceiveMidtransWebhook(w http.ResponseWriter, r *http.Request)
@@ -3543,6 +4017,36 @@ func (_ Unimplemented) ListSalesLocationOptions(w http.ResponseWriter, r *http.R
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListMarketplaceReceivables Sisa piutang marketplace per order (F1-402)
+// (GET /api/v1/sales/marketplace-receivables)
+func (_ Unimplemented) ListMarketplaceReceivables(w http.ResponseWriter, r *http.Request, params ListMarketplaceReceivablesParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListMarketplaceSettlements Daftar settlement marketplace (S-403)
+// (GET /api/v1/sales/marketplace-settlements)
+func (_ Unimplemented) ListMarketplaceSettlements(w http.ResponseWriter, r *http.Request, params ListMarketplaceSettlementsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetMarketplaceSettlement Detail settlement marketplace beserta order yang dicocokkan
+// (GET /api/v1/sales/marketplace-settlements/{id})
+func (_ Unimplemented) GetMarketplaceSettlement(w http.ResponseWriter, r *http.Request, id Id) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// CancelMarketplaceSettlement Batalkan settlement draft (order bisa diimpor ulang)
+// (POST /api/v1/sales/marketplace-settlements/{id}/cancel)
+func (_ Unimplemented) CancelMarketplaceSettlement(w http.ResponseWriter, r *http.Request, id Id, params CancelMarketplaceSettlementParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// PostMarketplaceSettlement Posting settlement — jurnal A-10s (Dr Bank + Fee 6105 + Promo 6107, Cr Piutang Marketplace 121x)
+// (POST /api/v1/sales/marketplace-settlements/{id}/post)
+func (_ Unimplemented) PostMarketplaceSettlement(w http.ResponseWriter, r *http.Request, id Id, params PostMarketplaceSettlementParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
 // ListSalesOrders Daftar Sales Order semua channel (Sales Order, Modern Trade, Penjualan Marketplace, WA/IG, Karyawan)
 // (GET /api/v1/sales/orders)
 func (_ Unimplemented) ListSalesOrders(w http.ResponseWriter, r *http.Request, params ListSalesOrdersParams) {
@@ -3606,6 +4110,18 @@ func (_ Unimplemented) ConfirmProformaPayment(w http.ResponseWriter, r *http.Req
 // GetReceivableAging Laporan Piutang — umur piutang per pelanggan/mitra
 // (GET /api/v1/sales/receivable-aging)
 func (_ Unimplemented) GetReceivableAging(w http.ResponseWriter, r *http.Request, params GetReceivableAgingParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetConsignmentReport Laporan Konsinyasi — invoice konsinyasi & selisih per mitra (RPT-06)
+// (GET /api/v1/sales/reports/consignment)
+func (_ Unimplemented) GetConsignmentReport(w http.ResponseWriter, r *http.Request, params GetConsignmentReportParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetSalesReport Laporan Penjualan & margin kotor per channel/sub-channel/produk/kategori/periode (RPT-05, RPT-15)
+// (GET /api/v1/sales/reports/sales)
+func (_ Unimplemented) GetSalesReport(w http.ResponseWriter, r *http.Request, params GetSalesReportParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -3690,6 +4206,12 @@ func (_ Unimplemented) SubmitSalesReturn(w http.ResponseWriter, r *http.Request,
 // VerifySalesReturn Verifikasi retur MT oleh Logistik Leader (tentukan pickup Merchandiser atau dikirim partner)
 // (POST /api/v1/sales/returns/{id}/verify)
 func (_ Unimplemented) VerifySalesReturn(w http.ResponseWriter, r *http.Request, id Id, params VerifySalesReturnParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListSettlementFormats Format laporan settlement per marketplace (jenis data impor dan kolom)
+// (GET /api/v1/sales/settlement-formats)
+func (_ Unimplemented) ListSettlementFormats(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -5555,6 +6077,297 @@ func (siw *ServerInterfaceWrapper) ListSalesLocationOptions(w http.ResponseWrite
 	handler.ServeHTTP(w, r)
 }
 
+// ListMarketplaceReceivables operation middleware
+func (siw *ServerInterfaceWrapper) ListMarketplaceReceivables(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListMarketplaceReceivablesParams
+
+	// ------------- Optional query parameter "subChannelId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "subChannelId", r.URL.Query(), &params.SubChannelId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "subChannelId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "subChannelId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "openOnly" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "openOnly", r.URL.Query(), &params.OpenOnly, runtime.BindQueryParameterOptions{Type: "boolean", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "openOnly"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "openOnly", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "q" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "q", r.URL.Query(), &params.Q, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "q"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "q", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", r.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "page"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "pageSize", r.URL.Query(), &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "pageSize"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListMarketplaceReceivables(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListMarketplaceSettlements operation middleware
+func (siw *ServerInterfaceWrapper) ListMarketplaceSettlements(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListMarketplaceSettlementsParams
+
+	// ------------- Optional query parameter "status" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "status", r.URL.Query(), &params.Status, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "status"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "status", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "subChannelId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "subChannelId", r.URL.Query(), &params.SubChannelId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "subChannelId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "subChannelId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", r.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "page"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "pageSize", r.URL.Query(), &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "pageSize"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListMarketplaceSettlements(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetMarketplaceSettlement operation middleware
+func (siw *ServerInterfaceWrapper) GetMarketplaceSettlement(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetMarketplaceSettlement(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CancelMarketplaceSettlement operation middleware
+func (siw *ServerInterfaceWrapper) CancelMarketplaceSettlement(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CancelMarketplaceSettlementParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CancelMarketplaceSettlement(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostMarketplaceSettlement operation middleware
+func (siw *ServerInterfaceWrapper) PostMarketplaceSettlement(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params PostMarketplaceSettlementParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostMarketplaceSettlement(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // ListSalesOrders operation middleware
 func (siw *ServerInterfaceWrapper) ListSalesOrders(w http.ResponseWriter, r *http.Request) {
 
@@ -6181,6 +6994,163 @@ func (siw *ServerInterfaceWrapper) GetReceivableAging(w http.ResponseWriter, r *
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetReceivableAging(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetConsignmentReport operation middleware
+func (siw *ServerInterfaceWrapper) GetConsignmentReport(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetConsignmentReportParams
+
+	// ------------- Required query parameter "dateFrom" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "dateFrom", r.URL.Query(), &params.DateFrom, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dateFrom"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dateFrom", Err: err})
+		}
+		return
+	}
+
+	// ------------- Required query parameter "dateTo" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "dateTo", r.URL.Query(), &params.DateTo, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dateTo"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dateTo", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetConsignmentReport(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetSalesReport operation middleware
+func (siw *ServerInterfaceWrapper) GetSalesReport(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetSalesReportParams
+
+	// ------------- Optional query parameter "groupBy" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "groupBy", r.URL.Query(), &params.GroupBy, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "groupBy"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "groupBy", Err: err})
+		}
+		return
+	}
+
+	// ------------- Required query parameter "dateFrom" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "dateFrom", r.URL.Query(), &params.DateFrom, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dateFrom"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dateFrom", Err: err})
+		}
+		return
+	}
+
+	// ------------- Required query parameter "dateTo" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "dateTo", r.URL.Query(), &params.DateTo, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dateTo"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dateTo", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "channelId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "channelId", r.URL.Query(), &params.ChannelId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "channelId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "channelId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "subChannelId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "subChannelId", r.URL.Query(), &params.SubChannelId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "subChannelId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "subChannelId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "productId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "productId", r.URL.Query(), &params.ProductId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "productId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "productId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "orderType" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "orderType", r.URL.Query(), &params.OrderType, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "orderType"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orderType", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetSalesReport(w, r, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -6877,6 +7847,20 @@ func (siw *ServerInterfaceWrapper) VerifySalesReturn(w http.ResponseWriter, r *h
 	handler.ServeHTTP(w, r)
 }
 
+// ListSettlementFormats operation middleware
+func (siw *ServerInterfaceWrapper) ListSettlementFormats(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListSettlementFormats(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // ReceiveMidtransWebhook operation middleware
 func (siw *ServerInterfaceWrapper) ReceiveMidtransWebhook(w http.ResponseWriter, r *http.Request) {
 
@@ -7081,6 +8065,30 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/api/v1/sales/receivable-aging", wrapper.GetReceivableAging)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/sales/reports/sales", wrapper.GetSalesReport)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/sales/reports/consignment", wrapper.GetConsignmentReport)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/sales/settlement-formats", wrapper.ListSettlementFormats)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/sales/marketplace-settlements", wrapper.ListMarketplaceSettlements)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/sales/marketplace-settlements/{id}", wrapper.GetMarketplaceSettlement)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/sales/marketplace-settlements/{id}/post", wrapper.PostMarketplaceSettlement)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/sales/marketplace-settlements/{id}/cancel", wrapper.CancelMarketplaceSettlement)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/sales/marketplace-receivables", wrapper.ListMarketplaceReceivables)
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/api/v1/sales/return-sources", wrapper.ListSalesReturnSources)
@@ -8541,6 +9549,205 @@ func (response ListSalesLocationOptionsdefaultApplicationProblemPlusJSONResponse
 	return err
 }
 
+type ListMarketplaceReceivablesRequestObject struct {
+	Params ListMarketplaceReceivablesParams
+}
+
+type ListMarketplaceReceivablesResponseObject interface {
+	VisitListMarketplaceReceivablesResponse(w http.ResponseWriter) error
+}
+
+type ListMarketplaceReceivables200JSONResponse MarketplaceReceivableList
+
+func (response ListMarketplaceReceivables200JSONResponse) VisitListMarketplaceReceivablesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListMarketplaceReceivablesdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListMarketplaceReceivablesdefaultApplicationProblemPlusJSONResponse) VisitListMarketplaceReceivablesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListMarketplaceSettlementsRequestObject struct {
+	Params ListMarketplaceSettlementsParams
+}
+
+type ListMarketplaceSettlementsResponseObject interface {
+	VisitListMarketplaceSettlementsResponse(w http.ResponseWriter) error
+}
+
+type ListMarketplaceSettlements200JSONResponse MarketplaceSettlementList
+
+func (response ListMarketplaceSettlements200JSONResponse) VisitListMarketplaceSettlementsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListMarketplaceSettlementsdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListMarketplaceSettlementsdefaultApplicationProblemPlusJSONResponse) VisitListMarketplaceSettlementsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetMarketplaceSettlementRequestObject struct {
+	Id Id `json:"id"`
+}
+
+type GetMarketplaceSettlementResponseObject interface {
+	VisitGetMarketplaceSettlementResponse(w http.ResponseWriter) error
+}
+
+type GetMarketplaceSettlement200JSONResponse MarketplaceSettlement
+
+func (response GetMarketplaceSettlement200JSONResponse) VisitGetMarketplaceSettlementResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetMarketplaceSettlementdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetMarketplaceSettlementdefaultApplicationProblemPlusJSONResponse) VisitGetMarketplaceSettlementResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CancelMarketplaceSettlementRequestObject struct {
+	Id     Id `json:"id"`
+	Params CancelMarketplaceSettlementParams
+	Body   *CancelMarketplaceSettlementJSONRequestBody
+}
+
+type CancelMarketplaceSettlementResponseObject interface {
+	VisitCancelMarketplaceSettlementResponse(w http.ResponseWriter) error
+}
+
+type CancelMarketplaceSettlement200JSONResponse MarketplaceSettlement
+
+func (response CancelMarketplaceSettlement200JSONResponse) VisitCancelMarketplaceSettlementResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CancelMarketplaceSettlementdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response CancelMarketplaceSettlementdefaultApplicationProblemPlusJSONResponse) VisitCancelMarketplaceSettlementResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostMarketplaceSettlementRequestObject struct {
+	Id     Id `json:"id"`
+	Params PostMarketplaceSettlementParams
+	Body   *PostMarketplaceSettlementJSONRequestBody
+}
+
+type PostMarketplaceSettlementResponseObject interface {
+	VisitPostMarketplaceSettlementResponse(w http.ResponseWriter) error
+}
+
+type PostMarketplaceSettlement200JSONResponse MarketplaceSettlement
+
+func (response PostMarketplaceSettlement200JSONResponse) VisitPostMarketplaceSettlementResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostMarketplaceSettlementdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response PostMarketplaceSettlementdefaultApplicationProblemPlusJSONResponse) VisitPostMarketplaceSettlementResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type ListSalesOrdersRequestObject struct {
 	Params ListSalesOrdersParams
 }
@@ -8970,6 +10177,84 @@ type GetReceivableAgingdefaultApplicationProblemPlusJSONResponse struct {
 }
 
 func (response GetReceivableAgingdefaultApplicationProblemPlusJSONResponse) VisitGetReceivableAgingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetConsignmentReportRequestObject struct {
+	Params GetConsignmentReportParams
+}
+
+type GetConsignmentReportResponseObject interface {
+	VisitGetConsignmentReportResponse(w http.ResponseWriter) error
+}
+
+type GetConsignmentReport200JSONResponse ConsignmentReport
+
+func (response GetConsignmentReport200JSONResponse) VisitGetConsignmentReportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetConsignmentReportdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetConsignmentReportdefaultApplicationProblemPlusJSONResponse) VisitGetConsignmentReportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetSalesReportRequestObject struct {
+	Params GetSalesReportParams
+}
+
+type GetSalesReportResponseObject interface {
+	VisitGetSalesReportResponse(w http.ResponseWriter) error
+}
+
+type GetSalesReport200JSONResponse SalesReport
+
+func (response GetSalesReport200JSONResponse) VisitGetSalesReportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetSalesReportdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetSalesReportdefaultApplicationProblemPlusJSONResponse) VisitGetSalesReportResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
@@ -9543,6 +10828,46 @@ func (response VerifySalesReturndefaultApplicationProblemPlusJSONResponse) Visit
 	return err
 }
 
+type ListSettlementFormatsRequestObject struct {
+}
+
+type ListSettlementFormatsResponseObject interface {
+	VisitListSettlementFormatsResponse(w http.ResponseWriter) error
+}
+
+type ListSettlementFormats200JSONResponse struct {
+	Items []SettlementFormat `json:"items"`
+}
+
+func (response ListSettlementFormats200JSONResponse) VisitListSettlementFormatsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListSettlementFormatsdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListSettlementFormatsdefaultApplicationProblemPlusJSONResponse) VisitListSettlementFormatsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type ReceiveMidtransWebhookRequestObject struct {
 	Body *ReceiveMidtransWebhookJSONRequestBody
 }
@@ -9697,6 +11022,21 @@ type StrictServerInterface interface {
 	// ListSalesLocationOptions Lokasi asal stok yang boleh dipakai jenis pesanan
 	// (GET /api/v1/sales/location-options)
 	ListSalesLocationOptions(ctx context.Context, request ListSalesLocationOptionsRequestObject) (ListSalesLocationOptionsResponseObject, error)
+	// ListMarketplaceReceivables Sisa piutang marketplace per order (F1-402)
+	// (GET /api/v1/sales/marketplace-receivables)
+	ListMarketplaceReceivables(ctx context.Context, request ListMarketplaceReceivablesRequestObject) (ListMarketplaceReceivablesResponseObject, error)
+	// ListMarketplaceSettlements Daftar settlement marketplace (S-403)
+	// (GET /api/v1/sales/marketplace-settlements)
+	ListMarketplaceSettlements(ctx context.Context, request ListMarketplaceSettlementsRequestObject) (ListMarketplaceSettlementsResponseObject, error)
+	// GetMarketplaceSettlement Detail settlement marketplace beserta order yang dicocokkan
+	// (GET /api/v1/sales/marketplace-settlements/{id})
+	GetMarketplaceSettlement(ctx context.Context, request GetMarketplaceSettlementRequestObject) (GetMarketplaceSettlementResponseObject, error)
+	// CancelMarketplaceSettlement Batalkan settlement draft (order bisa diimpor ulang)
+	// (POST /api/v1/sales/marketplace-settlements/{id}/cancel)
+	CancelMarketplaceSettlement(ctx context.Context, request CancelMarketplaceSettlementRequestObject) (CancelMarketplaceSettlementResponseObject, error)
+	// PostMarketplaceSettlement Posting settlement — jurnal A-10s (Dr Bank + Fee 6105 + Promo 6107, Cr Piutang Marketplace 121x)
+	// (POST /api/v1/sales/marketplace-settlements/{id}/post)
+	PostMarketplaceSettlement(ctx context.Context, request PostMarketplaceSettlementRequestObject) (PostMarketplaceSettlementResponseObject, error)
 	// ListSalesOrders Daftar Sales Order semua channel (Sales Order, Modern Trade, Penjualan Marketplace, WA/IG, Karyawan)
 	// (GET /api/v1/sales/orders)
 	ListSalesOrders(ctx context.Context, request ListSalesOrdersRequestObject) (ListSalesOrdersResponseObject, error)
@@ -9730,6 +11070,12 @@ type StrictServerInterface interface {
 	// GetReceivableAging Laporan Piutang — umur piutang per pelanggan/mitra
 	// (GET /api/v1/sales/receivable-aging)
 	GetReceivableAging(ctx context.Context, request GetReceivableAgingRequestObject) (GetReceivableAgingResponseObject, error)
+	// GetConsignmentReport Laporan Konsinyasi — invoice konsinyasi & selisih per mitra (RPT-06)
+	// (GET /api/v1/sales/reports/consignment)
+	GetConsignmentReport(ctx context.Context, request GetConsignmentReportRequestObject) (GetConsignmentReportResponseObject, error)
+	// GetSalesReport Laporan Penjualan & margin kotor per channel/sub-channel/produk/kategori/periode (RPT-05, RPT-15)
+	// (GET /api/v1/sales/reports/sales)
+	GetSalesReport(ctx context.Context, request GetSalesReportRequestObject) (GetSalesReportResponseObject, error)
 	// ListSalesReturnPickupUsers Merchandiser aktif untuk penugasan pickup retur
 	// (GET /api/v1/sales/return-pickup-users)
 	ListSalesReturnPickupUsers(ctx context.Context, request ListSalesReturnPickupUsersRequestObject) (ListSalesReturnPickupUsersResponseObject, error)
@@ -9772,6 +11118,9 @@ type StrictServerInterface interface {
 	// VerifySalesReturn Verifikasi retur MT oleh Logistik Leader (tentukan pickup Merchandiser atau dikirim partner)
 	// (POST /api/v1/sales/returns/{id}/verify)
 	VerifySalesReturn(ctx context.Context, request VerifySalesReturnRequestObject) (VerifySalesReturnResponseObject, error)
+	// ListSettlementFormats Format laporan settlement per marketplace (jenis data impor dan kolom)
+	// (GET /api/v1/sales/settlement-formats)
+	ListSettlementFormats(ctx context.Context, request ListSettlementFormatsRequestObject) (ListSettlementFormatsResponseObject, error)
 	// ReceiveMidtransWebhook Notifikasi pembayaran Midtrans
 	// (POST /api/v1/webhooks/midtrans)
 	ReceiveMidtransWebhook(ctx context.Context, request ReceiveMidtransWebhookRequestObject) (ReceiveMidtransWebhookResponseObject, error)
@@ -10837,6 +12186,152 @@ func (sh *strictHandler) ListSalesLocationOptions(w http.ResponseWriter, r *http
 	}
 }
 
+// ListMarketplaceReceivables operation middleware
+func (sh *strictHandler) ListMarketplaceReceivables(w http.ResponseWriter, r *http.Request, params ListMarketplaceReceivablesParams) {
+	var request ListMarketplaceReceivablesRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListMarketplaceReceivables(ctx, request.(ListMarketplaceReceivablesRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListMarketplaceReceivables")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListMarketplaceReceivablesResponseObject); ok {
+		if err := validResponse.VisitListMarketplaceReceivablesResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListMarketplaceSettlements operation middleware
+func (sh *strictHandler) ListMarketplaceSettlements(w http.ResponseWriter, r *http.Request, params ListMarketplaceSettlementsParams) {
+	var request ListMarketplaceSettlementsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListMarketplaceSettlements(ctx, request.(ListMarketplaceSettlementsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListMarketplaceSettlements")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListMarketplaceSettlementsResponseObject); ok {
+		if err := validResponse.VisitListMarketplaceSettlementsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetMarketplaceSettlement operation middleware
+func (sh *strictHandler) GetMarketplaceSettlement(w http.ResponseWriter, r *http.Request, id Id) {
+	var request GetMarketplaceSettlementRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetMarketplaceSettlement(ctx, request.(GetMarketplaceSettlementRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetMarketplaceSettlement")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetMarketplaceSettlementResponseObject); ok {
+		if err := validResponse.VisitGetMarketplaceSettlementResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CancelMarketplaceSettlement operation middleware
+func (sh *strictHandler) CancelMarketplaceSettlement(w http.ResponseWriter, r *http.Request, id Id, params CancelMarketplaceSettlementParams) {
+	var request CancelMarketplaceSettlementRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body CancelMarketplaceSettlementJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CancelMarketplaceSettlement(ctx, request.(CancelMarketplaceSettlementRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CancelMarketplaceSettlement")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CancelMarketplaceSettlementResponseObject); ok {
+		if err := validResponse.VisitCancelMarketplaceSettlementResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostMarketplaceSettlement operation middleware
+func (sh *strictHandler) PostMarketplaceSettlement(w http.ResponseWriter, r *http.Request, id Id, params PostMarketplaceSettlementParams) {
+	var request PostMarketplaceSettlementRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body PostMarketplaceSettlementJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostMarketplaceSettlement(ctx, request.(PostMarketplaceSettlementRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostMarketplaceSettlement")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostMarketplaceSettlementResponseObject); ok {
+		if err := validResponse.VisitPostMarketplaceSettlementResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // ListSalesOrders operation middleware
 func (sh *strictHandler) ListSalesOrders(w http.ResponseWriter, r *http.Request, params ListSalesOrdersParams) {
 	var request ListSalesOrdersRequestObject
@@ -11163,6 +12658,58 @@ func (sh *strictHandler) GetReceivableAging(w http.ResponseWriter, r *http.Reque
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(GetReceivableAgingResponseObject); ok {
 		if err := validResponse.VisitGetReceivableAgingResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetConsignmentReport operation middleware
+func (sh *strictHandler) GetConsignmentReport(w http.ResponseWriter, r *http.Request, params GetConsignmentReportParams) {
+	var request GetConsignmentReportRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetConsignmentReport(ctx, request.(GetConsignmentReportRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetConsignmentReport")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetConsignmentReportResponseObject); ok {
+		if err := validResponse.VisitGetConsignmentReportResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetSalesReport operation middleware
+func (sh *strictHandler) GetSalesReport(w http.ResponseWriter, r *http.Request, params GetSalesReportParams) {
+	var request GetSalesReportRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetSalesReport(ctx, request.(GetSalesReportRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetSalesReport")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetSalesReportResponseObject); ok {
+		if err := validResponse.VisitGetSalesReportResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
@@ -11596,6 +13143,30 @@ func (sh *strictHandler) VerifySalesReturn(w http.ResponseWriter, r *http.Reques
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(VerifySalesReturnResponseObject); ok {
 		if err := validResponse.VisitVerifySalesReturnResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListSettlementFormats operation middleware
+func (sh *strictHandler) ListSettlementFormats(w http.ResponseWriter, r *http.Request) {
+	var request ListSettlementFormatsRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListSettlementFormats(ctx, request.(ListSettlementFormatsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListSettlementFormats")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListSettlementFormatsResponseObject); ok {
+		if err := validResponse.VisitListSettlementFormatsResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

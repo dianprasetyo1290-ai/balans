@@ -1235,6 +1235,46 @@ type LoginAttempt struct {
 	CreatedAt time.Time
 }
 
+type MarketplaceSettlement struct {
+	ID              uuid.UUID
+	ChannelID       uuid.UUID
+	SubChannelID    uuid.UUID
+	MarketplaceCode string
+	PayoutReference string
+	SettlementDate  clock.BusinessDate
+	BankAccountCode string
+	Status          string
+	LineCount       int32
+	SettledAmount   decimal.Decimal
+	FeeAmount       decimal.Decimal
+	PromoAmount     decimal.Decimal
+	NetAmount       decimal.Decimal
+	JournalEntryID  uuid.NullUUID
+	PostedAt        *time.Time
+	PostedBy        uuid.NullUUID
+	CancelReason    string
+	CreatedAt       time.Time
+	CreatedBy       uuid.UUID
+	UpdatedAt       time.Time
+	UpdatedBy       uuid.UUID
+	Version         int32
+}
+
+type MarketplaceSettlementLine struct {
+	ID               uuid.UUID
+	SettlementID     uuid.UUID
+	LineNo           int32
+	SalesOrderID     uuid.UUID
+	ExternalOrderID  string
+	OrderNumber      string
+	ReceivableAmount decimal.Decimal
+	FeeAmount        decimal.Decimal
+	PromoAmount      decimal.Decimal
+	NetAmount        decimal.Decimal
+	SettledAmount    decimal.Decimal
+	ImportRowKey     pgtype.Text
+}
+
 type MockPayment struct {
 	OrderID       string
 	TransactionID uuid.UUID
@@ -1956,6 +1996,12 @@ type QualityCheck struct {
 	CheckedAt      time.Time
 }
 
+type ReadModelRefresh struct {
+	Name        string
+	RefreshedAt time.Time
+	DurationMs  int32
+}
+
 type RecostLine struct {
 	ID              uuid.UUID
 	RecostRunID     uuid.UUID
@@ -2083,6 +2129,41 @@ type ReturnReason struct {
 	Version            int32
 	DeletedAt          *time.Time
 	DeletedBy          uuid.NullUUID
+}
+
+type RmGlDaily struct {
+	BusinessDate clock.BusinessDate
+	AccountID    uuid.UUID
+	ChannelID    uuid.NullUUID
+	SubChannelID uuid.NullUUID
+	DivisionID   uuid.NullUUID
+	CampaignID   uuid.NullUUID
+	DebitAmount  decimal.Decimal
+	CreditAmount decimal.Decimal
+	LineCount    int32
+}
+
+type RmSalesLine struct {
+	BusinessDate   clock.BusinessDate
+	OrderType      string
+	ChannelID      uuid.UUID
+	SubChannelID   uuid.UUID
+	ProductID      uuid.UUID
+	Qty            decimal.Decimal
+	GrossAmount    decimal.Decimal
+	DiscountAmount decimal.Decimal
+	NetAmount      decimal.Decimal
+	CogsQty        decimal.Decimal
+	CogsAmount     decimal.Decimal
+}
+
+type RmStockValue struct {
+	ProductID   uuid.UUID
+	LocationID  uuid.UUID
+	BatchID     uuid.NullUUID
+	Qty         decimal.Decimal
+	ValueAmount decimal.Decimal
+	FirstInDate interface{}
 }
 
 type Role struct {

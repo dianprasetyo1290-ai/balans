@@ -154,6 +154,9 @@ type Spec struct {
 	// Resource adalah resource permission bila berbeda dari Kind, mis. `dataexchange.transaction` untuk jenis
 	// data transaksi (saldo awal, jurnal, laporan); kosong = Kind.
 	Resource string
+	// ExportPerm opsional: permission ekspor penuh (mis. laporan operasional `inventory.stock.read`) menggantikan
+	// `<resource>.export`.
+	ExportPerm string
 }
 
 func (s Spec) resource() string {
@@ -166,8 +169,13 @@ func (s Spec) resource() string {
 // ImportPermission adalah `<resource>.import`.
 func (s Spec) ImportPermission() string { return s.resource() + ".import" }
 
-// ExportPermission adalah `<resource>.export`.
-func (s Spec) ExportPermission() string { return s.resource() + ".export" }
+// ExportPermission adalah `<resource>.export` atau ExportPerm.
+func (s Spec) ExportPermission() string {
+	if s.ExportPerm != "" {
+		return s.ExportPerm
+	}
+	return s.resource() + ".export"
+}
 
 // FileName adalah nama file template/ekspor, mis. `Produk.xlsx`.
 func (s Spec) FileName(prefix string) string { return prefix + " " + s.Label + ".xlsx" }

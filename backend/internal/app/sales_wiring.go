@@ -96,7 +96,7 @@ type salesCatalog struct{ catalog *catalog.Module }
 func toSalesProduct(p catalog.Product) sales.ProductRef {
 	ref := sales.ProductRef{
 		ID: p.ID, SKU: p.SKU, Name: p.DisplayName(), UOM: p.UOM, Type: string(p.Type), IsBundle: p.IsBundle,
-		IsActive: p.IsActive, Deleted: p.Deleted(),
+		IsActive: p.IsActive, Deleted: p.Deleted(), CategoryID: p.CategoryID, CategoryName: p.CategoryName,
 	}
 	for _, c := range p.Components {
 		ref.Components = append(ref.Components, sales.ComponentQty{ProductID: c.ComponentID, Qty: c.Qty})

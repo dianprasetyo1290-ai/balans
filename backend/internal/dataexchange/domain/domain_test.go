@@ -85,6 +85,11 @@ func TestSpecNames(t *testing.T) {
 	assert.Equal(t, "catalog.product.import", s.ImportPermission())
 	assert.Equal(t, "catalog.product.export", s.ExportPermission())
 	assert.Equal(t, "Template Produk.xlsx", s.FileName("Template"))
+	settlement := domain.Spec{Kind: "settlement.shopee", Resource: "accounting.settlement"}
+	assert.Equal(t, "accounting.settlement.import", settlement.ImportPermission())
+	assert.Equal(t, "accounting.settlement.export", settlement.ExportPermission())
+	report := domain.Spec{Kind: "report.sales", ExportPerm: "sales.sales_order.read"}
+	assert.Equal(t, "sales.sales_order.read", report.ExportPermission())
 }
 
 func TestMapHeaders(t *testing.T) {
