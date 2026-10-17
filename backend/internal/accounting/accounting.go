@@ -50,6 +50,8 @@ type (
 	ExpenseType = domain.ExpenseType
 	// WithholdingType adalah jenis PPh yang dipotong pada biaya.
 	WithholdingType = domain.WithholdingType
+	// Account adalah akun Chart of Accounts.
+	Account = domain.Account
 )
 
 // Jenis PPh jenis biaya dan jenis dokumen approval yang dipakai jenis biaya.
@@ -164,6 +166,28 @@ func (m *Module) EnsureUpcomingPeriods(ctx context.Context) (int, error) {
 // dipakai dokumen baru; akun beban dikirim ke Post lewat ResolverExpenseType.
 func (m *Module) ExpenseType(ctx context.Context, id uuid.UUID) (ExpenseType, error) {
 	return m.svc.ExpenseType(ctx, id)
+}
+
+// DivisionOptions mengembalikan divisi aktif untuk pemilih divisi dokumen modul lain (PR, PO). Tidak memeriksa
+// permission.
+func (m *Module) DivisionOptions(ctx context.Context) ([]DimensionValue, error) {
+	return m.svc.DivisionOptions(ctx)
+}
+
+// DivisionNames mengembalikan nama divisi (termasuk nonaktif/terhapus) untuk tampilan dokumen lama.
+func (m *Module) DivisionNames(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID]string, error) {
+	return m.svc.DivisionNames(ctx, ids)
+}
+
+// CheckDivision menolak divisi yang tidak ada atau nonaktif dengan VALIDATION_FAILED pada field.
+func (m *Module) CheckDivision(ctx context.Context, id uuid.UUID, at clock.BusinessDate, field string) error {
+	return m.svc.CheckDivision(ctx, id, at, field)
+}
+
+// PostableAccounts mengembalikan akun aktif yang bisa diposting dengan awalan kode tertentu, mis. "11" untuk
+// Kas & Bank (rekening pembayaran uang muka). Tidak memeriksa permission.
+func (m *Module) PostableAccounts(ctx context.Context, codePrefix string) ([]Account, error) {
+	return m.svc.PostableAccounts(ctx, codePrefix)
 }
 
 // ExpenseTypeByCode membaca jenis biaya berdasarkan kode (impor data, seed).

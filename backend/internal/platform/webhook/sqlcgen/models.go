@@ -243,6 +243,23 @@ type CustomerAddress struct {
 	DeletedBy     uuid.NullUUID
 }
 
+type DiscountLimit struct {
+	ID                         uuid.UUID
+	RoleCode                   string
+	MaxLineDiscountPercent     decimal.Decimal
+	MaxDocumentDiscountPercent decimal.Decimal
+	ValidFrom                  clock.BusinessDate
+	ValidTo                    pgtype.Date
+	Notes                      string
+	CreatedAt                  time.Time
+	CreatedBy                  uuid.UUID
+	UpdatedAt                  time.Time
+	UpdatedBy                  uuid.UUID
+	Version                    int32
+	DeletedAt                  *time.Time
+	DeletedBy                  uuid.NullUUID
+}
+
 type Division struct {
 	ID        uuid.UUID
 	Code      string
@@ -687,6 +704,58 @@ type PostingRuleAccount struct {
 	Version         int32
 }
 
+type PriceList struct {
+	ID                   uuid.UUID
+	Code                 string
+	Name                 string
+	PriceListType        string
+	ChannelID            uuid.NullUUID
+	SubChannelID         uuid.NullUUID
+	PartnerID            uuid.NullUUID
+	ResellerLevel        string
+	Basis                string
+	ReferencePriceListID uuid.NullUUID
+	Description          string
+	IsActive             bool
+	CreatedAt            time.Time
+	CreatedBy            uuid.UUID
+	UpdatedAt            time.Time
+	UpdatedBy            uuid.UUID
+	Version              int32
+	DeletedAt            *time.Time
+	DeletedBy            uuid.NullUUID
+}
+
+type PriceListItem struct {
+	ID                   uuid.UUID
+	PriceListVersionID   uuid.UUID
+	ProductID            uuid.UUID
+	PriceAmount          decimal.Decimal
+	MaxRetailPriceAmount decimal.NullDecimal
+	CreatedAt            time.Time
+	CreatedBy            uuid.UUID
+}
+
+type PriceListVersion struct {
+	ID          uuid.UUID
+	PriceListID uuid.UUID
+	VersionNo   int32
+	ValidFrom   clock.BusinessDate
+	ValidTo     pgtype.Date
+	Status      string
+	Percent     decimal.NullDecimal
+	Notes       string
+	SubmittedAt *time.Time
+	SubmittedBy uuid.NullUUID
+	DecidedAt   *time.Time
+	DecidedBy   uuid.NullUUID
+	CreatedAt   time.Time
+	CreatedBy   uuid.UUID
+	UpdatedAt   time.Time
+	UpdatedBy   uuid.UUID
+	Version     int32
+}
+
 type Product struct {
 	ID             uuid.UUID
 	Sku            string
@@ -741,6 +810,149 @@ type ProductCategory struct {
 	Version   int32
 	DeletedAt *time.Time
 	DeletedBy uuid.NullUUID
+}
+
+type Promotion struct {
+	ID           uuid.UUID
+	Code         string
+	Name         string
+	ChannelID    uuid.NullUUID
+	SubChannelID uuid.NullUUID
+	ValidFrom    clock.BusinessDate
+	ValidTo      clock.BusinessDate
+	IsActive     bool
+	Description  string
+	CreatedAt    time.Time
+	CreatedBy    uuid.UUID
+	UpdatedAt    time.Time
+	UpdatedBy    uuid.UUID
+	Version      int32
+	DeletedAt    *time.Time
+	DeletedBy    uuid.NullUUID
+}
+
+type PromotionItem struct {
+	ID              uuid.UUID
+	PromotionID     uuid.UUID
+	ProductID       uuid.UUID
+	PriceAmount     decimal.NullDecimal
+	DiscountPercent decimal.NullDecimal
+	CreatedAt       time.Time
+	CreatedBy       uuid.UUID
+}
+
+type PurchaseAdvance struct {
+	ID                     uuid.UUID
+	Number                 pgtype.Text
+	PurchaseOrderID        uuid.UUID
+	SupplierID             uuid.UUID
+	DivisionID             uuid.UUID
+	Amount                 decimal.Decimal
+	PaymentDate            clock.BusinessDate
+	BankAccountCode        string
+	Note                   string
+	AppliedAmount          decimal.Decimal
+	Status                 string
+	JournalEntryID         uuid.NullUUID
+	ReversalJournalEntryID uuid.NullUUID
+	CancelReason           string
+	PostedAt               *time.Time
+	CreatedAt              time.Time
+	CreatedBy              uuid.UUID
+	UpdatedAt              time.Time
+	UpdatedBy              uuid.UUID
+	Version                int32
+	DeletedAt              *time.Time
+	DeletedBy              uuid.NullUUID
+}
+
+type PurchaseOrder struct {
+	ID                       uuid.UUID
+	Number                   pgtype.Text
+	OrderType                string
+	SupplierID               uuid.UUID
+	SupplierCode             string
+	SupplierName             string
+	DivisionID               uuid.UUID
+	BusinessDate             clock.BusinessDate
+	ExpectedDate             clock.BusinessDate
+	PaymentTermDays          int32
+	Note                     string
+	TollLocationID           uuid.NullUUID
+	MaterialSourceLocationID uuid.NullUUID
+	SubtotalAmount           decimal.Decimal
+	TotalAmount              decimal.Decimal
+	Status                   string
+	CloseReason              string
+	CancelReason             string
+	SubmittedAt              *time.Time
+	ApprovedAt               *time.Time
+	EtaNotifiedAt            *time.Time
+	CreatedAt                time.Time
+	CreatedBy                uuid.UUID
+	UpdatedAt                time.Time
+	UpdatedBy                uuid.UUID
+	Version                  int32
+	DeletedAt                *time.Time
+	DeletedBy                uuid.NullUUID
+}
+
+type PurchaseOrderLine struct {
+	ID                    uuid.UUID
+	PurchaseOrderID       uuid.UUID
+	LineNo                int32
+	ProductID             uuid.NullUUID
+	Description           string
+	OrderedQty            decimal.Decimal
+	UnitPriceAmount       decimal.Decimal
+	LineAmount            decimal.Decimal
+	ReceivedQty           decimal.Decimal
+	BilledQty             decimal.Decimal
+	PurchaseRequestLineID uuid.NullUUID
+	Note                  string
+}
+
+type PurchaseOrderMaterial struct {
+	ID                uuid.UUID
+	PurchaseOrderID   uuid.UUID
+	LineNo            int32
+	MaterialProductID uuid.UUID
+	PlannedQty        decimal.Decimal
+	Note              string
+}
+
+type PurchaseRequest struct {
+	ID                   uuid.UUID
+	Number               pgtype.Text
+	DivisionID           uuid.UUID
+	RequestedBy          uuid.UUID
+	BusinessDate         clock.BusinessDate
+	NeededDate           pgtype.Date
+	Note                 string
+	EstimatedTotalAmount decimal.Decimal
+	Status               string
+	CloseReason          string
+	SubmittedAt          *time.Time
+	DecidedAt            *time.Time
+	CreatedAt            time.Time
+	CreatedBy            uuid.UUID
+	UpdatedAt            time.Time
+	UpdatedBy            uuid.UUID
+	Version              int32
+	DeletedAt            *time.Time
+	DeletedBy            uuid.NullUUID
+}
+
+type PurchaseRequestLine struct {
+	ID                   uuid.UUID
+	PurchaseRequestID    uuid.UUID
+	LineNo               int32
+	ProductID            uuid.NullUUID
+	Description          string
+	Qty                  decimal.Decimal
+	EstimatedPriceAmount decimal.Decimal
+	FulfilledQty         decimal.Decimal
+	Note                 string
 }
 
 type QualityCheck struct {
@@ -812,6 +1024,24 @@ type Session struct {
 	UserAgent        string
 	Ip               string
 	CreatedAt        time.Time
+}
+
+type SpecialPrice struct {
+	ID          uuid.UUID
+	PartyType   string
+	PartyID     uuid.UUID
+	ProductID   uuid.UUID
+	PriceAmount decimal.Decimal
+	ValidFrom   clock.BusinessDate
+	ValidTo     pgtype.Date
+	Notes       string
+	CreatedAt   time.Time
+	CreatedBy   uuid.UUID
+	UpdatedAt   time.Time
+	UpdatedBy   uuid.UUID
+	Version     int32
+	DeletedAt   *time.Time
+	DeletedBy   uuid.NullUUID
 }
 
 type StockBalance struct {
@@ -1037,6 +1267,24 @@ type Supplier struct {
 	Version            int32
 	DeletedAt          *time.Time
 	DeletedBy          uuid.NullUUID
+}
+
+type TieredPrice struct {
+	ID          uuid.UUID
+	PriceListID uuid.NullUUID
+	ProductID   uuid.UUID
+	MinQty      decimal.Decimal
+	PriceAmount decimal.Decimal
+	ValidFrom   clock.BusinessDate
+	ValidTo     pgtype.Date
+	Notes       string
+	CreatedAt   time.Time
+	CreatedBy   uuid.UUID
+	UpdatedAt   time.Time
+	UpdatedBy   uuid.UUID
+	Version     int32
+	DeletedAt   *time.Time
+	DeletedBy   uuid.NullUUID
 }
 
 type User struct {

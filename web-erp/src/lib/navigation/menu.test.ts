@@ -208,4 +208,29 @@ describe("menu", () => {
       "Data Master › Jenis Biaya"
     )
   })
+
+  it("menampilkan halaman harga jika modul pricing aktif", () => {
+    const labels = (modules: string[], perms: string[]) =>
+      visibleMenu(modules, [], perms).flatMap((g) =>
+        g.items.map((i) => `${g.label} › ${i.label}`)
+      )
+    expect(
+      labels(["pricing"], ["pricing.price_list.read", "pricing.promotion.read"])
+    ).toEqual(
+      expect.arrayContaining([
+        "Data Master › Daftar Harga",
+        "Data Master › Aturan Harga",
+        "Penjualan › Harga & Diskon",
+      ])
+    )
+    // Approver Head Finance & Accounting membuka daftar harga dari inbox persetujuan.
+    expect(labels(["pricing"], ["pricing.price_list.approve"])).toEqual([
+      "Ringkasan › Ringkasan Operasional",
+      "Data Master › Daftar Harga",
+      "Pengaturan › Tentang Sistem",
+    ])
+    expect(labels([], ["pricing.price_list.read"])).not.toContain(
+      "Data Master › Daftar Harga"
+    )
+  })
 })

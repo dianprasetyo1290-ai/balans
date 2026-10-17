@@ -1,0 +1,1262 @@
+procurementDivisionOptions:
+  get:
+    operationId: listProcurementDivisionOptions
+    tags: [procurement]
+    summary: Divisi aktif untuk form Purchase Request dan Purchase Order
+    description: Terbuka untuk pemegang hak baca/tulis PR atau PO (tidak butuh hak master dimensi).
+    responses:
+      "200":
+        description: Divisi aktif urut kode
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/PurchaseOption"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+procurementCashBankAccounts:
+  get:
+    operationId: listProcurementCashBankAccounts
+    tags: [procurement]
+    summary: Akun Kas & Bank (11xx) untuk pembayaran uang muka pembelian
+    responses:
+      "200":
+        description: Akun aktif yang bisa diposting
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/PurchaseOption"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+purchaseRequests:
+  get:
+    operationId: listPurchaseRequests
+    tags: [procurement]
+    summary: Daftar Purchase Request (S-201)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - $ref: "../components/common.yaml#/parameters/Sort"
+      - $ref: "../components/common.yaml#/parameters/Search"
+      - name: status
+        in: query
+        schema:
+          $ref: "#/components/schemas/PurchaseRequestStatus"
+      - name: divisionId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: mine
+        in: query
+        description: Hanya PR yang diajukan user.
+        schema:
+          type: boolean
+      - name: dateFrom
+        in: query
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+      - name: dateTo
+        in: query
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+    responses:
+      "200":
+        description: PR terbaru lebih dulu
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseRequestList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createPurchaseRequest
+    tags: [procurement]
+    summary: Menyimpan draft Purchase Request
+    description: Pembuat menjadi peminta. Divisi peminta wajib; baris berisi produk katalog atau uraian bebas.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PurchaseRequestInput"
+    responses:
+      "201":
+        description: Draft dibuat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseRequest"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+purchaseRequest:
+  get:
+    operationId: getPurchaseRequest
+    tags: [procurement]
+    summary: Detail Purchase Request beserta PO yang dibuat darinya
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+    responses:
+      "200":
+        description: Purchase Request
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseRequest"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  put:
+    operationId: updatePurchaseRequest
+    tags: [procurement]
+    summary: Mengubah draft Purchase Request
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PurchaseRequestUpdate"
+    responses:
+      "200":
+        description: Draft diperbarui
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseRequest"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+purchaseRequestSubmit:
+  post:
+    operationId: submitPurchaseRequest
+    tags: [procurement]
+    summary: Ajukan Purchase Request
+    description: |
+      Nomor `PR/TAHUN/BULAN/NOMOR` diberikan dan approval `purchase_request` (Head divisi peminta) diminta di
+      transaksi yang sama. `APPROVAL_POLICY_MISSING` bila belum ada approver aktif selain pembuat.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../components/common.yaml#/VersionInput"
+    responses:
+      "200":
+        description: PR menunggu persetujuan
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseRequest"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+purchaseRequestRevise:
+  post:
+    operationId: revisePurchaseRequest
+    tags: [procurement]
+    summary: Revisi Purchase Request yang ditolak (kembali ke Draft, nomor tetap)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../components/common.yaml#/VersionInput"
+    responses:
+      "200":
+        description: PR kembali Draft
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseRequest"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+purchaseRequestCancel:
+  post:
+    operationId: cancelPurchaseRequest
+    tags: [procurement]
+    summary: Batalkan draft Purchase Request
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../components/common.yaml#/VersionInput"
+    responses:
+      "200":
+        description: PR dibatalkan
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseRequest"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+purchaseRequestClose:
+  post:
+    operationId: closePurchaseRequest
+    tags: [procurement]
+    summary: Tutup Purchase Request yang disetujui (sisa qty tidak dijadikan PO)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PurchaseReasonInput"
+    responses:
+      "200":
+        description: PR ditutup
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseRequest"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+purchaseOrders:
+  get:
+    operationId: listPurchaseOrders
+    tags: [procurement]
+    summary: Daftar Purchase Order (barang/packaging, maklon, reprocess)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - $ref: "../components/common.yaml#/parameters/Sort"
+      - $ref: "../components/common.yaml#/parameters/Search"
+      - name: status
+        in: query
+        schema:
+          $ref: "#/components/schemas/PurchaseOrderStatus"
+      - name: orderType
+        in: query
+        description: Satu atau beberapa jenis PO.
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            $ref: "../components/common.yaml#/PurchaseOrderType"
+      - name: supplierId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: divisionId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: dateFrom
+        in: query
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+      - name: dateTo
+        in: query
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+    responses:
+      "200":
+        description: PO terbaru lebih dulu
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseOrderList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createPurchaseOrder
+    tags: [procurement]
+    summary: Menyimpan draft Purchase Order (S-202, S-203, S-204)
+    description: |
+      NON-PKP: tanpa PPN, total = subtotal. PO maklon/reprocess wajib ke pemasok berjenis maklon yang punya lokasi
+      eksternal maklon, baris = FG hasil + harga jasa per unit, dan daftar bahan (packaging atau material GM) yang
+      dikirim ke maklon. Baris dari Purchase Request mengisi `purchaseRequestLineId` (qty ≤ sisa PR).
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PurchaseOrderInput"
+    responses:
+      "201":
+        description: Draft dibuat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseOrder"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+purchaseOrder:
+  get:
+    operationId: getPurchaseOrder
+    tags: [procurement]
+    summary: Detail Purchase Order beserta uang muka
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+    responses:
+      "200":
+        description: Purchase Order
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseOrder"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  put:
+    operationId: updatePurchaseOrder
+    tags: [procurement]
+    summary: Mengubah draft Purchase Order (jenis PO tetap)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PurchaseOrderUpdate"
+    responses:
+      "200":
+        description: Draft diperbarui
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseOrder"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+purchaseOrderSubmit:
+  post:
+    operationId: submitPurchaseOrder
+    tags: [procurement]
+    summary: Ajukan Purchase Order
+    description: |
+      Nomor `PO/TAHUN/BULAN/NOMOR` diberikan dan approval `purchase_order` dengan nominal `totalAmount` (level
+      sesuai Matriks Persetujuan) diminta di transaksi yang sama.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../components/common.yaml#/VersionInput"
+    responses:
+      "200":
+        description: PO menunggu persetujuan
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseOrder"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+purchaseOrderRevise:
+  post:
+    operationId: revisePurchaseOrder
+    tags: [procurement]
+    summary: Revisi Purchase Order yang ditolak (kembali ke Draft, nomor tetap)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../components/common.yaml#/VersionInput"
+    responses:
+      "200":
+        description: PO kembali Draft
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseOrder"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+purchaseOrderCancel:
+  post:
+    operationId: cancelPurchaseOrder
+    tags: [procurement]
+    summary: Batalkan Purchase Order
+    description: |
+      Draft, atau Disetujui yang belum ada penerimaan barang dan tidak punya uang muka aktif (alasan wajib).
+      Qty Purchase Request asal dikembalikan.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PurchaseCancelInput"
+    responses:
+      "200":
+        description: PO dibatalkan
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseOrder"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+purchaseOrderClose:
+  post:
+    operationId: closePurchaseOrder
+    tags: [procurement]
+    summary: Tutup Purchase Order yang diterima sebagian (sisa qty tidak ditunggu)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PurchaseReasonInput"
+    responses:
+      "200":
+        description: PO ditutup
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseOrder"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+purchaseAdvances:
+  get:
+    operationId: listPurchaseAdvances
+    tags: [procurement]
+    summary: Daftar uang muka pembelian (S-205)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - $ref: "../components/common.yaml#/parameters/Search"
+      - name: status
+        in: query
+        schema:
+          $ref: "#/components/schemas/PurchaseAdvanceStatus"
+      - name: purchaseOrderId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: supplierId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: dateFrom
+        in: query
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+      - name: dateTo
+        in: query
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+    responses:
+      "200":
+        description: Uang muka terbaru lebih dulu
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseAdvanceList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createPurchaseAdvance
+    tags: [procurement]
+    summary: Menyimpan draft uang muka untuk PO yang disetujui
+    description: Total uang muka aktif per PO tidak boleh melebihi total PO.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PurchaseAdvanceInput"
+    responses:
+      "201":
+        description: Draft dibuat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseAdvance"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+purchaseAdvance:
+  get:
+    operationId: getPurchaseAdvance
+    tags: [procurement]
+    summary: Detail uang muka pembelian
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+    responses:
+      "200":
+        description: Uang muka
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseAdvance"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  put:
+    operationId: updatePurchaseAdvance
+    tags: [procurement]
+    summary: Mengubah draft uang muka
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PurchaseAdvanceUpdate"
+    responses:
+      "200":
+        description: Draft diperbarui
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseAdvance"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+purchaseAdvancePost:
+  post:
+    operationId: postPurchaseAdvance
+    tags: [procurement]
+    summary: Posting uang muka (jurnal A-19)
+    description: |
+      Nomor `BYR/TAHUN/BULAN/NOMOR` dan jurnal A-19 (Dr 1401 Uang Muka Pembelian, Cr akun Kas & Bank) dengan
+      dimensi divisi PO dan pihak pemasok, di transaksi yang sama. Periode tertutup ditolak `PERIOD_LOCKED`.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../components/common.yaml#/VersionInput"
+    responses:
+      "200":
+        description: Uang muka diposting
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseAdvance"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+purchaseAdvanceCancel:
+  post:
+    operationId: cancelPurchaseAdvance
+    tags: [procurement]
+    summary: Batalkan uang muka
+    description: |
+      Draft (hak tulis) atau Diposting yang belum dipotong tagihan (hak posting, alasan wajib, jurnal A-19 dibalik).
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PurchaseCancelInput"
+    responses:
+      "200":
+        description: Uang muka dibatalkan
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseAdvance"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+components:
+  schemas:
+    PurchaseQuantity:
+      type: string
+      description: Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+      pattern: "^[0-9]{1,15}(\\.[0-9]{1,3})?$"
+      example: "10000.000"
+    PurchaseOption:
+      type: object
+      required: [id, code, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+    PurchaseProductRef:
+      type: object
+      required: [id, sku, name, uom]
+      properties:
+        id:
+          type: string
+          format: uuid
+        sku:
+          type: string
+        name:
+          type: string
+        uom:
+          type: string
+    PurchaseLocationRef:
+      type: object
+      required: [id, code, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+    PurchaseReasonInput:
+      type: object
+      required: [version, reason]
+      properties:
+        version:
+          type: integer
+        reason:
+          type: string
+          maxLength: 400
+    PurchaseCancelInput:
+      type: object
+      required: [version]
+      properties:
+        version:
+          type: integer
+        reason:
+          type: string
+          maxLength: 400
+          description: Wajib untuk PO Disetujui dan uang muka Diposting.
+    PurchaseRequestStatus:
+      type: string
+      enum: [draft, pending_approval, approved, rejected, completed, closed, cancelled]
+    PurchaseRequestLine:
+      type: object
+      required: [id, lineNo, description, qty, estimatedPrice, estimatedAmount, fulfilledQty, remainingQty, note]
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        product:
+          allOf:
+            - $ref: "#/components/schemas/PurchaseProductRef"
+          nullable: true
+        description:
+          type: string
+        qty:
+          $ref: "#/components/schemas/PurchaseQuantity"
+        estimatedPrice:
+          $ref: "../components/common.yaml#/Money"
+        estimatedAmount:
+          $ref: "../components/common.yaml#/Money"
+        fulfilledQty:
+          $ref: "#/components/schemas/PurchaseQuantity"
+        remainingQty:
+          $ref: "#/components/schemas/PurchaseQuantity"
+        note:
+          type: string
+    PurchaseRequestOrderRef:
+      type: object
+      required: [purchaseOrderId, status, purchaseRequestLineId, orderedQty, receivedQty]
+      properties:
+        purchaseOrderId:
+          type: string
+          format: uuid
+        purchaseOrderNumber:
+          type: string
+          nullable: true
+        status:
+          $ref: "#/components/schemas/PurchaseOrderStatus"
+        purchaseRequestLineId:
+          type: string
+          format: uuid
+        orderedQty:
+          $ref: "#/components/schemas/PurchaseQuantity"
+        receivedQty:
+          $ref: "#/components/schemas/PurchaseQuantity"
+    PurchaseRequestSummary:
+      type: object
+      required:
+        - id
+        - divisionId
+        - divisionName
+        - requestedById
+        - requestedByName
+        - businessDate
+        - note
+        - estimatedTotal
+        - status
+        - closeReason
+        - createdAt
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+          nullable: true
+          description: Nomor PR, diisi saat diajukan.
+        divisionId:
+          type: string
+          format: uuid
+        divisionName:
+          type: string
+        requestedById:
+          type: string
+          format: uuid
+        requestedByName:
+          type: string
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        neededDate:
+          allOf:
+            - $ref: "../components/common.yaml#/BusinessDate"
+          nullable: true
+        note:
+          type: string
+        estimatedTotal:
+          $ref: "../components/common.yaml#/Money"
+        status:
+          $ref: "#/components/schemas/PurchaseRequestStatus"
+        closeReason:
+          type: string
+        submittedAt:
+          type: string
+          format: date-time
+          nullable: true
+        decidedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    PurchaseRequest:
+      allOf:
+        - $ref: "#/components/schemas/PurchaseRequestSummary"
+        - type: object
+          required: [lines, orders, allowedActions]
+          properties:
+            lines:
+              type: array
+              items:
+                $ref: "#/components/schemas/PurchaseRequestLine"
+            orders:
+              type: array
+              items:
+                $ref: "#/components/schemas/PurchaseRequestOrderRef"
+            allowedActions:
+              type: array
+              items:
+                type: string
+                enum: [edit, submit, cancel, revise, close, create_order]
+    PurchaseRequestList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/PurchaseRequestSummary"
+    PurchaseRequestLineInput:
+      type: object
+      required: [qty, estimatedPrice]
+      properties:
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+        description:
+          type: string
+          maxLength: 500
+        qty:
+          $ref: "#/components/schemas/PurchaseQuantity"
+        estimatedPrice:
+          $ref: "../components/common.yaml#/Money"
+        note:
+          type: string
+          maxLength: 500
+    PurchaseRequestFields:
+      type: object
+      required: [divisionId, businessDate, lines]
+      properties:
+        divisionId:
+          type: string
+          format: uuid
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        neededDate:
+          allOf:
+            - $ref: "../components/common.yaml#/BusinessDate"
+          nullable: true
+        note:
+          type: string
+          maxLength: 1000
+        lines:
+          type: array
+          maxItems: 200
+          items:
+            $ref: "#/components/schemas/PurchaseRequestLineInput"
+    PurchaseRequestInput:
+      $ref: "#/components/schemas/PurchaseRequestFields"
+    PurchaseRequestUpdate:
+      allOf:
+        - $ref: "#/components/schemas/PurchaseRequestFields"
+        - $ref: "../components/common.yaml#/VersionInput"
+    PurchaseOrderStatus:
+      type: string
+      enum: [draft, pending_approval, approved, rejected, partially_received, received, completed, closed, cancelled]
+    PurchaseOrderLine:
+      type: object
+      required: [id, lineNo, description, orderedQty, unitPrice, amount, receivedQty, billedQty, outstandingQty, note]
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        product:
+          allOf:
+            - $ref: "#/components/schemas/PurchaseProductRef"
+          nullable: true
+        description:
+          type: string
+        orderedQty:
+          $ref: "#/components/schemas/PurchaseQuantity"
+        unitPrice:
+          $ref: "../components/common.yaml#/Money"
+        amount:
+          $ref: "../components/common.yaml#/Money"
+        receivedQty:
+          $ref: "#/components/schemas/PurchaseQuantity"
+        billedQty:
+          $ref: "#/components/schemas/PurchaseQuantity"
+        outstandingQty:
+          $ref: "#/components/schemas/PurchaseQuantity"
+        purchaseRequestLineId:
+          type: string
+          format: uuid
+          nullable: true
+        purchaseRequestId:
+          type: string
+          format: uuid
+          nullable: true
+        purchaseRequestNumber:
+          type: string
+          nullable: true
+        note:
+          type: string
+    PurchaseOrderMaterial:
+      type: object
+      required: [id, lineNo, product, plannedQty, note]
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        product:
+          $ref: "#/components/schemas/PurchaseProductRef"
+        plannedQty:
+          $ref: "#/components/schemas/PurchaseQuantity"
+        note:
+          type: string
+    PurchaseOrderSupplier:
+      type: object
+      required: [id, code, name, address, phone, email, picName]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        address:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        picName:
+          type: string
+    PurchaseOrderSummary:
+      type: object
+      required:
+        - id
+        - orderType
+        - orderTypeLabel
+        - supplierId
+        - supplierCode
+        - supplierName
+        - divisionId
+        - divisionName
+        - businessDate
+        - expectedDate
+        - paymentTermDays
+        - totalAmount
+        - status
+        - createdAt
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+          nullable: true
+          description: Nomor PO, diisi saat diajukan.
+        orderType:
+          $ref: "../components/common.yaml#/PurchaseOrderType"
+        orderTypeLabel:
+          type: string
+        supplierId:
+          type: string
+          format: uuid
+        supplierCode:
+          type: string
+        supplierName:
+          type: string
+        divisionId:
+          type: string
+          format: uuid
+        divisionName:
+          type: string
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        expectedDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        paymentTermDays:
+          type: integer
+        totalAmount:
+          $ref: "../components/common.yaml#/Money"
+        status:
+          $ref: "#/components/schemas/PurchaseOrderStatus"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    PurchaseOrder:
+      allOf:
+        - $ref: "#/components/schemas/PurchaseOrderSummary"
+        - type: object
+          required:
+            - note
+            - subtotalAmount
+            - closeReason
+            - cancelReason
+            - createdByName
+            - lines
+            - materials
+            - advances
+            - advancePaidAmount
+            - advanceOutstandingAmount
+            - allowedActions
+          properties:
+            note:
+              type: string
+            subtotalAmount:
+              $ref: "../components/common.yaml#/Money"
+            closeReason:
+              type: string
+            cancelReason:
+              type: string
+            submittedAt:
+              type: string
+              format: date-time
+              nullable: true
+            approvedAt:
+              type: string
+              format: date-time
+              nullable: true
+            createdByName:
+              type: string
+            supplier:
+              allOf:
+                - $ref: "#/components/schemas/PurchaseOrderSupplier"
+              nullable: true
+            tollLocation:
+              allOf:
+                - $ref: "#/components/schemas/PurchaseLocationRef"
+              nullable: true
+            materialSourceLocation:
+              allOf:
+                - $ref: "#/components/schemas/PurchaseLocationRef"
+              nullable: true
+            lines:
+              type: array
+              items:
+                $ref: "#/components/schemas/PurchaseOrderLine"
+            materials:
+              type: array
+              items:
+                $ref: "#/components/schemas/PurchaseOrderMaterial"
+            advances:
+              type: array
+              items:
+                $ref: "#/components/schemas/PurchaseAdvance"
+            advancePaidAmount:
+              $ref: "../components/common.yaml#/Money"
+            advanceOutstandingAmount:
+              $ref: "../components/common.yaml#/Money"
+            allowedActions:
+              type: array
+              items:
+                type: string
+                enum: [edit, submit, cancel, revise, close, print, create_advance]
+    PurchaseOrderList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/PurchaseOrderSummary"
+    PurchaseOrderLineInput:
+      type: object
+      required: [qty, unitPrice]
+      properties:
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+        description:
+          type: string
+          maxLength: 500
+        qty:
+          $ref: "#/components/schemas/PurchaseQuantity"
+        unitPrice:
+          $ref: "../components/common.yaml#/Money"
+        purchaseRequestLineId:
+          type: string
+          format: uuid
+          nullable: true
+        note:
+          type: string
+          maxLength: 500
+    PurchaseOrderMaterialInput:
+      type: object
+      required: [productId, plannedQty]
+      properties:
+        productId:
+          type: string
+          format: uuid
+        plannedQty:
+          $ref: "#/components/schemas/PurchaseQuantity"
+        note:
+          type: string
+          maxLength: 500
+    PurchaseOrderFields:
+      type: object
+      required: [supplierId, divisionId, businessDate, expectedDate, lines]
+      properties:
+        supplierId:
+          type: string
+          format: uuid
+        divisionId:
+          type: string
+          format: uuid
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        expectedDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        paymentTermDays:
+          type: integer
+          nullable: true
+          minimum: 0
+          maximum: 365
+          description: Kosong = termin default pemasok.
+        note:
+          type: string
+          maxLength: 1000
+        materialSourceLocationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Lokasi asal bahan — wajib Gudang GM – GM untuk reprocess, opsional Gudang GM – RM untuk maklon.
+        lines:
+          type: array
+          maxItems: 200
+          items:
+            $ref: "#/components/schemas/PurchaseOrderLineInput"
+        materials:
+          type: array
+          maxItems: 200
+          items:
+            $ref: "#/components/schemas/PurchaseOrderMaterialInput"
+    PurchaseOrderInput:
+      allOf:
+        - $ref: "#/components/schemas/PurchaseOrderFields"
+        - type: object
+          required: [orderType]
+          properties:
+            orderType:
+              $ref: "../components/common.yaml#/PurchaseOrderType"
+    PurchaseOrderUpdate:
+      allOf:
+        - $ref: "#/components/schemas/PurchaseOrderFields"
+        - $ref: "../components/common.yaml#/VersionInput"
+    PurchaseAdvanceStatus:
+      type: string
+      enum: [draft, posted, cancelled]
+    PurchaseAdvance:
+      type: object
+      required:
+        - id
+        - purchaseOrderId
+        - purchaseOrderNumber
+        - supplierId
+        - supplierName
+        - divisionId
+        - amount
+        - paymentDate
+        - bankAccountCode
+        - note
+        - appliedAmount
+        - outstandingAmount
+        - status
+        - cancelReason
+        - createdAt
+        - updatedAt
+        - version
+        - allowedActions
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+          nullable: true
+          description: Nomor BYR, diisi saat diposting.
+        purchaseOrderId:
+          type: string
+          format: uuid
+        purchaseOrderNumber:
+          type: string
+        supplierId:
+          type: string
+          format: uuid
+        supplierName:
+          type: string
+        divisionId:
+          type: string
+          format: uuid
+        amount:
+          $ref: "../components/common.yaml#/Money"
+        paymentDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        bankAccountCode:
+          type: string
+        note:
+          type: string
+        appliedAmount:
+          $ref: "../components/common.yaml#/Money"
+        outstandingAmount:
+          $ref: "../components/common.yaml#/Money"
+        status:
+          $ref: "#/components/schemas/PurchaseAdvanceStatus"
+        journalEntryId:
+          type: string
+          format: uuid
+          nullable: true
+        reversalJournalEntryId:
+          type: string
+          format: uuid
+          nullable: true
+        cancelReason:
+          type: string
+        postedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+        allowedActions:
+          type: array
+          items:
+            type: string
+            enum: [edit, post, cancel]
+    PurchaseAdvanceList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/PurchaseAdvance"
+    PurchaseAdvanceFields:
+      type: object
+      required: [amount, paymentDate, bankAccountCode]
+      properties:
+        amount:
+          $ref: "../components/common.yaml#/Money"
+        paymentDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        bankAccountCode:
+          type: string
+          example: "1111"
+        note:
+          type: string
+          maxLength: 1000
+    PurchaseAdvanceInput:
+      allOf:
+        - $ref: "#/components/schemas/PurchaseAdvanceFields"
+        - type: object
+          required: [purchaseOrderId]
+          properties:
+            purchaseOrderId:
+              type: string
+              format: uuid
+    PurchaseAdvanceUpdate:
+      allOf:
+        - $ref: "#/components/schemas/PurchaseAdvanceFields"
+        - $ref: "../components/common.yaml#/VersionInput"

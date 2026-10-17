@@ -36,6 +36,7 @@ import (
 	"balans/internal/platform/jobqueue"
 	"balans/internal/platform/pii"
 	"balans/internal/platform/webhook"
+	"balans/internal/pricing"
 	"balans/internal/sales"
 	"balans/internal/system"
 	"balans/internal/warehouse"
@@ -65,6 +66,7 @@ type App struct {
 	filestore    *filestore.Module
 	party        *party.Module
 	hris         *hris.Module
+	pricing      *pricing.Module
 	notification *notification.Module
 	dataexchange *dataexchange.Module
 	cipher       *pii.Cipher
@@ -230,7 +232,13 @@ func (a *App) buildModules() error {
 	}
 	a.connectMasterData()
 	a.connectWarehouseDocuments()
+	if err := a.buildPricing(); err != nil {
+		return err
+	}
 	if err := a.buildDataExchange(); err != nil {
+		return err
+	}
+	if err := a.buildProcurement(mailer); err != nil {
 		return err
 	}
 	if cfg.IsEnabled(sales.Name) {
