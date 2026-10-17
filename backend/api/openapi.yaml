@@ -36,6 +36,8 @@ tags:
     description: Pelanggan, mitra & PKS, kode produk mitra, pemasok & maklon (R1.1)
   - name: hris
     description: Data karyawan dasar (R1.1)
+  - name: procurement
+    description: Purchase Request, Purchase Order (barang, maklon, reprocess), uang muka pembelian (R1.2)
   - name: filestore
     description: Upload dan unduhan file bertanda tangan (R1.1)
 paths:
@@ -235,6 +237,42 @@ paths:
     $ref: "./paths/filestore.yaml#/fileDownloadUrl"
   /api/v1/file-content/{id}:
     $ref: "./paths/filestore.yaml#/fileContent"
+  /api/v1/procurement/division-options:
+    $ref: "./paths/procurement.yaml#/procurementDivisionOptions"
+  /api/v1/procurement/cash-bank-accounts:
+    $ref: "./paths/procurement.yaml#/procurementCashBankAccounts"
+  /api/v1/purchase-requests:
+    $ref: "./paths/procurement.yaml#/purchaseRequests"
+  /api/v1/purchase-requests/{id}:
+    $ref: "./paths/procurement.yaml#/purchaseRequest"
+  /api/v1/purchase-requests/{id}/submit:
+    $ref: "./paths/procurement.yaml#/purchaseRequestSubmit"
+  /api/v1/purchase-requests/{id}/revise:
+    $ref: "./paths/procurement.yaml#/purchaseRequestRevise"
+  /api/v1/purchase-requests/{id}/cancel:
+    $ref: "./paths/procurement.yaml#/purchaseRequestCancel"
+  /api/v1/purchase-requests/{id}/close:
+    $ref: "./paths/procurement.yaml#/purchaseRequestClose"
+  /api/v1/purchase-orders:
+    $ref: "./paths/procurement.yaml#/purchaseOrders"
+  /api/v1/purchase-orders/{id}:
+    $ref: "./paths/procurement.yaml#/purchaseOrder"
+  /api/v1/purchase-orders/{id}/submit:
+    $ref: "./paths/procurement.yaml#/purchaseOrderSubmit"
+  /api/v1/purchase-orders/{id}/revise:
+    $ref: "./paths/procurement.yaml#/purchaseOrderRevise"
+  /api/v1/purchase-orders/{id}/cancel:
+    $ref: "./paths/procurement.yaml#/purchaseOrderCancel"
+  /api/v1/purchase-orders/{id}/close:
+    $ref: "./paths/procurement.yaml#/purchaseOrderClose"
+  /api/v1/purchase-advances:
+    $ref: "./paths/procurement.yaml#/purchaseAdvances"
+  /api/v1/purchase-advances/{id}:
+    $ref: "./paths/procurement.yaml#/purchaseAdvance"
+  /api/v1/purchase-advances/{id}/post:
+    $ref: "./paths/procurement.yaml#/purchaseAdvancePost"
+  /api/v1/purchase-advances/{id}/cancel:
+    $ref: "./paths/procurement.yaml#/purchaseAdvanceCancel"
 components:
   securitySchemes:
     bearerAuth:

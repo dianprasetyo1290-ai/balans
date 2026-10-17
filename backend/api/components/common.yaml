@@ -42,6 +42,12 @@ WithholdingType:
   type: string
   description: Jenis PPh yang dipotong (pemasok, jenis biaya); tarif di master tarif PPh.
   enum: [none, pph21, pph23, pph4_2]
+PurchaseOrderType:
+  type: string
+  description: |
+    Jenis PO: `goods` barang, `packaging` packaging (RM), `toll_manufacturing` jasa maklon per batch,
+    `reprocess` reprocess bahan GM di maklon, `other` lainnya (baris boleh berupa uraian).
+  enum: [goods, packaging, toll_manufacturing, reprocess, other]
 VersionInput:
   type: object
   required: [version]

@@ -208,6 +208,9 @@ func (a *App) buildModules() error {
 	if err := a.buildMasterData(); err != nil {
 		return err
 	}
+	if err := a.buildProcurement(mailer); err != nil {
+		return err
+	}
 	if cfg.IsEnabled(sales.Name) {
 		if cfg.PaymentGateway != config.ProviderMock {
 			return providerNotAvailable("PAYMENT_GATEWAY", cfg.PaymentGateway)

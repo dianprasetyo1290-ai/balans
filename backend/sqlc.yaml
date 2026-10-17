@@ -122,3 +122,9 @@ sql:
       go:
         <<: *go
         out: internal/sales/postgres/sqlcgen
+  - <<: *pkg
+    queries: internal/procurement/postgres/queries
+    gen:
+      go:
+        <<: *go
+        out: internal/procurement/postgres/sqlcgen
