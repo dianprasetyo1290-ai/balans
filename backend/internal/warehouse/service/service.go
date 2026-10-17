@@ -3,6 +3,7 @@ package service
 
 import (
 	"context"
+	"log/slog"
 	"strings"
 	"time"
 
@@ -63,14 +64,18 @@ type store interface {
 // Deps adalah dependensi Service.
 type Deps struct {
 	Store store
+	// Docs menyimpan dokumen gudang (Inbound, Transfer Stok, Stock Count); biasanya store yang sama.
+	Docs  documentStore
 	Tx    txRunner
 	Audit audit.Recorder
 	Clock clock.Clock
+	Log   *slog.Logger
 }
 
-// Service adalah use case modul warehouse (bagian master).
+// Service adalah use case modul warehouse: master gudang & lokasi (R1.1) dan dokumen gudang (R1.2).
 type Service struct {
 	Deps
+	docs documents
 }
 
 // New membuat Service.

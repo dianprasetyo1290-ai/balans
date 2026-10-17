@@ -356,6 +356,45 @@ type IdempotencyKey struct {
 	ExpiresAt     time.Time
 }
 
+type Inbound struct {
+	ID           uuid.UUID
+	Number       string
+	SourceType   string
+	SourceID     uuid.UUID
+	SourceLabel  string
+	WarehouseID  uuid.UUID
+	LocationID   uuid.UUID
+	BusinessDate clock.BusinessDate
+	RejectAction string
+	Status       string
+	Note         string
+	CompletedAt  *time.Time
+	CreatedAt    time.Time
+	CreatedBy    uuid.UUID
+	UpdatedAt    time.Time
+	UpdatedBy    uuid.UUID
+	Version      int32
+}
+
+type InboundLine struct {
+	ID                    uuid.UUID
+	InboundID             uuid.UUID
+	LineNo                int32
+	SourceLineID          uuid.NullUUID
+	ProductID             uuid.UUID
+	BatchID               uuid.NullUUID
+	Qty                   decimal.Decimal
+	PassedQty             decimal.Decimal
+	RejectedQty           decimal.Decimal
+	DestinationLocationID uuid.UUID
+	Status                string
+	RejectReason          string
+	RejectLocationID      uuid.NullUUID
+	CheckedBy             uuid.NullUUID
+	CheckedByName         string
+	CheckedAt             *time.Time
+}
+
 type JournalEntry struct {
 	ID              uuid.UUID
 	Number          pgtype.Text
@@ -657,6 +696,21 @@ type ProductCategory struct {
 	DeletedBy uuid.NullUUID
 }
 
+type QualityCheck struct {
+	ID             uuid.UUID
+	DocumentType   string
+	DocumentID     uuid.UUID
+	DocumentLineID uuid.UUID
+	Result         string
+	Qty            decimal.Decimal
+	Checks         []byte
+	Note           string
+	PhotoFileIds   []uuid.UUID
+	CheckedBy      uuid.UUID
+	CheckedByName  string
+	CheckedAt      time.Time
+}
+
 type ReturnReason struct {
 	ID                 uuid.UUID
 	Code               string
@@ -723,6 +777,77 @@ type StockBalance struct {
 	UpdatedAt   time.Time
 }
 
+type StockCount struct {
+	ID              uuid.UUID
+	Number          pgtype.Text
+	CountType       string
+	LocationID      uuid.UUID
+	ScheduleID      uuid.NullUUID
+	BusinessDate    clock.BusinessDate
+	Status          string
+	AssignedTo      uuid.NullUUID
+	AssignedToName  string
+	Note            string
+	PhotoFileIds    []uuid.UUID
+	SnapshotAt      *time.Time
+	StartedBy       uuid.NullUUID
+	StartedByName   string
+	SubmittedBy     uuid.NullUUID
+	SubmittedByName string
+	SubmittedAt     *time.Time
+	VarianceAmount  decimal.Decimal
+	NetVariance     decimal.Decimal
+	DecidedAt       *time.Time
+	DecisionNote    string
+	PostedAt        *time.Time
+	JournalEntryID  uuid.NullUUID
+	CreatedAt       time.Time
+	CreatedBy       uuid.UUID
+	UpdatedAt       time.Time
+	UpdatedBy       uuid.UUID
+	Version         int32
+}
+
+type StockCountLine struct {
+	ID             uuid.UUID
+	StockCountID   uuid.UUID
+	LineNo         int32
+	ProductID      uuid.UUID
+	BatchID        uuid.NullUUID
+	SystemQty      decimal.Decimal
+	UnitCost       decimal.Decimal
+	CountedQty     decimal.NullDecimal
+	VarianceQty    decimal.Decimal
+	VarianceAmount decimal.Decimal
+	IsExtra        bool
+	PhotoFileID    uuid.NullUUID
+	Note           string
+	CountedBy      uuid.NullUUID
+	CountedAt      *time.Time
+}
+
+type StockCountSchedule struct {
+	ID             uuid.UUID
+	Name           string
+	CountType      string
+	Frequency      string
+	DayOfWeek      pgtype.Int4
+	DayOfMonth     pgtype.Int4
+	MonthOfYear    pgtype.Int4
+	WarehouseID    uuid.NullUUID
+	LocationIds    []uuid.UUID
+	AssigneeUserID uuid.NullUUID
+	AssigneeName   string
+	NextRunDate    clock.BusinessDate
+	LastRunDate    pgtype.Date
+	IsActive       bool
+	CreatedAt      time.Time
+	CreatedBy      uuid.UUID
+	UpdatedAt      time.Time
+	UpdatedBy      uuid.UUID
+	Version        int32
+}
+
 type StockMovement struct {
 	ID                  uuid.UUID
 	PostingID           uuid.UUID
@@ -774,6 +899,57 @@ type StockReservation struct {
 	UpdatedAt    time.Time
 	UpdatedBy    uuid.UUID
 	Version      int32
+}
+
+type StockTransfer struct {
+	ID               uuid.UUID
+	Number           pgtype.Text
+	TransferType     string
+	FromLocationID   uuid.UUID
+	ToLocationID     uuid.UUID
+	RequiresShipping bool
+	BusinessDate     clock.BusinessDate
+	Status           string
+	SourceType       string
+	SourceID         uuid.NullUUID
+	Note             string
+	RequestedBy      uuid.UUID
+	RequestedByName  string
+	SubmittedAt      *time.Time
+	ReleasedBy       uuid.NullUUID
+	ReleasedByName   string
+	ReleasedAt       *time.Time
+	PreparedBy       uuid.NullUUID
+	PreparedByName   string
+	PreparedAt       *time.Time
+	ShippedBy        uuid.NullUUID
+	ShippedByName    string
+	ShippedAt        *time.Time
+	ReceivedBy       uuid.NullUUID
+	ReceivedByName   string
+	ReceivedAt       *time.Time
+	CompletedAt      *time.Time
+	CancelledAt      *time.Time
+	CancelReason     string
+	CreatedAt        time.Time
+	CreatedBy        uuid.UUID
+	UpdatedAt        time.Time
+	UpdatedBy        uuid.UUID
+	Version          int32
+}
+
+type StockTransferLine struct {
+	ID          uuid.UUID
+	TransferID  uuid.UUID
+	LineNo      int32
+	ProductID   uuid.UUID
+	BatchID     uuid.NullUUID
+	Qty         decimal.Decimal
+	ReceivedQty decimal.Decimal
+	ShortageQty decimal.Decimal
+	CostAmount  decimal.Decimal
+	BatchReason string
+	Note        string
 }
 
 type SubChannel struct {
