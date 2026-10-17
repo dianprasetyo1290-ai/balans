@@ -28,6 +28,11 @@ func registerAccountingAuditEntities(a *audit.Module) {
 		"campaign":      "accounting.dimension.read",
 		"fiscal_period": "accounting.fiscal_period.read",
 		"expense_type":  "accounting.expense_type.read",
+		// R1.4: aset tetap, penyusutan, saldo awal.
+		"fixed_asset":       "accounting.fixed_asset.read",
+		"fixed_asset_class": "accounting.fixed_asset.read",
+		"depreciation_run":  "accounting.fixed_asset.read",
+		"opening_balance":   "accounting.journal.read",
 	} {
 		a.RegisterEntity(entity, perm)
 	}

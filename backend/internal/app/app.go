@@ -268,6 +268,8 @@ func (a *App) buildModules() error {
 		console.Shipments = provider
 	}
 
+	a.connectAccountingClose()
+
 	if cfg.MockActive() && cfg.Env != config.EnvProduction && (console.Email != nil || console.Payments != nil || console.Shipments != nil) {
 		a.console = mockconsole.New(console)
 	}

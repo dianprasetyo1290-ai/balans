@@ -71,6 +71,7 @@ type store interface {
 	InsertReservation(ctx context.Context, r postgres.NewReservation, actorID uuid.UUID) (uuid.UUID, error)
 	AddReservationUsage(ctx context.Context, id uuid.UUID, consumed, released decimal.Decimal, actorID uuid.UUID) error
 	ExpiredReservationSources(ctx context.Context, now time.Time, limit int32) ([]postgres.ReservationSource, error)
+	StockValues(ctx context.Context, asOf clock.BusinessDate) ([]postgres.StockValue, error)
 }
 
 var _ store = (*postgres.Store)(nil)
@@ -103,3 +104,9 @@ func New(d Deps) *Service {
 }
 
 func (s *Service) today() clock.BusinessDate { return clock.Today(s.Clock) }
+
+// StockValues mengembalikan qty & nilai persediaan per produk & lokasi s.d. tanggal tanpa cek permission
+// (rekonsiliasi cut-over di modul accounting).
+func (s *Service) StockValues(ctx context.Context, asOf clock.BusinessDate) ([]postgres.StockValue, error) {
+	return s.Store.StockValues(ctx, asOf)
+}

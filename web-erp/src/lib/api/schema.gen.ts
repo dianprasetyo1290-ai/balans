@@ -4,12904 +4,14186 @@
  */
 
 export interface paths {
-  "/healthz": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Proses hidup */
-    get: operations["getHealth"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/readyz": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Siap menerima trafik (DB terhubung dan migrasi terbaru) */
-    get: operations["getReadiness"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/system/info": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Informasi versi, lingkungan, dan modul aktif
-     * @description Dipakai halaman Tentang Sistem dan untuk menentukan menu modul yang tampil (Technical Guideline 14.5).
-     */
-    get: operations["getSystemInfo"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/webhooks/midtrans": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Notifikasi pembayaran Midtrans
-     * @description Signature diverifikasi sebelum payload disimpan. Event disimpan di webhook_events (dedup per event)
-     *     dan diproses job payment_webhook.process yang mengonfirmasi ulang status ke Midtrans
-     *     (Technical Guideline 7.4, 9.3). Endpoint ini tidak memakai Idempotency-Key.
-     */
-    post: operations["receiveMidtransWebhook"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/return-reasons": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Data Master › Alasan Retur
-     * @description Butuh `sales.return_reason.read`, `sales.sales_return.read`, atau `procurement.purchase_return.read`
-     *     (dropdown dokumen retur). Filter `appliesTo` mengembalikan alasan untuk jenis itu dan alasan `both`.
-     */
-    get: operations["listReturnReasons"]
-    put?: never
-    /**
-     * Menambah alasan retur
-     * @description Kode unik permanen.
-     */
-    post: operations["createReturnReason"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/return-reasons/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    /** Mengubah alasan retur (kode tetap) */
-    put: operations["updateReturnReason"]
-    post?: never
-    /** Menghapus (soft delete) alasan retur */
-    delete: operations["deleteReturnReason"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/webhooks/biteship": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Notifikasi status pengiriman Biteship
-     * @description Signature di header X-Biteship-Signature diverifikasi sebelum payload disimpan. Event diproses job
-     *     shipment_webhook.process yang mengonfirmasi ulang status ke Biteship. Endpoint ini tidak memakai Idempotency-Key.
-     */
-    post: operations["receiveBiteshipWebhook"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/auth/login": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Masuk dengan email dan password
-     * @description Mengembalikan access token (15 menit, disimpan di memori FE) dan memasang refresh token di cookie
-     *     HttpOnly `Path=/api/v1/auth` (Technical Guideline 9.1). Gagal login selalu `AUTH_INVALID_CREDENTIALS`;
-     *     5 kali gagal dalam 15 menit → `AUTH_ACCOUNT_LOCKED`. User ber-MFA → `AUTH_MFA_REQUIRED` lalu kirim ulang dengan `totpCode`.
-     *     Tidak memakai Idempotency-Key.
-     */
-    post: operations["login"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/auth/refresh": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Memperbarui access token dengan refresh token (rotasi)
-     * @description Refresh token lama langsung tidak berlaku. Pemakaian ulang token lama mencabut seluruh keluarga sesi.
-     */
-    post: operations["refreshSession"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/auth/logout": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Keluar dan mencabut sesi aktif
-     * @description Sesi dicari dari cookie refresh token, sehingga tetap bisa keluar walaupun access token sudah kedaluwarsa.
-     */
-    post: operations["logout"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/auth/reauth": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Konfirmasi identitas untuk aksi sensitif
-     * @description Mengembalikan access token baru dengan claim `reauth_at` yang berlaku 5 menit (Technical Guideline 9.1).
-     */
-    post: operations["reauthenticate"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/auth/password/forgot": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Meminta tautan atur ulang password
-     * @description Selalu 204 walaupun email tidak terdaftar, agar tidak bisa dipakai menebak email.
-     */
-    post: operations["requestPasswordReset"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/auth/password/token": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Memeriksa tautan undangan atau atur ulang password */
-    get: operations["getPasswordToken"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/auth/password/setup": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Mengatur password dari tautan undangan atau atur ulang */
-    post: operations["setupPassword"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/auth/password/change": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Mengganti password sendiri */
-    post: operations["changePassword"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/auth/mfa/setup": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Membuat secret TOTP baru untuk didaftarkan di aplikasi autentikator */
-    post: operations["setupMfa"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/auth/mfa/activate": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Mengaktifkan MFA dengan kode pertama dari aplikasi autentikator */
-    post: operations["activateMfa"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/me": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * User yang sedang login beserta permission
-     * @description Permission dimuat server-side dan tidak disimpan di token (Technical Guideline 9.1).
-     */
-    get: operations["getCurrentUser"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/users": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Daftar pengguna */
-    get: operations["listUsers"]
-    put?: never
-    /**
-     * Membuat pengguna dan mengirim undangan atur password
-     * @description Pemberian role butuh re-autentikasi (`identity.user_role.write`).
-     */
-    post: operations["createUser"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/users/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Detail pengguna */
-    get: operations["getUser"]
-    /**
-     * Mengubah nama, divisi, dan role pengguna
-     * @description Perubahan role butuh re-autentikasi dan memutus semua sesi pengguna (< 30 detik).
-     */
-    put: operations["updateUser"]
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/users/{id}/activate": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Mengaktifkan kembali pengguna */
-    post: operations["activateUser"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/users/{id}/deactivate": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Menonaktifkan pengguna dan memutus semua sesinya */
-    post: operations["deactivateUser"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/users/{id}/resend-invitation": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Mengirim ulang undangan atur password */
-    post: operations["resendUserInvitation"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/users/{id}/reset-mfa": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Mereset MFA pengguna (HP hilang); pengguna mendaftar ulang saat masuk berikutnya */
-    post: operations["resetUserMfa"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/roles": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Daftar role beserta permission */
-    get: operations["listRoles"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/roles/{id}/permissions": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    /** Mengganti permission role (berlaku langsung, butuh re-autentikasi) */
-    put: operations["setRolePermissions"]
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/permissions": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Katalog permission */
-    get: operations["listPermissions"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/audit-logs": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Riwayat perubahan
-     * @description Tanpa `entityId` butuh `audit.log.read`. Dengan `entityType` + `entityId` (tab Riwayat dokumen) cukup permission
-     *     baca entitas tersebut. Field sensitif sudah dimask (Technical Guideline 6.6).
-     */
-    get: operations["listAuditLogs"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/approvals/inbox": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Persetujuan Saya — dokumen yang menunggu keputusan user
-     * @description Termasuk dokumen yang bisa diputuskan sebagai penerima delegasi atau sebagai pengganti approver.
-     *     Dokumen yang diajukan user sendiri tidak pernah muncul (pembuat tidak boleh menyetujui dokumennya sendiri).
-     *     Terlama lebih dulu.
-     */
-    get: operations["listApprovalInbox"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/approvals/inbox/count": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Jumlah dokumen yang menunggu keputusan user (badge menu) */
-    get: operations["getApprovalInboxCount"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/approvals/subject-types": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Jenis dokumen yang memakai engine approval */
-    get: operations["listApprovalSubjectTypes"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/approvals/user-options": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Mencari pengguna aktif untuk dipilih sebagai penerima delegasi, approver, atau pengganti */
-    get: operations["listApprovalUserOptions"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/approval-requests": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Riwayat permintaan persetujuan
-     * @description `scope=requested` — diajukan user; `scope=decided` — pernah diputuskan user; `scope=all` — semua dokumen
-     *     (butuh `approval.policy.read`). Dengan `subjectType` + `subjectId` mengembalikan riwayat satu dokumen
-     *     (panel Persetujuan di detail dokumen) dan `scope` diabaikan.
-     */
-    get: operations["listApprovalRequests"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/approval-requests/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Detail permintaan persetujuan */
-    get: operations["getApprovalRequest"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/approval-requests/{id}/approve": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Setujui level yang aktif
-     * @description Level berikutnya aktif dan approver-nya diberi notifikasi. Setelah level terakhir, modul pemilik dokumen
-     *     memproses persetujuan di transaksi yang sama. Pembuat dokumen ditolak `FORBIDDEN`.
-     */
-    post: operations["approveApprovalRequest"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/approval-requests/{id}/reject": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Tolak dokumen
-     * @description Catatan wajib diisi. Dokumen kembali ke pembuat untuk direvisi.
-     */
-    post: operations["rejectApprovalRequest"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/approval-policies": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Matriks Persetujuan
-     * @description Butuh `approval.policy.read`. Tanpa `includeEnded` hanya versi yang masih/akan berlaku.
-     */
-    get: operations["listApprovalPolicies"]
-    put?: never
-    /** Menambah level kebijakan (langsung berlaku) */
-    post: operations["createApprovalPolicy"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/approval-policies/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    /**
-     * Mengubah kebijakan (versi baru mulai sekarang)
-     * @description Versi lama ditutup dan versi baru berlaku mulai sekarang (effective-dated). Jenis dokumen, divisi, dan level
-     *     tidak berubah. Dokumen yang sudah diajukan tetap memakai approver versi lama.
-     */
-    put: operations["updateApprovalPolicy"]
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/approval-policies/{id}/end": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Menghentikan level kebijakan mulai sekarang */
-    post: operations["endApprovalPolicy"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/approval-delegations": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Delegasi persetujuan
-     * @description Default delegasi yang melibatkan user. `all=true` untuk semua user (butuh `approval.policy.read`).
-     */
-    get: operations["listApprovalDelegations"]
-    put?: never
-    /**
-     * Mendelegasikan persetujuan selama cuti
-     * @description Tanpa `fromUserId` mendelegasikan milik user sendiri. Mencatat delegasi untuk user lain butuh
-     *     `approval.policy.write`. Satu user hanya punya satu delegasi pada tanggal yang sama; maksimal 90 hari.
-     */
-    post: operations["createApprovalDelegation"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/approval-delegations/{id}/cancel": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Menghentikan delegasi */
-    post: operations["cancelApprovalDelegation"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/notifications": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Notifikasi in-app milik user yang login */
-    get: operations["listNotifications"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/notifications/unread-count": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Jumlah notifikasi belum dibaca (badge) */
-    get: operations["getNotificationUnreadCount"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/notifications/read-all": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Menandai semua notifikasi sudah dibaca */
-    post: operations["markAllNotificationsRead"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/notifications/{id}/read": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Menandai notifikasi sudah dibaca */
-    post: operations["markNotificationRead"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/products": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Daftar produk (Produk Jadi, Packaging, Material, Bundling)
-     * @description Produk yang dihapus tidak tampil kecuali `deleted=true` (hanya produk terhapus, untuk dipulihkan Admin Sistem).
-     *     `q` mencari SKU, nama, varian, atau barcode persis.
-     */
-    get: operations["listProducts"]
-    put?: never
-    /**
-     * Membuat produk (MD-01, MD-02, MD-03)
-     * @description SKU unik permanen dan tidak bisa dipakai ulang walau produk dihapus (`DUPLICATE_CODE`). Produk Jadi wajib
-     *     umur simpan dan tipe kemasan dan selalu memakai batch. Bundel virtual wajib punya komponen Produk Jadi
-     *     non-bundel dan tidak punya stok, batch, maupun umur simpan sendiri.
-     */
-    post: operations["createProduct"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/products/lookup": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Mencari satu produk aktif berdasarkan SKU atau barcode persis (pindai barcode) */
-    get: operations["lookupProduct"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/products/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    /** Detail produk (produk terhapus tetap bisa dibuka untuk dokumen lama) */
-    get: operations["getProduct"]
-    /**
-     * Mengubah produk (optimistic locking dengan `version`)
-     * @description SKU, jenis produk, dan status bundel tidak bisa diubah.
-     */
-    put: operations["updateProduct"]
-    post?: never
-    /**
-     * Menghapus produk (soft delete; tetap tampil di dokumen lama)
-     * @description Produk yang masih menjadi komponen bundel aktif tidak bisa dihapus (`INVALID_STATE_TRANSITION`).
-     */
-    delete: operations["deleteProduct"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/products/{id}/restore": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Memulihkan produk yang dihapus (hanya Admin Sistem) */
-    post: operations["restoreProduct"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/product-categories": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Daftar kategori produk */
-    get: operations["listProductCategories"]
-    put?: never
-    /** Membuat kategori produk (kode unik permanen) */
-    post: operations["createProductCategory"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/product-categories/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    get?: never
-    /** Mengubah nama kategori */
-    put: operations["updateProductCategory"]
-    post?: never
-    /** Menghapus kategori (soft delete) */
-    delete: operations["deleteProductCategory"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/product-categories/{id}/restore": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Memulihkan kategori yang dihapus (hanya Admin Sistem) */
-    post: operations["restoreProductCategory"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/warehouses": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Daftar gudang fisik
-     * @description Gudang yang dihapus tidak tampil kecuali `deleted=true` (hanya gudang terhapus).
-     */
-    get: operations["listWarehouses"]
-    put?: never
-    /**
-     * Membuat gudang fisik beserta lokasi standarnya (MD-09, F1-114)
-     * @description Lokasi Inbound, FG Non-Ecommerce, E-commerce Stock, Petty Stock, RM, GM (Gudang GM), dan Gudang Retur dibuat
-     *     otomatis dengan kode `<kode gudang>-INB/FG/ECM/RM/GM/RET` (U-08). Kode gudang unik permanen.
-     */
-    post: operations["createWarehouse"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/warehouses/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    /** Detail gudang (gudang terhapus tetap bisa dibuka untuk dokumen lama) */
-    get: operations["getWarehouse"]
-    /** Mengubah nama, alamat, atau status aktif gudang */
-    put: operations["updateWarehouse"]
-    post?: never
-    /** Menghapus gudang beserta lokasinya (soft delete) */
-    delete: operations["deleteWarehouse"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/warehouses/{id}/restore": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Memulihkan gudang beserta lokasi yang ikut terhapus (hanya Admin Sistem) */
-    post: operations["restoreWarehouse"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/locations": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Daftar lokasi stok (internal dan eksternal) */
-    get: operations["listLocations"]
-    put?: never
-    /**
-     * Membuat lokasi (termasuk lokasi eksternal maklon, konsinyasi, buffer vending, mesin)
-     * @description Lokasi internal wajib `warehouseId`. Lokasi eksternal wajib `externalPartyType` + `externalPartyId` (maklon =
-     *     `supplier`, konsinyasi = `partner`, buffer vending = `partner`/`vending_machine`, mesin = `vending_machine`);
-     *     satu lokasi per jenis per pihak.
-     */
-    post: operations["createLocation"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/accounts": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Chart of Accounts urut kode
-     * @description Butuh `accounting.account.read`. Tanpa `includeInactive` hanya akun aktif.
-     */
-    get: operations["listAccounts"]
-    put?: never
-    /**
-     * Menambah akun COA (S-126)
-     * @description Kode 4 digit, digit pertama = kelompok 1–7, unik permanen (`DUPLICATE_CODE`, termasuk akun yang sudah dihapus).
-     *     Induk harus akun judul (tidak bisa diposting) dalam kelompok yang sama.
-     */
-    post: operations["createAccount"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/accounts/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Detail akun */
-    get: operations["getAccount"]
-    /**
-     * Mengubah akun
-     * @description Kode tidak berubah. Saldo normal akun yang sudah dipakai jurnal tidak bisa diubah; akun terpakai tidak bisa
-     *     dijadikan akun induk; akun yang punya sub-akun harus tetap akun induk.
-     */
-    put: operations["updateAccount"]
-    post?: never
-    /**
-     * Menghapus akun yang belum dipakai (soft delete)
-     * @description Akun yang sudah dipakai jurnal atau posting rule, atau masih punya sub-akun, ditolak `INVALID_STATE_TRANSITION`.
-     */
-    delete: operations["deleteAccount"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/channels": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Master channel (dimensi C) */
-    get: operations["listChannels"]
-    put?: never
-    /** Menambah channel */
-    post: operations["createChannel"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/channels/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    /** Mengubah channel (kode tetap) */
-    put: operations["updateChannel"]
-    post?: never
-    /** Menghapus channel yang belum dipakai jurnal dan tanpa sub-channel */
-    delete: operations["deleteChannel"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/sub-channels": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Master sub-channel (dimensi S) */
-    get: operations["listSubChannels"]
-    put?: never
-    /** Menambah sub-channel */
-    post: operations["createSubChannel"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/sub-channels/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    /** Mengubah sub-channel (kode dan channel tetap) */
-    put: operations["updateSubChannel"]
-    post?: never
-    /** Menghapus sub-channel yang belum dipakai jurnal */
-    delete: operations["deleteSubChannel"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/divisions": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Master divisi (dimensi D) */
-    get: operations["listDivisions"]
-    put?: never
-    /** Menambah divisi */
-    post: operations["createDivision"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/divisions/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    /** Mengubah divisi (kode tetap) */
-    put: operations["updateDivision"]
-    post?: never
-    /** Menghapus divisi yang belum dipakai jurnal */
-    delete: operations["deleteDivision"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/campaigns": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Data Master › Kampanye (dimensi K) */
-    get: operations["listCampaigns"]
-    put?: never
-    /**
-     * Menambah kampanye
-     * @description Kode `KMP-YYYYMM-SINGKATAN` unik permanen; periode berlaku wajib.
-     */
-    post: operations["createCampaign"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/campaigns/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    /** Mengubah kampanye (kode tetap) */
-    put: operations["updateCampaign"]
-    post?: never
-    /** Menghapus kampanye yang belum dipakai jurnal */
-    delete: operations["deleteCampaign"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/expense-types": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Data Master › Jenis Biaya
-     * @description Butuh `accounting.expense_type.read` atau `accounting.expense_claim.read` (dropdown pengajuan biaya).
-     */
-    get: operations["listExpenseTypes"]
-    put?: never
-    /**
-     * Menambah jenis biaya
-     * @description Kode unik permanen; akun beban wajib akun beban (6xxx/7xxx bersaldo debit) aktif yang bisa diposting.
-     */
-    post: operations["createExpenseType"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/expense-types/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    /** Mengubah jenis biaya (kode tetap) */
-    put: operations["updateExpenseType"]
-    post?: never
-    /** Menghapus (soft delete) jenis biaya */
-    delete: operations["deleteExpenseType"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/fiscal-periods": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Periode akuntansi bulanan (ACC-08) */
-    get: operations["listFiscalPeriods"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/fiscal-periods/ensure": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Membuat periode bulan berjalan dan bulan berikutnya bila belum ada
-     * @description Periode juga dibuat otomatis oleh job harian `accounting.ensure_fiscal_periods` dan saat jurnal pertama
-     *     diposting di bulan tersebut. Butuh `accounting.fiscal_period.write`.
-     */
-    post: operations["ensureFiscalPeriods"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/posting-rules": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Posting rule jurnal otomatis dan pemetaan akun yang berlaku hari ini (S-130) */
-    get: operations["listPostingRules"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/journal-entries": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Daftar jurnal (manual, otomatis, Balik Jurnal) */
-    get: operations["listJournalEntries"]
-    put?: never
-    /**
-     * Menyimpan draft Jurnal Umum (S-127)
-     * @description Akun harus bisa diposting manual (akun kontrol hanya diisi jurnal otomatis). Tanggal di periode tertutup
-     *     ditolak `PERIOD_LOCKED`. Balance dan dimensi wajib diperiksa saat posting.
-     */
-    post: operations["createJournalEntry"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/journal-entries/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Detail jurnal beserta baris dan aksi yang diizinkan */
-    get: operations["getJournalEntry"]
-    /**
-     * Mengubah draft Jurnal Umum
-     * @description Jurnal yang sudah diposting tidak bisa diubah (`INVALID_STATE_TRANSITION`, ACC-13).
-     */
-    put: operations["updateJournalEntry"]
-    post?: never
-    /**
-     * Menghapus draft Jurnal Umum
-     * @description Jurnal yang sudah diposting tidak bisa dihapus (`INVALID_STATE_TRANSITION`, ACC-13).
-     */
-    delete: operations["deleteJournalEntry"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/journal-entries/{id}/post": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Memposting draft Jurnal Umum
-     * @description Jurnal harus balance, di periode terbuka (`PERIOD_LOCKED`), dan dimensi wajib terisi (pendapatan: channel +
-     *     sub-channel; HPP/beban/lain-lain: divisi). Nomor `JV/TAHUN/BULAN/NOMOR` diberikan saat posting.
-     */
-    post: operations["postJournalEntry"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/journal-entries/{id}/reverse": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Balik Jurnal (S-128)
-     * @description Membuat dan memposting JV pembalik (debit/kredit ditukar) yang mereferensikan jurnal asal. Jurnal asal tetap
-     *     tidak berubah. Satu jurnal hanya bisa dibalik sekali; jurnal otomatis dibalik lewat pembatalan dokumen sumber.
-     */
-    post: operations["reverseJournalEntry"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/general-ledger": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Buku Besar per akun dengan saldo berjalan
-     * @description Hanya jurnal yang sudah diposting. Saldo mengikuti saldo normal akun. Rentang paling panjang 2 tahun.
-     *     Butuh `accounting.journal.read` atau `accounting.report.read`.
-     */
-    get: operations["getGeneralLedger"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/document-sequences": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Pengaturan › Nomor Dokumen — nomor terakhir per kode dokumen
-     * @description Format `KODE/TAHUN/BULAN/NOMOR` dengan nomor urut 5 digit yang reset setiap tahun (U-15). Nomor diberikan
-     *     saat dokumen diajukan atau diposting di dalam transaksi bisnis, sehingga tidak loncat. Butuh
-     *     `document.sequence.read`. Tanpa `year` dipakai tahun berjalan (WIB).
-     */
-    get: operations["listDocumentSequences"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/locations/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    /** Detail lokasi (lokasi terhapus tetap bisa dibuka untuk dokumen lama) */
-    get: operations["getLocation"]
-    /** Mengubah nama atau status aktif lokasi */
-    put: operations["updateLocation"]
-    post?: never
-    /** Menghapus lokasi tambahan (soft delete); lokasi standar ikut gudangnya */
-    delete: operations["deleteLocation"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/locations/{id}/restore": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Memulihkan lokasi yang dihapus (hanya Admin Sistem) */
-    post: operations["restoreLocation"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/inbounds": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Antrian Inbound — barang Karantina per dokumen asal (WMS-02, WMS-09)
-     * @description Terbaru lebih dulu. Permission `warehouse.inbound.read`.
-     */
-    get: operations["listInbounds"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/inbounds/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    /** Detail Inbound beserta baris dan catatan QC */
-    get: operations["getInbound"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/inbounds/{id}/lines/{lineId}/qc": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-        lineId: string
-      }
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * QC satu baris Inbound (checklist, qty lulus/ditolak, foto, lokasi tujuan)
-     * @description Qty lulus pindah Karantina → Tersedia di lokasi tujuan; qty ditolak tetap Karantina (ditahan di Inbound untuk
-     *     barang pemasok/maklon, atau pindah ke Gudang Retur). Qty lulus + ditolak = qty baris. Permission
-     *     `warehouse.inbound.post`.
-     */
-    post: operations["recordInboundQc"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/stock-transfers": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Daftar Transfer Stok atau Permintaan Petty Stock */
-    get: operations["listStockTransfers"]
-    put?: never
-    /** Membuat Transfer Stok / Permintaan Petty Stock berstatus Draft */
-    post: operations["createStockTransfer"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/stock-transfers/in-transit": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Stok dalam Pengiriman — baris transfer yang belum diterima penuh (WMS-10) */
-    get: operations["listStockInTransit"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/stock-transfers/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    /** Detail transfer */
-    get: operations["getStockTransfer"]
-    /** Mengubah transfer Draft */
-    put: operations["updateStockTransfer"]
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/stock-transfers/{id}/actions": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Aksi status transfer (submit, release, prepare, post, ship, receive, complete, cancel)
-     * @description Transfer langsung: `post` (dalam satu gudang, langsung Selesai) atau `ship` (antar gudang/eksternal →
-     *     Dalam Pengiriman), `receive` (qty diterima per baris), `complete` (sisa dicatat kekurangan). Permintaan
-     *     Petty Stock: `submit` (Fulfillment Leader), `release` (Logistik Leader; stok asal dialokasikan FEFO),
-     *     `prepare` (Staf Gudang), `receive` (Fulfillment Leader mengonfirmasi qty; sisa alokasi dilepas).
-     *     Aksi yang boleh dijalankan ada di `allowedActions`.
-     */
-    post: operations["actOnStockTransfer"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/stock-counts": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Daftar Stock Count (Merchandiser hanya lokasi konsinyasi mitra yang ditugaskan) */
-    get: operations["listStockCounts"]
-    put?: never
-    /** Membuat Stock Count Draft, satu dokumen per lokasi */
-    post: operations["createStockCounts"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/stock-counts/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    /** Detail Stock Count (hitung buta — qty sistem dan selisih kosong sampai hasil dikirim) */
-    get: operations["getStockCount"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/stock-counts/{id}/entries": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    get?: never
-    /** Menyimpan isian hitung (autosave form HP), barang tambahan, dan foto */
-    put: operations["saveStockCountEntries"]
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/stock-counts/{id}/actions": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Aksi status Stock Count (start, submit, recount, cancel)
-     * @description `start` memberi nomor SC dan mengambil snapshot saldo sistem; `submit` menghitung selisih — ada selisih
-     *     pada stock count gudang → approval `stock_count` (nominal = nilai selisih absolut); tanpa selisih atau
-     *     konsinyasi/vending → Selesai. Setelah disetujui, penyesuaian stok + jurnal A-14 diposting otomatis.
-     */
-    post: operations["actOnStockCount"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/stock-count-schedules": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Jadwal Stock Count (cycle count, konsinyasi/vending bulanan, penuh akhir tahun) */
-    get: operations["listStockCountSchedules"]
-    put?: never
-    /** Membuat jadwal Stock Count */
-    post: operations["createStockCountSchedule"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/stock-count-schedules/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    get?: never
-    /** Mengubah jadwal Stock Count */
-    put: operations["updateStockCountSchedule"]
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/stock-balances": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Stok per Lokasi — saldo per produk × lokasi × batch × status (INV-01, WMS-01)
-     * @description Hanya saldo > 0. `unitCost` adalah HPP rata-rata sisa cost layer batch (FIFO di dalam batch), `value` =
-     *     qty × unitCost. Permission `inventory.stock.read`.
-     */
-    get: operations["listStockBalances"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/stock-card": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Kartu Stok per SKU (opsional lokasi, batch, status) dengan saldo qty & nilai berjalan (INV-01) */
-    get: operations["getStockCard"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/batches": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Batch & Kedaluwarsa — batch berurutan FEFO dengan qty per status (INV-04, INV-09) */
-    get: operations["listBatches"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/batch-suggestions": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Alokasi Batch (FEFO) — saran batch untuk mengambil qty dari satu lokasi (S-215)
-     * @description Batch stok Tersedia diurutkan kedaluwarsa terdekat; batch kedaluwarsa dan stok Karantina tidak diusulkan.
-     *     Pemilihan batch manual yang bukan saran FEFO wajib alasan saat diposting.
-     */
-    get: operations["suggestBatches"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/cost-layers": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** HPP per Batch — cost layer FIFO per penerimaan (INV-03) */
-    get: operations["listCostLayers"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/cost-layers/{id}/consumptions": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    /** Jejak konsumsi HPP satu cost layer (RPT-04) */
-    get: operations["listCostLayerConsumptions"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/bundle-availability": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Stok tersedia bundel virtual = min(floor(stok komponen ÷ qty)) (S-115, MD-03)
-     * @description Stok komponen = stok Tersedia di lokasi `locationId`, atau di semua lokasi yang bisa dijual bila kosong.
-     */
-    get: operations["listBundleAvailability"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/customers": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Daftar pelanggan (MD-06)
-     * @description `q` mencari nama, kode, atau nomor HP (nomor dinormalisasi lebih dulu sehingga `0812…`, `62812…`, dan
-     *     `+62812…` sama). `phone` mencari persis satu nomor untuk cek duplikat sebelum membuat pelanggan.
-     */
-    get: operations["listCustomers"]
-    put?: never
-    /**
-     * Membuat pelanggan
-     * @description Nomor HP yang sudah dipakai pelanggan lain ditolak `VALIDATION_FAILED` pada field `phone`.
-     */
-    post: operations["createCustomer"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/customers/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    /** Detail pelanggan beserta alamat */
-    get: operations["getCustomer"]
-    /**
-     * Mengubah pelanggan (optimistic locking dengan `version`)
-     * @description Daftar `addresses` menggantikan seluruh alamat: alamat dengan `id` diubah, tanpa `id` ditambah, dan yang
-     *     tidak dikirim dihapus (soft delete).
-     */
-    put: operations["updateCustomer"]
-    post?: never
-    /**
-     * Menghapus pelanggan (soft delete)
-     * @description Pelanggan tetap tampil di dokumen lama; nomor HP-nya boleh dipakai pelanggan baru.
-     */
-    delete: operations["deleteCustomer"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/partners": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Daftar mitra MT, konsinyasi, dan B2B (MD-07) */
-    get: operations["listPartners"]
-    put?: never
-    /**
-     * Membuat mitra
-     * @description Kode mitra unik permanen dan tidak bisa dipakai ulang walau mitra dihapus (`DUPLICATE_CODE`).
-     */
-    post: operations["createPartner"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/partners/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    /** Detail mitra */
-    get: operations["getPartner"]
-    /**
-     * Mengubah mitra
-     * @description Kode tidak bisa diubah. `npwp` tidak dikirim = tidak berubah; string kosong = dihapus.
-     */
-    put: operations["updatePartner"]
-    post?: never
-    /** Menghapus mitra (soft delete) */
-    delete: operations["deletePartner"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/partners/{id}/agreements": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    /** Riwayat PKS mitra, terbaru lebih dulu */
-    get: operations["listPartnerAgreements"]
-    put?: never
-    /**
-     * Mencatat PKS baru (effective-dated)
-     * @description Periode PKS dengan jenis yang sama tidak boleh tumpang tindih (Technical Guideline 5.14). Perubahan
-     *     ketentuan dicatat sebagai PKS baru mulai tanggal berlakunya; PKS lama dipersingkat lewat `validTo`.
-     *     `fileId` adalah PDF PKS yang sudah diunggah lewat `POST /api/v1/files` dengan `ownerType=partner_agreement`.
-     */
-    post: operations["createPartnerAgreement"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/partner-agreements/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    get?: never
-    /** Mengoreksi PKS */
-    put: operations["updatePartnerAgreement"]
-    post?: never
-    /** Menghapus PKS yang salah input (soft delete) */
-    delete: operations["deletePartnerAgreement"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/partner-product-codes": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Kode artikel & barcode retailer per SKU per mitra (MD-07) */
-    get: operations["listPartnerProductCodes"]
-    put?: never
-    /**
-     * Menambah kode produk mitra
-     * @description Satu produk hanya punya satu kode per mitra; kode artikel unik per mitra (`VALIDATION_FAILED`).
-     */
-    post: operations["createPartnerProductCode"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/partner-product-codes/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    get?: never
-    /** Mengubah kode artikel, barcode, atau keterangan */
-    put: operations["updatePartnerProductCode"]
-    post?: never
-    /** Menghapus kode produk mitra (soft delete) */
-    delete: operations["deletePartnerProductCode"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/suppliers": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Daftar pemasok & maklon (MD-08) */
-    get: operations["listSuppliers"]
-    put?: never
-    /**
-     * Membuat pemasok atau maklon
-     * @description Kode unik permanen (`DUPLICATE_CODE`). NPWP dan nomor rekening dienkripsi (NFR-04).
-     */
-    post: operations["createSupplier"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/suppliers/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    /** Detail pemasok; NPWP dan rekening ditampilkan tersamar */
-    get: operations["getSupplier"]
-    /**
-     * Mengubah pemasok
-     * @description Kode tidak bisa diubah. `npwp` tidak dikirim = tidak berubah. Rekening dengan `id` tanpa `accountNumber`
-     *     mempertahankan nomor lama; rekening yang tidak dikirim dihapus.
-     */
-    put: operations["updateSupplier"]
-    post?: never
-    /** Menghapus pemasok (soft delete) */
-    delete: operations["deleteSupplier"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/party/user-options": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Pengguna aktif untuk dipilih sebagai Sales atau Merchandiser mitra */
-    get: operations["listPartyUserOptions"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/employees": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Data karyawan dasar (HR-01)
-     * @description `q` mencari nomor karyawan atau nama. `nik` mencari persis lewat hash HMAC (NIK tidak pernah dicari
-     *     sebagai teks, Technical Guideline 6.7).
-     */
-    get: operations["listEmployees"]
-    put?: never
-    /**
-     * Menambah karyawan
-     * @description Nomor karyawan unik permanen (`DUPLICATE_CODE`); NIK dienkripsi AES-256-GCM.
-     */
-    post: operations["createEmployee"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/employees/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    /** Detail karyawan; NIK ditampilkan tersamar */
-    get: operations["getEmployee"]
-    /**
-     * Mengubah data karyawan
-     * @description Nomor karyawan tidak bisa diubah. `nik` tidak dikirim = tidak berubah; string kosong = dihapus.
-     */
-    put: operations["updateEmployee"]
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/employees/{id}/resign": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Mencatat resign karyawan
-     * @description Mulai tanggal resign karyawan tidak lagi aktif; pelanggan yang tertaut otomatis kehilangan harga karyawan
-     *     (HR-03). Tanggal boleh di masa depan (resign terjadwal).
-     */
-    post: operations["resignEmployee"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/employee-options": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Pilihan karyawan untuk ditautkan ke pelanggan
-     * @description Hanya nomor, nama, dan status (tanpa data pribadi). Terbuka untuk `hris.employee.read` atau
-     *     `party.customer.write` (CS menautkan pelanggan ke karyawan).
-     */
-    get: operations["listEmployeeOptions"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/files": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Meminta URL upload file (Technical Guideline 5.16)
-     * @description Backend memeriksa permission tulis pemilik (`ownerType`), ukuran, dan tipe file lalu mengembalikan URL
-     *     upload bertanda tangan yang berlaku 15 menit. Browser mengirim isi file dengan `PUT uploadUrl`, lalu
-     *     mengirim `fileId` di request bisnis (mis. PKS mitra) yang memvalidasi dan menautkan file ke pemiliknya.
-     *     Ukuran berlebih ditolak `FILE_TOO_LARGE`, tipe lain `FILE_TYPE_NOT_ALLOWED`.
-     */
-    post: operations["createFileUpload"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/files/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Metadata file */
-    get: operations["getFile"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/files/{id}/download-url": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * URL unduhan bertanda tangan berumur 5 menit
-     * @description File yang sudah ditautkan hanya bisa diunduh pemegang permission baca pemiliknya (mis.
-     *     `party.partner_agreement.read`); file yang belum ditautkan hanya oleh pengunggahnya.
-     */
-    get: operations["getFileDownloadUrl"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/file-content/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Mengunduh isi file dengan URL bertanda tangan */
-    get: operations["getFileContent"]
-    /**
-     * Mengunggah isi file ke URL bertanda tangan
-     * @description Dipanggil browser dengan `uploadUrl` dari `createFileUpload`, tanpa header Authorization dan tanpa
-     *     Idempotency-Key (setara presigned PUT object storage). Ukuran harus sama dengan yang dideklarasikan dan
-     *     isi file harus sesuai tipenya.
-     */
-    put: operations["putFileContent"]
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/price-lists": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Data Master › Daftar Harga
-     * @description Butuh `pricing.price_list.read` (atau `pricing.price_list.approve` untuk approver). Harga Dasar & HET selalu
-     *     paling atas. `deleted=true` hanya menampilkan daftar harga terhapus (untuk dipulihkan Admin Sistem).
-     */
-    get: operations["listPriceLists"]
-    put?: never
-    /**
-     * Menambah daftar harga
-     * @description Harga diisi lewat versi yang diajukan untuk approval (Head Sales → Head Finance & Accounting).
-     */
-    post: operations["createPriceList"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/price-lists/options": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Pilihan daftar harga aktif (acuan persentase, harga bertingkat) */
-    get: operations["listPriceListOptions"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/price-lists/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    /** Detail daftar harga dan riwayat versi */
-    get: operations["getPriceList"]
-    /** Mengubah header daftar harga (kode dan jenis tetap) */
-    put: operations["updatePriceList"]
-    post?: never
-    /**
-     * Menghapus (soft delete) daftar harga
-     * @description Harga Dasar & HET tidak bisa dihapus. Transaksi lama tetap menyimpan harga dan versinya.
-     */
-    delete: operations["deletePriceList"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/price-lists/{id}/restore": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Memulihkan daftar harga yang dihapus (hanya Admin Sistem) */
-    post: operations["restorePriceList"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/price-lists/{id}/versions": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Menyiapkan versi draft baru
-     * @description `copyFromVersionId` menyalin harga versi lain bila `items` kosong. Paling banyak satu versi draft/diajukan per
-     *     daftar harga. Tanggal mulai berlaku tidak boleh sebelum hari ini.
-     */
-    post: operations["createPriceListVersion"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/price-list-versions/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    /** Detail versi beserta harga per produk */
-    get: operations["getPriceListVersion"]
-    /** Mengubah versi draft (seluruh item diganti) */
-    put: operations["updatePriceListVersion"]
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/price-list-versions/{id}/submit": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Mengajukan versi untuk approval price_list_version
-     * @description Versi berlaku setelah disetujui Head Sales lalu Head Finance & Accounting.
-     */
-    post: operations["submitPriceListVersion"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/price-list-versions/{id}/withdraw": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Menarik kembali pengajuan menjadi draft */
-    post: operations["withdrawPriceListVersion"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/price-list-versions/{id}/cancel": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Membatalkan versi draft */
-    post: operations["cancelPriceListVersion"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/special-prices": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Data Master › Aturan Harga › Harga Khusus */
-    get: operations["listSpecialPrices"]
-    put?: never
-    /**
-     * Menambah harga khusus pelanggan/mitra
-     * @description Harga khusus lama tanpa tanggal berakhir untuk pihak & produk yang sama ditutup otomatis.
-     */
-    post: operations["createSpecialPrice"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/special-prices/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post?: never
-    /** Menghapus harga khusus yang belum pernah berlaku */
-    delete: operations["deleteSpecialPrice"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/special-prices/{id}/end": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Mengisi tanggal berakhir harga khusus */
-    post: operations["endSpecialPrice"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/promotions": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Data Master › Aturan Harga › Promo */
-    get: operations["listPromotions"]
-    put?: never
-    /** Menambah promo periode */
-    post: operations["createPromotion"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/promotions/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    /** Detail promo beserta item */
-    get: operations["getPromotion"]
-    /**
-     * Mengubah promo
-     * @description Promo yang sudah berjalan hanya boleh diubah nama, keterangan, status, dan tanggal selesai (paling cepat
-     *     kemarin); `items` harus sama dengan yang tersimpan atau dikosongkan.
-     */
-    put: operations["updatePromotion"]
-    post?: never
-    /** Menghapus promo yang belum berjalan */
-    delete: operations["deletePromotion"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/tiered-prices": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Data Master › Aturan Harga › Harga Bertingkat */
-    get: operations["listTieredPrices"]
-    put?: never
-    /** Menambah harga bertingkat per qty minimum */
-    post: operations["createTieredPrice"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/tiered-prices/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post?: never
-    /** Menghapus harga bertingkat yang belum pernah berlaku */
-    delete: operations["deleteTieredPrice"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/tiered-prices/{id}/end": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Mengisi tanggal berakhir harga bertingkat */
-    post: operations["endTieredPrice"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/discount-limits": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Penjualan › Harga & Diskon › Batas Diskon per Role */
-    get: operations["listDiscountLimits"]
-    put?: never
-    /**
-     * Menetapkan batas diskon role mulai tanggal tertentu
-     * @description Batas lama tanpa tanggal berakhir ditutup otomatis sehari sebelum batas baru berlaku.
-     */
-    post: operations["createDiscountLimit"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/discount-limits/roles": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Pilihan role untuk batas diskon */
-    get: operations["listDiscountLimitRoles"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/discount-limits/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post?: never
-    /** Menghapus batas diskon yang belum pernah berlaku */
-    delete: operations["deleteDiscountLimit"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/discount-limits/{id}/end": {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Mengisi tanggal berakhir batas diskon */
-    post: operations["endDiscountLimit"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/pricing/quote": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Simulasi harga (resolver 5 aturan BRD 5.18)
-     * @description Menjalankan resolver yang sama dengan transaksi: harga khusus → promo → harga bertingkat → daftar harga
-     *     channel/mitra/karyawan → Harga Dasar & HET, berdasarkan tanggal transaksi. Tidak menyimpan data, sehingga
-     *     tidak memakai Idempotency-Key.
-     */
-    post: operations["quotePrice"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/pricing/discount-check": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Simulasi diskon manual terhadap batas diskon role user yang login
-     * @description Subtotal dokumen = total bruto baris dikurangi diskon baris. Diskon di atas batas berarti Sales Order butuh
-     *     approval `sales_order_discount` (Head Sales). Tidak menyimpan data.
-     */
-    post: operations["checkDiscount"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/data-exchange/kinds": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Jenis data yang boleh diimpor/diekspor user (MD-10, INT-02)
-     * @description Hanya jenis data dengan permission `<kind>.import` atau `<kind>.export` milik user. `uploadOwnerType`
-     *     dipakai sebagai `ownerType` saat meminta URL upload file (`POST /api/v1/files`).
-     */
-    get: operations["listDataExchangeKinds"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/data-exchange/kinds/{kind}/template": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Mengunduh template impor (xlsx) yang dihasilkan dari definisi kolom
-     * @description Template berisi sheet data (header oranye bertanda `*` wajib, abu-abu opsional, dropdown untuk kolom
-     *     pilihan) dan sheet Petunjuk berisi format, aturan, serta contoh baris. Butuh `<kind>.import`.
-     */
-    get: operations["getDataExchangeTemplate"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/import-jobs": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Riwayat impor (jenis data yang boleh diimpor user) */
-    get: operations["listImportJobs"]
-    put?: never
-    /**
-     * Memulai impor dari file xlsx yang sudah diunggah
-     * @description File diunggah dulu lewat `POST /api/v1/files` dengan `ownerType` dari `listDataExchangeKinds`. Pemeriksaan
-     *     per baris berjalan sebagai job `dataexchange.import` (antrean bulk); pantau progress lewat `getImportJob`.
-     *     File yang sama (SHA-256) untuk jenis data yang sama ditolak `IMPORT_ALREADY_PROCESSED`, kecuali job
-     *     sebelumnya gagal atau dibatalkan.
-     */
-    post: operations["createImportJob"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/import-jobs/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Status, progress, dan ringkasan job impor */
-    get: operations["getImportJob"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/import-jobs/{id}/rows": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Preview baris hasil pemeriksaan
-     * @description Data pribadi (NPWP, nomor rekening, NIK) ditampilkan tersamar.
-     */
-    get: operations["listImportJobRows"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/import-jobs/{id}/commit": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Menyimpan baris valid
-     * @description Hanya untuk status `validated` dengan minimal satu baris valid. Penyimpanan berjalan sebagai job; master
-     *     data disimpan dalam satu transaksi (gagal satu baris = tidak ada yang tersimpan, TG 5.15).
-     */
-    post: operations["commitImportJob"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/import-jobs/{id}/cancel": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Membatalkan impor yang menunggu konfirmasi */
-    post: operations["cancelImportJob"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/import-jobs/{id}/error-file": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** URL unduhan file baris error (xlsx dengan kolom Keterangan Error) */
-    get: operations["getImportJobErrorFile"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/export-jobs": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Riwayat ekspor (jenis data yang boleh diekspor user) */
-    get: operations["listExportJobs"]
-    put?: never
-    /**
-     * Memulai ekspor ke xlsx
-     * @description File dibuat job `dataexchange.export` (antrean bulk) dengan kolom yang sama dengan template impor, lalu
-     *     user mendapat notifikasi berisi tautan unduhan. Butuh `<kind>.export`.
-     */
-    post: operations["createExportJob"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/export-jobs/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Status job ekspor */
-    get: operations["getExportJob"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/export-jobs/{id}/download-url": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** URL unduhan file ekspor */
-    get: operations["getExportJobDownloadUrl"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/procurement/division-options": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Divisi aktif untuk form Purchase Request dan Purchase Order
-     * @description Terbuka untuk pemegang hak baca/tulis PR atau PO (tidak butuh hak master dimensi).
-     */
-    get: operations["listProcurementDivisionOptions"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/procurement/cash-bank-accounts": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Akun Kas & Bank (11xx) untuk pembayaran uang muka pembelian */
-    get: operations["listProcurementCashBankAccounts"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/purchase-requests": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Daftar Purchase Request (S-201) */
-    get: operations["listPurchaseRequests"]
-    put?: never
-    /**
-     * Menyimpan draft Purchase Request
-     * @description Pembuat menjadi peminta. Divisi peminta wajib; baris berisi produk katalog atau uraian bebas.
-     */
-    post: operations["createPurchaseRequest"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/purchase-requests/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Detail Purchase Request beserta PO yang dibuat darinya */
-    get: operations["getPurchaseRequest"]
-    /** Mengubah draft Purchase Request */
-    put: operations["updatePurchaseRequest"]
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/purchase-requests/{id}/submit": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Ajukan Purchase Request
-     * @description Nomor `PR/TAHUN/BULAN/NOMOR` diberikan dan approval `purchase_request` (Head divisi peminta) diminta di
-     *     transaksi yang sama. `APPROVAL_POLICY_MISSING` bila belum ada approver aktif selain pembuat.
-     */
-    post: operations["submitPurchaseRequest"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/purchase-requests/{id}/revise": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Revisi Purchase Request yang ditolak (kembali ke Draft, nomor tetap) */
-    post: operations["revisePurchaseRequest"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/purchase-requests/{id}/cancel": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Batalkan draft Purchase Request */
-    post: operations["cancelPurchaseRequest"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/purchase-requests/{id}/close": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Tutup Purchase Request yang disetujui (sisa qty tidak dijadikan PO) */
-    post: operations["closePurchaseRequest"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/purchase-orders": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Daftar Purchase Order (barang/packaging, maklon, reprocess) */
-    get: operations["listPurchaseOrders"]
-    put?: never
-    /**
-     * Menyimpan draft Purchase Order (S-202, S-203, S-204)
-     * @description NON-PKP: tanpa PPN, total = subtotal. PO maklon/reprocess wajib ke pemasok berjenis maklon yang punya lokasi
-     *     eksternal maklon, baris = FG hasil + harga jasa per unit, dan daftar bahan (packaging atau material GM) yang
-     *     dikirim ke maklon. Baris dari Purchase Request mengisi `purchaseRequestLineId` (qty ≤ sisa PR).
-     */
-    post: operations["createPurchaseOrder"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/purchase-orders/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Detail Purchase Order beserta uang muka */
-    get: operations["getPurchaseOrder"]
-    /** Mengubah draft Purchase Order (jenis PO tetap) */
-    put: operations["updatePurchaseOrder"]
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/purchase-orders/{id}/submit": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Ajukan Purchase Order
-     * @description Nomor `PO/TAHUN/BULAN/NOMOR` diberikan dan approval `purchase_order` dengan nominal `totalAmount` (level
-     *     sesuai Matriks Persetujuan) diminta di transaksi yang sama.
-     */
-    post: operations["submitPurchaseOrder"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/purchase-orders/{id}/revise": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Revisi Purchase Order yang ditolak (kembali ke Draft, nomor tetap) */
-    post: operations["revisePurchaseOrder"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/purchase-orders/{id}/cancel": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Batalkan Purchase Order
-     * @description Draft, atau Disetujui yang belum ada penerimaan barang dan tidak punya uang muka aktif (alasan wajib).
-     *     Qty Purchase Request asal dikembalikan.
-     */
-    post: operations["cancelPurchaseOrder"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/purchase-orders/{id}/close": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Tutup Purchase Order yang diterima sebagian (sisa qty tidak ditunggu) */
-    post: operations["closePurchaseOrder"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/purchase-advances": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Daftar uang muka pembelian (S-205) */
-    get: operations["listPurchaseAdvances"]
-    put?: never
-    /**
-     * Menyimpan draft uang muka untuk PO yang disetujui
-     * @description Total uang muka aktif per PO tidak boleh melebihi total PO.
-     */
-    post: operations["createPurchaseAdvance"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/purchase-advances/{id}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Detail uang muka pembelian */
-    get: operations["getPurchaseAdvance"]
-    /** Mengubah draft uang muka */
-    put: operations["updatePurchaseAdvance"]
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/purchase-advances/{id}/post": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Posting uang muka (jurnal A-19)
-     * @description Nomor `BYR/TAHUN/BULAN/NOMOR` dan jurnal A-19 (Dr 1401 Uang Muka Pembelian, Cr akun Kas & Bank) dengan
-     *     dimensi divisi PO dan pihak pemasok, di transaksi yang sama. Periode tertutup ditolak `PERIOD_LOCKED`.
-     */
-    post: operations["postPurchaseAdvance"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/api/v1/purchase-advances/{id}/cancel": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Batalkan uang muka
-     * @description Draft (hak tulis) atau Diposting yang belum dipotong tagihan (hak posting, alasan wajib, jurnal A-19 dibalik).
-     */
-    post: operations["cancelPurchaseAdvance"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
+    "/healthz": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Proses hidup */
+        get: operations["getHealth"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/readyz": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Siap menerima trafik (DB terhubung dan migrasi terbaru) */
+        get: operations["getReadiness"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/info": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Informasi versi, lingkungan, dan modul aktif
+         * @description Dipakai halaman Tentang Sistem dan untuk menentukan menu modul yang tampil (Technical Guideline 14.5).
+         */
+        get: operations["getSystemInfo"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/webhooks/midtrans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Notifikasi pembayaran Midtrans
+         * @description Signature diverifikasi sebelum payload disimpan. Event disimpan di webhook_events (dedup per event)
+         *     dan diproses job payment_webhook.process yang mengonfirmasi ulang status ke Midtrans
+         *     (Technical Guideline 7.4, 9.3). Endpoint ini tidak memakai Idempotency-Key.
+         */
+        post: operations["receiveMidtransWebhook"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/return-reasons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Data Master › Alasan Retur
+         * @description Butuh `sales.return_reason.read`, `sales.sales_return.read`, atau `procurement.purchase_return.read`
+         *     (dropdown dokumen retur). Filter `appliesTo` mengembalikan alasan untuk jenis itu dan alasan `both`.
+         */
+        get: operations["listReturnReasons"];
+        put?: never;
+        /**
+         * Menambah alasan retur
+         * @description Kode unik permanen.
+         */
+        post: operations["createReturnReason"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/return-reasons/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Mengubah alasan retur (kode tetap) */
+        put: operations["updateReturnReason"];
+        post?: never;
+        /** Menghapus (soft delete) alasan retur */
+        delete: operations["deleteReturnReason"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/webhooks/biteship": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Notifikasi status pengiriman Biteship
+         * @description Signature di header X-Biteship-Signature diverifikasi sebelum payload disimpan. Event diproses job
+         *     shipment_webhook.process yang mengonfirmasi ulang status ke Biteship. Endpoint ini tidak memakai Idempotency-Key.
+         */
+        post: operations["receiveBiteshipWebhook"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Masuk dengan email dan password
+         * @description Mengembalikan access token (15 menit, disimpan di memori FE) dan memasang refresh token di cookie
+         *     HttpOnly `Path=/api/v1/auth` (Technical Guideline 9.1). Gagal login selalu `AUTH_INVALID_CREDENTIALS`;
+         *     5 kali gagal dalam 15 menit → `AUTH_ACCOUNT_LOCKED`. User ber-MFA → `AUTH_MFA_REQUIRED` lalu kirim ulang dengan `totpCode`.
+         *     Tidak memakai Idempotency-Key.
+         */
+        post: operations["login"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Memperbarui access token dengan refresh token (rotasi)
+         * @description Refresh token lama langsung tidak berlaku. Pemakaian ulang token lama mencabut seluruh keluarga sesi.
+         */
+        post: operations["refreshSession"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Keluar dan mencabut sesi aktif
+         * @description Sesi dicari dari cookie refresh token, sehingga tetap bisa keluar walaupun access token sudah kedaluwarsa.
+         */
+        post: operations["logout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/reauth": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Konfirmasi identitas untuk aksi sensitif
+         * @description Mengembalikan access token baru dengan claim `reauth_at` yang berlaku 5 menit (Technical Guideline 9.1).
+         */
+        post: operations["reauthenticate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/password/forgot": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Meminta tautan atur ulang password
+         * @description Selalu 204 walaupun email tidak terdaftar, agar tidak bisa dipakai menebak email.
+         */
+        post: operations["requestPasswordReset"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/password/token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Memeriksa tautan undangan atau atur ulang password */
+        get: operations["getPasswordToken"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/password/setup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mengatur password dari tautan undangan atau atur ulang */
+        post: operations["setupPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/password/change": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mengganti password sendiri */
+        post: operations["changePassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/mfa/setup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Membuat secret TOTP baru untuk didaftarkan di aplikasi autentikator */
+        post: operations["setupMfa"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/mfa/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mengaktifkan MFA dengan kode pertama dari aplikasi autentikator */
+        post: operations["activateMfa"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * User yang sedang login beserta permission
+         * @description Permission dimuat server-side dan tidak disimpan di token (Technical Guideline 9.1).
+         */
+        get: operations["getCurrentUser"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Daftar pengguna */
+        get: operations["listUsers"];
+        put?: never;
+        /**
+         * Membuat pengguna dan mengirim undangan atur password
+         * @description Pemberian role butuh re-autentikasi (`identity.user_role.write`).
+         */
+        post: operations["createUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Detail pengguna */
+        get: operations["getUser"];
+        /**
+         * Mengubah nama, divisi, dan role pengguna
+         * @description Perubahan role butuh re-autentikasi dan memutus semua sesi pengguna (< 30 detik).
+         */
+        put: operations["updateUser"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/{id}/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mengaktifkan kembali pengguna */
+        post: operations["activateUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/{id}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Menonaktifkan pengguna dan memutus semua sesinya */
+        post: operations["deactivateUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/{id}/resend-invitation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mengirim ulang undangan atur password */
+        post: operations["resendUserInvitation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/{id}/reset-mfa": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mereset MFA pengguna (HP hilang); pengguna mendaftar ulang saat masuk berikutnya */
+        post: operations["resetUserMfa"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Daftar role beserta permission */
+        get: operations["listRoles"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/roles/{id}/permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Mengganti permission role (berlaku langsung, butuh re-autentikasi) */
+        put: operations["setRolePermissions"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Katalog permission */
+        get: operations["listPermissions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit-logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Riwayat perubahan
+         * @description Tanpa `entityId` butuh `audit.log.read`. Dengan `entityType` + `entityId` (tab Riwayat dokumen) cukup permission
+         *     baca entitas tersebut. Field sensitif sudah dimask (Technical Guideline 6.6).
+         */
+        get: operations["listAuditLogs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/approvals/inbox": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Persetujuan Saya — dokumen yang menunggu keputusan user
+         * @description Termasuk dokumen yang bisa diputuskan sebagai penerima delegasi atau sebagai pengganti approver.
+         *     Dokumen yang diajukan user sendiri tidak pernah muncul (pembuat tidak boleh menyetujui dokumennya sendiri).
+         *     Terlama lebih dulu.
+         */
+        get: operations["listApprovalInbox"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/approvals/inbox/count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Jumlah dokumen yang menunggu keputusan user (badge menu) */
+        get: operations["getApprovalInboxCount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/approvals/subject-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Jenis dokumen yang memakai engine approval */
+        get: operations["listApprovalSubjectTypes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/approvals/user-options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Mencari pengguna aktif untuk dipilih sebagai penerima delegasi, approver, atau pengganti */
+        get: operations["listApprovalUserOptions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/approval-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Riwayat permintaan persetujuan
+         * @description `scope=requested` — diajukan user; `scope=decided` — pernah diputuskan user; `scope=all` — semua dokumen
+         *     (butuh `approval.policy.read`). Dengan `subjectType` + `subjectId` mengembalikan riwayat satu dokumen
+         *     (panel Persetujuan di detail dokumen) dan `scope` diabaikan.
+         */
+        get: operations["listApprovalRequests"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/approval-requests/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Detail permintaan persetujuan */
+        get: operations["getApprovalRequest"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/approval-requests/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Setujui level yang aktif
+         * @description Level berikutnya aktif dan approver-nya diberi notifikasi. Setelah level terakhir, modul pemilik dokumen
+         *     memproses persetujuan di transaksi yang sama. Pembuat dokumen ditolak `FORBIDDEN`.
+         */
+        post: operations["approveApprovalRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/approval-requests/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Tolak dokumen
+         * @description Catatan wajib diisi. Dokumen kembali ke pembuat untuk direvisi.
+         */
+        post: operations["rejectApprovalRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/approval-policies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Matriks Persetujuan
+         * @description Butuh `approval.policy.read`. Tanpa `includeEnded` hanya versi yang masih/akan berlaku.
+         */
+        get: operations["listApprovalPolicies"];
+        put?: never;
+        /** Menambah level kebijakan (langsung berlaku) */
+        post: operations["createApprovalPolicy"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/approval-policies/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Mengubah kebijakan (versi baru mulai sekarang)
+         * @description Versi lama ditutup dan versi baru berlaku mulai sekarang (effective-dated). Jenis dokumen, divisi, dan level
+         *     tidak berubah. Dokumen yang sudah diajukan tetap memakai approver versi lama.
+         */
+        put: operations["updateApprovalPolicy"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/approval-policies/{id}/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Menghentikan level kebijakan mulai sekarang */
+        post: operations["endApprovalPolicy"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/approval-delegations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Delegasi persetujuan
+         * @description Default delegasi yang melibatkan user. `all=true` untuk semua user (butuh `approval.policy.read`).
+         */
+        get: operations["listApprovalDelegations"];
+        put?: never;
+        /**
+         * Mendelegasikan persetujuan selama cuti
+         * @description Tanpa `fromUserId` mendelegasikan milik user sendiri. Mencatat delegasi untuk user lain butuh
+         *     `approval.policy.write`. Satu user hanya punya satu delegasi pada tanggal yang sama; maksimal 90 hari.
+         */
+        post: operations["createApprovalDelegation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/approval-delegations/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Menghentikan delegasi */
+        post: operations["cancelApprovalDelegation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Notifikasi in-app milik user yang login */
+        get: operations["listNotifications"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Jumlah notifikasi belum dibaca (badge) */
+        get: operations["getNotificationUnreadCount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/read-all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Menandai semua notifikasi sudah dibaca */
+        post: operations["markAllNotificationsRead"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/{id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Menandai notifikasi sudah dibaca */
+        post: operations["markNotificationRead"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Daftar produk (Produk Jadi, Packaging, Material, Bundling)
+         * @description Produk yang dihapus tidak tampil kecuali `deleted=true` (hanya produk terhapus, untuk dipulihkan Admin Sistem).
+         *     `q` mencari SKU, nama, varian, atau barcode persis.
+         */
+        get: operations["listProducts"];
+        put?: never;
+        /**
+         * Membuat produk (MD-01, MD-02, MD-03)
+         * @description SKU unik permanen dan tidak bisa dipakai ulang walau produk dihapus (`DUPLICATE_CODE`). Produk Jadi wajib
+         *     umur simpan dan tipe kemasan dan selalu memakai batch. Bundel virtual wajib punya komponen Produk Jadi
+         *     non-bundel dan tidak punya stok, batch, maupun umur simpan sendiri.
+         */
+        post: operations["createProduct"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/products/lookup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Mencari satu produk aktif berdasarkan SKU atau barcode persis (pindai barcode) */
+        get: operations["lookupProduct"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/products/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        /** Detail produk (produk terhapus tetap bisa dibuka untuk dokumen lama) */
+        get: operations["getProduct"];
+        /**
+         * Mengubah produk (optimistic locking dengan `version`)
+         * @description SKU, jenis produk, dan status bundel tidak bisa diubah.
+         */
+        put: operations["updateProduct"];
+        post?: never;
+        /**
+         * Menghapus produk (soft delete; tetap tampil di dokumen lama)
+         * @description Produk yang masih menjadi komponen bundel aktif tidak bisa dihapus (`INVALID_STATE_TRANSITION`).
+         */
+        delete: operations["deleteProduct"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/products/{id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Memulihkan produk yang dihapus (hanya Admin Sistem) */
+        post: operations["restoreProduct"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/product-categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Daftar kategori produk */
+        get: operations["listProductCategories"];
+        put?: never;
+        /** Membuat kategori produk (kode unik permanen) */
+        post: operations["createProductCategory"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/product-categories/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        /** Mengubah nama kategori */
+        put: operations["updateProductCategory"];
+        post?: never;
+        /** Menghapus kategori (soft delete) */
+        delete: operations["deleteProductCategory"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/product-categories/{id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Memulihkan kategori yang dihapus (hanya Admin Sistem) */
+        post: operations["restoreProductCategory"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/warehouses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Daftar gudang fisik
+         * @description Gudang yang dihapus tidak tampil kecuali `deleted=true` (hanya gudang terhapus).
+         */
+        get: operations["listWarehouses"];
+        put?: never;
+        /**
+         * Membuat gudang fisik beserta lokasi standarnya (MD-09, F1-114)
+         * @description Lokasi Inbound, FG Non-Ecommerce, E-commerce Stock, Petty Stock, RM, GM (Gudang GM), dan Gudang Retur dibuat
+         *     otomatis dengan kode `<kode gudang>-INB/FG/ECM/RM/GM/RET` (U-08). Kode gudang unik permanen.
+         */
+        post: operations["createWarehouse"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/warehouses/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        /** Detail gudang (gudang terhapus tetap bisa dibuka untuk dokumen lama) */
+        get: operations["getWarehouse"];
+        /** Mengubah nama, alamat, atau status aktif gudang */
+        put: operations["updateWarehouse"];
+        post?: never;
+        /** Menghapus gudang beserta lokasinya (soft delete) */
+        delete: operations["deleteWarehouse"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/warehouses/{id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Memulihkan gudang beserta lokasi yang ikut terhapus (hanya Admin Sistem) */
+        post: operations["restoreWarehouse"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/locations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Daftar lokasi stok (internal dan eksternal) */
+        get: operations["listLocations"];
+        put?: never;
+        /**
+         * Membuat lokasi (termasuk lokasi eksternal maklon, konsinyasi, buffer vending, mesin)
+         * @description Lokasi internal wajib `warehouseId`. Lokasi eksternal wajib `externalPartyType` + `externalPartyId` (maklon =
+         *     `supplier`, konsinyasi = `partner`, buffer vending = `partner`/`vending_machine`, mesin = `vending_machine`);
+         *     satu lokasi per jenis per pihak.
+         */
+        post: operations["createLocation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/accounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Chart of Accounts urut kode
+         * @description Butuh `accounting.account.read`. Tanpa `includeInactive` hanya akun aktif.
+         */
+        get: operations["listAccounts"];
+        put?: never;
+        /**
+         * Menambah akun COA (S-126)
+         * @description Kode 4 digit, digit pertama = kelompok 1–7, unik permanen (`DUPLICATE_CODE`, termasuk akun yang sudah dihapus).
+         *     Induk harus akun judul (tidak bisa diposting) dalam kelompok yang sama.
+         */
+        post: operations["createAccount"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/accounts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Detail akun */
+        get: operations["getAccount"];
+        /**
+         * Mengubah akun
+         * @description Kode tidak berubah. Saldo normal akun yang sudah dipakai jurnal tidak bisa diubah; akun terpakai tidak bisa
+         *     dijadikan akun induk; akun yang punya sub-akun harus tetap akun induk.
+         */
+        put: operations["updateAccount"];
+        post?: never;
+        /**
+         * Menghapus akun yang belum dipakai (soft delete)
+         * @description Akun yang sudah dipakai jurnal atau posting rule, atau masih punya sub-akun, ditolak `INVALID_STATE_TRANSITION`.
+         */
+        delete: operations["deleteAccount"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/channels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Master channel (dimensi C) */
+        get: operations["listChannels"];
+        put?: never;
+        /** Menambah channel */
+        post: operations["createChannel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/channels/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Mengubah channel (kode tetap) */
+        put: operations["updateChannel"];
+        post?: never;
+        /** Menghapus channel yang belum dipakai jurnal dan tanpa sub-channel */
+        delete: operations["deleteChannel"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sub-channels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Master sub-channel (dimensi S) */
+        get: operations["listSubChannels"];
+        put?: never;
+        /** Menambah sub-channel */
+        post: operations["createSubChannel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sub-channels/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Mengubah sub-channel (kode dan channel tetap) */
+        put: operations["updateSubChannel"];
+        post?: never;
+        /** Menghapus sub-channel yang belum dipakai jurnal */
+        delete: operations["deleteSubChannel"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/divisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Master divisi (dimensi D) */
+        get: operations["listDivisions"];
+        put?: never;
+        /** Menambah divisi */
+        post: operations["createDivision"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/divisions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Mengubah divisi (kode tetap) */
+        put: operations["updateDivision"];
+        post?: never;
+        /** Menghapus divisi yang belum dipakai jurnal */
+        delete: operations["deleteDivision"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/campaigns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Data Master › Kampanye (dimensi K) */
+        get: operations["listCampaigns"];
+        put?: never;
+        /**
+         * Menambah kampanye
+         * @description Kode `KMP-YYYYMM-SINGKATAN` unik permanen; periode berlaku wajib.
+         */
+        post: operations["createCampaign"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/campaigns/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Mengubah kampanye (kode tetap) */
+        put: operations["updateCampaign"];
+        post?: never;
+        /** Menghapus kampanye yang belum dipakai jurnal */
+        delete: operations["deleteCampaign"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/expense-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Data Master › Jenis Biaya
+         * @description Butuh `accounting.expense_type.read` atau `accounting.expense_claim.read` (dropdown pengajuan biaya).
+         */
+        get: operations["listExpenseTypes"];
+        put?: never;
+        /**
+         * Menambah jenis biaya
+         * @description Kode unik permanen; akun beban wajib akun beban (6xxx/7xxx bersaldo debit) aktif yang bisa diposting.
+         */
+        post: operations["createExpenseType"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/expense-types/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Mengubah jenis biaya (kode tetap) */
+        put: operations["updateExpenseType"];
+        post?: never;
+        /** Menghapus (soft delete) jenis biaya */
+        delete: operations["deleteExpenseType"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fiscal-periods": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Periode akuntansi bulanan (ACC-08) */
+        get: operations["listFiscalPeriods"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fiscal-periods/ensure": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Membuat periode bulan berjalan dan bulan berikutnya bila belum ada
+         * @description Periode juga dibuat otomatis oleh job harian `accounting.ensure_fiscal_periods` dan saat jurnal pertama
+         *     diposting di bulan tersebut. Butuh `accounting.fiscal_period.write`.
+         */
+        post: operations["ensureFiscalPeriods"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/posting-rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Posting rule jurnal otomatis dan pemetaan akun yang berlaku hari ini (S-130) */
+        get: operations["listPostingRules"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/journal-entries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Daftar jurnal (manual, otomatis, Balik Jurnal) */
+        get: operations["listJournalEntries"];
+        put?: never;
+        /**
+         * Menyimpan draft Jurnal Umum (S-127)
+         * @description Akun harus bisa diposting manual (akun kontrol hanya diisi jurnal otomatis). Tanggal di periode tertutup
+         *     ditolak `PERIOD_LOCKED`. Balance dan dimensi wajib diperiksa saat posting.
+         */
+        post: operations["createJournalEntry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/journal-entries/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Detail jurnal beserta baris dan aksi yang diizinkan */
+        get: operations["getJournalEntry"];
+        /**
+         * Mengubah draft Jurnal Umum
+         * @description Jurnal yang sudah diposting tidak bisa diubah (`INVALID_STATE_TRANSITION`, ACC-13).
+         */
+        put: operations["updateJournalEntry"];
+        post?: never;
+        /**
+         * Menghapus draft Jurnal Umum
+         * @description Jurnal yang sudah diposting tidak bisa dihapus (`INVALID_STATE_TRANSITION`, ACC-13).
+         */
+        delete: operations["deleteJournalEntry"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/journal-entries/{id}/post": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Memposting draft Jurnal Umum
+         * @description Jurnal harus balance, di periode terbuka (`PERIOD_LOCKED`), dan dimensi wajib terisi (pendapatan: channel +
+         *     sub-channel; HPP/beban/lain-lain: divisi). Nomor `JV/TAHUN/BULAN/NOMOR` diberikan saat posting.
+         */
+        post: operations["postJournalEntry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/journal-entries/{id}/reverse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Balik Jurnal (S-128)
+         * @description Membuat dan memposting JV pembalik (debit/kredit ditukar) yang mereferensikan jurnal asal. Jurnal asal tetap
+         *     tidak berubah. Satu jurnal hanya bisa dibalik sekali; jurnal otomatis dibalik lewat pembatalan dokumen sumber.
+         */
+        post: operations["reverseJournalEntry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/general-ledger": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Buku Besar per akun dengan saldo berjalan
+         * @description Hanya jurnal yang sudah diposting. Saldo mengikuti saldo normal akun. Rentang paling panjang 2 tahun.
+         *     Butuh `accounting.journal.read` atau `accounting.report.read`.
+         */
+        get: operations["getGeneralLedger"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/trial-balance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Neraca Saldo per rentang & dimensi (ACC-18)
+         * @description Hanya jurnal terposting. Saldo awal = sebelum `dateFrom`. Butuh `accounting.report.read` atau
+         *     `accounting.journal.read`. Drill-down ke Buku Besar per akun dengan filter yang sama.
+         */
+        get: operations["getTrialBalance"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fixed-asset-classes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Kelas aset tetap (umur manfaat & akun A-31)
+         * @description Permission `accounting.fixed_asset.read`.
+         */
+        get: operations["listFixedAssetClasses"];
+        put?: never;
+        /**
+         * Menambah kelas aset
+         * @description Permission `accounting.fixed_asset.write`. Akun aset bersaldo debit, akun akumulasi bersaldo kredit (1xxx).
+         */
+        post: operations["createFixedAssetClass"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fixed-asset-classes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Mengubah kelas aset
+         * @description Umur manfaat baru dipakai aset yang dibuat setelahnya.
+         */
+        put: operations["updateFixedAssetClass"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fixed-assets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Register Aset Tetap (ACC-21)
+         * @description Permission `accounting.fixed_asset.read` atau `accounting.report.read`.
+         */
+        get: operations["listFixedAssets"];
+        put?: never;
+        /**
+         * Menambah aset tetap (Draft)
+         * @description Aset pembelian (`purchase`) wajib akun pembayaran dan dijurnal A-31 saat diaktifkan. Aset saldo awal
+         *     (`opening`) membutuhkan tanggal cut-over di Saldo Awal; nilainya masuk GL lewat A-36.
+         */
+        post: operations["createFixedAsset"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fixed-assets/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        /** Detail aset beserta riwayat penyusutan */
+        get: operations["getFixedAsset"];
+        /** Mengubah aset Draft */
+        put: operations["updateFixedAsset"];
+        post?: never;
+        /** Menghapus aset Draft */
+        delete: operations["deleteFixedAsset"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fixed-assets/{id}/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mengaktifkan aset (jurnal A-31 perolehan untuk aset pembelian)
+         * @description Permission `accounting.fixed_asset.post`. Tanggal perolehan harus di periode terbuka (`PERIOD_LOCKED`).
+         */
+        post: operations["activateFixedAsset"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fixed-assets/{id}/dispose": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Melepas aset (dijual/dihapusbukukan, jurnal A-31 pelepasan) */
+        post: operations["disposeFixedAsset"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/depreciation-runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Riwayat penyusutan per periode */
+        get: operations["listDepreciationRuns"];
+        put?: never;
+        /**
+         * Menjalankan penyusutan satu periode (A-31)
+         * @description Sama dengan job `accounting.depreciate` (tanggal 1 pukul 01.00 WIB untuk bulan sebelumnya). Idempotent per
+         *     aset per periode; periode harus terbuka. Permission `accounting.fixed_asset.post`.
+         */
+        post: operations["runDepreciation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/depreciation-runs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Detail penyusutan per aset satu periode */
+        get: operations["getDepreciationRun"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fiscal-periods/{id}/close-checklist": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Checklist Tutup Buku 9 langkah satu periode (BRD 5.15)
+         * @description Termasuk hasil pemeriksaan otomatis, hal yang menahan tutup periode, dan riwayat buka kembali.
+         */
+        get: operations["getCloseChecklist"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fiscal-periods/{id}/close-checklist/{stepCode}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Mengubah status, PIC, atau catatan satu langkah
+         * @description Permission `accounting.fiscal_period.write` atau `.post`. Selesai butuh pemeriksaan otomatis lolos; Tidak Berlaku
+         *     wajib catatan; langkah 9 selesai saat Tutup Periode.
+         */
+        put: operations["updateCloseChecklistStep"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fiscal-periods/{id}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Tutup Periode (★ re-autentikasi)
+         * @description Permission `accounting.fiscal_period.post` dan re-autentikasi 5 menit terakhir (`AUTH_REAUTH_REQUIRED`).
+         *     Advisory lock per periode; periode sebelumnya harus Ditutup; langkah 1–8 selesai; neraca saldo balance.
+         */
+        post: operations["closeFiscalPeriod"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fiscal-periods/{id}/reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ajukan Buka Kembali periode (★ re-autentikasi, approval Head F&A → Direksi)
+         * @description Permission `accounting.fiscal_period.reopen` dan re-autentikasi. Periode menjadi Menunggu Persetujuan (tetap
+         *     terkunci) sampai approval `fiscal_period_reopen` diputuskan.
+         */
+        post: operations["requestFiscalPeriodReopen"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/opening-balance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Saldo Awal — tanggal cut-over dan Neraca Saldo Awal (A-36) */
+        get: operations["getOpeningBalance"];
+        /**
+         * Mengisi tanggal cut-over (akhir bulan)
+         * @description Permission `accounting.journal.write`; hanya selama saldo awal Draft.
+         */
+        put: operations["saveOpeningBalanceSet"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/opening-balance/lines": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mengisi saldo awal satu akun neraca (akun yang sama diganti) */
+        post: operations["saveOpeningBalanceLine"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/opening-balance/lines/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Menghapus saldo awal satu akun */
+        delete: operations["deleteOpeningBalanceLine"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/opening-balance/post": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Memposting saldo awal sebagai jurnal A-36 (selisih ke 3901)
+         * @description Permission `accounting.journal.post`. Tanggal cut-over harus di periode terbuka.
+         */
+        post: operations["postOpeningBalance"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/opening-items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Piutang & utang terbuka saldo awal per dokumen lama */
+        get: operations["listOpeningItems"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/cutover-reconciliation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Pengecekan rekonsiliasi cut-over (sub-ledger vs GL)
+         * @description Neraca saldo awal balance, nilai persediaan per akun, piutang/utang terbuka, harga perolehan & akumulasi aset
+         *     tetap (Panduan Migrasi Data bagian 4). Sebelum saldo awal diposting, GL diambil dari Neraca Saldo Awal.
+         */
+        get: operations["getCutoverReconciliation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/document-sequences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Pengaturan › Nomor Dokumen — nomor terakhir per kode dokumen
+         * @description Format `KODE/TAHUN/BULAN/NOMOR` dengan nomor urut 5 digit yang reset setiap tahun (U-15). Nomor diberikan
+         *     saat dokumen diajukan atau diposting di dalam transaksi bisnis, sehingga tidak loncat. Butuh
+         *     `document.sequence.read`. Tanpa `year` dipakai tahun berjalan (WIB).
+         */
+        get: operations["listDocumentSequences"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/locations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        /** Detail lokasi (lokasi terhapus tetap bisa dibuka untuk dokumen lama) */
+        get: operations["getLocation"];
+        /** Mengubah nama atau status aktif lokasi */
+        put: operations["updateLocation"];
+        post?: never;
+        /** Menghapus lokasi tambahan (soft delete); lokasi standar ikut gudangnya */
+        delete: operations["deleteLocation"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/locations/{id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Memulihkan lokasi yang dihapus (hanya Admin Sistem) */
+        post: operations["restoreLocation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inbounds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Antrian Inbound — barang Karantina per dokumen asal (WMS-02, WMS-09)
+         * @description Terbaru lebih dulu. Permission `warehouse.inbound.read`.
+         */
+        get: operations["listInbounds"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inbounds/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        /** Detail Inbound beserta baris dan catatan QC */
+        get: operations["getInbound"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inbounds/{id}/lines/{lineId}/qc": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+                lineId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * QC satu baris Inbound (checklist, qty lulus/ditolak, foto, lokasi tujuan)
+         * @description Qty lulus pindah Karantina → Tersedia di lokasi tujuan; qty ditolak tetap Karantina (ditahan di Inbound untuk
+         *     barang pemasok/maklon, atau pindah ke Gudang Retur). Qty lulus + ditolak = qty baris. Permission
+         *     `warehouse.inbound.post`.
+         */
+        post: operations["recordInboundQc"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stock-transfers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Daftar Transfer Stok atau Permintaan Petty Stock */
+        get: operations["listStockTransfers"];
+        put?: never;
+        /** Membuat Transfer Stok / Permintaan Petty Stock berstatus Draft */
+        post: operations["createStockTransfer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stock-transfers/in-transit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Stok dalam Pengiriman — baris transfer yang belum diterima penuh (WMS-10) */
+        get: operations["listStockInTransit"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stock-transfers/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        /** Detail transfer */
+        get: operations["getStockTransfer"];
+        /** Mengubah transfer Draft */
+        put: operations["updateStockTransfer"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stock-transfers/{id}/actions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Aksi status transfer (submit, release, prepare, post, ship, receive, complete, cancel)
+         * @description Transfer langsung: `post` (dalam satu gudang, langsung Selesai) atau `ship` (antar gudang/eksternal →
+         *     Dalam Pengiriman), `receive` (qty diterima per baris), `complete` (sisa dicatat kekurangan). Permintaan
+         *     Petty Stock: `submit` (Fulfillment Leader), `release` (Logistik Leader; stok asal dialokasikan FEFO),
+         *     `prepare` (Staf Gudang), `receive` (Fulfillment Leader mengonfirmasi qty; sisa alokasi dilepas).
+         *     Aksi yang boleh dijalankan ada di `allowedActions`.
+         */
+        post: operations["actOnStockTransfer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stock-counts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Daftar Stock Count (Merchandiser hanya lokasi konsinyasi mitra yang ditugaskan) */
+        get: operations["listStockCounts"];
+        put?: never;
+        /** Membuat Stock Count Draft, satu dokumen per lokasi */
+        post: operations["createStockCounts"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stock-counts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        /** Detail Stock Count (hitung buta — qty sistem dan selisih kosong sampai hasil dikirim) */
+        get: operations["getStockCount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stock-counts/{id}/entries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        /** Menyimpan isian hitung (autosave form HP), barang tambahan, dan foto */
+        put: operations["saveStockCountEntries"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stock-counts/{id}/actions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Aksi status Stock Count (start, submit, recount, cancel)
+         * @description `start` memberi nomor SC dan mengambil snapshot saldo sistem; `submit` menghitung selisih — ada selisih
+         *     pada stock count gudang → approval `stock_count` (nominal = nilai selisih absolut); tanpa selisih atau
+         *     konsinyasi/vending → Selesai. Setelah disetujui, penyesuaian stok + jurnal A-14 diposting otomatis.
+         */
+        post: operations["actOnStockCount"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stock-count-schedules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Jadwal Stock Count (cycle count, konsinyasi/vending bulanan, penuh akhir tahun) */
+        get: operations["listStockCountSchedules"];
+        put?: never;
+        /** Membuat jadwal Stock Count */
+        post: operations["createStockCountSchedule"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stock-count-schedules/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        /** Mengubah jadwal Stock Count */
+        put: operations["updateStockCountSchedule"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stock-balances": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Stok per Lokasi — saldo per produk × lokasi × batch × status (INV-01, WMS-01)
+         * @description Hanya saldo > 0. `unitCost` adalah HPP rata-rata sisa cost layer batch (FIFO di dalam batch), `value` =
+         *     qty × unitCost. Permission `inventory.stock.read`.
+         */
+        get: operations["listStockBalances"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stock-card": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Kartu Stok per SKU (opsional lokasi, batch, status) dengan saldo qty & nilai berjalan (INV-01) */
+        get: operations["getStockCard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/batches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Batch & Kedaluwarsa — batch berurutan FEFO dengan qty per status (INV-04, INV-09) */
+        get: operations["listBatches"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/batch-suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Alokasi Batch (FEFO) — saran batch untuk mengambil qty dari satu lokasi (S-215)
+         * @description Batch stok Tersedia diurutkan kedaluwarsa terdekat; batch kedaluwarsa dan stok Karantina tidak diusulkan.
+         *     Pemilihan batch manual yang bukan saran FEFO wajib alasan saat diposting.
+         */
+        get: operations["suggestBatches"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/cost-layers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** HPP per Batch — cost layer FIFO per penerimaan (INV-03) */
+        get: operations["listCostLayers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/cost-layers/{id}/consumptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        /** Jejak konsumsi HPP satu cost layer (RPT-04) */
+        get: operations["listCostLayerConsumptions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/bundle-availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Stok tersedia bundel virtual = min(floor(stok komponen ÷ qty)) (S-115, MD-03)
+         * @description Stok komponen = stok Tersedia di lokasi `locationId`, atau di semua lokasi yang bisa dijual bila kosong.
+         */
+        get: operations["listBundleAvailability"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/customers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Daftar pelanggan (MD-06)
+         * @description `q` mencari nama, kode, atau nomor HP (nomor dinormalisasi lebih dulu sehingga `0812…`, `62812…`, dan
+         *     `+62812…` sama). `phone` mencari persis satu nomor untuk cek duplikat sebelum membuat pelanggan.
+         */
+        get: operations["listCustomers"];
+        put?: never;
+        /**
+         * Membuat pelanggan
+         * @description Nomor HP yang sudah dipakai pelanggan lain ditolak `VALIDATION_FAILED` pada field `phone`.
+         */
+        post: operations["createCustomer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/customers/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        /** Detail pelanggan beserta alamat */
+        get: operations["getCustomer"];
+        /**
+         * Mengubah pelanggan (optimistic locking dengan `version`)
+         * @description Daftar `addresses` menggantikan seluruh alamat: alamat dengan `id` diubah, tanpa `id` ditambah, dan yang
+         *     tidak dikirim dihapus (soft delete).
+         */
+        put: operations["updateCustomer"];
+        post?: never;
+        /**
+         * Menghapus pelanggan (soft delete)
+         * @description Pelanggan tetap tampil di dokumen lama; nomor HP-nya boleh dipakai pelanggan baru.
+         */
+        delete: operations["deleteCustomer"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/partners": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Daftar mitra MT, konsinyasi, dan B2B (MD-07) */
+        get: operations["listPartners"];
+        put?: never;
+        /**
+         * Membuat mitra
+         * @description Kode mitra unik permanen dan tidak bisa dipakai ulang walau mitra dihapus (`DUPLICATE_CODE`).
+         */
+        post: operations["createPartner"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/partners/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        /** Detail mitra */
+        get: operations["getPartner"];
+        /**
+         * Mengubah mitra
+         * @description Kode tidak bisa diubah. `npwp` tidak dikirim = tidak berubah; string kosong = dihapus.
+         */
+        put: operations["updatePartner"];
+        post?: never;
+        /** Menghapus mitra (soft delete) */
+        delete: operations["deletePartner"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/partners/{id}/agreements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        /** Riwayat PKS mitra, terbaru lebih dulu */
+        get: operations["listPartnerAgreements"];
+        put?: never;
+        /**
+         * Mencatat PKS baru (effective-dated)
+         * @description Periode PKS dengan jenis yang sama tidak boleh tumpang tindih (Technical Guideline 5.14). Perubahan
+         *     ketentuan dicatat sebagai PKS baru mulai tanggal berlakunya; PKS lama dipersingkat lewat `validTo`.
+         *     `fileId` adalah PDF PKS yang sudah diunggah lewat `POST /api/v1/files` dengan `ownerType=partner_agreement`.
+         */
+        post: operations["createPartnerAgreement"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/partner-agreements/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        /** Mengoreksi PKS */
+        put: operations["updatePartnerAgreement"];
+        post?: never;
+        /** Menghapus PKS yang salah input (soft delete) */
+        delete: operations["deletePartnerAgreement"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/partner-product-codes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Kode artikel & barcode retailer per SKU per mitra (MD-07) */
+        get: operations["listPartnerProductCodes"];
+        put?: never;
+        /**
+         * Menambah kode produk mitra
+         * @description Satu produk hanya punya satu kode per mitra; kode artikel unik per mitra (`VALIDATION_FAILED`).
+         */
+        post: operations["createPartnerProductCode"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/partner-product-codes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        /** Mengubah kode artikel, barcode, atau keterangan */
+        put: operations["updatePartnerProductCode"];
+        post?: never;
+        /** Menghapus kode produk mitra (soft delete) */
+        delete: operations["deletePartnerProductCode"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/suppliers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Daftar pemasok & maklon (MD-08) */
+        get: operations["listSuppliers"];
+        put?: never;
+        /**
+         * Membuat pemasok atau maklon
+         * @description Kode unik permanen (`DUPLICATE_CODE`). NPWP dan nomor rekening dienkripsi (NFR-04).
+         */
+        post: operations["createSupplier"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/suppliers/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        /** Detail pemasok; NPWP dan rekening ditampilkan tersamar */
+        get: operations["getSupplier"];
+        /**
+         * Mengubah pemasok
+         * @description Kode tidak bisa diubah. `npwp` tidak dikirim = tidak berubah. Rekening dengan `id` tanpa `accountNumber`
+         *     mempertahankan nomor lama; rekening yang tidak dikirim dihapus.
+         */
+        put: operations["updateSupplier"];
+        post?: never;
+        /** Menghapus pemasok (soft delete) */
+        delete: operations["deleteSupplier"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/party/user-options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Pengguna aktif untuk dipilih sebagai Sales atau Merchandiser mitra */
+        get: operations["listPartyUserOptions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/employees": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Data karyawan dasar (HR-01)
+         * @description `q` mencari nomor karyawan atau nama. `nik` mencari persis lewat hash HMAC (NIK tidak pernah dicari
+         *     sebagai teks, Technical Guideline 6.7).
+         */
+        get: operations["listEmployees"];
+        put?: never;
+        /**
+         * Menambah karyawan
+         * @description Nomor karyawan unik permanen (`DUPLICATE_CODE`); NIK dienkripsi AES-256-GCM.
+         */
+        post: operations["createEmployee"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/employees/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        /** Detail karyawan; NIK ditampilkan tersamar */
+        get: operations["getEmployee"];
+        /**
+         * Mengubah data karyawan
+         * @description Nomor karyawan tidak bisa diubah. `nik` tidak dikirim = tidak berubah; string kosong = dihapus.
+         */
+        put: operations["updateEmployee"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/employees/{id}/resign": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mencatat resign karyawan
+         * @description Mulai tanggal resign karyawan tidak lagi aktif; pelanggan yang tertaut otomatis kehilangan harga karyawan
+         *     (HR-03). Tanggal boleh di masa depan (resign terjadwal).
+         */
+        post: operations["resignEmployee"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/employee-options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Pilihan karyawan untuk ditautkan ke pelanggan
+         * @description Hanya nomor, nama, dan status (tanpa data pribadi). Terbuka untuk `hris.employee.read` atau
+         *     `party.customer.write` (CS menautkan pelanggan ke karyawan).
+         */
+        get: operations["listEmployeeOptions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Meminta URL upload file (Technical Guideline 5.16)
+         * @description Backend memeriksa permission tulis pemilik (`ownerType`), ukuran, dan tipe file lalu mengembalikan URL
+         *     upload bertanda tangan yang berlaku 15 menit. Browser mengirim isi file dengan `PUT uploadUrl`, lalu
+         *     mengirim `fileId` di request bisnis (mis. PKS mitra) yang memvalidasi dan menautkan file ke pemiliknya.
+         *     Ukuran berlebih ditolak `FILE_TOO_LARGE`, tipe lain `FILE_TYPE_NOT_ALLOWED`.
+         */
+        post: operations["createFileUpload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/files/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Metadata file */
+        get: operations["getFile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/files/{id}/download-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * URL unduhan bertanda tangan berumur 5 menit
+         * @description File yang sudah ditautkan hanya bisa diunduh pemegang permission baca pemiliknya (mis.
+         *     `party.partner_agreement.read`); file yang belum ditautkan hanya oleh pengunggahnya.
+         */
+        get: operations["getFileDownloadUrl"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/file-content/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Mengunduh isi file dengan URL bertanda tangan */
+        get: operations["getFileContent"];
+        /**
+         * Mengunggah isi file ke URL bertanda tangan
+         * @description Dipanggil browser dengan `uploadUrl` dari `createFileUpload`, tanpa header Authorization dan tanpa
+         *     Idempotency-Key (setara presigned PUT object storage). Ukuran harus sama dengan yang dideklarasikan dan
+         *     isi file harus sesuai tipenya.
+         */
+        put: operations["putFileContent"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/price-lists": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Data Master › Daftar Harga
+         * @description Butuh `pricing.price_list.read` (atau `pricing.price_list.approve` untuk approver). Harga Dasar & HET selalu
+         *     paling atas. `deleted=true` hanya menampilkan daftar harga terhapus (untuk dipulihkan Admin Sistem).
+         */
+        get: operations["listPriceLists"];
+        put?: never;
+        /**
+         * Menambah daftar harga
+         * @description Harga diisi lewat versi yang diajukan untuk approval (Head Sales → Head Finance & Accounting).
+         */
+        post: operations["createPriceList"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/price-lists/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Pilihan daftar harga aktif (acuan persentase, harga bertingkat) */
+        get: operations["listPriceListOptions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/price-lists/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        /** Detail daftar harga dan riwayat versi */
+        get: operations["getPriceList"];
+        /** Mengubah header daftar harga (kode dan jenis tetap) */
+        put: operations["updatePriceList"];
+        post?: never;
+        /**
+         * Menghapus (soft delete) daftar harga
+         * @description Harga Dasar & HET tidak bisa dihapus. Transaksi lama tetap menyimpan harga dan versinya.
+         */
+        delete: operations["deletePriceList"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/price-lists/{id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Memulihkan daftar harga yang dihapus (hanya Admin Sistem) */
+        post: operations["restorePriceList"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/price-lists/{id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Menyiapkan versi draft baru
+         * @description `copyFromVersionId` menyalin harga versi lain bila `items` kosong. Paling banyak satu versi draft/diajukan per
+         *     daftar harga. Tanggal mulai berlaku tidak boleh sebelum hari ini.
+         */
+        post: operations["createPriceListVersion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/price-list-versions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        /** Detail versi beserta harga per produk */
+        get: operations["getPriceListVersion"];
+        /** Mengubah versi draft (seluruh item diganti) */
+        put: operations["updatePriceListVersion"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/price-list-versions/{id}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mengajukan versi untuk approval price_list_version
+         * @description Versi berlaku setelah disetujui Head Sales lalu Head Finance & Accounting.
+         */
+        post: operations["submitPriceListVersion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/price-list-versions/{id}/withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Menarik kembali pengajuan menjadi draft */
+        post: operations["withdrawPriceListVersion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/price-list-versions/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Membatalkan versi draft */
+        post: operations["cancelPriceListVersion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/special-prices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Data Master › Aturan Harga › Harga Khusus */
+        get: operations["listSpecialPrices"];
+        put?: never;
+        /**
+         * Menambah harga khusus pelanggan/mitra
+         * @description Harga khusus lama tanpa tanggal berakhir untuk pihak & produk yang sama ditutup otomatis.
+         */
+        post: operations["createSpecialPrice"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/special-prices/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Menghapus harga khusus yang belum pernah berlaku */
+        delete: operations["deleteSpecialPrice"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/special-prices/{id}/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mengisi tanggal berakhir harga khusus */
+        post: operations["endSpecialPrice"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/promotions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Data Master › Aturan Harga › Promo */
+        get: operations["listPromotions"];
+        put?: never;
+        /** Menambah promo periode */
+        post: operations["createPromotion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/promotions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        /** Detail promo beserta item */
+        get: operations["getPromotion"];
+        /**
+         * Mengubah promo
+         * @description Promo yang sudah berjalan hanya boleh diubah nama, keterangan, status, dan tanggal selesai (paling cepat
+         *     kemarin); `items` harus sama dengan yang tersimpan atau dikosongkan.
+         */
+        put: operations["updatePromotion"];
+        post?: never;
+        /** Menghapus promo yang belum berjalan */
+        delete: operations["deletePromotion"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tiered-prices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Data Master › Aturan Harga › Harga Bertingkat */
+        get: operations["listTieredPrices"];
+        put?: never;
+        /** Menambah harga bertingkat per qty minimum */
+        post: operations["createTieredPrice"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tiered-prices/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Menghapus harga bertingkat yang belum pernah berlaku */
+        delete: operations["deleteTieredPrice"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tiered-prices/{id}/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mengisi tanggal berakhir harga bertingkat */
+        post: operations["endTieredPrice"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/discount-limits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Penjualan › Harga & Diskon › Batas Diskon per Role */
+        get: operations["listDiscountLimits"];
+        put?: never;
+        /**
+         * Menetapkan batas diskon role mulai tanggal tertentu
+         * @description Batas lama tanpa tanggal berakhir ditutup otomatis sehari sebelum batas baru berlaku.
+         */
+        post: operations["createDiscountLimit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/discount-limits/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Pilihan role untuk batas diskon */
+        get: operations["listDiscountLimitRoles"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/discount-limits/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Menghapus batas diskon yang belum pernah berlaku */
+        delete: operations["deleteDiscountLimit"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/discount-limits/{id}/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mengisi tanggal berakhir batas diskon */
+        post: operations["endDiscountLimit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pricing/quote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Simulasi harga (resolver 5 aturan BRD 5.18)
+         * @description Menjalankan resolver yang sama dengan transaksi: harga khusus → promo → harga bertingkat → daftar harga
+         *     channel/mitra/karyawan → Harga Dasar & HET, berdasarkan tanggal transaksi. Tidak menyimpan data, sehingga
+         *     tidak memakai Idempotency-Key.
+         */
+        post: operations["quotePrice"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pricing/discount-check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Simulasi diskon manual terhadap batas diskon role user yang login
+         * @description Subtotal dokumen = total bruto baris dikurangi diskon baris. Diskon di atas batas berarti Sales Order butuh
+         *     approval `sales_order_discount` (Head Sales). Tidak menyimpan data.
+         */
+        post: operations["checkDiscount"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/data-exchange/kinds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Jenis data yang boleh diimpor/diekspor user (MD-10, INT-02)
+         * @description Hanya jenis data dengan permission `<kind>.import` atau `<kind>.export` milik user. `uploadOwnerType`
+         *     dipakai sebagai `ownerType` saat meminta URL upload file (`POST /api/v1/files`).
+         */
+        get: operations["listDataExchangeKinds"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/data-exchange/kinds/{kind}/template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Mengunduh template impor (xlsx) yang dihasilkan dari definisi kolom
+         * @description Template berisi sheet data (header oranye bertanda `*` wajib, abu-abu opsional, dropdown untuk kolom
+         *     pilihan) dan sheet Petunjuk berisi format, aturan, serta contoh baris. Butuh `<kind>.import`.
+         */
+        get: operations["getDataExchangeTemplate"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/import-jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Riwayat impor (jenis data yang boleh diimpor user) */
+        get: operations["listImportJobs"];
+        put?: never;
+        /**
+         * Memulai impor dari file xlsx yang sudah diunggah
+         * @description File diunggah dulu lewat `POST /api/v1/files` dengan `ownerType` dari `listDataExchangeKinds`. Pemeriksaan
+         *     per baris berjalan sebagai job `dataexchange.import` (antrean bulk); pantau progress lewat `getImportJob`.
+         *     File yang sama (SHA-256) untuk jenis data yang sama ditolak `IMPORT_ALREADY_PROCESSED`, kecuali job
+         *     sebelumnya gagal atau dibatalkan.
+         */
+        post: operations["createImportJob"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/import-jobs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Status, progress, dan ringkasan job impor */
+        get: operations["getImportJob"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/import-jobs/{id}/rows": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Preview baris hasil pemeriksaan
+         * @description Data pribadi (NPWP, nomor rekening, NIK) ditampilkan tersamar.
+         */
+        get: operations["listImportJobRows"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/import-jobs/{id}/commit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Menyimpan baris valid
+         * @description Hanya untuk status `validated` dengan minimal satu baris valid. Penyimpanan berjalan sebagai job; master
+         *     data disimpan dalam satu transaksi (gagal satu baris = tidak ada yang tersimpan, TG 5.15).
+         */
+        post: operations["commitImportJob"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/import-jobs/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Membatalkan impor yang menunggu konfirmasi */
+        post: operations["cancelImportJob"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/import-jobs/{id}/error-file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** URL unduhan file baris error (xlsx dengan kolom Keterangan Error) */
+        get: operations["getImportJobErrorFile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/export-jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Riwayat ekspor (jenis data yang boleh diekspor user) */
+        get: operations["listExportJobs"];
+        put?: never;
+        /**
+         * Memulai ekspor ke xlsx
+         * @description File dibuat job `dataexchange.export` (antrean bulk) dengan kolom yang sama dengan template impor, lalu
+         *     user mendapat notifikasi berisi tautan unduhan. Butuh `<kind>.export`.
+         */
+        post: operations["createExportJob"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/export-jobs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Status job ekspor */
+        get: operations["getExportJob"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/export-jobs/{id}/download-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** URL unduhan file ekspor */
+        get: operations["getExportJobDownloadUrl"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/procurement/division-options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Divisi aktif untuk form Purchase Request dan Purchase Order
+         * @description Terbuka untuk pemegang hak baca/tulis PR atau PO (tidak butuh hak master dimensi).
+         */
+        get: operations["listProcurementDivisionOptions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/procurement/cash-bank-accounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Akun Kas & Bank (11xx) untuk pembayaran uang muka pembelian */
+        get: operations["listProcurementCashBankAccounts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/purchase-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Daftar Purchase Request (S-201) */
+        get: operations["listPurchaseRequests"];
+        put?: never;
+        /**
+         * Menyimpan draft Purchase Request
+         * @description Pembuat menjadi peminta. Divisi peminta wajib; baris berisi produk katalog atau uraian bebas.
+         */
+        post: operations["createPurchaseRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/purchase-requests/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Detail Purchase Request beserta PO yang dibuat darinya */
+        get: operations["getPurchaseRequest"];
+        /** Mengubah draft Purchase Request */
+        put: operations["updatePurchaseRequest"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/purchase-requests/{id}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ajukan Purchase Request
+         * @description Nomor `PR/TAHUN/BULAN/NOMOR` diberikan dan approval `purchase_request` (Head divisi peminta) diminta di
+         *     transaksi yang sama. `APPROVAL_POLICY_MISSING` bila belum ada approver aktif selain pembuat.
+         */
+        post: operations["submitPurchaseRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/purchase-requests/{id}/revise": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Revisi Purchase Request yang ditolak (kembali ke Draft, nomor tetap) */
+        post: operations["revisePurchaseRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/purchase-requests/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Batalkan draft Purchase Request */
+        post: operations["cancelPurchaseRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/purchase-requests/{id}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Tutup Purchase Request yang disetujui (sisa qty tidak dijadikan PO) */
+        post: operations["closePurchaseRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/purchase-orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Daftar Purchase Order (barang/packaging, maklon, reprocess) */
+        get: operations["listPurchaseOrders"];
+        put?: never;
+        /**
+         * Menyimpan draft Purchase Order (S-202, S-203, S-204)
+         * @description NON-PKP: tanpa PPN, total = subtotal. PO maklon/reprocess wajib ke pemasok berjenis maklon yang punya lokasi
+         *     eksternal maklon, baris = FG hasil + harga jasa per unit, dan daftar bahan (packaging atau material GM) yang
+         *     dikirim ke maklon. Baris dari Purchase Request mengisi `purchaseRequestLineId` (qty ≤ sisa PR).
+         */
+        post: operations["createPurchaseOrder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/purchase-orders/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Detail Purchase Order beserta uang muka */
+        get: operations["getPurchaseOrder"];
+        /** Mengubah draft Purchase Order (jenis PO tetap) */
+        put: operations["updatePurchaseOrder"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/purchase-orders/{id}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ajukan Purchase Order
+         * @description Nomor `PO/TAHUN/BULAN/NOMOR` diberikan dan approval `purchase_order` dengan nominal `totalAmount` (level
+         *     sesuai Matriks Persetujuan) diminta di transaksi yang sama.
+         */
+        post: operations["submitPurchaseOrder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/purchase-orders/{id}/revise": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Revisi Purchase Order yang ditolak (kembali ke Draft, nomor tetap) */
+        post: operations["revisePurchaseOrder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/purchase-orders/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Batalkan Purchase Order
+         * @description Draft, atau Disetujui yang belum ada penerimaan barang dan tidak punya uang muka aktif (alasan wajib).
+         *     Qty Purchase Request asal dikembalikan.
+         */
+        post: operations["cancelPurchaseOrder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/purchase-orders/{id}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Tutup Purchase Order yang diterima sebagian (sisa qty tidak ditunggu) */
+        post: operations["closePurchaseOrder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/purchase-advances": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Daftar uang muka pembelian (S-205) */
+        get: operations["listPurchaseAdvances"];
+        put?: never;
+        /**
+         * Menyimpan draft uang muka untuk PO yang disetujui
+         * @description Total uang muka aktif per PO tidak boleh melebihi total PO.
+         */
+        post: operations["createPurchaseAdvance"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/purchase-advances/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Detail uang muka pembelian */
+        get: operations["getPurchaseAdvance"];
+        /** Mengubah draft uang muka */
+        put: operations["updatePurchaseAdvance"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/purchase-advances/{id}/post": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Posting uang muka (jurnal A-19)
+         * @description Nomor `BYR/TAHUN/BULAN/NOMOR` dan jurnal A-19 (Dr 1401 Uang Muka Pembelian, Cr akun Kas & Bank) dengan
+         *     dimensi divisi PO dan pihak pemasok, di transaksi yang sama. Periode tertutup ditolak `PERIOD_LOCKED`.
+         */
+        post: operations["postPurchaseAdvance"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/purchase-advances/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Batalkan uang muka
+         * @description Draft (hak tulis) atau Diposting yang belum dipotong tagihan (hak posting, alasan wajib, jurnal A-19 dibalik).
+         */
+        post: operations["cancelPurchaseAdvance"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
-export type webhooks = Record<string, never>
+export type webhooks = Record<string, never>;
 export interface components {
-  schemas: {
-    /** @description Format error RFC 7807 (Technical Guideline 8.3). Field code adalah kontrak stabil untuk FE. */
-    Problem: {
-      type: string
-      title: string
-      status: number
-      code: components["schemas"]["ErrorCode"]
-      /** @description Pesan Bahasa Indonesia yang aman ditampilkan ke user. */
-      detail: string
-      fields?: {
-        [key: string]: string
-      }
-      requestId?: string
-    }
-    /**
-     * @description Katalog kode error (Technical Guideline Lampiran A).
-     * @enum {string}
-     */
-    ErrorCode:
-      | "VALIDATION_FAILED"
-      | "AUTH_INVALID_CREDENTIALS"
-      | "AUTH_ACCOUNT_LOCKED"
-      | "AUTH_MFA_REQUIRED"
-      | "AUTH_MFA_INVALID"
-      | "AUTH_TOKEN_EXPIRED"
-      | "AUTH_SESSION_EXPIRED"
-      | "AUTH_REAUTH_REQUIRED"
-      | "AUTH_MFA_ENROLLMENT_REQUIRED"
-      | "AUTH_PASSWORD_TOKEN_INVALID"
-      | "FORBIDDEN"
-      | "NOT_FOUND"
-      | "VERSION_CONFLICT"
-      | "INVALID_STATE_TRANSITION"
-      | "IDEMPOTENCY_KEY_REQUIRED"
-      | "IDEMPOTENCY_IN_PROGRESS"
-      | "IDEMPOTENCY_KEY_REUSED"
-      | "DUPLICATE_CODE"
-      | "PERIOD_LOCKED"
-      | "STOCK_INSUFFICIENT"
-      | "BATCH_SHELF_LIFE_TOO_SHORT"
-      | "APPROVAL_REQUIRED"
-      | "APPROVAL_POLICY_MISSING"
-      | "DISCOUNT_LIMIT_EXCEEDED"
-      | "CREDIT_LIMIT_EXCEEDED"
-      | "THREE_WAY_MATCH_FAILED"
-      | "DEPOSIT_INSUFFICIENT"
-      | "OUTSIDE_ATTENDANCE_RADIUS"
-      | "FILE_TOO_LARGE"
-      | "FILE_TYPE_NOT_ALLOWED"
-      | "IMPORT_ALREADY_PROCESSED"
-      | "RATE_LIMITED"
-      | "PROVIDER_UNAVAILABLE"
-      | "BAD_REQUEST"
-      | "INTERNAL_ERROR"
-    HealthStatus: {
-      /** @enum {string} */
-      status: "ok"
-    }
-    ReadinessCheck: {
-      /** @example database */
-      name: string
-      /** @enum {string} */
-      status: "ok" | "failed"
-      detail?: string
-    }
-    ReadinessStatus: {
-      /** @enum {string} */
-      status: "ready" | "not_ready"
-      checks: components["schemas"]["ReadinessCheck"][]
-    }
-    DatabaseInfo: {
-      /** @enum {string} */
-      status: "ok" | "failed"
-      /** Format: int64 */
-      schemaVersion: number
-      /** Format: int64 */
-      latestSchemaVersion: number
-    }
-    SystemInfo: {
-      /** @example v1.0.0 */
-      version: string
-      commit: string
-      /** @enum {string} */
-      environment: "local" | "staging" | "production"
-      enabledModules: string[]
-      /** @description True jika minimal satu adapter pihak ketiga memakai mock. */
-      mockActive: boolean
-      /** Format: date-time */
-      serverTime: string
-      database: components["schemas"]["DatabaseInfo"]
-    }
-    /** @description Payload HTTP notification Midtrans (nama field milik Midtrans). */
-    MidtransNotification: {
-      order_id: string
-      status_code: string
-      gross_amount: string
-      signature_key: string
-      transaction_status: string
-      transaction_id: string
-      fraud_status?: string
-    }
-    WebhookAck: {
-      received: boolean
-      duplicate: boolean
-    }
-    /** @enum {string} */
-    ReturnReasonScope: "sales_return" | "purchase_return"
-    /**
-     * @description Dokumen yang memakai alasan ini.
-     * @enum {string}
-     */
-    ReturnReasonAppliesTo: "sales_return" | "purchase_return" | "both"
-    /**
-     * @description Disposisi barang retur (Disposisi Retur, WMS-07).
-     * @enum {string}
-     */
-    ReturnDisposition:
-      "restock" | "repack" | "reprocess" | "marketing_sample" | "dispose"
-    ReturnReason: {
-      /** Format: uuid */
-      id: string
-      /** @example DAMAGED_SHIPPING */
-      code: string
-      name: string
-      appliesTo: components["schemas"]["ReturnReasonAppliesTo"]
-      /** @description Usulan awal disposisi; staf gudang tetap memilih saat QC. */
-      defaultDisposition?: components["schemas"]["ReturnDisposition"] | null
-      description: string
-      isActive: boolean
-      /** Format: date-time */
-      updatedAt: string
-      version: number
-    }
-    ReturnReasonFields: {
-      name: string
-      appliesTo: components["schemas"]["ReturnReasonAppliesTo"]
-      defaultDisposition?: components["schemas"]["ReturnDisposition"] | null
-      description?: string
-      isActive: boolean
-    }
-    ReturnReasonInput: components["schemas"]["ReturnReasonFields"] & {
-      /** @example DAMAGED_SHIPPING */
-      code: string
-    }
-    VersionInput: {
-      /** @description Versi terakhir yang dilihat user (optimistic locking). */
-      version: number
-    }
-    ReturnReasonUpdate: components["schemas"]["ReturnReasonFields"] &
-      components["schemas"]["VersionInput"]
-    /** @description Payload webhook status order Biteship (nama field milik Biteship). */
-    BiteshipNotification: {
-      /** @example order.status */
-      event: string
-      order_id: string
-      courier_waybill_id?: string
-      status: string
-    }
-    LoginRequest: {
-      /** Format: email */
-      email: string
-      password: string
-      totpCode?: string
-    }
-    AccessToken: {
-      accessToken: string
-      /** Format: date-time */
-      expiresAt: string
-    }
-    ReauthRequest: {
-      password?: string
-      totpCode?: string
-    }
-    PasswordForgotRequest: {
-      /** Format: email */
-      email: string
-    }
-    PasswordTokenInfo: {
-      email: string
-      fullName: string
-      /** @enum {string} */
-      purpose: "invite" | "reset"
-    }
-    PasswordSetupRequest: {
-      token: string
-      password: string
-    }
-    PasswordChangeRequest: {
-      currentPassword: string
-      newPassword: string
-    }
-    MfaSetup: {
-      secret: string
-      otpauthUrl: string
-      /** @description Gambar PNG QR code dalam format data URL. */
-      qrCodeDataUrl: string
-    }
-    MfaActivateRequest: {
-      code: string
-    }
-    CurrentUser: {
-      /** Format: uuid */
-      id: string
-      email: string
-      fullName: string
-      roles: string[]
-      /**
-       * @example [
-       *       "catalog.product.read",
-       *       "catalog.product.write"
-       *     ]
-       */
-      permissions: string[]
-      isMfaEnabled: boolean
-      /** @description Role user mewajibkan MFA tetapi MFA belum aktif; semua menu lain terkunci sampai MFA aktif. */
-      mfaEnrollmentRequired: boolean
-    }
-    /** @description Metadata pagination standar (Technical Guideline 8.2). */
-    Pagination: {
-      page: number
-      pageSize: number
-      /** Format: int64 */
-      totalItems: number
-      totalPages: number
-    }
-    UserRoleAssignment: {
-      code: string
-      readonly name?: string
-      /** Format: uuid */
-      scopeDivisionId?: string | null
-    }
-    User: {
-      /** Format: uuid */
-      id: string
-      email: string
-      fullName: string
-      roles: components["schemas"]["UserRoleAssignment"][]
-      /** Format: uuid */
-      divisionId?: string | null
-      /** Format: uuid */
-      employeeId?: string | null
-      isActive: boolean
-      isMfaEnabled: boolean
-      /** @description false berarti undangan belum diterima. */
-      hasPassword: boolean
-      /** Format: date-time */
-      lastLoginAt?: string | null
-      /** Format: date-time */
-      createdAt: string
-      /** Format: date-time */
-      updatedAt: string
-      version: number
-    }
-    UserList: components["schemas"]["Pagination"] & {
-      items: components["schemas"]["User"][]
-    }
-    UserInput: {
-      /** Format: email */
-      email: string
-      fullName: string
-      roles: components["schemas"]["UserRoleAssignment"][]
-      /** Format: uuid */
-      divisionId?: string | null
-      /** Format: uuid */
-      employeeId?: string | null
-    }
-    UserUpdate: {
-      fullName: string
-      roles: components["schemas"]["UserRoleAssignment"][]
-      /** Format: uuid */
-      divisionId?: string | null
-      /** Format: uuid */
-      employeeId?: string | null
-      version: number
-    }
-    Role: {
-      /** Format: uuid */
-      id: string
-      code: string
-      name: string
-      description: string
-      requiresMfa: boolean
-      hasDivisionScope: boolean
-      permissions: string[]
-      version: number
-    }
-    RolePermissionsInput: {
-      permissions: string[]
-      version: number
-    }
-    Permission: {
-      code: string
-      module: string
-      description: string
-      requiresReauth: boolean
-    }
-    /** @enum {string} */
-    AuditAction:
-      | "create"
-      | "update"
-      | "delete"
-      | "restore"
-      | "status_change"
-      | "approve"
-      | "reject"
-      | "submit"
-      | "post"
-      | "cancel"
-      | "login"
-      | "login_failed"
-      | "logout"
-      | "import"
-      | "export"
-    AuditChange: {
-      from?: unknown
-      to?: unknown
-    }
-    AuditLog: {
-      /** Format: uuid */
-      id: string
-      /** Format: uuid */
-      actorId: string
-      actorName: string
-      action: components["schemas"]["AuditAction"]
-      entityType: string
-      /** Format: uuid */
-      entityId: string
-      entityLabel: string
-      changes: {
-        [key: string]: components["schemas"]["AuditChange"]
-      }
-      note: string
-      ip?: string
-      /** Format: date-time */
-      createdAt: string
-    }
-    AuditLogList: components["schemas"]["Pagination"] & {
-      items: components["schemas"]["AuditLog"][]
-    }
-    /**
-     * @description Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
-     * @example 1250000.00
-     */
-    Money: string
-    /** @enum {string} */
-    ApprovalStatus: "pending_approval" | "approved" | "rejected" | "cancelled"
-    /**
-     * @description `waiting` belum aktif, `pending` menunggu keputusan, `skipped` tidak diputuskan karena dokumen ditolak/dibatalkan.
-     * @enum {string}
-     */
-    ApprovalStepStatus:
-      "waiting" | "pending" | "approved" | "rejected" | "skipped"
-    ApprovalStep: {
-      level: number
-      approverRole: string
-      approverRoleName: string
-      /** Format: uuid */
-      approverUserId?: string | null
-      approverUserName?: string | null
-      /** Format: uuid */
-      substituteUserId?: string | null
-      substituteUserName?: string | null
-      status: components["schemas"]["ApprovalStepStatus"]
-      /** Format: uuid */
-      decidedById?: string | null
-      decidedByName: string
-      /** @description Terisi jika keputusan diambil penerima delegasi atas nama approver ini. */
-      delegatedFromName?: string | null
-      note: string
-      /** Format: date-time */
-      activatedAt?: string | null
-      /** Format: date-time */
-      decidedAt?: string | null
-    }
-    ApprovalRequest: {
-      /** Format: uuid */
-      id: string
-      subjectType: string
-      subjectTypeLabel: string
-      /** Format: uuid */
-      subjectId: string
-      /** @description Nomor dokumen, mis. PO/2027/01/00012. */
-      subjectLabel: string
-      /** @description Path detail dokumen di ERP; kosong jika halaman detail belum ada. */
-      subjectLink: string
-      summary: string
-      amount: components["schemas"]["Money"]
-      /** Format: uuid */
-      divisionId?: string | null
-      /** Format: uuid */
-      requestedById: string
-      requestedByName: string
-      status: components["schemas"]["ApprovalStatus"]
-      currentLevel: number
-      totalLevels: number
-      steps: components["schemas"]["ApprovalStep"][]
-      /** Format: date-time */
-      createdAt: string
-      /** Format: date-time */
-      decidedAt?: string | null
-      version: number
-      /** @description Aksi yang boleh dilakukan user yang login (Technical Guideline 5.4). */
-      allowedActions: ("approve" | "reject")[]
-    }
-    ApprovalTask: {
-      request: components["schemas"]["ApprovalRequest"]
-      /** Format: uuid */
-      delegatedFromUserId?: string | null
-      /** @description Approver yang sedang cuti dan mendelegasikan dokumen ini kepada user. */
-      delegatedFromName?: string | null
-    }
-    ApprovalInbox: {
-      items: components["schemas"]["ApprovalTask"][]
-      totalItems: number
-    }
-    ApprovalInboxCount: {
-      pending: number
-    }
-    ApprovalCondition: {
-      code: string
-      label: string
-    }
-    ApprovalSubjectType: {
-      type: string
-      label: string
-      amountLabel: string
-      conditions: components["schemas"]["ApprovalCondition"][]
-    }
-    ApprovalUserOption: {
-      /** Format: uuid */
-      id: string
-      fullName: string
-      email: string
-    }
-    ApprovalRequestList: components["schemas"]["Pagination"] & {
-      items: components["schemas"]["ApprovalRequest"][]
-    }
-    ApprovalApproveInput: {
-      version: number
-      note?: string
-    }
-    ApprovalRejectInput: {
-      version: number
-      note: string
-    }
-    ApprovalPolicy: {
-      /** Format: uuid */
-      id: string
-      subjectType: string
-      subjectTypeLabel: string
-      /** Format: uuid */
-      divisionId?: string | null
-      level: number
-      /** @description Level berlaku jika nominal lebih dari nilai ini; kosong = semua nominal. */
-      minAmount?: components["schemas"]["Money"] | null
-      /** @description Level berlaku jika nominal paling besar nilai ini; kosong = tanpa batas. */
-      maxAmount?: components["schemas"]["Money"] | null
-      condition: string
-      approverRole: string
-      approverRoleName: string
-      /** Format: uuid */
-      approverUserId?: string | null
-      approverUserName?: string | null
-      /** Format: uuid */
-      substituteUserId?: string | null
-      substituteUserName?: string | null
-      /** Format: date-time */
-      validFrom: string
-      /** Format: date-time */
-      validTo?: string | null
-      isActive: boolean
-      /** Format: date-time */
-      updatedAt: string
-      version: number
-    }
-    ApprovalPolicyFields: {
-      minAmount?: components["schemas"]["Money"] | null
-      maxAmount?: components["schemas"]["Money"] | null
-      condition?: string
-      approverRole: string
-      /** Format: uuid */
-      approverUserId?: string | null
-      /** Format: uuid */
-      substituteUserId?: string | null
-    }
-    ApprovalPolicyInput: components["schemas"]["ApprovalPolicyFields"] & {
-      subjectType: string
-      /** Format: uuid */
-      divisionId?: string | null
-      level: number
-    }
-    ApprovalPolicyUpdate: components["schemas"]["ApprovalPolicyFields"] & {
-      version: number
-    }
-    /**
-     * Format: date
-     * @description Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
-     * @example 2026-10-19
-     */
-    BusinessDate: string
-    /** @enum {string} */
-    ApprovalDelegationStatus: "scheduled" | "active" | "ended" | "cancelled"
-    ApprovalDelegation: {
-      /** Format: uuid */
-      id: string
-      /** Format: uuid */
-      fromUserId: string
-      fromUserName: string
-      /** Format: uuid */
-      toUserId: string
-      toUserName: string
-      validFrom: components["schemas"]["BusinessDate"]
-      validTo: components["schemas"]["BusinessDate"]
-      reason: string
-      status: components["schemas"]["ApprovalDelegationStatus"]
-      /** Format: date-time */
-      cancelledAt?: string | null
-      version: number
-    }
-    ApprovalDelegationInput: {
-      /** Format: uuid */
-      fromUserId?: string | null
-      /** Format: uuid */
-      toUserId: string
-      validFrom: components["schemas"]["BusinessDate"]
-      validTo: components["schemas"]["BusinessDate"]
-      reason?: string
-    }
-    Notification: {
-      /** Format: uuid */
-      id: string
-      /**
-       * @description Jenis notifikasi `<modul>.<peristiwa>`, mis. `approval.pending`.
-       * @example approval.pending
-       */
-      kind: string
-      title: string
-      body: string
-      /** @description Path ERP yang dibuka saat notifikasi diklik; kosong jika tidak ada. */
-      link: string
-      /** Format: date-time */
-      readAt?: string | null
-      /** Format: date-time */
-      createdAt: string
-    }
-    NotificationList: components["schemas"]["Pagination"] & {
-      items: components["schemas"]["Notification"][]
-      /** Format: int64 */
-      unreadCount: number
-    }
-    NotificationUnreadCount: {
-      /** Format: int64 */
-      unreadCount: number
-    }
-    /**
-     * @description `finished_good` = Produk Jadi, `packaging` = Packaging (RM), `reprocess_material` = Material (GM).
-     * @enum {string}
-     */
-    ProductType: "finished_good" | "packaging" | "reprocess_material"
-    /** @enum {string} */
-    PackagingType: "tube" | "pouch" | "roll_sachet"
-    /**
-     * @description Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
-     * @example 2.000
-     */
-    Quantity: string
-    /**
-     * @description 13 digit dengan digit periksa benar = EAN-13, selain itu Code 128.
-     * @enum {string}
-     */
-    BarcodeSymbology: "ean13" | "code128"
-    ProductBarcode: {
-      barcode: string
-      symbology: components["schemas"]["BarcodeSymbology"]
-      isPrimary: boolean
-    }
-    BundleComponent: {
-      /** Format: uuid */
-      componentProductId: string
-      qty: components["schemas"]["Quantity"]
-      componentSku: string
-      componentName: string
-      componentVariant: string
-      componentUom: string
-      componentDeleted: boolean
-    }
-    /** @enum {string} */
-    ProductAction: "update" | "delete" | "restore"
-    Product: {
-      /** Format: uuid */
-      id: string
-      sku: string
-      name: string
-      variant: string
-      productType: components["schemas"]["ProductType"]
-      packagingType?: components["schemas"]["PackagingType"] | null
-      uom: string
-      shelfLifeDays?: number | null
-      hasBatch: boolean
-      isBundle: boolean
-      /** Format: uuid */
-      categoryId?: string | null
-      categoryName?: string | null
-      minStockQty?: components["schemas"]["Quantity"] | null
-      unitsPerCarton?: number | null
-      isActive: boolean
-      barcodes: components["schemas"]["ProductBarcode"][]
-      /** @description Barcode utama yang dicetak di label produk. */
-      primaryBarcode?: string | null
-      bundleComponents: components["schemas"]["BundleComponent"][]
-      /** Format: date-time */
-      deletedAt?: string | null
-      /** Format: date-time */
-      createdAt: string
-      /** Format: date-time */
-      updatedAt: string
-      version: number
-      allowedActions: components["schemas"]["ProductAction"][]
-    }
-    ProductList: components["schemas"]["Pagination"] & {
-      items: components["schemas"]["Product"][]
-    }
-    ProductBarcodeInput: {
-      barcode: string
-      isPrimary: boolean
-    }
-    BundleComponentInput: {
-      /** Format: uuid */
-      componentProductId: string
-      qty: components["schemas"]["Quantity"]
-    }
-    ProductFields: {
-      name: string
-      variant?: string
-      packagingType?: components["schemas"]["PackagingType"] | null
-      /** @example pcs */
-      uom: string
-      /** @description Umur simpan dalam hari; wajib untuk Produk Jadi non-bundel. */
-      shelfLifeDays?: number | null
-      /** @description Hanya dipakai untuk Packaging & Material; Produk Jadi selalu memakai batch, bundel tidak. */
-      hasBatch: boolean
-      /** Format: uuid */
-      categoryId?: string | null
-      minStockQty?: components["schemas"]["Quantity"] | null
-      unitsPerCarton?: number | null
-      isActive: boolean
-      /** @description Tepat satu barcode utama jika ada barcode; barcode unik di semua produk. */
-      barcodes?: components["schemas"]["ProductBarcodeInput"][]
-      /** @description Wajib untuk bundel; komponen harus Produk Jadi non-bundel yang aktif. */
-      bundleComponents?: components["schemas"]["BundleComponentInput"][]
-    }
-    ProductInput: components["schemas"]["ProductFields"] & {
-      /** @description Huruf besar, angka, dan tanda minus; huruf kecil diubah menjadi besar. */
-      sku: string
-      productType: components["schemas"]["ProductType"]
-      /** @description Bundel virtual tidak punya stok sendiri; stok komponen terpotong saat terjual (MD-03). */
-      isBundle: boolean
-    }
-    ProductUpdate: components["schemas"]["ProductFields"] &
-      components["schemas"]["VersionInput"]
-    ProductCategory: {
-      /** Format: uuid */
-      id: string
-      code: string
-      name: string
-      /** Format: date-time */
-      deletedAt?: string | null
-      /** Format: date-time */
-      createdAt: string
-      /** Format: date-time */
-      updatedAt: string
-      version: number
-      allowedActions: components["schemas"]["ProductAction"][]
-    }
-    ProductCategoryInput: {
-      code: string
-      name: string
-    }
-    ProductCategoryUpdate: {
-      name: string
-    } & components["schemas"]["VersionInput"]
-    /** @enum {string} */
-    RecordAction: "update" | "delete" | "restore"
-    Warehouse: {
-      /** Format: uuid */
-      id: string
-      code: string
-      name: string
-      address: string
-      isActive: boolean
-      /** Format: date-time */
-      deletedAt?: string | null
-      /** Format: date-time */
-      createdAt: string
-      /** Format: date-time */
-      updatedAt: string
-      version: number
-      allowedActions: components["schemas"]["RecordAction"][]
-    }
-    WarehouseList: components["schemas"]["Pagination"] & {
-      items: components["schemas"]["Warehouse"][]
-    }
-    WarehouseFields: {
-      name: string
-      address?: string
-      isActive: boolean
-    }
-    WarehouseInput: components["schemas"]["WarehouseFields"] & {
-      code: string
-    }
-    WarehouseUpdate: components["schemas"]["WarehouseFields"] &
-      components["schemas"]["VersionInput"]
-    /**
-     * @description Di dalam gudang: `inbound`, `finished_goods` (FG Non-Ecommerce), `ecommerce` (E-commerce Stock), `petty_stock` (Petty Stock),
-     *     `raw_material` (RM), `goods_material` (GM), `returns`, `event`. Eksternal: `toll_manufacturer` (maklon),
-     *     `consignment`, `vending_buffer`, `vending_machine`.
-     * @enum {string}
-     */
-    LocationType:
-      | "inbound"
-      | "finished_goods"
-      | "ecommerce"
-      | "petty_stock"
-      | "raw_material"
-      | "goods_material"
-      | "returns"
-      | "event"
-      | "toll_manufacturer"
-      | "consignment"
-      | "vending_buffer"
-      | "vending_machine"
-    /** @enum {string} */
-    ExternalPartyType: "supplier" | "partner" | "vending_machine"
-    Location: {
-      /** Format: uuid */
-      id: string
-      code: string
-      name: string
-      locationType: components["schemas"]["LocationType"]
-      locationTypeLabel: string
-      /** Format: uuid */
-      warehouseId?: string | null
-      warehouseName?: string | null
-      externalPartyType?: components["schemas"]["ExternalPartyType"] | null
-      /** Format: uuid */
-      externalPartyId?: string | null
-      isExternal: boolean
-      /** @description Stok di lokasi ini bisa dialokasikan ke penjualan. */
-      isSellable: boolean
-      /** @description Lokasi standar dibuat otomatis bersama gudang dan ikut terhapus/dipulihkan bersama gudang. */
-      isStandard: boolean
-      isActive: boolean
-      /** Format: date-time */
-      deletedAt?: string | null
-      /** Format: date-time */
-      createdAt: string
-      /** Format: date-time */
-      updatedAt: string
-      version: number
-      allowedActions: components["schemas"]["RecordAction"][]
-    }
-    LocationList: components["schemas"]["Pagination"] & {
-      items: components["schemas"]["Location"][]
-    }
-    LocationInput: {
-      code: string
-      name: string
-      locationType: components["schemas"]["LocationType"]
-      /**
-       * Format: uuid
-       * @description Wajib untuk lokasi internal; kosong untuk lokasi eksternal.
-       */
-      warehouseId?: string | null
-      externalPartyType?: components["schemas"]["ExternalPartyType"] | null
-      /**
-       * Format: uuid
-       * @description ID pemasok/maklon, mitra, atau mesin vending di modul pemiliknya.
-       */
-      externalPartyId?: string | null
-      isActive: boolean
-    }
-    /** @enum {string} */
-    NormalBalance: "debit" | "credit"
-    Account: {
-      /** Format: uuid */
-      id: string
-      /** @example 1111 */
-      code: string
-      name: string
-      group: number
-      groupLabel: string
-      normalBalance: components["schemas"]["NormalBalance"]
-      /** Format: uuid */
-      parentId?: string | null
-      /** @description false = akun induk (judul), tidak bisa diposting. */
-      isPostable: boolean
-      /** @description Boleh dipakai di Jurnal Umum manual. Akun kontrol hanya diisi jurnal otomatis. */
-      allowManualPosting: boolean
-      isActive: boolean
-      description: string
-      /** Format: date-time */
-      updatedAt: string
-      version: number
-    }
-    AccountFields: {
-      name: string
-      normalBalance: components["schemas"]["NormalBalance"]
-      /** Format: uuid */
-      parentId?: string | null
-      isPostable: boolean
-      allowManualPosting: boolean
-      isActive: boolean
-      description?: string
-    }
-    AccountInput: components["schemas"]["AccountFields"] & {
-      code: string
-    }
-    AccountUpdate: components["schemas"]["AccountFields"] &
-      components["schemas"]["VersionInput"]
-    /** @enum {string} */
-    DimensionKind: "channel" | "sub_channel" | "division" | "campaign"
-    /** @description Master dimensi jurnal. Field channel/pihak hanya untuk sub-channel; periode/anggaran hanya kampanye. */
-    Dimension: {
-      /** Format: uuid */
-      id: string
-      kind: components["schemas"]["DimensionKind"]
-      code: string
-      name: string
-      /** Format: uuid */
-      channelId?: string | null
-      partyType?: string | null
-      /** Format: uuid */
-      partyId?: string | null
-      validFrom?: components["schemas"]["BusinessDate"] | null
-      validTo?: components["schemas"]["BusinessDate"] | null
-      budgetAmount?: components["schemas"]["Money"] | null
-      description?: string | null
-      isActive: boolean
-      /** Format: date-time */
-      updatedAt: string
-      version: number
-    }
-    DimensionInput: {
-      code: string
-      name: string
-      isActive: boolean
-    }
-    DimensionUpdate: {
-      name: string
-      isActive: boolean
-      version: number
-    }
-    SubChannelFields: {
-      name: string
-      partyType?: string | null
-      /** Format: uuid */
-      partyId?: string | null
-      isActive: boolean
-    }
-    SubChannelInput: components["schemas"]["SubChannelFields"] & {
-      /** Format: uuid */
-      channelId: string
-      code: string
-    }
-    SubChannelUpdate: components["schemas"]["SubChannelFields"] &
-      components["schemas"]["VersionInput"]
-    CampaignFields: {
-      name: string
-      validFrom: components["schemas"]["BusinessDate"]
-      validTo: components["schemas"]["BusinessDate"]
-      budgetAmount?: components["schemas"]["Money"] | null
-      description?: string
-      isActive: boolean
-    }
-    CampaignInput: components["schemas"]["CampaignFields"] & {
-      /** @example KMP-202701-RAMADAN */
-      code: string
-    }
-    CampaignUpdate: components["schemas"]["CampaignFields"] &
-      components["schemas"]["VersionInput"]
-    /**
-     * @description Jenis PPh yang dipotong (pemasok, jenis biaya); tarif di master tarif PPh.
-     * @enum {string}
-     */
-    WithholdingType: "none" | "pph21" | "pph23" | "pph4_2"
-    /**
-     * @description Jenis dokumen approval (subject_type) yang dipakai dokumen biaya dengan jenis ini.
-     * @enum {string}
-     */
-    ExpenseApprovalSubject: "expense_claim" | "petty_cash_replenishment"
-    ExpenseType: {
-      /** Format: uuid */
-      id: string
-      /** @example OFFICE_SUPPLY */
-      code: string
-      name: string
-      /** Format: uuid */
-      expenseAccountId: string
-      /** @example 6303 */
-      expenseAccountCode: string
-      expenseAccountName: string
-      withholdingType: components["schemas"]["WithholdingType"]
-      requiresReceipt: boolean
-      /** @description Jurnal biaya jenis ini wajib dimensi kampanye. */
-      requiresCampaign: boolean
-      approvalSubject: components["schemas"]["ExpenseApprovalSubject"]
-      description: string
-      isActive: boolean
-      /** Format: date-time */
-      updatedAt: string
-      version: number
-    }
-    ExpenseTypeFields: {
-      name: string
-      /** Format: uuid */
-      expenseAccountId: string
-      withholdingType: components["schemas"]["WithholdingType"]
-      requiresReceipt: boolean
-      requiresCampaign: boolean
-      approvalSubject?: components["schemas"]["ExpenseApprovalSubject"]
-      description?: string
-      isActive: boolean
-    }
-    ExpenseTypeInput: components["schemas"]["ExpenseTypeFields"] & {
-      /** @example OFFICE_SUPPLY */
-      code: string
-    }
-    ExpenseTypeUpdate: components["schemas"]["ExpenseTypeFields"] &
-      components["schemas"]["VersionInput"]
-    /** @enum {string} */
-    FiscalPeriodStatus: "open" | "closed"
-    FiscalPeriod: {
-      /** Format: uuid */
-      id: string
-      year: number
-      month: number
-      /** @example Okt 2026 */
-      label: string
-      status: components["schemas"]["FiscalPeriodStatus"]
-      startDate: components["schemas"]["BusinessDate"]
-      endDate: components["schemas"]["BusinessDate"]
-      /** Format: date-time */
-      closedAt?: string | null
-      reopenedCount: number
-      version: number
-    }
-    PostingRuleAccount: {
-      amountKey: string
-      side: components["schemas"]["NormalBalance"]
-      /** @description `fixed` = akun tetap; selain itu akun dipilih dokumen sumber (akun di sini = default). */
-      resolver: string
-      accountCode: string
-      accountName: string
-    }
-    PostingRule: {
-      /** @example A-01 */
-      code: string
-      name: string
-      description: string
-      requiredDimensions: components["schemas"]["DimensionKind"][]
-      release: string
-      isActive: boolean
-      accounts: components["schemas"]["PostingRuleAccount"][]
-    }
-    /** @enum {string} */
-    JournalStatus: "draft" | "posted"
-    /** @enum {string} */
-    JournalEntryType: "manual" | "automatic" | "reversal"
-    JournalEntrySummary: {
-      /** Format: uuid */
-      id: string
-      /** @description Nomor JV, diisi saat posting. */
-      number?: string | null
-      businessDate: components["schemas"]["BusinessDate"]
-      entryType: components["schemas"]["JournalEntryType"]
-      sourceType: string
-      /** Format: uuid */
-      sourceId: string
-      sourceLabel: string
-      postingRuleCode?: string | null
-      description: string
-      status: components["schemas"]["JournalStatus"]
-      totalAmount: components["schemas"]["Money"]
-      /** Format: uuid */
-      reversalOfId?: string | null
-      reversalOfNumber?: string | null
-      /** Format: uuid */
-      reversedById?: string | null
-      reversedByNumber?: string | null
-      /** Format: date-time */
-      postedAt?: string | null
-      /** Format: date-time */
-      createdAt: string
-      /** Format: date-time */
-      updatedAt: string
-      version: number
-    }
-    JournalEntryList: components["schemas"]["Pagination"] & {
-      items: components["schemas"]["JournalEntrySummary"][]
-    }
-    ManualJournalLineInput: {
-      /** Format: uuid */
-      accountId: string
-      debit: components["schemas"]["Money"]
-      credit: components["schemas"]["Money"]
-      /** Format: uuid */
-      channelId?: string | null
-      /** Format: uuid */
-      subChannelId?: string | null
-      /** Format: uuid */
-      divisionId?: string | null
-      /** Format: uuid */
-      campaignId?: string | null
-      memo?: string
-    }
-    ManualJournalFields: {
-      businessDate: components["schemas"]["BusinessDate"]
-      description: string
-      lines: components["schemas"]["ManualJournalLineInput"][]
-    }
-    DimensionRef: {
-      /** Format: uuid */
-      id: string
-      code: string
-      name: string
-    }
-    JournalLine: {
-      lineNo: number
-      /** Format: uuid */
-      accountId: string
-      accountCode: string
-      accountName: string
-      debit: components["schemas"]["Money"]
-      credit: components["schemas"]["Money"]
-      channel?: components["schemas"]["DimensionRef"] | null
-      subChannel?: components["schemas"]["DimensionRef"] | null
-      division?: components["schemas"]["DimensionRef"] | null
-      campaign?: components["schemas"]["DimensionRef"] | null
-      partyType?: string | null
-      /** Format: uuid */
-      partyId?: string | null
-      amountKey?: string | null
-      memo: string
-    }
-    JournalEntry: components["schemas"]["JournalEntrySummary"] & {
-      lines: components["schemas"]["JournalLine"][]
-      totalDebit: components["schemas"]["Money"]
-      totalCredit: components["schemas"]["Money"]
-      allowedActions: ("edit" | "delete" | "post" | "reverse")[]
-    }
-    ManualJournalUpdate: components["schemas"]["ManualJournalFields"] &
-      components["schemas"]["VersionInput"]
-    JournalReverseInput: {
-      version: number
-      businessDate: components["schemas"]["BusinessDate"]
-      reason: string
-    }
-    GeneralLedgerLine: {
-      /** Format: uuid */
-      entryId: string
-      number?: string | null
-      businessDate: components["schemas"]["BusinessDate"]
-      entryType: components["schemas"]["JournalEntryType"]
-      sourceType: string
-      sourceLabel: string
-      description: string
-      lineNo: number
-      debit: components["schemas"]["Money"]
-      credit: components["schemas"]["Money"]
-      balance: components["schemas"]["Money"]
-      memo: string
-      channel?: components["schemas"]["DimensionRef"] | null
-      subChannel?: components["schemas"]["DimensionRef"] | null
-      division?: components["schemas"]["DimensionRef"] | null
-      campaign?: components["schemas"]["DimensionRef"] | null
-    }
-    GeneralLedger: components["schemas"]["Pagination"] & {
-      account: components["schemas"]["Account"]
-      dateFrom: components["schemas"]["BusinessDate"]
-      dateTo: components["schemas"]["BusinessDate"]
-      openingBalance: components["schemas"]["Money"]
-      periodDebit: components["schemas"]["Money"]
-      periodCredit: components["schemas"]["Money"]
-      closingBalance: components["schemas"]["Money"]
-      items: components["schemas"]["GeneralLedgerLine"][]
-    }
-    DocumentSequence: {
-      /** @example JV */
-      documentType: string
-      /** @example Jurnal */
-      label: string
-      /** @description Saat nomor diberikan, mis. `Posting` atau `Submit`. */
-      assignedAt: string
-      year: number
-      /**
-       * Format: int64
-       * @description Nomor urut terakhir yang terpakai; 0 = belum ada dokumen pada tahun ini.
-       */
-      lastNumber: number
-      /** Format: date-time */
-      lastIssuedAt?: string | null
-      /** @description Contoh nomor berikutnya, mis. `JV/2026/10/00013`. */
-      example: string
-    }
-    DocumentSequenceList: {
-      year: number
-      items: components["schemas"]["DocumentSequence"][]
-    }
-    LocationUpdate: {
-      name: string
-      isActive: boolean
-    } & components["schemas"]["VersionInput"]
-    /**
-     * @description `in_progress` Diproses, `completed` Selesai.
-     * @enum {string}
-     */
-    InboundStatus: "in_progress" | "completed"
-    WhLocationRef: {
-      /** Format: uuid */
-      id: string
-      code: string
-      name: string
-      locationType: components["schemas"]["LocationType"]
-      locationTypeLabel: string
-      isExternal: boolean
-      warehouseName?: string
-    }
-    InboundSummary: {
-      /** Format: uuid */
-      id: string
-      number: string
-      sourceType: string
-      sourceTypeLabel: string
-      sourceLabel: string
-      location: components["schemas"]["WhLocationRef"]
-      businessDate: components["schemas"]["BusinessDate"]
-      status: components["schemas"]["InboundStatus"]
-      lineCount: number
-      pendingCount: number
-      /** Format: date-time */
-      createdAt: string
-    }
-    InboundList: components["schemas"]["Pagination"] & {
-      items: components["schemas"]["InboundSummary"][]
-    }
-    /**
-     * @description `hold` ditahan di Inbound (reject ke pemasok/maklon), `returns` ke Gudang Retur.
-     * @enum {string}
-     */
-    InboundRejectAction: "hold" | "returns"
-    WhProductRef: {
-      /** Format: uuid */
-      id: string
-      sku: string
-      name: string
-      uom: string
-    }
-    WhBatchRef: {
-      /** Format: uuid */
-      id: string
-      number: string
-      expiryDate?: components["schemas"]["BusinessDate"]
-    }
-    /**
-     * @description Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
-     * @example 12.000
-     */
-    WhQuantity: string
-    /**
-     * @description `quarantine` Karantina (belum QC), `posted` Diposting (lulus), `qc_rejected` Ditolak QC.
-     * @enum {string}
-     */
-    InboundLineStatus: "quarantine" | "posted" | "qc_rejected"
-    InboundLine: {
-      /** Format: uuid */
-      id: string
-      lineNo: number
-      product: components["schemas"]["WhProductRef"]
-      batch?: components["schemas"]["WhBatchRef"]
-      qty: components["schemas"]["WhQuantity"]
-      passedQty: components["schemas"]["WhQuantity"]
-      rejectedQty: components["schemas"]["WhQuantity"]
-      destination: components["schemas"]["WhLocationRef"]
-      rejectLocation?: components["schemas"]["WhLocationRef"]
-      status: components["schemas"]["InboundLineStatus"]
-      rejectReason: string
-      checkedByName?: string
-      /** Format: date-time */
-      checkedAt?: string
-      allowedActions: "qc"[]
-    }
-    InboundQcChecklist: {
-      batch: boolean
-      expiry: boolean
-      condition: boolean
-      seal: boolean
-    }
-    InboundQualityCheck: {
-      /** Format: uuid */
-      id: string
-      /** Format: uuid */
-      lineId: string
-      /** @enum {string} */
-      result: "passed" | "rejected"
-      qty: components["schemas"]["WhQuantity"]
-      checks: components["schemas"]["InboundQcChecklist"]
-      note: string
-      photoFileIds: string[]
-      checkedByName: string
-      /** Format: date-time */
-      checkedAt: string
-    }
-    Inbound: components["schemas"]["InboundSummary"] & {
-      /** Format: uuid */
-      sourceId: string
-      rejectAction: components["schemas"]["InboundRejectAction"]
-      note: string
-      /** Format: date-time */
-      completedAt?: string
-      version: number
-      lines: components["schemas"]["InboundLine"][]
-      checks: components["schemas"]["InboundQualityCheck"][]
-    }
-    InboundQcInput: {
-      passedQty: components["schemas"]["WhQuantity"]
-      rejectedQty: components["schemas"]["WhQuantity"]
-      checks: components["schemas"]["InboundQcChecklist"]
-      rejectReason?: string
-      /** Format: uuid */
-      destinationLocationId?: string
-      note?: string
-      photoFileIds?: string[]
-    }
-    /**
-     * @description `direct` Transfer Stok, `request` Permintaan Petty Stock.
-     * @enum {string}
-     */
-    StockTransferType: "direct" | "request"
-    /** @enum {string} */
-    StockTransferStatus:
-      | "draft"
-      | "submitted"
-      | "in_progress"
-      | "in_transit"
-      | "partially_received"
-      | "received"
-      | "completed"
-      | "cancelled"
-    StockTransferSummary: {
-      /** Format: uuid */
-      id: string
-      number?: string
-      transferType: components["schemas"]["StockTransferType"]
-      from: components["schemas"]["WhLocationRef"]
-      to: components["schemas"]["WhLocationRef"]
-      requiresShipping: boolean
-      businessDate: components["schemas"]["BusinessDate"]
-      status: components["schemas"]["StockTransferStatus"]
-      requestedByName: string
-      lineCount: number
-      totalQty: components["schemas"]["WhQuantity"]
-      /** Format: date-time */
-      createdAt: string
-    }
-    StockTransferList: components["schemas"]["Pagination"] & {
-      items: components["schemas"]["StockTransferSummary"][]
-    }
-    StockTransferLineInput: {
-      /** Format: uuid */
-      productId: string
-      /** Format: uuid */
-      batchId?: string
-      qty: components["schemas"]["WhQuantity"]
-      batchReason?: string
-      note?: string
-    }
-    StockTransferInput: {
-      transferType: components["schemas"]["StockTransferType"]
-      /** Format: uuid */
-      fromLocationId: string
-      /** Format: uuid */
-      toLocationId: string
-      businessDate: components["schemas"]["BusinessDate"]
-      note?: string
-      lines: components["schemas"]["StockTransferLineInput"][]
-    }
-    StockTransferLine: {
-      /** Format: uuid */
-      id: string
-      lineNo: number
-      product: components["schemas"]["WhProductRef"]
-      batch?: components["schemas"]["WhBatchRef"]
-      qty: components["schemas"]["WhQuantity"]
-      receivedQty: components["schemas"]["WhQuantity"]
-      shortageQty: components["schemas"]["WhQuantity"]
-      costAmount: components["schemas"]["Money"]
-      batchReason: string
-      note: string
-    }
-    /** @enum {string} */
-    StockTransferAction:
-      | "edit"
-      | "submit"
-      | "release"
-      | "prepare"
-      | "post"
-      | "ship"
-      | "receive"
-      | "complete"
-      | "cancel"
-    StockTransfer: components["schemas"]["StockTransferSummary"] & {
-      note: string
-      sourceType?: string
-      /** Format: uuid */
-      sourceId?: string
-      /** Format: date-time */
-      submittedAt?: string
-      releasedByName?: string
-      /** Format: date-time */
-      releasedAt?: string
-      preparedByName?: string
-      /** Format: date-time */
-      preparedAt?: string
-      shippedByName?: string
-      /** Format: date-time */
-      shippedAt?: string
-      receivedByName?: string
-      /** Format: date-time */
-      receivedAt?: string
-      /** Format: date-time */
-      completedAt?: string
-      /** Format: date-time */
-      cancelledAt?: string
-      cancelReason: string
-      version: number
-      lines: components["schemas"]["StockTransferLine"][]
-      allowedActions: components["schemas"]["StockTransferAction"][]
-    }
-    StockInTransitLine: {
-      /** Format: uuid */
-      transferId: string
-      number?: string
-      /** Format: uuid */
-      lineId: string
-      from: components["schemas"]["WhLocationRef"]
-      to: components["schemas"]["WhLocationRef"]
-      businessDate: components["schemas"]["BusinessDate"]
-      /** Format: date-time */
-      shippedAt?: string
-      status: components["schemas"]["StockTransferStatus"]
-      product: components["schemas"]["WhProductRef"]
-      batch?: components["schemas"]["WhBatchRef"]
-      qty: components["schemas"]["WhQuantity"]
-      receivedQty: components["schemas"]["WhQuantity"]
-      outstandingQty: components["schemas"]["WhQuantity"]
-      costAmount: components["schemas"]["Money"]
-    }
-    StockInTransitList: components["schemas"]["Pagination"] & {
-      items: components["schemas"]["StockInTransitLine"][]
-    }
-    StockTransferReceiveLine: {
-      /** Format: uuid */
-      lineId: string
-      qty: components["schemas"]["WhQuantity"]
-    }
-    StockTransferActionInput: {
-      action: components["schemas"]["StockTransferAction"]
-      version: number
-      reason?: string
-      lines?: components["schemas"]["StockTransferReceiveLine"][]
-    }
-    /** @enum {string} */
-    StockCountStatus:
-      | "draft"
-      | "in_progress"
-      | "pending_approval"
-      | "rejected"
-      | "posted"
-      | "completed"
-      | "cancelled"
-    /**
-     * @description `full` Penuh, `cycle` Cycle count, `consignment` Konsinyasi, `vending` Vending.
-     * @enum {string}
-     */
-    StockCountType: "full" | "cycle" | "consignment" | "vending"
-    StockCountSummary: {
-      /** Format: uuid */
-      id: string
-      number?: string
-      countType: components["schemas"]["StockCountType"]
-      location: components["schemas"]["WhLocationRef"]
-      businessDate: components["schemas"]["BusinessDate"]
-      status: components["schemas"]["StockCountStatus"]
-      /** Format: uuid */
-      scheduleId?: string
-      assignedToName: string
-      lineCount: number
-      countedCount: number
-      /** @description Kosong sampai hasil dikirim. */
-      varianceAmount?: components["schemas"]["Money"]
-      /** Format: date-time */
-      createdAt: string
-    }
-    StockCountList: components["schemas"]["Pagination"] & {
-      items: components["schemas"]["StockCountSummary"][]
-    }
-    StockCountInput: {
-      countType: components["schemas"]["StockCountType"]
-      locationIds: string[]
-      businessDate?: components["schemas"]["BusinessDate"]
-      note?: string
-    }
-    StockCountLine: {
-      /** Format: uuid */
-      id: string
-      lineNo: number
-      product: components["schemas"]["WhProductRef"]
-      batch?: components["schemas"]["WhBatchRef"]
-      /** @description Kosong saat hitung buta (Draft, Diproses, Ditolak). */
-      systemQty?: components["schemas"]["WhQuantity"]
-      countedQty?: components["schemas"]["WhQuantity"]
-      varianceQty?: components["schemas"]["WhQuantity"]
-      unitCost?: string
-      varianceAmount?: components["schemas"]["Money"]
-      isExtra: boolean
-      /** Format: uuid */
-      photoFileId?: string
-      note: string
-      /** Format: date-time */
-      countedAt?: string
-    }
-    /** @enum {string} */
-    StockCountAction: "start" | "count" | "submit" | "recount" | "cancel"
-    StockCount: components["schemas"]["StockCountSummary"] & {
-      note: string
-      photoFileIds: string[]
-      /** @description true = qty sistem dan selisih ditampilkan (setelah hasil dikirim). */
-      revealed: boolean
-      /** Format: date-time */
-      snapshotAt?: string
-      startedByName?: string
-      submittedByName?: string
-      /** Format: date-time */
-      submittedAt?: string
-      netVariance?: components["schemas"]["Money"]
-      /** Format: date-time */
-      decidedAt?: string
-      decisionNote: string
-      /** Format: date-time */
-      postedAt?: string
-      /** Format: uuid */
-      journalEntryId?: string
-      version: number
-      lines: components["schemas"]["StockCountLine"][]
-      allowedActions: components["schemas"]["StockCountAction"][]
-    }
-    StockCountEntry: {
-      /** Format: uuid */
-      lineId: string
-      countedQty?: components["schemas"]["WhQuantity"]
-      note?: string
-      /** Format: uuid */
-      photoFileId?: string
-    }
-    StockCountExtraEntry: {
-      /** Format: uuid */
-      productId: string
-      /** Format: uuid */
-      batchId?: string
-      countedQty: components["schemas"]["WhQuantity"]
-      note?: string
-    }
-    StockCountEntriesInput: {
-      lines?: components["schemas"]["StockCountEntry"][]
-      extraLines?: components["schemas"]["StockCountExtraEntry"][]
-      /** @description Diisi = mengganti foto lokasi/rak; tidak dikirim = foto tidak berubah. */
-      photoFileIds?: string[]
-    }
-    StockCountActionInput: {
-      action: components["schemas"]["StockCountAction"]
-      version: number
-      reason?: string
-    }
-    /** @enum {string} */
-    StockCountFrequency: "weekly" | "monthly" | "yearly"
-    StockCountScheduleInput: {
-      name: string
-      countType: components["schemas"]["StockCountType"]
-      frequency: components["schemas"]["StockCountFrequency"]
-      dayOfWeek?: number
-      dayOfMonth?: number
-      monthOfYear?: number
-      /** Format: uuid */
-      warehouseId?: string
-      locationIds?: string[]
-      /** Format: uuid */
-      assigneeUserId?: string
-      isActive: boolean
-    }
-    StockCountSchedule: components["schemas"]["StockCountScheduleInput"] & {
-      /** Format: uuid */
-      id: string
-      assigneeName: string
-      nextRunDate: components["schemas"]["BusinessDate"]
-      lastRunDate?: components["schemas"]["BusinessDate"]
-      version: number
-    }
-    /**
-     * @description `available` Tersedia, `quarantine` Karantina, `in_transit` Dalam Pengiriman, `reserved` Dialokasikan.
-     * @enum {string}
-     */
-    StockStatus: "available" | "quarantine" | "in_transit" | "reserved"
-    StockProductRef: {
-      /** Format: uuid */
-      id: string
-      sku: string
-      name: string
-      uom: string
-    }
-    StockLocationRef: {
-      /** Format: uuid */
-      id: string
-      code: string
-      name: string
-      warehouseName?: string
-    }
-    /**
-     * @description `expired` Kedaluwarsa, `near_expiry` Segera kedaluwarsa, `ok` Aman, `no_expiry` Tanpa kedaluwarsa.
-     * @enum {string}
-     */
-    ExpiryState: "expired" | "near_expiry" | "ok" | "no_expiry"
-    /**
-     * @description Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string; bisa negatif di kartu stok.
-     * @example 12.000
-     */
-    StockQuantity: string
-    /**
-     * @description HPP per unit 4 desimal sebagai string.
-     * @example 12500.0000
-     */
-    UnitCost: string
-    StockBalance: {
-      product: components["schemas"]["StockProductRef"]
-      location: components["schemas"]["StockLocationRef"]
-      /** Format: uuid */
-      batchId?: string
-      batchNumber?: string
-      productionDate?: components["schemas"]["BusinessDate"]
-      expiryDate?: components["schemas"]["BusinessDate"]
-      expiryState?: components["schemas"]["ExpiryState"]
-      status: components["schemas"]["StockStatus"]
-      statusLabel: string
-      qty: components["schemas"]["StockQuantity"]
-      unitCost: components["schemas"]["UnitCost"]
-      value: components["schemas"]["Money"]
-      /** Format: date-time */
-      updatedAt: string
-    }
-    StockBalanceList: components["schemas"]["Pagination"] & {
-      items: components["schemas"]["StockBalance"][]
-      totalQty: components["schemas"]["StockQuantity"]
-    }
-    /** @enum {string} */
-    StockMovementType: "receive" | "issue" | "move_out" | "move_in"
-    StockCardLine: {
-      /** Format: uuid */
-      movementId: string
-      businessDate: components["schemas"]["BusinessDate"]
-      /** Format: date-time */
-      createdAt: string
-      sourceType: string
-      /** Format: uuid */
-      sourceId: string
-      sourceLabel: string
-      movementType: components["schemas"]["StockMovementType"]
-      movementTypeLabel: string
-      location: components["schemas"]["StockLocationRef"]
-      /** Format: uuid */
-      batchId?: string
-      batchNumber?: string
-      status: components["schemas"]["StockStatus"]
-      statusLabel: string
-      qtyIn: components["schemas"]["StockQuantity"]
-      qtyOut: components["schemas"]["StockQuantity"]
-      unitCost: components["schemas"]["UnitCost"]
-      costAmount: components["schemas"]["Money"]
-      runningQty: components["schemas"]["StockQuantity"]
-      runningValue: components["schemas"]["Money"]
-      batchReason?: string
-      note: string
-    }
-    StockCard: components["schemas"]["Pagination"] & {
-      product: components["schemas"]["StockProductRef"]
-      openingQty: components["schemas"]["StockQuantity"]
-      openingValue: components["schemas"]["Money"]
-      qtyIn: components["schemas"]["StockQuantity"]
-      qtyOut: components["schemas"]["StockQuantity"]
-      closingQty: components["schemas"]["StockQuantity"]
-      closingValue: components["schemas"]["Money"]
-      items: components["schemas"]["StockCardLine"][]
-    }
-    BatchSummary: {
-      /** Format: uuid */
-      id: string
-      product: components["schemas"]["StockProductRef"]
-      batchNumber: string
-      productionDate?: components["schemas"]["BusinessDate"]
-      expiryDate?: components["schemas"]["BusinessDate"]
-      /** @description Sisa hari sampai kedaluwarsa (negatif = sudah lewat). */
-      daysToExpiry?: number
-      expiryState: components["schemas"]["ExpiryState"]
-      qtyAvailable: components["schemas"]["StockQuantity"]
-      qtyQuarantine: components["schemas"]["StockQuantity"]
-      qtyInTransit: components["schemas"]["StockQuantity"]
-      qtyReserved: components["schemas"]["StockQuantity"]
-      qtyTotal: components["schemas"]["StockQuantity"]
-      /** Format: date-time */
-      createdAt: string
-    }
-    BatchList: components["schemas"]["Pagination"] & {
-      items: components["schemas"]["BatchSummary"][]
-      nearExpiryDays: number
-    }
-    SuggestedBatch: {
-      /** Format: uuid */
-      batchId?: string
-      batchNumber: string
-      productionDate?: components["schemas"]["BusinessDate"]
-      expiryDate?: components["schemas"]["BusinessDate"]
-      availableQty: components["schemas"]["StockQuantity"]
-      suggestedQty: components["schemas"]["StockQuantity"]
-    }
-    BatchSuggestion: {
-      product: components["schemas"]["StockProductRef"]
-      location: components["schemas"]["StockLocationRef"]
-      requestedQty: components["schemas"]["StockQuantity"]
-      allocatedQty: components["schemas"]["StockQuantity"]
-      shortfallQty: components["schemas"]["StockQuantity"]
-      quarantineQty: components["schemas"]["StockQuantity"]
-      /** @description Batch Tersedia yang belum kedaluwarsa dalam urutan FEFO; suggestedQty 0 = tidak perlu diambil. */
-      items: components["schemas"]["SuggestedBatch"][]
-      /** @description Batch Tersedia yang sudah kedaluwarsa (tidak diusulkan). */
-      expired: components["schemas"]["SuggestedBatch"][]
-    }
-    CostLayer: {
-      /** Format: uuid */
-      id: string
-      product: components["schemas"]["StockProductRef"]
-      /** Format: uuid */
-      batchId?: string
-      batchNumber?: string
-      expiryDate?: components["schemas"]["BusinessDate"]
-      sourceType: string
-      /** Format: uuid */
-      sourceId: string
-      sourceLabel: string
-      businessDate: components["schemas"]["BusinessDate"]
-      receivedQty: components["schemas"]["StockQuantity"]
-      remainingQty: components["schemas"]["StockQuantity"]
-      consumedQty: components["schemas"]["StockQuantity"]
-      unitCost: components["schemas"]["UnitCost"]
-      remainingValue: components["schemas"]["Money"]
-      /** Format: date-time */
-      createdAt: string
-    }
-    CostLayerList: components["schemas"]["Pagination"] & {
-      items: components["schemas"]["CostLayer"][]
-    }
-    CostLayerConsumption: {
-      /** Format: uuid */
-      id: string
-      /** Format: uuid */
-      movementId: string
-      businessDate: components["schemas"]["BusinessDate"]
-      sourceType: string
-      /** Format: uuid */
-      sourceId: string
-      sourceLabel: string
-      location: components["schemas"]["StockLocationRef"]
-      qty: components["schemas"]["StockQuantity"]
-      unitCost: components["schemas"]["UnitCost"]
-      amount: components["schemas"]["Money"]
-    }
-    CostLayerConsumptionList: {
-      layer: components["schemas"]["CostLayer"]
-      items: components["schemas"]["CostLayerConsumption"][]
-    }
-    BundleComponentAvailability: {
-      /** Format: uuid */
-      productId: string
-      qtyPerBundle: components["schemas"]["StockQuantity"]
-      availableQty: components["schemas"]["StockQuantity"]
-    }
-    BundleAvailability: {
-      /** Format: uuid */
-      bundleId: string
-      availableQty: components["schemas"]["StockQuantity"]
-      components: components["schemas"]["BundleComponentAvailability"][]
-    }
-    BundleAvailabilityList: {
-      items: components["schemas"]["BundleAvailability"][]
-    }
-    /** @enum {string} */
-    CustomerType: "retail" | "b2b" | "reseller" | "employee"
-    CustomerAddress: {
-      /** Format: uuid */
-      id: string
-      label: string
-      recipientName: string
-      phone: string
-      addressLine: string
-      district: string
-      city: string
-      province: string
-      postalCode: string
-      latitude?: string | null
-      longitude?: string | null
-      isDefault: boolean
-    }
-    Customer: {
-      /** Format: uuid */
-      id: string
-      /** @example PLG-000123 */
-      code: string
-      fullName: string
-      /** @example +6281234567890 */
-      phone: string
-      email: string
-      customerType: components["schemas"]["CustomerType"]
-      /** Format: uuid */
-      employeeId?: string | null
-      employeeName?: string | null
-      employeeNumber?: string | null
-      /** @description Status karyawan hari ini; `false` = karyawan sudah resign dan harga karyawan tidak berlaku. */
-      isEmployeeActive?: boolean | null
-      marketingConsent: boolean
-      /** Format: date-time */
-      marketingConsentAt?: string | null
-      marketingConsentVersion: string
-      notes: string
-      addresses: components["schemas"]["CustomerAddress"][]
-      /** Format: date-time */
-      createdAt: string
-      /** Format: date-time */
-      updatedAt: string
-      version: number
-    }
-    CustomerList: components["schemas"]["Pagination"] & {
-      items: components["schemas"]["Customer"][]
-    }
-    CustomerAddressInput: {
-      /**
-       * Format: uuid
-       * @description Kosong = alamat baru.
-       */
-      id?: string
-      /** @example Rumah */
-      label?: string
-      recipientName: string
-      phone?: string
-      addressLine: string
-      district?: string
-      city: string
-      province?: string
-      postalCode?: string
-      /** @description Desimal derajat sebagai string, mis. `-6.200000`. */
-      latitude?: string | null
-      longitude?: string | null
-      isDefault: boolean
-    }
-    CustomerInput: {
-      fullName: string
-      /**
-       * @description Nomor WA/HP; `08…`, `628…`, dan `+628…` disimpan sebagai `+628…`.
-       * @example 0812-3456-7890
-       */
-      phone: string
-      email?: string
-      customerType: components["schemas"]["CustomerType"]
-      /**
-       * Format: uuid
-       * @description Wajib untuk tipe `employee`; karyawan harus aktif (HR-03).
-       */
-      employeeId?: string | null
-      /** @description Persetujuan menerima pesan pemasaran; waktu persetujuan dicatat server (NFR-04). */
-      marketingConsent: boolean
-      /** @description Versi teks persetujuan yang disetujui pelanggan. */
-      marketingConsentVersion?: string
-      notes?: string
-      addresses: components["schemas"]["CustomerAddressInput"][]
-    }
-    /** @enum {string} */
-    PartnerType: "modern_trade" | "consignment" | "b2b"
-    /** @enum {string} */
-    AgreementType: "consignment" | "modern_trade"
-    /** @enum {string} */
-    AgreementStatus: "scheduled" | "active" | "expired"
-    /**
-     * @description Pihak yang menanggung selisih rekonsiliasi konsinyasi (BRD U-02).
-     * @enum {string}
-     */
-    BorneBy: "partner" | "balans"
-    PartnerAgreement: {
-      /** Format: uuid */
-      id: string
-      /** Format: uuid */
-      partnerId: string
-      agreementNumber: string
-      agreementType: components["schemas"]["AgreementType"]
-      validFrom: components["schemas"]["BusinessDate"]
-      validTo: components["schemas"]["BusinessDate"]
-      status: components["schemas"]["AgreementStatus"]
-      /** Format: uuid */
-      fileId?: string | null
-      fileName?: string | null
-      /** Format: uuid */
-      priceListId?: string | null
-      consignmentMarginPercent?: string | null
-      paymentTermDays: number
-      lossBorneBy: components["schemas"]["BorneBy"]
-      partnerDamageBorneBy: components["schemas"]["BorneBy"]
-      productDefectBorneBy: components["schemas"]["BorneBy"]
-      nearExpiryBorneBy: components["schemas"]["BorneBy"]
-      notes: string
-      /** Format: date-time */
-      createdAt: string
-      /** Format: date-time */
-      updatedAt: string
-      version: number
-    }
-    Partner: {
-      /** Format: uuid */
-      id: string
-      code: string
-      name: string
-      partnerType: components["schemas"]["PartnerType"]
-      hasNpwp: boolean
-      /** @example •••••••••••5678 */
-      npwpMasked?: string | null
-      address: string
-      picName: string
-      picPhone: string
-      /** Format: uuid */
-      salesUserId?: string | null
-      salesUserName?: string | null
-      /** Format: uuid */
-      merchandiserUserId?: string | null
-      merchandiserUserName?: string | null
-      notes: string
-      /** @description PKS yang berlaku hari ini (detail dan daftar). */
-      activeAgreements?: components["schemas"]["PartnerAgreement"][]
-      /** Format: date-time */
-      createdAt: string
-      /** Format: date-time */
-      updatedAt: string
-      version: number
-    }
-    PartnerList: components["schemas"]["Pagination"] & {
-      items: components["schemas"]["Partner"][]
-    }
-    PartnerInput: {
-      /** @description Disimpan huruf besar; diabaikan saat update. */
-      code: string
-      name: string
-      partnerType: components["schemas"]["PartnerType"]
-      /** @description 15 atau 16 digit; tanda baca diabaikan. */
-      npwp?: string | null
-      address?: string
-      picName?: string
-      picPhone?: string
-      /** Format: uuid */
-      salesUserId?: string | null
-      /**
-       * Format: uuid
-       * @description Merchandiser yang ditugaskan; membatasi akses stock count partner (MD-07).
-       */
-      merchandiserUserId?: string | null
-      notes?: string
-    }
-    PartnerAgreementInput: {
-      /**
-       * Format: uuid
-       * @description Diisi dari path saat membuat; diabaikan saat update.
-       */
-      partnerId?: string
-      agreementNumber: string
-      agreementType: components["schemas"]["AgreementType"]
-      validFrom: components["schemas"]["BusinessDate"]
-      validTo: components["schemas"]["BusinessDate"]
-      /**
-       * Format: uuid
-       * @description PDF PKS hasil upload.
-       */
-      fileId?: string | null
-      /**
-       * Format: uuid
-       * @description Daftar harga konsinyasi/MT (modul pricing, R1.1).
-       */
-      priceListId?: string | null
-      /** @description Margin/komisi mitra dari harga jual, persen desimal, mis. `25.0000`. */
-      consignmentMarginPercent?: string | null
-      paymentTermDays: number
-      lossBorneBy?: components["schemas"]["BorneBy"]
-      partnerDamageBorneBy?: components["schemas"]["BorneBy"]
-      productDefectBorneBy?: components["schemas"]["BorneBy"]
-      nearExpiryBorneBy?: components["schemas"]["BorneBy"]
-      notes?: string
-    }
-    PartnerProductCode: {
-      /** Format: uuid */
-      id: string
-      /** Format: uuid */
-      partnerId: string
-      partnerCode: string
-      partnerName: string
-      /** Format: uuid */
-      productId: string
-      productSku?: string | null
-      productName?: string | null
-      articleCode: string
-      barcode: string
-      description: string
-      /** Format: date-time */
-      createdAt: string
-      /** Format: date-time */
-      updatedAt: string
-      version: number
-    }
-    PartnerProductCodeList: components["schemas"]["Pagination"] & {
-      items: components["schemas"]["PartnerProductCode"][]
-    }
-    PartnerProductCodeUpdate: {
-      articleCode: string
-      barcode?: string
-      description?: string
-    }
-    PartnerProductCodeInput: components["schemas"]["PartnerProductCodeUpdate"] & {
-      /** Format: uuid */
-      partnerId: string
-      /**
-       * Format: uuid
-       * @description Produk di modul catalog.
-       */
-      productId: string
-    }
-    /**
-     * @description `toll_manufacturer` = maklon.
-     * @enum {string}
-     */
-    SupplierType: "supplier" | "toll_manufacturer"
-    SupplierBankAccount: {
-      /** Format: uuid */
-      id: string
-      bankName: string
-      /** @example ••••••7890 */
-      accountNumberMasked: string
-      accountName: string
-      isDefault: boolean
-    }
-    Supplier: {
-      /** Format: uuid */
-      id: string
-      code: string
-      name: string
-      supplierType: components["schemas"]["SupplierType"]
-      isBusinessEntity: boolean
-      hasNpwp: boolean
-      npwpMasked?: string | null
-      defaultWithholding: components["schemas"]["WithholdingType"]
-      paymentTermDays: number
-      address: string
-      phone: string
-      email: string
-      picName: string
-      notes: string
-      bankAccounts: components["schemas"]["SupplierBankAccount"][]
-      /** Format: date-time */
-      createdAt: string
-      /** Format: date-time */
-      updatedAt: string
-      version: number
-    }
-    SupplierList: components["schemas"]["Pagination"] & {
-      items: components["schemas"]["Supplier"][]
-    }
-    SupplierBankAccountInput: {
-      /**
-       * Format: uuid
-       * @description Kosong = rekening baru.
-       */
-      id?: string
-      bankName: string
-      /** @description Wajib untuk rekening baru; kosong pada rekening lama = nomor tidak berubah. */
-      accountNumber?: string
-      accountName: string
-      isDefault: boolean
-    }
-    SupplierInput: {
-      code: string
-      name: string
-      supplierType: components["schemas"]["SupplierType"]
-      /** @description Badan usaha (PT/CV) atau perorangan. */
-      isBusinessEntity: boolean
-      npwp?: string | null
-      defaultWithholding: components["schemas"]["WithholdingType"]
-      paymentTermDays: number
-      address?: string
-      phone?: string
-      email?: string
-      picName?: string
-      notes?: string
-      bankAccounts: components["schemas"]["SupplierBankAccountInput"][]
-    }
-    PartyUserOption: {
-      /** Format: uuid */
-      id: string
-      fullName: string
-      email: string
-    }
-    /**
-     * @description `resigned` juga untuk resign terjadwal; lihat `isActive` untuk status hari ini.
-     * @enum {string}
-     */
-    EmploymentStatus: "active" | "resigned"
-    Employee: {
-      /** Format: uuid */
-      id: string
-      employeeNumber: string
-      fullName: string
-      /** Format: uuid */
-      divisionId?: string | null
-      positionTitle: string
-      employmentStatus: components["schemas"]["EmploymentStatus"]
-      /** @description Aktif pada hari ini (WIB). */
-      isActive: boolean
-      joinDate: components["schemas"]["BusinessDate"]
-      resignDate?: components["schemas"]["BusinessDate"] | null
-      resignReason: string
-      workEmail: string
-      phone: string
-      hasNik: boolean
-      nikMasked?: string | null
-      /** Format: date-time */
-      createdAt: string
-      /** Format: date-time */
-      updatedAt: string
-      version: number
-    }
-    EmployeeList: components["schemas"]["Pagination"] & {
-      items: components["schemas"]["Employee"][]
-    }
-    EmployeeInput: {
-      /** @description Disimpan huruf besar; diabaikan saat update. */
-      employeeNumber: string
-      fullName: string
-      /** Format: uuid */
-      divisionId?: string | null
-      positionTitle: string
-      joinDate: components["schemas"]["BusinessDate"]
-      workEmail?: string
-      phone?: string
-      /** @description 16 digit NIK KTP. */
-      nik?: string | null
-    }
-    EmployeeResignInput: {
-      resignDate: components["schemas"]["BusinessDate"]
-      reason: string
-      version: number
-    }
-    EmployeeOption: {
-      /** Format: uuid */
-      id: string
-      employeeNumber: string
-      fullName: string
-      isActive: boolean
-    }
-    FileUploadInput: {
-      /**
-       * @description Jenis pemilik file, mis. `partner_agreement` (PDF PKS).
-       * @example partner_agreement
-       */
-      ownerType: string
-      fileName: string
-      /** @example application/pdf */
-      contentType: string
-      /** Format: int64 */
-      sizeBytes: number
-    }
-    FileUploadTarget: {
-      /** Format: uuid */
-      fileId: string
-      /** @description URL relatif untuk `PUT` isi file. */
-      uploadUrl: string
-      /** Format: date-time */
-      expiresAt: string
-      /** Format: int64 */
-      maxSizeBytes: number
-    }
-    FileObject: {
-      /** Format: uuid */
-      id: string
-      fileName: string
-      contentType: string
-      /** Format: int64 */
-      sizeBytes: number
-      ownerType: string
-      /** Format: uuid */
-      ownerId?: string | null
-      /** @enum {string} */
-      status: "pending" | "uploaded"
-      /** Format: date-time */
-      uploadedAt?: string | null
-      /** Format: date-time */
-      createdAt: string
-    }
-    FileDownloadTarget: {
-      url: string
-      /** Format: date-time */
-      expiresAt: string
-    }
-    /**
-     * @description Cakupan daftar harga (BRD 5.18): `base` Harga Dasar & HET, `channel` per channel/sub-channel, `partner` per
-     *     mitra, `reseller` per level reseller (Fase 2), `employee` harga karyawan, `vending` per channel vending/mesin.
-     * @enum {string}
-     */
-    PriceListType:
-      "base" | "channel" | "partner" | "reseller" | "employee" | "vending"
-    /**
-     * @description `fixed` harga per produk; `percent` persentase dari daftar harga acuan.
-     * @enum {string}
-     */
-    PriceListBasis: "fixed" | "percent"
-    /** @enum {string} */
-    PriceListVersionStatus:
-      "draft" | "pending_approval" | "active" | "rejected" | "cancelled"
-    /**
-     * @description Persen desimal maks. 4 angka di belakang koma, mis. `12.5`.
-     * @example 10
-     */
-    PricingPercent: string
-    PriceListVersionSummary: {
-      /** Format: uuid */
-      id: string
-      versionNo: number
-      status: components["schemas"]["PriceListVersionStatus"]
-      validFrom: components["schemas"]["BusinessDate"]
-      validTo?: components["schemas"]["BusinessDate"] | null
-      percent?: components["schemas"]["PricingPercent"] | null
-      itemCount: number
-      notes: string
-      /** Format: date-time */
-      submittedAt?: string | null
-      /** Format: date-time */
-      decidedAt?: string | null
-      /** Format: date-time */
-      updatedAt: string
-      version: number
-    }
-    PriceList: {
-      /** Format: uuid */
-      id: string
-      /** @example MT-BELI-PUTUS */
-      code: string
-      name: string
-      priceListType: components["schemas"]["PriceListType"]
-      /** Format: uuid */
-      channelId?: string | null
-      /** Format: uuid */
-      subChannelId?: string | null
-      /** Format: uuid */
-      partnerId?: string | null
-      partnerName?: string | null
-      resellerLevel: string
-      basis: components["schemas"]["PriceListBasis"]
-      /** Format: uuid */
-      referencePriceListId?: string | null
-      referencePriceListName?: string | null
-      description: string
-      isActive: boolean
-      /** Format: date-time */
-      deletedAt?: string | null
-      /** @description Versi yang berlaku hari ini. */
-      currentVersion?: components["schemas"]["PriceListVersionSummary"] | null
-      /** @description Versi aktif terdekat yang mulai berlaku setelah hari ini. */
-      nextVersion?: components["schemas"]["PriceListVersionSummary"] | null
-      /** @description Versi draft atau yang sedang diajukan. */
-      openVersion?: components["schemas"]["PriceListVersionSummary"] | null
-      /** Format: date-time */
-      updatedAt: string
-      version: number
-    }
-    PriceListFields: {
-      name: string
-      /** Format: uuid */
-      channelId?: string | null
-      /** Format: uuid */
-      subChannelId?: string | null
-      /** Format: uuid */
-      partnerId?: string | null
-      resellerLevel?: string
-      basis?: components["schemas"]["PriceListBasis"]
-      /** Format: uuid */
-      referencePriceListId?: string | null
-      description?: string
-      isActive: boolean
-    }
-    PriceListInput: components["schemas"]["PriceListFields"] & {
-      code: string
-      priceListType: components["schemas"]["PriceListType"]
-    }
-    PriceListDetail: components["schemas"]["PriceList"] & {
-      /** @description Riwayat versi, terbaru dulu. */
-      versions: components["schemas"]["PriceListVersionSummary"][]
-      /** @description update, create_version, delete, restore */
-      allowedActions: string[]
-    }
-    PriceListOption: {
-      /** Format: uuid */
-      id: string
-      code: string
-      name: string
-      priceListType: components["schemas"]["PriceListType"]
-      basis: components["schemas"]["PriceListBasis"]
-    }
-    PriceListUpdate: components["schemas"]["PriceListFields"] &
-      components["schemas"]["VersionInput"]
-    PriceListItemInput: {
-      /** Format: uuid */
-      productId: string
-      priceAmount: components["schemas"]["Money"]
-      maxRetailPriceAmount?: components["schemas"]["Money"] | null
-    }
-    PriceListVersionFields: {
-      validFrom: components["schemas"]["BusinessDate"]
-      validTo?: components["schemas"]["BusinessDate"] | null
-      /** @description Wajib untuk daftar harga basis percent. */
-      percent?: components["schemas"]["PricingPercent"] | null
-      notes?: string
-      items: components["schemas"]["PriceListItemInput"][]
-    }
-    PriceListVersionInput: components["schemas"]["PriceListVersionFields"] & {
-      /** Format: uuid */
-      copyFromVersionId?: string | null
-    }
-    PriceListItem: {
-      /** Format: uuid */
-      productId: string
-      productSku: string
-      productName: string
-      priceAmount: components["schemas"]["Money"]
-      /** @description HET, hanya di Harga Dasar & HET. */
-      maxRetailPriceAmount?: components["schemas"]["Money"] | null
-    }
-    PriceListVersion: components["schemas"]["PriceListVersionSummary"] & {
-      /** Format: uuid */
-      priceListId: string
-      priceListCode: string
-      priceListName: string
-      priceListType: components["schemas"]["PriceListType"]
-      basis: components["schemas"]["PriceListBasis"]
-      items: components["schemas"]["PriceListItem"][]
-      /** @description update, cancel, submit, withdraw */
-      allowedActions: string[]
-    }
-    PriceListVersionUpdate: components["schemas"]["PriceListVersionFields"] &
-      components["schemas"]["VersionInput"]
-    /** @enum {string} */
-    SpecialPricePartyType: "customer" | "partner"
-    /**
-     * @description Posisi periode berlaku terhadap hari ini.
-     * @enum {string}
-     */
-    PricingPeriodStatus: "scheduled" | "active" | "expired"
-    SpecialPrice: {
-      /** Format: uuid */
-      id: string
-      partyType: components["schemas"]["SpecialPricePartyType"]
-      /** Format: uuid */
-      partyId: string
-      partyCode: string
-      partyName: string
-      /** Format: uuid */
-      productId: string
-      productSku: string
-      productName: string
-      priceAmount: components["schemas"]["Money"]
-      validFrom: components["schemas"]["BusinessDate"]
-      validTo?: components["schemas"]["BusinessDate"] | null
-      status: components["schemas"]["PricingPeriodStatus"]
-      notes: string
-      /** Format: date-time */
-      updatedAt: string
-      version: number
-    }
-    SpecialPriceInput: {
-      partyType: components["schemas"]["SpecialPricePartyType"]
-      /** Format: uuid */
-      partyId: string
-      /** Format: uuid */
-      productId: string
-      priceAmount: components["schemas"]["Money"]
-      validFrom: components["schemas"]["BusinessDate"]
-      validTo?: components["schemas"]["BusinessDate"] | null
-      notes?: string
-    }
-    PricingEndInput: {
-      validTo: components["schemas"]["BusinessDate"]
-      version: number
-    }
-    PromotionItem: {
-      /** Format: uuid */
-      productId: string
-      productSku: string
-      productName: string
-      priceAmount?: components["schemas"]["Money"] | null
-      discountPercent?: components["schemas"]["PricingPercent"] | null
-    }
-    Promotion: {
-      /** Format: uuid */
-      id: string
-      /** @example PROMO-1111 */
-      code: string
-      name: string
-      /**
-       * Format: uuid
-       * @description Kosong = semua channel.
-       */
-      channelId?: string | null
-      /** Format: uuid */
-      subChannelId?: string | null
-      validFrom: components["schemas"]["BusinessDate"]
-      validTo: components["schemas"]["BusinessDate"]
-      isActive: boolean
-      description: string
-      status: components["schemas"]["PricingPeriodStatus"]
-      itemCount: number
-      /** @description Hanya di detail. */
-      items?: components["schemas"]["PromotionItem"][]
-      /** @description update, delete */
-      allowedActions: string[]
-      /** Format: date-time */
-      updatedAt: string
-      version: number
-    }
-    /** @description Isi salah satu dari harga promo atau potongan persen dari harga normal. */
-    PromotionItemInput: {
-      /** Format: uuid */
-      productId: string
-      priceAmount?: components["schemas"]["Money"] | null
-      discountPercent?: components["schemas"]["PricingPercent"] | null
-    }
-    PromotionFields: {
-      name: string
-      /** Format: uuid */
-      channelId?: string | null
-      /** Format: uuid */
-      subChannelId?: string | null
-      validFrom: components["schemas"]["BusinessDate"]
-      validTo: components["schemas"]["BusinessDate"]
-      isActive: boolean
-      description?: string
-      items: components["schemas"]["PromotionItemInput"][]
-    }
-    PromotionInput: components["schemas"]["PromotionFields"] & {
-      code: string
-    }
-    PromotionUpdate: components["schemas"]["PromotionFields"] &
-      components["schemas"]["VersionInput"]
-    /**
-     * @description Kuantitas desimal maks. 3 angka di belakang koma.
-     * @example 12
-     */
-    PricingQuantity: string
-    TieredPrice: {
-      /** Format: uuid */
-      id: string
-      /**
-       * Format: uuid
-       * @description Kosong = berlaku untuk semua daftar harga.
-       */
-      priceListId?: string | null
-      priceListCode?: string | null
-      priceListName?: string | null
-      /** Format: uuid */
-      productId: string
-      productSku: string
-      productName: string
-      minQty: components["schemas"]["PricingQuantity"]
-      priceAmount: components["schemas"]["Money"]
-      validFrom: components["schemas"]["BusinessDate"]
-      validTo?: components["schemas"]["BusinessDate"] | null
-      status: components["schemas"]["PricingPeriodStatus"]
-      notes: string
-      /** Format: date-time */
-      updatedAt: string
-      version: number
-    }
-    TieredPriceInput: {
-      /** Format: uuid */
-      priceListId?: string | null
-      /** Format: uuid */
-      productId: string
-      minQty: components["schemas"]["PricingQuantity"]
-      priceAmount: components["schemas"]["Money"]
-      validFrom: components["schemas"]["BusinessDate"]
-      validTo?: components["schemas"]["BusinessDate"] | null
-      notes?: string
-    }
-    DiscountLimit: {
-      /** Format: uuid */
-      id: string
-      roleCode: string
-      roleName: string
-      maxLineDiscountPercent: components["schemas"]["PricingPercent"]
-      maxDocumentDiscountPercent: components["schemas"]["PricingPercent"]
-      validFrom: components["schemas"]["BusinessDate"]
-      validTo?: components["schemas"]["BusinessDate"] | null
-      status: components["schemas"]["PricingPeriodStatus"]
-      notes: string
-      /** Format: date-time */
-      updatedAt: string
-      version: number
-    }
-    DiscountLimitInput: {
-      roleCode: string
-      maxLineDiscountPercent: components["schemas"]["PricingPercent"]
-      maxDocumentDiscountPercent: components["schemas"]["PricingPercent"]
-      validFrom: components["schemas"]["BusinessDate"]
-      validTo?: components["schemas"]["BusinessDate"] | null
-      notes?: string
-    }
-    DiscountLimitRole: {
-      code: string
-      name: string
-    }
-    PriceQuoteRequest: {
-      /** Format: uuid */
-      productId: string
-      qty: components["schemas"]["PricingQuantity"]
-      /** Format: uuid */
-      channelId?: string | null
-      /** Format: uuid */
-      subChannelId?: string | null
-      /** Format: uuid */
-      customerId?: string | null
-      /** Format: uuid */
-      partnerId?: string | null
-      date: components["schemas"]["BusinessDate"]
-    }
-    /**
-     * @description Aturan harga yang menghasilkan harga baris transaksi (BRD 5.18, disimpan sebagai `price_rule`): harga khusus,
-     *     promo, harga bertingkat, daftar harga channel/mitra/karyawan, atau Harga Dasar & HET.
-     * @enum {string}
-     */
-    PriceRule:
-      | "special_price"
-      | "promotion"
-      | "tiered_price"
-      | "price_list"
-      | "base_price"
-    PriceQuote: {
-      unitPrice: components["schemas"]["Money"]
-      rule: components["schemas"]["PriceRule"]
-      /**
-       * Format: uuid
-       * @description Disimpan di baris transaksi sebagai `price_source_id`.
-       */
-      sourceId: string
-      /** Format: uuid */
-      priceListId?: string | null
-      /** Format: uuid */
-      priceListVersionId?: string | null
-      /** Format: uuid */
-      promotionId?: string | null
-      /** Format: uuid */
-      specialPriceId?: string | null
-      /** Format: uuid */
-      tieredPriceId?: string | null
-      /** @description Harga tanpa promo (dasar potongan persen promo). */
-      regularPrice?: components["schemas"]["Money"] | null
-      /** @description HET bila harga berasal dari Harga Dasar & HET. */
-      maxRetailPrice?: components["schemas"]["Money"] | null
-      description: string
-    }
-    /**
-     * @description Bentuk diskon manual (MD-05) — persen dari dasar atau nominal rupiah.
-     * @enum {string}
-     */
-    DiscountKind: "percent" | "amount"
-    DiscountValue: {
-      kind: components["schemas"]["DiscountKind"]
-      /** @description Persen (maks. 4 desimal) atau nominal rupiah (maks. 2 desimal) sebagai string desimal. */
-      value: string
-    }
-    DiscountCheckLine: {
-      grossAmount: components["schemas"]["Money"]
-      discount?: components["schemas"]["DiscountValue"] | null
-    }
-    DiscountCheckRequest: {
-      lines: components["schemas"]["DiscountCheckLine"][]
-      documentDiscount?: components["schemas"]["DiscountValue"] | null
-    }
-    DiscountCheckOutcome: {
-      discountAmount: components["schemas"]["Money"]
-      discountPercent: components["schemas"]["PricingPercent"]
-      exceedsLimit: boolean
-    }
-    DiscountCheckResult: {
-      maxLineDiscountPercent: components["schemas"]["PricingPercent"]
-      maxDocumentDiscountPercent: components["schemas"]["PricingPercent"]
-      lines: components["schemas"]["DiscountCheckOutcome"][]
-      document: components["schemas"]["DiscountCheckOutcome"]
-      subtotalAmount: components["schemas"]["Money"]
-      totalDiscountAmount: components["schemas"]["Money"]
-      /** @description Diskon di atas batas → Sales Order butuh approval `sales_order_discount` (Head Sales). */
-      requiresApproval: boolean
-    }
-    DataExchangeColumn: {
-      /** @description Nama field (dipakai di `values` dan `errors[].column` preview). */
-      key: string
-      header: string
-      required: boolean
-      /** @enum {string} */
-      columnType: "text" | "integer" | "decimal" | "date" | "choice" | "bool"
-      options: string[]
-      sensitive?: boolean
-    }
-    DataExchangeKind: {
-      /** @example catalog.product */
-      kind: string
-      /** @example Produk */
-      label: string
-      canImport: boolean
-      canExport: boolean
-      /** @example import.catalog.product */
-      uploadOwnerType: string
-      /** Format: int64 */
-      maxFileBytes?: number
-      columns: components["schemas"]["DataExchangeColumn"][]
-    }
-    DataExchangeKindList: {
-      items: components["schemas"]["DataExchangeKind"][]
-    }
-    ImportJob: {
-      /** Format: uuid */
-      id: string
-      kind: string
-      kindLabel: string
-      fileName: string
-      /** @enum {string} */
-      status:
-        | "uploaded"
-        | "validating"
-        | "validated"
-        | "committing"
-        | "completed"
-        | "failed"
-        | "cancelled"
-      totalRows: number
-      processedRows: number
-      validRows: number
-      errorRows: number
-      committedRows: number
-      progress: number
-      /** @description Alasan gagal untuk status `failed`. */
-      message: string
-      allowedActions: ("commit" | "cancel" | "download_errors")[]
-      /** Format: date-time */
-      validatedAt?: string | null
-      /** Format: date-time */
-      completedAt?: string | null
-      /** Format: uuid */
-      createdBy: string
-      /** Format: date-time */
-      createdAt: string
-      /** Format: date-time */
-      updatedAt: string
-    }
-    ImportJobList: {
-      items: components["schemas"]["ImportJob"][]
-      pagination: components["schemas"]["Pagination"]
-    }
-    ImportJobInput: {
-      kind: string
-      /** Format: uuid */
-      fileId: string
-    }
-    ImportJobRowError: {
-      /** @description Key kolom; kosong = error baris. */
-      column?: string
-      message: string
-    }
-    ImportJobRow: {
-      /** @description Nomor baris di Excel (header = 1). */
-      rowNumber: number
-      isValid: boolean
-      values: {
-        [key: string]: string
-      }
-      errors: components["schemas"]["ImportJobRowError"][]
-    }
-    ImportJobRowList: {
-      items: components["schemas"]["ImportJobRow"][]
-      pagination: components["schemas"]["Pagination"]
-    }
-    DataExchangeFileLink: {
-      url: string
-      /** Format: date-time */
-      expiresAt: string
-    }
-    ExportJob: {
-      /** Format: uuid */
-      id: string
-      kind: string
-      kindLabel: string
-      /** @enum {string} */
-      status: "queued" | "running" | "completed" | "failed"
-      totalRows: number
-      fileName: string
-      message: string
-      /** Format: date-time */
-      completedAt?: string | null
-      /** Format: uuid */
-      createdBy: string
-      /** Format: date-time */
-      createdAt: string
-      /** Format: date-time */
-      updatedAt: string
-    }
-    ExportJobList: {
-      items: components["schemas"]["ExportJob"][]
-      pagination: components["schemas"]["Pagination"]
-    }
-    ExportJobInput: {
-      kind: string
-    }
-    PurchaseOption: {
-      /** Format: uuid */
-      id: string
-      code: string
-      name: string
-    }
-    /** @enum {string} */
-    PurchaseRequestStatus:
-      | "draft"
-      | "pending_approval"
-      | "approved"
-      | "rejected"
-      | "completed"
-      | "closed"
-      | "cancelled"
-    PurchaseRequestSummary: {
-      /** Format: uuid */
-      id: string
-      /** @description Nomor PR, diisi saat diajukan. */
-      number?: string | null
-      /** Format: uuid */
-      divisionId: string
-      divisionName: string
-      /** Format: uuid */
-      requestedById: string
-      requestedByName: string
-      businessDate: components["schemas"]["BusinessDate"]
-      neededDate?: components["schemas"]["BusinessDate"] | null
-      note: string
-      estimatedTotal: components["schemas"]["Money"]
-      status: components["schemas"]["PurchaseRequestStatus"]
-      closeReason: string
-      /** Format: date-time */
-      submittedAt?: string | null
-      /** Format: date-time */
-      decidedAt?: string | null
-      /** Format: date-time */
-      createdAt: string
-      /** Format: date-time */
-      updatedAt: string
-      version: number
-    }
-    PurchaseRequestList: components["schemas"]["Pagination"] & {
-      items: components["schemas"]["PurchaseRequestSummary"][]
-    }
-    /**
-     * @description Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
-     * @example 10000.000
-     */
-    PurchaseQuantity: string
-    PurchaseRequestLineInput: {
-      /** Format: uuid */
-      productId?: string | null
-      description?: string
-      qty: components["schemas"]["PurchaseQuantity"]
-      estimatedPrice: components["schemas"]["Money"]
-      note?: string
-    }
-    PurchaseRequestFields: {
-      /** Format: uuid */
-      divisionId: string
-      businessDate: components["schemas"]["BusinessDate"]
-      neededDate?: components["schemas"]["BusinessDate"] | null
-      note?: string
-      lines: components["schemas"]["PurchaseRequestLineInput"][]
-    }
-    PurchaseProductRef: {
-      /** Format: uuid */
-      id: string
-      sku: string
-      name: string
-      uom: string
-    }
-    PurchaseRequestLine: {
-      /** Format: uuid */
-      id: string
-      lineNo: number
-      product?: components["schemas"]["PurchaseProductRef"] | null
-      description: string
-      qty: components["schemas"]["PurchaseQuantity"]
-      estimatedPrice: components["schemas"]["Money"]
-      estimatedAmount: components["schemas"]["Money"]
-      fulfilledQty: components["schemas"]["PurchaseQuantity"]
-      remainingQty: components["schemas"]["PurchaseQuantity"]
-      note: string
-    }
-    /** @enum {string} */
-    PurchaseOrderStatus:
-      | "draft"
-      | "pending_approval"
-      | "approved"
-      | "rejected"
-      | "partially_received"
-      | "received"
-      | "completed"
-      | "closed"
-      | "cancelled"
-    PurchaseRequestOrderRef: {
-      /** Format: uuid */
-      purchaseOrderId: string
-      purchaseOrderNumber?: string | null
-      status: components["schemas"]["PurchaseOrderStatus"]
-      /** Format: uuid */
-      purchaseRequestLineId: string
-      orderedQty: components["schemas"]["PurchaseQuantity"]
-      receivedQty: components["schemas"]["PurchaseQuantity"]
-    }
-    PurchaseRequest: components["schemas"]["PurchaseRequestSummary"] & {
-      lines: components["schemas"]["PurchaseRequestLine"][]
-      orders: components["schemas"]["PurchaseRequestOrderRef"][]
-      allowedActions: (
-        "edit" | "submit" | "cancel" | "revise" | "close" | "create_order"
-      )[]
-    }
-    PurchaseRequestUpdate: components["schemas"]["PurchaseRequestFields"] &
-      components["schemas"]["VersionInput"]
-    PurchaseReasonInput: {
-      version: number
-      reason: string
-    }
-    /**
-     * @description Jenis PO: `goods` barang, `packaging` packaging (RM), `toll_manufacturing` jasa maklon per batch,
-     *     `reprocess` reprocess bahan GM di maklon, `other` lainnya (baris boleh berupa uraian).
-     * @enum {string}
-     */
-    PurchaseOrderType:
-      "goods" | "packaging" | "toll_manufacturing" | "reprocess" | "other"
-    PurchaseOrderSummary: {
-      /** Format: uuid */
-      id: string
-      /** @description Nomor PO, diisi saat diajukan. */
-      number?: string | null
-      orderType: components["schemas"]["PurchaseOrderType"]
-      orderTypeLabel: string
-      /** Format: uuid */
-      supplierId: string
-      supplierCode: string
-      supplierName: string
-      /** Format: uuid */
-      divisionId: string
-      divisionName: string
-      businessDate: components["schemas"]["BusinessDate"]
-      expectedDate: components["schemas"]["BusinessDate"]
-      paymentTermDays: number
-      totalAmount: components["schemas"]["Money"]
-      status: components["schemas"]["PurchaseOrderStatus"]
-      /** Format: date-time */
-      createdAt: string
-      /** Format: date-time */
-      updatedAt: string
-      version: number
-    }
-    PurchaseOrderList: components["schemas"]["Pagination"] & {
-      items: components["schemas"]["PurchaseOrderSummary"][]
-    }
-    PurchaseOrderLineInput: {
-      /** Format: uuid */
-      productId?: string | null
-      description?: string
-      qty: components["schemas"]["PurchaseQuantity"]
-      unitPrice: components["schemas"]["Money"]
-      /** Format: uuid */
-      purchaseRequestLineId?: string | null
-      note?: string
-    }
-    PurchaseOrderMaterialInput: {
-      /** Format: uuid */
-      productId: string
-      plannedQty: components["schemas"]["PurchaseQuantity"]
-      note?: string
-    }
-    PurchaseOrderFields: {
-      /** Format: uuid */
-      supplierId: string
-      /** Format: uuid */
-      divisionId: string
-      businessDate: components["schemas"]["BusinessDate"]
-      expectedDate: components["schemas"]["BusinessDate"]
-      /** @description Kosong = termin default pemasok. */
-      paymentTermDays?: number | null
-      note?: string
-      /**
-       * Format: uuid
-       * @description Lokasi asal bahan — wajib Gudang GM – GM untuk reprocess, opsional Gudang GM – RM untuk maklon.
-       */
-      materialSourceLocationId?: string | null
-      lines: components["schemas"]["PurchaseOrderLineInput"][]
-      materials?: components["schemas"]["PurchaseOrderMaterialInput"][]
-    }
-    PurchaseOrderInput: components["schemas"]["PurchaseOrderFields"] & {
-      orderType: components["schemas"]["PurchaseOrderType"]
-    }
-    PurchaseOrderSupplier: {
-      /** Format: uuid */
-      id: string
-      code: string
-      name: string
-      address: string
-      phone: string
-      email: string
-      picName: string
-    }
-    PurchaseLocationRef: {
-      /** Format: uuid */
-      id: string
-      code: string
-      name: string
-    }
-    PurchaseOrderLine: {
-      /** Format: uuid */
-      id: string
-      lineNo: number
-      product?: components["schemas"]["PurchaseProductRef"] | null
-      description: string
-      orderedQty: components["schemas"]["PurchaseQuantity"]
-      unitPrice: components["schemas"]["Money"]
-      amount: components["schemas"]["Money"]
-      receivedQty: components["schemas"]["PurchaseQuantity"]
-      billedQty: components["schemas"]["PurchaseQuantity"]
-      outstandingQty: components["schemas"]["PurchaseQuantity"]
-      /** Format: uuid */
-      purchaseRequestLineId?: string | null
-      /** Format: uuid */
-      purchaseRequestId?: string | null
-      purchaseRequestNumber?: string | null
-      note: string
-    }
-    PurchaseOrderMaterial: {
-      /** Format: uuid */
-      id: string
-      lineNo: number
-      product: components["schemas"]["PurchaseProductRef"]
-      plannedQty: components["schemas"]["PurchaseQuantity"]
-      note: string
-    }
-    /** @enum {string} */
-    PurchaseAdvanceStatus: "draft" | "posted" | "cancelled"
-    PurchaseAdvance: {
-      /** Format: uuid */
-      id: string
-      /** @description Nomor BYR, diisi saat diposting. */
-      number?: string | null
-      /** Format: uuid */
-      purchaseOrderId: string
-      purchaseOrderNumber: string
-      /** Format: uuid */
-      supplierId: string
-      supplierName: string
-      /** Format: uuid */
-      divisionId: string
-      amount: components["schemas"]["Money"]
-      paymentDate: components["schemas"]["BusinessDate"]
-      bankAccountCode: string
-      note: string
-      appliedAmount: components["schemas"]["Money"]
-      outstandingAmount: components["schemas"]["Money"]
-      status: components["schemas"]["PurchaseAdvanceStatus"]
-      /** Format: uuid */
-      journalEntryId?: string | null
-      /** Format: uuid */
-      reversalJournalEntryId?: string | null
-      cancelReason: string
-      /** Format: date-time */
-      postedAt?: string | null
-      /** Format: date-time */
-      createdAt: string
-      /** Format: date-time */
-      updatedAt: string
-      version: number
-      allowedActions: ("edit" | "post" | "cancel")[]
-    }
-    PurchaseOrder: components["schemas"]["PurchaseOrderSummary"] & {
-      note: string
-      subtotalAmount: components["schemas"]["Money"]
-      closeReason: string
-      cancelReason: string
-      /** Format: date-time */
-      submittedAt?: string | null
-      /** Format: date-time */
-      approvedAt?: string | null
-      createdByName: string
-      supplier?: components["schemas"]["PurchaseOrderSupplier"] | null
-      tollLocation?: components["schemas"]["PurchaseLocationRef"] | null
-      materialSourceLocation?:
-        components["schemas"]["PurchaseLocationRef"] | null
-      lines: components["schemas"]["PurchaseOrderLine"][]
-      materials: components["schemas"]["PurchaseOrderMaterial"][]
-      advances: components["schemas"]["PurchaseAdvance"][]
-      advancePaidAmount: components["schemas"]["Money"]
-      advanceOutstandingAmount: components["schemas"]["Money"]
-      allowedActions: (
-        | "edit"
-        | "submit"
-        | "cancel"
-        | "revise"
-        | "close"
-        | "print"
-        | "create_advance"
-      )[]
-    }
-    PurchaseOrderUpdate: components["schemas"]["PurchaseOrderFields"] &
-      components["schemas"]["VersionInput"]
-    PurchaseCancelInput: {
-      version: number
-      /** @description Wajib untuk PO Disetujui dan uang muka Diposting. */
-      reason?: string
-    }
-    PurchaseAdvanceList: components["schemas"]["Pagination"] & {
-      items: components["schemas"]["PurchaseAdvance"][]
-    }
-    PurchaseAdvanceFields: {
-      amount: components["schemas"]["Money"]
-      paymentDate: components["schemas"]["BusinessDate"]
-      /** @example 1111 */
-      bankAccountCode: string
-      note?: string
-    }
-    PurchaseAdvanceInput: components["schemas"]["PurchaseAdvanceFields"] & {
-      /** Format: uuid */
-      purchaseOrderId: string
-    }
-    PurchaseAdvanceUpdate: components["schemas"]["PurchaseAdvanceFields"] &
-      components["schemas"]["VersionInput"]
-  }
-  responses: {
-    /** @description Error standar (problem+json) */
-    Problem: {
-      headers: {
-        [name: string]: unknown
-      }
-      content: {
-        "application/problem+json": components["schemas"]["Problem"]
-      }
-    }
-  }
-  parameters: {
-    Search: string
-    /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-    IdempotencyKey: string
-    Id: string
-    RefreshCookie: string
-    Page: number
-    PageSize: number
-    /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
-    Sort: string
-    /** @description Versi terakhir yang dilihat user (optimistic locking). */
-    Version: number
-    IncludeInactive: boolean
-    /** @description Versi terakhir yang dilihat user (optimistic locking). */
-    PartyVersion: number
-    /** @description Waktu kedaluwarsa URL (Unix detik). */
-    FileExpires: number
-    FileSignature: string
-    /** @description Versi terakhir yang dilihat user (optimistic locking). */
-    PricingVersion: number
-    /** @description Tampilkan juga data yang periodenya sudah berakhir (riwayat). */
-    PricingIncludeEnded: boolean
-    /** @description Jenis data = resource permission, mis. `catalog.product`. */
-    DataExchangeKindPath: string
-    DataExchangeKindQuery: string
-  }
-  requestBodies: never
-  headers: never
-  pathItems: never
-}
-export type $defs = Record<string, never>
-export interface operations {
-  getHealth: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
+    schemas: {
+        /** @description Format error RFC 7807 (Technical Guideline 8.3). Field code adalah kontrak stabil untuk FE. */
+        Problem: {
+            type: string;
+            title: string;
+            status: number;
+            code: components["schemas"]["ErrorCode"];
+            /** @description Pesan Bahasa Indonesia yang aman ditampilkan ke user. */
+            detail: string;
+            fields?: {
+                [key: string]: string;
+            };
+            requestId?: string;
+        };
+        /**
+         * @description Katalog kode error (Technical Guideline Lampiran A).
+         * @enum {string}
+         */
+        ErrorCode: "VALIDATION_FAILED" | "AUTH_INVALID_CREDENTIALS" | "AUTH_ACCOUNT_LOCKED" | "AUTH_MFA_REQUIRED" | "AUTH_MFA_INVALID" | "AUTH_TOKEN_EXPIRED" | "AUTH_SESSION_EXPIRED" | "AUTH_REAUTH_REQUIRED" | "AUTH_MFA_ENROLLMENT_REQUIRED" | "AUTH_PASSWORD_TOKEN_INVALID" | "FORBIDDEN" | "NOT_FOUND" | "VERSION_CONFLICT" | "INVALID_STATE_TRANSITION" | "IDEMPOTENCY_KEY_REQUIRED" | "IDEMPOTENCY_IN_PROGRESS" | "IDEMPOTENCY_KEY_REUSED" | "DUPLICATE_CODE" | "PERIOD_LOCKED" | "STOCK_INSUFFICIENT" | "BATCH_SHELF_LIFE_TOO_SHORT" | "APPROVAL_REQUIRED" | "APPROVAL_POLICY_MISSING" | "DISCOUNT_LIMIT_EXCEEDED" | "CREDIT_LIMIT_EXCEEDED" | "THREE_WAY_MATCH_FAILED" | "DEPOSIT_INSUFFICIENT" | "OUTSIDE_ATTENDANCE_RADIUS" | "FILE_TOO_LARGE" | "FILE_TYPE_NOT_ALLOWED" | "IMPORT_ALREADY_PROCESSED" | "RATE_LIMITED" | "PROVIDER_UNAVAILABLE" | "BAD_REQUEST" | "INTERNAL_ERROR";
+        HealthStatus: {
+            /** @enum {string} */
+            status: "ok";
+        };
+        ReadinessCheck: {
+            /** @example database */
+            name: string;
+            /** @enum {string} */
+            status: "ok" | "failed";
+            detail?: string;
+        };
+        ReadinessStatus: {
+            /** @enum {string} */
+            status: "ready" | "not_ready";
+            checks: components["schemas"]["ReadinessCheck"][];
+        };
+        DatabaseInfo: {
+            /** @enum {string} */
+            status: "ok" | "failed";
+            /** Format: int64 */
+            schemaVersion: number;
+            /** Format: int64 */
+            latestSchemaVersion: number;
+        };
+        SystemInfo: {
+            /** @example v1.0.0 */
+            version: string;
+            commit: string;
+            /** @enum {string} */
+            environment: "local" | "staging" | "production";
+            enabledModules: string[];
+            /** @description True jika minimal satu adapter pihak ketiga memakai mock. */
+            mockActive: boolean;
+            /** Format: date-time */
+            serverTime: string;
+            database: components["schemas"]["DatabaseInfo"];
+        };
+        /** @description Payload HTTP notification Midtrans (nama field milik Midtrans). */
+        MidtransNotification: {
+            order_id: string;
+            status_code: string;
+            gross_amount: string;
+            signature_key: string;
+            transaction_status: string;
+            transaction_id: string;
+            fraud_status?: string;
+        };
+        WebhookAck: {
+            received: boolean;
+            duplicate: boolean;
+        };
+        /** @enum {string} */
+        ReturnReasonScope: "sales_return" | "purchase_return";
+        /**
+         * @description Dokumen yang memakai alasan ini.
+         * @enum {string}
+         */
+        ReturnReasonAppliesTo: "sales_return" | "purchase_return" | "both";
+        /**
+         * @description Disposisi barang retur (Disposisi Retur, WMS-07).
+         * @enum {string}
+         */
+        ReturnDisposition: "restock" | "repack" | "reprocess" | "marketing_sample" | "dispose";
+        ReturnReason: {
+            /** Format: uuid */
+            id: string;
+            /** @example DAMAGED_SHIPPING */
+            code: string;
+            name: string;
+            appliesTo: components["schemas"]["ReturnReasonAppliesTo"];
+            /** @description Usulan awal disposisi; staf gudang tetap memilih saat QC. */
+            defaultDisposition?: components["schemas"]["ReturnDisposition"] | null;
+            description: string;
+            isActive: boolean;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+        };
+        ReturnReasonFields: {
+            name: string;
+            appliesTo: components["schemas"]["ReturnReasonAppliesTo"];
+            defaultDisposition?: components["schemas"]["ReturnDisposition"] | null;
+            description?: string;
+            isActive: boolean;
+        };
+        ReturnReasonInput: components["schemas"]["ReturnReasonFields"] & {
+            /** @example DAMAGED_SHIPPING */
+            code: string;
+        };
+        VersionInput: {
+            /** @description Versi terakhir yang dilihat user (optimistic locking). */
+            version: number;
+        };
+        ReturnReasonUpdate: components["schemas"]["ReturnReasonFields"] & components["schemas"]["VersionInput"];
+        /** @description Payload webhook status order Biteship (nama field milik Biteship). */
+        BiteshipNotification: {
+            /** @example order.status */
+            event: string;
+            order_id: string;
+            courier_waybill_id?: string;
+            status: string;
+        };
+        LoginRequest: {
+            /** Format: email */
+            email: string;
+            password: string;
+            totpCode?: string;
+        };
+        AccessToken: {
+            accessToken: string;
+            /** Format: date-time */
+            expiresAt: string;
+        };
+        ReauthRequest: {
+            password?: string;
+            totpCode?: string;
+        };
+        PasswordForgotRequest: {
+            /** Format: email */
+            email: string;
+        };
+        PasswordTokenInfo: {
+            email: string;
+            fullName: string;
+            /** @enum {string} */
+            purpose: "invite" | "reset";
+        };
+        PasswordSetupRequest: {
+            token: string;
+            password: string;
+        };
+        PasswordChangeRequest: {
+            currentPassword: string;
+            newPassword: string;
+        };
+        MfaSetup: {
+            secret: string;
+            otpauthUrl: string;
+            /** @description Gambar PNG QR code dalam format data URL. */
+            qrCodeDataUrl: string;
+        };
+        MfaActivateRequest: {
+            code: string;
+        };
+        CurrentUser: {
+            /** Format: uuid */
+            id: string;
+            email: string;
+            fullName: string;
+            roles: string[];
+            /**
+             * @example [
+             *       "catalog.product.read",
+             *       "catalog.product.write"
+             *     ]
+             */
+            permissions: string[];
+            isMfaEnabled: boolean;
+            /** @description Role user mewajibkan MFA tetapi MFA belum aktif; semua menu lain terkunci sampai MFA aktif. */
+            mfaEnrollmentRequired: boolean;
+        };
+        /** @description Metadata pagination standar (Technical Guideline 8.2). */
+        Pagination: {
+            page: number;
+            pageSize: number;
+            /** Format: int64 */
+            totalItems: number;
+            totalPages: number;
+        };
+        UserRoleAssignment: {
+            code: string;
+            readonly name?: string;
+            /** Format: uuid */
+            scopeDivisionId?: string | null;
+        };
+        User: {
+            /** Format: uuid */
+            id: string;
+            email: string;
+            fullName: string;
+            roles: components["schemas"]["UserRoleAssignment"][];
+            /** Format: uuid */
+            divisionId?: string | null;
+            /** Format: uuid */
+            employeeId?: string | null;
+            isActive: boolean;
+            isMfaEnabled: boolean;
+            /** @description false berarti undangan belum diterima. */
+            hasPassword: boolean;
+            /** Format: date-time */
+            lastLoginAt?: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+        };
+        UserList: components["schemas"]["Pagination"] & {
+            items: components["schemas"]["User"][];
+        };
+        UserInput: {
+            /** Format: email */
+            email: string;
+            fullName: string;
+            roles: components["schemas"]["UserRoleAssignment"][];
+            /** Format: uuid */
+            divisionId?: string | null;
+            /** Format: uuid */
+            employeeId?: string | null;
+        };
+        UserUpdate: {
+            fullName: string;
+            roles: components["schemas"]["UserRoleAssignment"][];
+            /** Format: uuid */
+            divisionId?: string | null;
+            /** Format: uuid */
+            employeeId?: string | null;
+            version: number;
+        };
+        Role: {
+            /** Format: uuid */
+            id: string;
+            code: string;
+            name: string;
+            description: string;
+            requiresMfa: boolean;
+            hasDivisionScope: boolean;
+            permissions: string[];
+            version: number;
+        };
+        RolePermissionsInput: {
+            permissions: string[];
+            version: number;
+        };
+        Permission: {
+            code: string;
+            module: string;
+            description: string;
+            requiresReauth: boolean;
+        };
+        /** @enum {string} */
+        AuditAction: "create" | "update" | "delete" | "restore" | "status_change" | "approve" | "reject" | "submit" | "post" | "cancel" | "login" | "login_failed" | "logout" | "import" | "export";
+        AuditChange: {
+            from?: unknown;
+            to?: unknown;
+        };
+        AuditLog: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            actorId: string;
+            actorName: string;
+            action: components["schemas"]["AuditAction"];
+            entityType: string;
+            /** Format: uuid */
+            entityId: string;
+            entityLabel: string;
+            changes: {
+                [key: string]: components["schemas"]["AuditChange"];
+            };
+            note: string;
+            ip?: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        AuditLogList: components["schemas"]["Pagination"] & {
+            items: components["schemas"]["AuditLog"][];
+        };
+        /**
+         * @description Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+         * @example 1250000.00
+         */
+        Money: string;
+        /** @enum {string} */
+        ApprovalStatus: "pending_approval" | "approved" | "rejected" | "cancelled";
+        /**
+         * @description `waiting` belum aktif, `pending` menunggu keputusan, `skipped` tidak diputuskan karena dokumen ditolak/dibatalkan.
+         * @enum {string}
+         */
+        ApprovalStepStatus: "waiting" | "pending" | "approved" | "rejected" | "skipped";
+        ApprovalStep: {
+            level: number;
+            approverRole: string;
+            approverRoleName: string;
+            /** Format: uuid */
+            approverUserId?: string | null;
+            approverUserName?: string | null;
+            /** Format: uuid */
+            substituteUserId?: string | null;
+            substituteUserName?: string | null;
+            status: components["schemas"]["ApprovalStepStatus"];
+            /** Format: uuid */
+            decidedById?: string | null;
+            decidedByName: string;
+            /** @description Terisi jika keputusan diambil penerima delegasi atas nama approver ini. */
+            delegatedFromName?: string | null;
+            note: string;
+            /** Format: date-time */
+            activatedAt?: string | null;
+            /** Format: date-time */
+            decidedAt?: string | null;
+        };
+        ApprovalRequest: {
+            /** Format: uuid */
+            id: string;
+            subjectType: string;
+            subjectTypeLabel: string;
+            /** Format: uuid */
+            subjectId: string;
+            /** @description Nomor dokumen, mis. PO/2027/01/00012. */
+            subjectLabel: string;
+            /** @description Path detail dokumen di ERP; kosong jika halaman detail belum ada. */
+            subjectLink: string;
+            summary: string;
+            amount: components["schemas"]["Money"];
+            /** Format: uuid */
+            divisionId?: string | null;
+            /** Format: uuid */
+            requestedById: string;
+            requestedByName: string;
+            status: components["schemas"]["ApprovalStatus"];
+            currentLevel: number;
+            totalLevels: number;
+            steps: components["schemas"]["ApprovalStep"][];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            decidedAt?: string | null;
+            version: number;
+            /** @description Aksi yang boleh dilakukan user yang login (Technical Guideline 5.4). */
+            allowedActions: ("approve" | "reject")[];
+        };
+        ApprovalTask: {
+            request: components["schemas"]["ApprovalRequest"];
+            /** Format: uuid */
+            delegatedFromUserId?: string | null;
+            /** @description Approver yang sedang cuti dan mendelegasikan dokumen ini kepada user. */
+            delegatedFromName?: string | null;
+        };
+        ApprovalInbox: {
+            items: components["schemas"]["ApprovalTask"][];
+            totalItems: number;
+        };
+        ApprovalInboxCount: {
+            pending: number;
+        };
+        ApprovalCondition: {
+            code: string;
+            label: string;
+        };
+        ApprovalSubjectType: {
+            type: string;
+            label: string;
+            amountLabel: string;
+            conditions: components["schemas"]["ApprovalCondition"][];
+        };
+        ApprovalUserOption: {
+            /** Format: uuid */
+            id: string;
+            fullName: string;
+            email: string;
+        };
+        ApprovalRequestList: components["schemas"]["Pagination"] & {
+            items: components["schemas"]["ApprovalRequest"][];
+        };
+        ApprovalApproveInput: {
+            version: number;
+            note?: string;
+        };
+        ApprovalRejectInput: {
+            version: number;
+            note: string;
+        };
+        ApprovalPolicy: {
+            /** Format: uuid */
+            id: string;
+            subjectType: string;
+            subjectTypeLabel: string;
+            /** Format: uuid */
+            divisionId?: string | null;
+            level: number;
+            /** @description Level berlaku jika nominal lebih dari nilai ini; kosong = semua nominal. */
+            minAmount?: components["schemas"]["Money"] | null;
+            /** @description Level berlaku jika nominal paling besar nilai ini; kosong = tanpa batas. */
+            maxAmount?: components["schemas"]["Money"] | null;
+            condition: string;
+            approverRole: string;
+            approverRoleName: string;
+            /** Format: uuid */
+            approverUserId?: string | null;
+            approverUserName?: string | null;
+            /** Format: uuid */
+            substituteUserId?: string | null;
+            substituteUserName?: string | null;
+            /** Format: date-time */
+            validFrom: string;
+            /** Format: date-time */
+            validTo?: string | null;
+            isActive: boolean;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+        };
+        ApprovalPolicyFields: {
+            minAmount?: components["schemas"]["Money"] | null;
+            maxAmount?: components["schemas"]["Money"] | null;
+            condition?: string;
+            approverRole: string;
+            /** Format: uuid */
+            approverUserId?: string | null;
+            /** Format: uuid */
+            substituteUserId?: string | null;
+        };
+        ApprovalPolicyInput: components["schemas"]["ApprovalPolicyFields"] & {
+            subjectType: string;
+            /** Format: uuid */
+            divisionId?: string | null;
+            level: number;
+        };
+        ApprovalPolicyUpdate: components["schemas"]["ApprovalPolicyFields"] & {
+            version: number;
+        };
+        /**
+         * Format: date
+         * @description Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+         * @example 2026-10-19
+         */
+        BusinessDate: string;
+        /** @enum {string} */
+        ApprovalDelegationStatus: "scheduled" | "active" | "ended" | "cancelled";
+        ApprovalDelegation: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            fromUserId: string;
+            fromUserName: string;
+            /** Format: uuid */
+            toUserId: string;
+            toUserName: string;
+            validFrom: components["schemas"]["BusinessDate"];
+            validTo: components["schemas"]["BusinessDate"];
+            reason: string;
+            status: components["schemas"]["ApprovalDelegationStatus"];
+            /** Format: date-time */
+            cancelledAt?: string | null;
+            version: number;
+        };
+        ApprovalDelegationInput: {
+            /** Format: uuid */
+            fromUserId?: string | null;
+            /** Format: uuid */
+            toUserId: string;
+            validFrom: components["schemas"]["BusinessDate"];
+            validTo: components["schemas"]["BusinessDate"];
+            reason?: string;
+        };
+        Notification: {
+            /** Format: uuid */
+            id: string;
+            /**
+             * @description Jenis notifikasi `<modul>.<peristiwa>`, mis. `approval.pending`.
+             * @example approval.pending
+             */
+            kind: string;
+            title: string;
+            body: string;
+            /** @description Path ERP yang dibuka saat notifikasi diklik; kosong jika tidak ada. */
+            link: string;
+            /** Format: date-time */
+            readAt?: string | null;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        NotificationList: components["schemas"]["Pagination"] & {
+            items: components["schemas"]["Notification"][];
+            /** Format: int64 */
+            unreadCount: number;
+        };
+        NotificationUnreadCount: {
+            /** Format: int64 */
+            unreadCount: number;
+        };
+        /**
+         * @description `finished_good` = Produk Jadi, `packaging` = Packaging (RM), `reprocess_material` = Material (GM).
+         * @enum {string}
+         */
+        ProductType: "finished_good" | "packaging" | "reprocess_material";
+        /** @enum {string} */
+        PackagingType: "tube" | "pouch" | "roll_sachet";
+        /**
+         * @description Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+         * @example 2.000
+         */
+        Quantity: string;
+        /**
+         * @description 13 digit dengan digit periksa benar = EAN-13, selain itu Code 128.
+         * @enum {string}
+         */
+        BarcodeSymbology: "ean13" | "code128";
+        ProductBarcode: {
+            barcode: string;
+            symbology: components["schemas"]["BarcodeSymbology"];
+            isPrimary: boolean;
+        };
+        BundleComponent: {
+            /** Format: uuid */
+            componentProductId: string;
+            qty: components["schemas"]["Quantity"];
+            componentSku: string;
+            componentName: string;
+            componentVariant: string;
+            componentUom: string;
+            componentDeleted: boolean;
+        };
+        /** @enum {string} */
+        ProductAction: "update" | "delete" | "restore";
+        Product: {
+            /** Format: uuid */
+            id: string;
+            sku: string;
+            name: string;
+            variant: string;
+            productType: components["schemas"]["ProductType"];
+            packagingType?: components["schemas"]["PackagingType"] | null;
+            uom: string;
+            shelfLifeDays?: number | null;
+            hasBatch: boolean;
+            isBundle: boolean;
+            /** Format: uuid */
+            categoryId?: string | null;
+            categoryName?: string | null;
+            minStockQty?: components["schemas"]["Quantity"] | null;
+            unitsPerCarton?: number | null;
+            isActive: boolean;
+            barcodes: components["schemas"]["ProductBarcode"][];
+            /** @description Barcode utama yang dicetak di label produk. */
+            primaryBarcode?: string | null;
+            bundleComponents: components["schemas"]["BundleComponent"][];
+            /** Format: date-time */
+            deletedAt?: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+            allowedActions: components["schemas"]["ProductAction"][];
+        };
+        ProductList: components["schemas"]["Pagination"] & {
+            items: components["schemas"]["Product"][];
+        };
+        ProductBarcodeInput: {
+            barcode: string;
+            isPrimary: boolean;
+        };
+        BundleComponentInput: {
+            /** Format: uuid */
+            componentProductId: string;
+            qty: components["schemas"]["Quantity"];
+        };
+        ProductFields: {
+            name: string;
+            variant?: string;
+            packagingType?: components["schemas"]["PackagingType"] | null;
+            /** @example pcs */
+            uom: string;
+            /** @description Umur simpan dalam hari; wajib untuk Produk Jadi non-bundel. */
+            shelfLifeDays?: number | null;
+            /** @description Hanya dipakai untuk Packaging & Material; Produk Jadi selalu memakai batch, bundel tidak. */
+            hasBatch: boolean;
+            /** Format: uuid */
+            categoryId?: string | null;
+            minStockQty?: components["schemas"]["Quantity"] | null;
+            unitsPerCarton?: number | null;
+            isActive: boolean;
+            /** @description Tepat satu barcode utama jika ada barcode; barcode unik di semua produk. */
+            barcodes?: components["schemas"]["ProductBarcodeInput"][];
+            /** @description Wajib untuk bundel; komponen harus Produk Jadi non-bundel yang aktif. */
+            bundleComponents?: components["schemas"]["BundleComponentInput"][];
+        };
+        ProductInput: components["schemas"]["ProductFields"] & {
+            /** @description Huruf besar, angka, dan tanda minus; huruf kecil diubah menjadi besar. */
+            sku: string;
+            productType: components["schemas"]["ProductType"];
+            /** @description Bundel virtual tidak punya stok sendiri; stok komponen terpotong saat terjual (MD-03). */
+            isBundle: boolean;
+        };
+        ProductUpdate: components["schemas"]["ProductFields"] & components["schemas"]["VersionInput"];
+        ProductCategory: {
+            /** Format: uuid */
+            id: string;
+            code: string;
+            name: string;
+            /** Format: date-time */
+            deletedAt?: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+            allowedActions: components["schemas"]["ProductAction"][];
+        };
+        ProductCategoryInput: {
+            code: string;
+            name: string;
+        };
+        ProductCategoryUpdate: {
+            name: string;
+        } & components["schemas"]["VersionInput"];
+        /** @enum {string} */
+        RecordAction: "update" | "delete" | "restore";
+        Warehouse: {
+            /** Format: uuid */
+            id: string;
+            code: string;
+            name: string;
+            address: string;
+            isActive: boolean;
+            /** Format: date-time */
+            deletedAt?: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+            allowedActions: components["schemas"]["RecordAction"][];
+        };
+        WarehouseList: components["schemas"]["Pagination"] & {
+            items: components["schemas"]["Warehouse"][];
+        };
+        WarehouseFields: {
+            name: string;
+            address?: string;
+            isActive: boolean;
+        };
+        WarehouseInput: components["schemas"]["WarehouseFields"] & {
+            code: string;
+        };
+        WarehouseUpdate: components["schemas"]["WarehouseFields"] & components["schemas"]["VersionInput"];
+        /**
+         * @description Di dalam gudang: `inbound`, `finished_goods` (FG Non-Ecommerce), `ecommerce` (E-commerce Stock), `petty_stock` (Petty Stock),
+         *     `raw_material` (RM), `goods_material` (GM), `returns`, `event`. Eksternal: `toll_manufacturer` (maklon),
+         *     `consignment`, `vending_buffer`, `vending_machine`.
+         * @enum {string}
+         */
+        LocationType: "inbound" | "finished_goods" | "ecommerce" | "petty_stock" | "raw_material" | "goods_material" | "returns" | "event" | "toll_manufacturer" | "consignment" | "vending_buffer" | "vending_machine";
+        /** @enum {string} */
+        ExternalPartyType: "supplier" | "partner" | "vending_machine";
+        Location: {
+            /** Format: uuid */
+            id: string;
+            code: string;
+            name: string;
+            locationType: components["schemas"]["LocationType"];
+            locationTypeLabel: string;
+            /** Format: uuid */
+            warehouseId?: string | null;
+            warehouseName?: string | null;
+            externalPartyType?: components["schemas"]["ExternalPartyType"] | null;
+            /** Format: uuid */
+            externalPartyId?: string | null;
+            isExternal: boolean;
+            /** @description Stok di lokasi ini bisa dialokasikan ke penjualan. */
+            isSellable: boolean;
+            /** @description Lokasi standar dibuat otomatis bersama gudang dan ikut terhapus/dipulihkan bersama gudang. */
+            isStandard: boolean;
+            isActive: boolean;
+            /** Format: date-time */
+            deletedAt?: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+            allowedActions: components["schemas"]["RecordAction"][];
+        };
+        LocationList: components["schemas"]["Pagination"] & {
+            items: components["schemas"]["Location"][];
+        };
+        LocationInput: {
+            code: string;
+            name: string;
+            locationType: components["schemas"]["LocationType"];
+            /**
+             * Format: uuid
+             * @description Wajib untuk lokasi internal; kosong untuk lokasi eksternal.
+             */
+            warehouseId?: string | null;
+            externalPartyType?: components["schemas"]["ExternalPartyType"] | null;
+            /**
+             * Format: uuid
+             * @description ID pemasok/maklon, mitra, atau mesin vending di modul pemiliknya.
+             */
+            externalPartyId?: string | null;
+            isActive: boolean;
+        };
+        /** @enum {string} */
+        NormalBalance: "debit" | "credit";
+        Account: {
+            /** Format: uuid */
+            id: string;
+            /** @example 1111 */
+            code: string;
+            name: string;
+            group: number;
+            groupLabel: string;
+            normalBalance: components["schemas"]["NormalBalance"];
+            /** Format: uuid */
+            parentId?: string | null;
+            /** @description false = akun induk (judul), tidak bisa diposting. */
+            isPostable: boolean;
+            /** @description Boleh dipakai di Jurnal Umum manual. Akun kontrol hanya diisi jurnal otomatis. */
+            allowManualPosting: boolean;
+            isActive: boolean;
+            description: string;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+        };
+        AccountFields: {
+            name: string;
+            normalBalance: components["schemas"]["NormalBalance"];
+            /** Format: uuid */
+            parentId?: string | null;
+            isPostable: boolean;
+            allowManualPosting: boolean;
+            isActive: boolean;
+            description?: string;
+        };
+        AccountInput: components["schemas"]["AccountFields"] & {
+            code: string;
+        };
+        AccountUpdate: components["schemas"]["AccountFields"] & components["schemas"]["VersionInput"];
+        /** @enum {string} */
+        DimensionKind: "channel" | "sub_channel" | "division" | "campaign";
+        /** @description Master dimensi jurnal. Field channel/pihak hanya untuk sub-channel; periode/anggaran hanya kampanye. */
+        Dimension: {
+            /** Format: uuid */
+            id: string;
+            kind: components["schemas"]["DimensionKind"];
+            code: string;
+            name: string;
+            /** Format: uuid */
+            channelId?: string | null;
+            partyType?: string | null;
+            /** Format: uuid */
+            partyId?: string | null;
+            validFrom?: components["schemas"]["BusinessDate"] | null;
+            validTo?: components["schemas"]["BusinessDate"] | null;
+            budgetAmount?: components["schemas"]["Money"] | null;
+            description?: string | null;
+            isActive: boolean;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+        };
+        DimensionInput: {
+            code: string;
+            name: string;
+            isActive: boolean;
+        };
+        DimensionUpdate: {
+            name: string;
+            isActive: boolean;
+            version: number;
+        };
+        SubChannelFields: {
+            name: string;
+            partyType?: string | null;
+            /** Format: uuid */
+            partyId?: string | null;
+            isActive: boolean;
+        };
+        SubChannelInput: components["schemas"]["SubChannelFields"] & {
+            /** Format: uuid */
+            channelId: string;
+            code: string;
+        };
+        SubChannelUpdate: components["schemas"]["SubChannelFields"] & components["schemas"]["VersionInput"];
+        CampaignFields: {
+            name: string;
+            validFrom: components["schemas"]["BusinessDate"];
+            validTo: components["schemas"]["BusinessDate"];
+            budgetAmount?: components["schemas"]["Money"] | null;
+            description?: string;
+            isActive: boolean;
+        };
+        CampaignInput: components["schemas"]["CampaignFields"] & {
+            /** @example KMP-202701-RAMADAN */
+            code: string;
+        };
+        CampaignUpdate: components["schemas"]["CampaignFields"] & components["schemas"]["VersionInput"];
+        /**
+         * @description Jenis PPh yang dipotong (pemasok, jenis biaya); tarif di master tarif PPh.
+         * @enum {string}
+         */
+        WithholdingType: "none" | "pph21" | "pph23" | "pph4_2";
+        /**
+         * @description Jenis dokumen approval (subject_type) yang dipakai dokumen biaya dengan jenis ini.
+         * @enum {string}
+         */
+        ExpenseApprovalSubject: "expense_claim" | "petty_cash_replenishment";
+        ExpenseType: {
+            /** Format: uuid */
+            id: string;
+            /** @example OFFICE_SUPPLY */
+            code: string;
+            name: string;
+            /** Format: uuid */
+            expenseAccountId: string;
+            /** @example 6303 */
+            expenseAccountCode: string;
+            expenseAccountName: string;
+            withholdingType: components["schemas"]["WithholdingType"];
+            requiresReceipt: boolean;
+            /** @description Jurnal biaya jenis ini wajib dimensi kampanye. */
+            requiresCampaign: boolean;
+            approvalSubject: components["schemas"]["ExpenseApprovalSubject"];
+            description: string;
+            isActive: boolean;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+        };
+        ExpenseTypeFields: {
+            name: string;
+            /** Format: uuid */
+            expenseAccountId: string;
+            withholdingType: components["schemas"]["WithholdingType"];
+            requiresReceipt: boolean;
+            requiresCampaign: boolean;
+            approvalSubject?: components["schemas"]["ExpenseApprovalSubject"];
+            description?: string;
+            isActive: boolean;
+        };
+        ExpenseTypeInput: components["schemas"]["ExpenseTypeFields"] & {
+            /** @example OFFICE_SUPPLY */
+            code: string;
+        };
+        ExpenseTypeUpdate: components["schemas"]["ExpenseTypeFields"] & components["schemas"]["VersionInput"];
+        /**
+         * @description `open` Terbuka, `closed` Ditutup, `pending_approval` Menunggu Persetujuan buka kembali (tetap terkunci).
+         * @enum {string}
+         */
+        FiscalPeriodStatus: "open" | "closed" | "pending_approval";
+        FiscalPeriod: {
+            /** Format: uuid */
+            id: string;
+            year: number;
+            month: number;
+            /** @example Okt 2026 */
+            label: string;
+            status: components["schemas"]["FiscalPeriodStatus"];
+            startDate: components["schemas"]["BusinessDate"];
+            endDate: components["schemas"]["BusinessDate"];
+            /** Format: date-time */
+            closedAt?: string | null;
+            reopenedCount: number;
+            version: number;
+        };
+        PostingRuleAccount: {
+            amountKey: string;
+            side: components["schemas"]["NormalBalance"];
+            /** @description `fixed` = akun tetap; selain itu akun dipilih dokumen sumber (akun di sini = default). */
+            resolver: string;
+            accountCode: string;
+            accountName: string;
+        };
+        PostingRule: {
+            /** @example A-01 */
+            code: string;
+            name: string;
+            description: string;
+            requiredDimensions: components["schemas"]["DimensionKind"][];
+            release: string;
+            isActive: boolean;
+            accounts: components["schemas"]["PostingRuleAccount"][];
+        };
+        /** @enum {string} */
+        JournalStatus: "draft" | "posted";
+        /** @enum {string} */
+        JournalEntryType: "manual" | "automatic" | "reversal";
+        JournalEntrySummary: {
+            /** Format: uuid */
+            id: string;
+            /** @description Nomor JV, diisi saat posting. */
+            number?: string | null;
+            businessDate: components["schemas"]["BusinessDate"];
+            entryType: components["schemas"]["JournalEntryType"];
+            sourceType: string;
+            /** Format: uuid */
+            sourceId: string;
+            sourceLabel: string;
+            postingRuleCode?: string | null;
+            description: string;
+            status: components["schemas"]["JournalStatus"];
+            totalAmount: components["schemas"]["Money"];
+            /** Format: uuid */
+            reversalOfId?: string | null;
+            reversalOfNumber?: string | null;
+            /** Format: uuid */
+            reversedById?: string | null;
+            reversedByNumber?: string | null;
+            /** Format: date-time */
+            postedAt?: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+        };
+        JournalEntryList: components["schemas"]["Pagination"] & {
+            items: components["schemas"]["JournalEntrySummary"][];
+        };
+        ManualJournalLineInput: {
+            /** Format: uuid */
+            accountId: string;
+            debit: components["schemas"]["Money"];
+            credit: components["schemas"]["Money"];
+            /** Format: uuid */
+            channelId?: string | null;
+            /** Format: uuid */
+            subChannelId?: string | null;
+            /** Format: uuid */
+            divisionId?: string | null;
+            /** Format: uuid */
+            campaignId?: string | null;
+            memo?: string;
+        };
+        ManualJournalFields: {
+            businessDate: components["schemas"]["BusinessDate"];
+            description: string;
+            lines: components["schemas"]["ManualJournalLineInput"][];
+        };
+        DimensionRef: {
+            /** Format: uuid */
+            id: string;
+            code: string;
+            name: string;
+        };
+        JournalLine: {
+            lineNo: number;
+            /** Format: uuid */
+            accountId: string;
+            accountCode: string;
+            accountName: string;
+            debit: components["schemas"]["Money"];
+            credit: components["schemas"]["Money"];
+            channel?: components["schemas"]["DimensionRef"] | null;
+            subChannel?: components["schemas"]["DimensionRef"] | null;
+            division?: components["schemas"]["DimensionRef"] | null;
+            campaign?: components["schemas"]["DimensionRef"] | null;
+            partyType?: string | null;
+            /** Format: uuid */
+            partyId?: string | null;
+            amountKey?: string | null;
+            memo: string;
+        };
+        JournalEntry: components["schemas"]["JournalEntrySummary"] & {
+            lines: components["schemas"]["JournalLine"][];
+            totalDebit: components["schemas"]["Money"];
+            totalCredit: components["schemas"]["Money"];
+            allowedActions: ("edit" | "delete" | "post" | "reverse")[];
+        };
+        ManualJournalUpdate: components["schemas"]["ManualJournalFields"] & components["schemas"]["VersionInput"];
+        JournalReverseInput: {
+            version: number;
+            businessDate: components["schemas"]["BusinessDate"];
+            reason: string;
+        };
+        GeneralLedgerLine: {
+            /** Format: uuid */
+            entryId: string;
+            number?: string | null;
+            businessDate: components["schemas"]["BusinessDate"];
+            entryType: components["schemas"]["JournalEntryType"];
+            sourceType: string;
+            /** Format: uuid */
+            sourceId: string;
+            sourceLabel: string;
+            description: string;
+            lineNo: number;
+            debit: components["schemas"]["Money"];
+            credit: components["schemas"]["Money"];
+            balance: components["schemas"]["Money"];
+            memo: string;
+            channel?: components["schemas"]["DimensionRef"] | null;
+            subChannel?: components["schemas"]["DimensionRef"] | null;
+            division?: components["schemas"]["DimensionRef"] | null;
+            campaign?: components["schemas"]["DimensionRef"] | null;
+        };
+        GeneralLedger: components["schemas"]["Pagination"] & {
+            account: components["schemas"]["Account"];
+            dateFrom: components["schemas"]["BusinessDate"];
+            dateTo: components["schemas"]["BusinessDate"];
+            openingBalance: components["schemas"]["Money"];
+            periodDebit: components["schemas"]["Money"];
+            periodCredit: components["schemas"]["Money"];
+            closingBalance: components["schemas"]["Money"];
+            items: components["schemas"]["GeneralLedgerLine"][];
+        };
+        TrialBalanceRow: {
+            /** Format: uuid */
+            accountId: string;
+            accountCode: string;
+            accountName: string;
+            group: number;
+            groupLabel: string;
+            normalBalance: components["schemas"]["NormalBalance"];
+            openingDebit: components["schemas"]["Money"];
+            openingCredit: components["schemas"]["Money"];
+            periodDebit: components["schemas"]["Money"];
+            periodCredit: components["schemas"]["Money"];
+            closingDebit: components["schemas"]["Money"];
+            closingCredit: components["schemas"]["Money"];
+        };
+        TrialBalanceTotals: {
+            openingDebit: components["schemas"]["Money"];
+            openingCredit: components["schemas"]["Money"];
+            periodDebit: components["schemas"]["Money"];
+            periodCredit: components["schemas"]["Money"];
+            closingDebit: components["schemas"]["Money"];
+            closingCredit: components["schemas"]["Money"];
+        };
+        TrialBalance: {
+            dateFrom: components["schemas"]["BusinessDate"];
+            dateTo: components["schemas"]["BusinessDate"];
+            rows: components["schemas"]["TrialBalanceRow"][];
+            totals: components["schemas"]["TrialBalanceTotals"];
+            balanced: boolean;
+        };
+        FixedAssetClass: {
+            /** Format: uuid */
+            id: string;
+            code: string;
+            name: string;
+            usefulLifeMonths: number;
+            /** Format: uuid */
+            assetAccountId: string;
+            assetAccountCode: string;
+            /** Format: uuid */
+            accumulatedAccountId: string;
+            accumulatedAccountCode: string;
+            isActive: boolean;
+            version: number;
+        };
+        FixedAssetClassCreate: {
+            /** @example vending_machine */
+            code: string;
+            name: string;
+            usefulLifeMonths: number;
+            /** Format: uuid */
+            assetAccountId: string;
+            /** Format: uuid */
+            accumulatedAccountId: string;
+            isActive: boolean;
+        };
+        FixedAssetClassUpdate: {
+            name: string;
+            usefulLifeMonths: number;
+            /** Format: uuid */
+            assetAccountId: string;
+            /** Format: uuid */
+            accumulatedAccountId: string;
+            isActive: boolean;
+            version: number;
+        };
+        /**
+         * @description `draft` Draft, `active` Aktif, `disposed` Dilepas.
+         * @enum {string}
+         */
+        FixedAssetStatus: "draft" | "active" | "disposed";
+        /**
+         * @description `purchase` pembelian setelah go-live, `opening` saldo awal migrasi.
+         * @enum {string}
+         */
+        FixedAssetSource: "purchase" | "opening";
+        FixedAsset: {
+            /** Format: uuid */
+            id: string;
+            code: string;
+            name: string;
+            /** Format: uuid */
+            classId: string;
+            className: string;
+            /** Format: uuid */
+            locationId?: string | null;
+            locationLabel: string;
+            /** Format: uuid */
+            divisionId: string;
+            source: components["schemas"]["FixedAssetSource"];
+            acquisitionDate: components["schemas"]["BusinessDate"];
+            cost: components["schemas"]["Money"];
+            salvage: components["schemas"]["Money"];
+            usefulLifeMonths: number;
+            depreciationStart: components["schemas"]["BusinessDate"];
+            openingAccumulated: components["schemas"]["Money"];
+            openingDepreciatedMonths: number;
+            accumulated: components["schemas"]["Money"];
+            bookValue: components["schemas"]["Money"];
+            monthlyDepreciation: components["schemas"]["Money"];
+            /** Format: uuid */
+            paymentAccountId?: string | null;
+            status: components["schemas"]["FixedAssetStatus"];
+            /** Format: uuid */
+            acquisitionJournalId?: string | null;
+            disposalDate?: components["schemas"]["BusinessDate"] | null;
+            disposalProceeds?: components["schemas"]["Money"] | null;
+            /** Format: uuid */
+            disposalAccountId?: string | null;
+            disposalReason: string;
+            /** Format: uuid */
+            disposalJournalId?: string | null;
+            note: string;
+            allowedActions: ("edit" | "delete" | "activate" | "dispose")[];
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+        };
+        FixedAssetList: components["schemas"]["Pagination"] & {
+            items: components["schemas"]["FixedAsset"][];
+        };
+        FixedAssetFields: {
+            name: string;
+            /** Format: uuid */
+            classId: string;
+            /** Format: uuid */
+            locationId?: string | null;
+            locationLabel?: string;
+            /** Format: uuid */
+            divisionId: string;
+            source: components["schemas"]["FixedAssetSource"];
+            acquisitionDate: components["schemas"]["BusinessDate"];
+            cost: components["schemas"]["Money"];
+            salvage?: components["schemas"]["Money"];
+            /** @description Kosong/0 = umur manfaat kelas. */
+            usefulLifeMonths?: number;
+            openingAccumulated?: components["schemas"]["Money"];
+            /** Format: uuid */
+            paymentAccountId?: string | null;
+            note?: string;
+        };
+        FixedAssetCreate: components["schemas"]["FixedAssetFields"] & {
+            /** @example AST-VM-001 */
+            code: string;
+        };
+        DepreciationLine: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            runId: string;
+            /** Format: uuid */
+            assetId: string;
+            assetCode: string;
+            assetName: string;
+            periodLabel: string;
+            amount: components["schemas"]["Money"];
+            accumulated: components["schemas"]["Money"];
+            bookValue: components["schemas"]["Money"];
+            /** Format: uuid */
+            journalEntryId: string;
+            journalNumber: string;
+        };
+        FixedAssetDetail: {
+            asset: components["schemas"]["FixedAsset"];
+            depreciation: components["schemas"]["DepreciationLine"][];
+        };
+        FixedAssetUpdate: components["schemas"]["FixedAssetFields"] & {
+            version: number;
+        };
+        FixedAssetDisposeInput: {
+            version: number;
+            disposalDate: components["schemas"]["BusinessDate"];
+            proceeds: components["schemas"]["Money"];
+            /** Format: uuid */
+            disposalAccountId?: string | null;
+            reason: string;
+        };
+        DepreciationRun: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            periodId: string;
+            year: number;
+            month: number;
+            periodLabel: string;
+            assetCount: number;
+            total: components["schemas"]["Money"];
+            runCount: number;
+            /** Format: date-time */
+            lastRunAt: string;
+        };
+        DepreciationRunList: components["schemas"]["Pagination"] & {
+            items: components["schemas"]["DepreciationRun"][];
+        };
+        DepreciationRunInput: {
+            year: number;
+            month: number;
+        };
+        DepreciationRunDetail: {
+            run: components["schemas"]["DepreciationRun"];
+            lines: components["schemas"]["DepreciationLine"][];
+        };
+        /** @enum {string} */
+        CloseStepCode: "operational_documents" | "consignment_vending_reconciliation" | "settlement_reconciliation" | "bank_petty_cash_reconciliation" | "payroll" | "depreciation" | "tax_recap" | "inventory_review" | "financial_review";
+        /**
+         * @description `pending` Belum, `done` Selesai, `skipped` Tidak Berlaku.
+         * @enum {string}
+         */
+        CloseStepStatus: "pending" | "done" | "skipped";
+        CloseCheckResult: {
+            source: string;
+            ok: boolean;
+            message: string;
+            link?: string;
+        };
+        CloseChecklistStep: {
+            stepCode: components["schemas"]["CloseStepCode"];
+            order: number;
+            title: string;
+            /** @description PIC default BRD 5.15. */
+            picLabel: string;
+            automatic: boolean;
+            status: components["schemas"]["CloseStepStatus"];
+            /** Format: uuid */
+            picUserId?: string | null;
+            picUserName?: string | null;
+            /** Format: uuid */
+            completedBy?: string | null;
+            completedByName?: string | null;
+            /** Format: date-time */
+            completedAt?: string | null;
+            note: string;
+            checks: components["schemas"]["CloseCheckResult"][];
+            /** @description 0 = langkah belum pernah disimpan. */
+            version: number;
+        };
+        FiscalPeriodReopenRequest: {
+            /** Format: uuid */
+            id: string;
+            reason: string;
+            /** @enum {string} */
+            status: "pending_approval" | "approved" | "rejected";
+            /** Format: uuid */
+            requestedBy: string;
+            requestedByName?: string | null;
+            /** Format: date-time */
+            requestedAt: string;
+            /** Format: date-time */
+            decidedAt?: string | null;
+            decisionNote: string;
+        };
+        CloseChecklist: {
+            period: components["schemas"]["FiscalPeriod"];
+            steps: components["schemas"]["CloseChecklistStep"][];
+            /** @description Alasan periode belum bisa ditutup. */
+            blockers: string[];
+            reopenRequests: components["schemas"]["FiscalPeriodReopenRequest"][];
+            allowedActions: ("close" | "request_reopen" | "edit_checklist")[];
+        };
+        CloseChecklistStepInput: {
+            status: components["schemas"]["CloseStepStatus"];
+            /** Format: uuid */
+            picUserId?: string | null;
+            note?: string;
+            version: number;
+        };
+        FiscalPeriodReopenInput: {
+            version: number;
+            reason: string;
+        };
+        OpeningBalanceLine: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            accountId: string;
+            accountCode: string;
+            accountName: string;
+            debit: components["schemas"]["Money"];
+            credit: components["schemas"]["Money"];
+            note: string;
+        };
+        OpeningBalance: {
+            /** Format: uuid */
+            id?: string | null;
+            cutoverDate?: components["schemas"]["BusinessDate"] | null;
+            /**
+             * @description `draft` Draft, `posted` Diposting.
+             * @enum {string|null}
+             */
+            status?: "draft" | "posted" | null;
+            /** Format: uuid */
+            journalEntryId?: string | null;
+            journalNumber?: string | null;
+            /** Format: date-time */
+            postedAt?: string | null;
+            version?: number | null;
+            lines: components["schemas"]["OpeningBalanceLine"][];
+            totalDebit: components["schemas"]["Money"];
+            totalCredit: components["schemas"]["Money"];
+            difference: components["schemas"]["Money"];
+            allowedActions: ("edit" | "post")[];
+        };
+        OpeningBalanceSetInput: {
+            cutoverDate: components["schemas"]["BusinessDate"];
+            /** @description 0 saat membuat saldo awal pertama kali. */
+            version: number;
+        };
+        OpeningBalanceLineInput: {
+            /** Format: uuid */
+            accountId: string;
+            debit: components["schemas"]["Money"];
+            credit: components["schemas"]["Money"];
+            note?: string;
+        };
+        /**
+         * @description `receivable` piutang, `payable` utang.
+         * @enum {string}
+         */
+        OpeningItemType: "receivable" | "payable";
+        OpeningItem: {
+            /** Format: uuid */
+            id: string;
+            itemType: components["schemas"]["OpeningItemType"];
+            /** @enum {string} */
+            partyType: "customer" | "partner" | "supplier";
+            /** Format: uuid */
+            partyId: string;
+            partyCode: string;
+            documentNumber: string;
+            documentDate: components["schemas"]["BusinessDate"];
+            dueDate: components["schemas"]["BusinessDate"];
+            amount: components["schemas"]["Money"];
+            openAmount: components["schemas"]["Money"];
+            settledAmount: components["schemas"]["Money"];
+            outstanding: components["schemas"]["Money"];
+            accountCode: string;
+            /** Format: uuid */
+            channelId?: string | null;
+            note: string;
+        };
+        OpeningItemList: components["schemas"]["Pagination"] & {
+            items: components["schemas"]["OpeningItem"][];
+            outstandingTotal: components["schemas"]["Money"];
+        };
+        CutoverReconciliationCheck: {
+            code: string;
+            label: string;
+            accountCode: string;
+            subledger: components["schemas"]["Money"];
+            ledger: components["schemas"]["Money"];
+            difference: components["schemas"]["Money"];
+            /** @enum {string} */
+            status: "ok" | "failed" | "skipped";
+            note: string;
+        };
+        CutoverReconciliation: {
+            cutoverDate?: components["schemas"]["BusinessDate"] | null;
+            /**
+             * @description `posted` = saldo GL terposting s.d. cut-over; `draft` = Neraca Saldo Awal belum diposting.
+             * @enum {string|null}
+             */
+            ledgerSource?: "posted" | "draft" | null;
+            checks: components["schemas"]["CutoverReconciliationCheck"][];
+            passed: boolean;
+        };
+        DocumentSequence: {
+            /** @example JV */
+            documentType: string;
+            /** @example Jurnal */
+            label: string;
+            /** @description Saat nomor diberikan, mis. `Posting` atau `Submit`. */
+            assignedAt: string;
+            year: number;
+            /**
+             * Format: int64
+             * @description Nomor urut terakhir yang terpakai; 0 = belum ada dokumen pada tahun ini.
+             */
+            lastNumber: number;
+            /** Format: date-time */
+            lastIssuedAt?: string | null;
+            /** @description Contoh nomor berikutnya, mis. `JV/2026/10/00013`. */
+            example: string;
+        };
+        DocumentSequenceList: {
+            year: number;
+            items: components["schemas"]["DocumentSequence"][];
+        };
+        LocationUpdate: {
+            name: string;
+            isActive: boolean;
+        } & components["schemas"]["VersionInput"];
+        /**
+         * @description `in_progress` Diproses, `completed` Selesai.
+         * @enum {string}
+         */
+        InboundStatus: "in_progress" | "completed";
+        WhLocationRef: {
+            /** Format: uuid */
+            id: string;
+            code: string;
+            name: string;
+            locationType: components["schemas"]["LocationType"];
+            locationTypeLabel: string;
+            isExternal: boolean;
+            warehouseName?: string;
+        };
+        InboundSummary: {
+            /** Format: uuid */
+            id: string;
+            number: string;
+            sourceType: string;
+            sourceTypeLabel: string;
+            sourceLabel: string;
+            location: components["schemas"]["WhLocationRef"];
+            businessDate: components["schemas"]["BusinessDate"];
+            status: components["schemas"]["InboundStatus"];
+            lineCount: number;
+            pendingCount: number;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        InboundList: components["schemas"]["Pagination"] & {
+            items: components["schemas"]["InboundSummary"][];
+        };
+        /**
+         * @description `hold` ditahan di Inbound (reject ke pemasok/maklon), `returns` ke Gudang Retur.
+         * @enum {string}
+         */
+        InboundRejectAction: "hold" | "returns";
+        WhProductRef: {
+            /** Format: uuid */
+            id: string;
+            sku: string;
+            name: string;
+            uom: string;
+        };
+        WhBatchRef: {
+            /** Format: uuid */
+            id: string;
+            number: string;
+            expiryDate?: components["schemas"]["BusinessDate"];
+        };
+        /**
+         * @description Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string.
+         * @example 12.000
+         */
+        WhQuantity: string;
+        /**
+         * @description `quarantine` Karantina (belum QC), `posted` Diposting (lulus), `qc_rejected` Ditolak QC.
+         * @enum {string}
+         */
+        InboundLineStatus: "quarantine" | "posted" | "qc_rejected";
+        InboundLine: {
+            /** Format: uuid */
+            id: string;
+            lineNo: number;
+            product: components["schemas"]["WhProductRef"];
+            batch?: components["schemas"]["WhBatchRef"];
+            qty: components["schemas"]["WhQuantity"];
+            passedQty: components["schemas"]["WhQuantity"];
+            rejectedQty: components["schemas"]["WhQuantity"];
+            destination: components["schemas"]["WhLocationRef"];
+            rejectLocation?: components["schemas"]["WhLocationRef"];
+            status: components["schemas"]["InboundLineStatus"];
+            rejectReason: string;
+            checkedByName?: string;
+            /** Format: date-time */
+            checkedAt?: string;
+            allowedActions: "qc"[];
+        };
+        InboundQcChecklist: {
+            batch: boolean;
+            expiry: boolean;
+            condition: boolean;
+            seal: boolean;
+        };
+        InboundQualityCheck: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            lineId: string;
+            /** @enum {string} */
+            result: "passed" | "rejected";
+            qty: components["schemas"]["WhQuantity"];
+            checks: components["schemas"]["InboundQcChecklist"];
+            note: string;
+            photoFileIds: string[];
+            checkedByName: string;
+            /** Format: date-time */
+            checkedAt: string;
+        };
+        Inbound: components["schemas"]["InboundSummary"] & {
+            /** Format: uuid */
+            sourceId: string;
+            rejectAction: components["schemas"]["InboundRejectAction"];
+            note: string;
+            /** Format: date-time */
+            completedAt?: string;
+            version: number;
+            lines: components["schemas"]["InboundLine"][];
+            checks: components["schemas"]["InboundQualityCheck"][];
+        };
+        InboundQcInput: {
+            passedQty: components["schemas"]["WhQuantity"];
+            rejectedQty: components["schemas"]["WhQuantity"];
+            checks: components["schemas"]["InboundQcChecklist"];
+            rejectReason?: string;
+            /** Format: uuid */
+            destinationLocationId?: string;
+            note?: string;
+            photoFileIds?: string[];
+        };
+        /**
+         * @description `direct` Transfer Stok, `request` Permintaan Petty Stock.
+         * @enum {string}
+         */
+        StockTransferType: "direct" | "request";
+        /** @enum {string} */
+        StockTransferStatus: "draft" | "submitted" | "in_progress" | "in_transit" | "partially_received" | "received" | "completed" | "cancelled";
+        StockTransferSummary: {
+            /** Format: uuid */
+            id: string;
+            number?: string;
+            transferType: components["schemas"]["StockTransferType"];
+            from: components["schemas"]["WhLocationRef"];
+            to: components["schemas"]["WhLocationRef"];
+            requiresShipping: boolean;
+            businessDate: components["schemas"]["BusinessDate"];
+            status: components["schemas"]["StockTransferStatus"];
+            requestedByName: string;
+            lineCount: number;
+            totalQty: components["schemas"]["WhQuantity"];
+            /** Format: date-time */
+            createdAt: string;
+        };
+        StockTransferList: components["schemas"]["Pagination"] & {
+            items: components["schemas"]["StockTransferSummary"][];
+        };
+        StockTransferLineInput: {
+            /** Format: uuid */
+            productId: string;
+            /** Format: uuid */
+            batchId?: string;
+            qty: components["schemas"]["WhQuantity"];
+            batchReason?: string;
+            note?: string;
+        };
+        StockTransferInput: {
+            transferType: components["schemas"]["StockTransferType"];
+            /** Format: uuid */
+            fromLocationId: string;
+            /** Format: uuid */
+            toLocationId: string;
+            businessDate: components["schemas"]["BusinessDate"];
+            note?: string;
+            lines: components["schemas"]["StockTransferLineInput"][];
+        };
+        StockTransferLine: {
+            /** Format: uuid */
+            id: string;
+            lineNo: number;
+            product: components["schemas"]["WhProductRef"];
+            batch?: components["schemas"]["WhBatchRef"];
+            qty: components["schemas"]["WhQuantity"];
+            receivedQty: components["schemas"]["WhQuantity"];
+            shortageQty: components["schemas"]["WhQuantity"];
+            costAmount: components["schemas"]["Money"];
+            batchReason: string;
+            note: string;
+        };
+        /** @enum {string} */
+        StockTransferAction: "edit" | "submit" | "release" | "prepare" | "post" | "ship" | "receive" | "complete" | "cancel";
+        StockTransfer: components["schemas"]["StockTransferSummary"] & {
+            note: string;
+            sourceType?: string;
+            /** Format: uuid */
+            sourceId?: string;
+            /** Format: date-time */
+            submittedAt?: string;
+            releasedByName?: string;
+            /** Format: date-time */
+            releasedAt?: string;
+            preparedByName?: string;
+            /** Format: date-time */
+            preparedAt?: string;
+            shippedByName?: string;
+            /** Format: date-time */
+            shippedAt?: string;
+            receivedByName?: string;
+            /** Format: date-time */
+            receivedAt?: string;
+            /** Format: date-time */
+            completedAt?: string;
+            /** Format: date-time */
+            cancelledAt?: string;
+            cancelReason: string;
+            version: number;
+            lines: components["schemas"]["StockTransferLine"][];
+            allowedActions: components["schemas"]["StockTransferAction"][];
+        };
+        StockInTransitLine: {
+            /** Format: uuid */
+            transferId: string;
+            number?: string;
+            /** Format: uuid */
+            lineId: string;
+            from: components["schemas"]["WhLocationRef"];
+            to: components["schemas"]["WhLocationRef"];
+            businessDate: components["schemas"]["BusinessDate"];
+            /** Format: date-time */
+            shippedAt?: string;
+            status: components["schemas"]["StockTransferStatus"];
+            product: components["schemas"]["WhProductRef"];
+            batch?: components["schemas"]["WhBatchRef"];
+            qty: components["schemas"]["WhQuantity"];
+            receivedQty: components["schemas"]["WhQuantity"];
+            outstandingQty: components["schemas"]["WhQuantity"];
+            costAmount: components["schemas"]["Money"];
+        };
+        StockInTransitList: components["schemas"]["Pagination"] & {
+            items: components["schemas"]["StockInTransitLine"][];
+        };
+        StockTransferReceiveLine: {
+            /** Format: uuid */
+            lineId: string;
+            qty: components["schemas"]["WhQuantity"];
+        };
+        StockTransferActionInput: {
+            action: components["schemas"]["StockTransferAction"];
+            version: number;
+            reason?: string;
+            lines?: components["schemas"]["StockTransferReceiveLine"][];
+        };
+        /** @enum {string} */
+        StockCountStatus: "draft" | "in_progress" | "pending_approval" | "rejected" | "posted" | "completed" | "cancelled";
+        /**
+         * @description `full` Penuh, `cycle` Cycle count, `consignment` Konsinyasi, `vending` Vending.
+         * @enum {string}
+         */
+        StockCountType: "full" | "cycle" | "consignment" | "vending";
+        StockCountSummary: {
+            /** Format: uuid */
+            id: string;
+            number?: string;
+            countType: components["schemas"]["StockCountType"];
+            location: components["schemas"]["WhLocationRef"];
+            businessDate: components["schemas"]["BusinessDate"];
+            status: components["schemas"]["StockCountStatus"];
+            /** Format: uuid */
+            scheduleId?: string;
+            assignedToName: string;
+            lineCount: number;
+            countedCount: number;
+            /** @description Kosong sampai hasil dikirim. */
+            varianceAmount?: components["schemas"]["Money"];
+            /** Format: date-time */
+            createdAt: string;
+        };
+        StockCountList: components["schemas"]["Pagination"] & {
+            items: components["schemas"]["StockCountSummary"][];
+        };
+        StockCountInput: {
+            countType: components["schemas"]["StockCountType"];
+            locationIds: string[];
+            businessDate?: components["schemas"]["BusinessDate"];
+            note?: string;
+        };
+        StockCountLine: {
+            /** Format: uuid */
+            id: string;
+            lineNo: number;
+            product: components["schemas"]["WhProductRef"];
+            batch?: components["schemas"]["WhBatchRef"];
+            /** @description Kosong saat hitung buta (Draft, Diproses, Ditolak). */
+            systemQty?: components["schemas"]["WhQuantity"];
+            countedQty?: components["schemas"]["WhQuantity"];
+            varianceQty?: components["schemas"]["WhQuantity"];
+            unitCost?: string;
+            varianceAmount?: components["schemas"]["Money"];
+            isExtra: boolean;
+            /** Format: uuid */
+            photoFileId?: string;
+            note: string;
+            /** Format: date-time */
+            countedAt?: string;
+        };
+        /** @enum {string} */
+        StockCountAction: "start" | "count" | "submit" | "recount" | "cancel";
+        StockCount: components["schemas"]["StockCountSummary"] & {
+            note: string;
+            photoFileIds: string[];
+            /** @description true = qty sistem dan selisih ditampilkan (setelah hasil dikirim). */
+            revealed: boolean;
+            /** Format: date-time */
+            snapshotAt?: string;
+            startedByName?: string;
+            submittedByName?: string;
+            /** Format: date-time */
+            submittedAt?: string;
+            netVariance?: components["schemas"]["Money"];
+            /** Format: date-time */
+            decidedAt?: string;
+            decisionNote: string;
+            /** Format: date-time */
+            postedAt?: string;
+            /** Format: uuid */
+            journalEntryId?: string;
+            version: number;
+            lines: components["schemas"]["StockCountLine"][];
+            allowedActions: components["schemas"]["StockCountAction"][];
+        };
+        StockCountEntry: {
+            /** Format: uuid */
+            lineId: string;
+            countedQty?: components["schemas"]["WhQuantity"];
+            note?: string;
+            /** Format: uuid */
+            photoFileId?: string;
+        };
+        StockCountExtraEntry: {
+            /** Format: uuid */
+            productId: string;
+            /** Format: uuid */
+            batchId?: string;
+            countedQty: components["schemas"]["WhQuantity"];
+            note?: string;
+        };
+        StockCountEntriesInput: {
+            lines?: components["schemas"]["StockCountEntry"][];
+            extraLines?: components["schemas"]["StockCountExtraEntry"][];
+            /** @description Diisi = mengganti foto lokasi/rak; tidak dikirim = foto tidak berubah. */
+            photoFileIds?: string[];
+        };
+        StockCountActionInput: {
+            action: components["schemas"]["StockCountAction"];
+            version: number;
+            reason?: string;
+        };
+        /** @enum {string} */
+        StockCountFrequency: "weekly" | "monthly" | "yearly";
+        StockCountScheduleInput: {
+            name: string;
+            countType: components["schemas"]["StockCountType"];
+            frequency: components["schemas"]["StockCountFrequency"];
+            dayOfWeek?: number;
+            dayOfMonth?: number;
+            monthOfYear?: number;
+            /** Format: uuid */
+            warehouseId?: string;
+            locationIds?: string[];
+            /** Format: uuid */
+            assigneeUserId?: string;
+            isActive: boolean;
+        };
+        StockCountSchedule: components["schemas"]["StockCountScheduleInput"] & {
+            /** Format: uuid */
+            id: string;
+            assigneeName: string;
+            nextRunDate: components["schemas"]["BusinessDate"];
+            lastRunDate?: components["schemas"]["BusinessDate"];
+            version: number;
+        };
+        /**
+         * @description `available` Tersedia, `quarantine` Karantina, `in_transit` Dalam Pengiriman, `reserved` Dialokasikan.
+         * @enum {string}
+         */
+        StockStatus: "available" | "quarantine" | "in_transit" | "reserved";
+        StockProductRef: {
+            /** Format: uuid */
+            id: string;
+            sku: string;
+            name: string;
+            uom: string;
+        };
+        StockLocationRef: {
+            /** Format: uuid */
+            id: string;
+            code: string;
+            name: string;
+            warehouseName?: string;
+        };
+        /**
+         * @description `expired` Kedaluwarsa, `near_expiry` Segera kedaluwarsa, `ok` Aman, `no_expiry` Tanpa kedaluwarsa.
+         * @enum {string}
+         */
+        ExpiryState: "expired" | "near_expiry" | "ok" | "no_expiry";
+        /**
+         * @description Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string; bisa negatif di kartu stok.
+         * @example 12.000
+         */
+        StockQuantity: string;
+        /**
+         * @description HPP per unit 4 desimal sebagai string.
+         * @example 12500.0000
+         */
+        UnitCost: string;
+        StockBalance: {
+            product: components["schemas"]["StockProductRef"];
+            location: components["schemas"]["StockLocationRef"];
+            /** Format: uuid */
+            batchId?: string;
+            batchNumber?: string;
+            productionDate?: components["schemas"]["BusinessDate"];
+            expiryDate?: components["schemas"]["BusinessDate"];
+            expiryState?: components["schemas"]["ExpiryState"];
+            status: components["schemas"]["StockStatus"];
+            statusLabel: string;
+            qty: components["schemas"]["StockQuantity"];
+            unitCost: components["schemas"]["UnitCost"];
+            value: components["schemas"]["Money"];
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        StockBalanceList: components["schemas"]["Pagination"] & {
+            items: components["schemas"]["StockBalance"][];
+            totalQty: components["schemas"]["StockQuantity"];
+        };
+        /** @enum {string} */
+        StockMovementType: "receive" | "issue" | "move_out" | "move_in";
+        StockCardLine: {
+            /** Format: uuid */
+            movementId: string;
+            businessDate: components["schemas"]["BusinessDate"];
+            /** Format: date-time */
+            createdAt: string;
+            sourceType: string;
+            /** Format: uuid */
+            sourceId: string;
+            sourceLabel: string;
+            movementType: components["schemas"]["StockMovementType"];
+            movementTypeLabel: string;
+            location: components["schemas"]["StockLocationRef"];
+            /** Format: uuid */
+            batchId?: string;
+            batchNumber?: string;
+            status: components["schemas"]["StockStatus"];
+            statusLabel: string;
+            qtyIn: components["schemas"]["StockQuantity"];
+            qtyOut: components["schemas"]["StockQuantity"];
+            unitCost: components["schemas"]["UnitCost"];
+            costAmount: components["schemas"]["Money"];
+            runningQty: components["schemas"]["StockQuantity"];
+            runningValue: components["schemas"]["Money"];
+            batchReason?: string;
+            note: string;
+        };
+        StockCard: components["schemas"]["Pagination"] & {
+            product: components["schemas"]["StockProductRef"];
+            openingQty: components["schemas"]["StockQuantity"];
+            openingValue: components["schemas"]["Money"];
+            qtyIn: components["schemas"]["StockQuantity"];
+            qtyOut: components["schemas"]["StockQuantity"];
+            closingQty: components["schemas"]["StockQuantity"];
+            closingValue: components["schemas"]["Money"];
+            items: components["schemas"]["StockCardLine"][];
+        };
+        BatchSummary: {
+            /** Format: uuid */
+            id: string;
+            product: components["schemas"]["StockProductRef"];
+            batchNumber: string;
+            productionDate?: components["schemas"]["BusinessDate"];
+            expiryDate?: components["schemas"]["BusinessDate"];
+            /** @description Sisa hari sampai kedaluwarsa (negatif = sudah lewat). */
+            daysToExpiry?: number;
+            expiryState: components["schemas"]["ExpiryState"];
+            qtyAvailable: components["schemas"]["StockQuantity"];
+            qtyQuarantine: components["schemas"]["StockQuantity"];
+            qtyInTransit: components["schemas"]["StockQuantity"];
+            qtyReserved: components["schemas"]["StockQuantity"];
+            qtyTotal: components["schemas"]["StockQuantity"];
+            /** Format: date-time */
+            createdAt: string;
+        };
+        BatchList: components["schemas"]["Pagination"] & {
+            items: components["schemas"]["BatchSummary"][];
+            nearExpiryDays: number;
+        };
+        SuggestedBatch: {
+            /** Format: uuid */
+            batchId?: string;
+            batchNumber: string;
+            productionDate?: components["schemas"]["BusinessDate"];
+            expiryDate?: components["schemas"]["BusinessDate"];
+            availableQty: components["schemas"]["StockQuantity"];
+            suggestedQty: components["schemas"]["StockQuantity"];
+        };
+        BatchSuggestion: {
+            product: components["schemas"]["StockProductRef"];
+            location: components["schemas"]["StockLocationRef"];
+            requestedQty: components["schemas"]["StockQuantity"];
+            allocatedQty: components["schemas"]["StockQuantity"];
+            shortfallQty: components["schemas"]["StockQuantity"];
+            quarantineQty: components["schemas"]["StockQuantity"];
+            /** @description Batch Tersedia yang belum kedaluwarsa dalam urutan FEFO; suggestedQty 0 = tidak perlu diambil. */
+            items: components["schemas"]["SuggestedBatch"][];
+            /** @description Batch Tersedia yang sudah kedaluwarsa (tidak diusulkan). */
+            expired: components["schemas"]["SuggestedBatch"][];
+        };
+        CostLayer: {
+            /** Format: uuid */
+            id: string;
+            product: components["schemas"]["StockProductRef"];
+            /** Format: uuid */
+            batchId?: string;
+            batchNumber?: string;
+            expiryDate?: components["schemas"]["BusinessDate"];
+            sourceType: string;
+            /** Format: uuid */
+            sourceId: string;
+            sourceLabel: string;
+            businessDate: components["schemas"]["BusinessDate"];
+            receivedQty: components["schemas"]["StockQuantity"];
+            remainingQty: components["schemas"]["StockQuantity"];
+            consumedQty: components["schemas"]["StockQuantity"];
+            unitCost: components["schemas"]["UnitCost"];
+            remainingValue: components["schemas"]["Money"];
+            /** Format: date-time */
+            createdAt: string;
+        };
+        CostLayerList: components["schemas"]["Pagination"] & {
+            items: components["schemas"]["CostLayer"][];
+        };
+        CostLayerConsumption: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            movementId: string;
+            businessDate: components["schemas"]["BusinessDate"];
+            sourceType: string;
+            /** Format: uuid */
+            sourceId: string;
+            sourceLabel: string;
+            location: components["schemas"]["StockLocationRef"];
+            qty: components["schemas"]["StockQuantity"];
+            unitCost: components["schemas"]["UnitCost"];
+            amount: components["schemas"]["Money"];
+        };
+        CostLayerConsumptionList: {
+            layer: components["schemas"]["CostLayer"];
+            items: components["schemas"]["CostLayerConsumption"][];
+        };
+        BundleComponentAvailability: {
+            /** Format: uuid */
+            productId: string;
+            qtyPerBundle: components["schemas"]["StockQuantity"];
+            availableQty: components["schemas"]["StockQuantity"];
+        };
+        BundleAvailability: {
+            /** Format: uuid */
+            bundleId: string;
+            availableQty: components["schemas"]["StockQuantity"];
+            components: components["schemas"]["BundleComponentAvailability"][];
+        };
+        BundleAvailabilityList: {
+            items: components["schemas"]["BundleAvailability"][];
+        };
+        /** @enum {string} */
+        CustomerType: "retail" | "b2b" | "reseller" | "employee";
+        CustomerAddress: {
+            /** Format: uuid */
+            id: string;
+            label: string;
+            recipientName: string;
+            phone: string;
+            addressLine: string;
+            district: string;
+            city: string;
+            province: string;
+            postalCode: string;
+            latitude?: string | null;
+            longitude?: string | null;
+            isDefault: boolean;
+        };
+        Customer: {
+            /** Format: uuid */
+            id: string;
+            /** @example PLG-000123 */
+            code: string;
+            fullName: string;
+            /** @example +6281234567890 */
+            phone: string;
+            email: string;
+            customerType: components["schemas"]["CustomerType"];
+            /** Format: uuid */
+            employeeId?: string | null;
+            employeeName?: string | null;
+            employeeNumber?: string | null;
+            /** @description Status karyawan hari ini; `false` = karyawan sudah resign dan harga karyawan tidak berlaku. */
+            isEmployeeActive?: boolean | null;
+            marketingConsent: boolean;
+            /** Format: date-time */
+            marketingConsentAt?: string | null;
+            marketingConsentVersion: string;
+            notes: string;
+            addresses: components["schemas"]["CustomerAddress"][];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+        };
+        CustomerList: components["schemas"]["Pagination"] & {
+            items: components["schemas"]["Customer"][];
+        };
+        CustomerAddressInput: {
+            /**
+             * Format: uuid
+             * @description Kosong = alamat baru.
+             */
+            id?: string;
+            /** @example Rumah */
+            label?: string;
+            recipientName: string;
+            phone?: string;
+            addressLine: string;
+            district?: string;
+            city: string;
+            province?: string;
+            postalCode?: string;
+            /** @description Desimal derajat sebagai string, mis. `-6.200000`. */
+            latitude?: string | null;
+            longitude?: string | null;
+            isDefault: boolean;
+        };
+        CustomerInput: {
+            fullName: string;
+            /**
+             * @description Nomor WA/HP; `08…`, `628…`, dan `+628…` disimpan sebagai `+628…`.
+             * @example 0812-3456-7890
+             */
+            phone: string;
+            email?: string;
+            customerType: components["schemas"]["CustomerType"];
+            /**
+             * Format: uuid
+             * @description Wajib untuk tipe `employee`; karyawan harus aktif (HR-03).
+             */
+            employeeId?: string | null;
+            /** @description Persetujuan menerima pesan pemasaran; waktu persetujuan dicatat server (NFR-04). */
+            marketingConsent: boolean;
+            /** @description Versi teks persetujuan yang disetujui pelanggan. */
+            marketingConsentVersion?: string;
+            notes?: string;
+            addresses: components["schemas"]["CustomerAddressInput"][];
+        };
+        /** @enum {string} */
+        PartnerType: "modern_trade" | "consignment" | "b2b";
+        /** @enum {string} */
+        AgreementType: "consignment" | "modern_trade";
+        /** @enum {string} */
+        AgreementStatus: "scheduled" | "active" | "expired";
+        /**
+         * @description Pihak yang menanggung selisih rekonsiliasi konsinyasi (BRD U-02).
+         * @enum {string}
+         */
+        BorneBy: "partner" | "balans";
+        PartnerAgreement: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            partnerId: string;
+            agreementNumber: string;
+            agreementType: components["schemas"]["AgreementType"];
+            validFrom: components["schemas"]["BusinessDate"];
+            validTo: components["schemas"]["BusinessDate"];
+            status: components["schemas"]["AgreementStatus"];
+            /** Format: uuid */
+            fileId?: string | null;
+            fileName?: string | null;
+            /** Format: uuid */
+            priceListId?: string | null;
+            consignmentMarginPercent?: string | null;
+            paymentTermDays: number;
+            lossBorneBy: components["schemas"]["BorneBy"];
+            partnerDamageBorneBy: components["schemas"]["BorneBy"];
+            productDefectBorneBy: components["schemas"]["BorneBy"];
+            nearExpiryBorneBy: components["schemas"]["BorneBy"];
+            notes: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+        };
+        Partner: {
+            /** Format: uuid */
+            id: string;
+            code: string;
+            name: string;
+            partnerType: components["schemas"]["PartnerType"];
+            hasNpwp: boolean;
+            /** @example •••••••••••5678 */
+            npwpMasked?: string | null;
+            address: string;
+            picName: string;
+            picPhone: string;
+            /** Format: uuid */
+            salesUserId?: string | null;
+            salesUserName?: string | null;
+            /** Format: uuid */
+            merchandiserUserId?: string | null;
+            merchandiserUserName?: string | null;
+            notes: string;
+            /** @description PKS yang berlaku hari ini (detail dan daftar). */
+            activeAgreements?: components["schemas"]["PartnerAgreement"][];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+        };
+        PartnerList: components["schemas"]["Pagination"] & {
+            items: components["schemas"]["Partner"][];
+        };
+        PartnerInput: {
+            /** @description Disimpan huruf besar; diabaikan saat update. */
+            code: string;
+            name: string;
+            partnerType: components["schemas"]["PartnerType"];
+            /** @description 15 atau 16 digit; tanda baca diabaikan. */
+            npwp?: string | null;
+            address?: string;
+            picName?: string;
+            picPhone?: string;
+            /** Format: uuid */
+            salesUserId?: string | null;
+            /**
+             * Format: uuid
+             * @description Merchandiser yang ditugaskan; membatasi akses stock count partner (MD-07).
+             */
+            merchandiserUserId?: string | null;
+            notes?: string;
+        };
+        PartnerAgreementInput: {
+            /**
+             * Format: uuid
+             * @description Diisi dari path saat membuat; diabaikan saat update.
+             */
+            partnerId?: string;
+            agreementNumber: string;
+            agreementType: components["schemas"]["AgreementType"];
+            validFrom: components["schemas"]["BusinessDate"];
+            validTo: components["schemas"]["BusinessDate"];
+            /**
+             * Format: uuid
+             * @description PDF PKS hasil upload.
+             */
+            fileId?: string | null;
+            /**
+             * Format: uuid
+             * @description Daftar harga konsinyasi/MT (modul pricing, R1.1).
+             */
+            priceListId?: string | null;
+            /** @description Margin/komisi mitra dari harga jual, persen desimal, mis. `25.0000`. */
+            consignmentMarginPercent?: string | null;
+            paymentTermDays: number;
+            lossBorneBy?: components["schemas"]["BorneBy"];
+            partnerDamageBorneBy?: components["schemas"]["BorneBy"];
+            productDefectBorneBy?: components["schemas"]["BorneBy"];
+            nearExpiryBorneBy?: components["schemas"]["BorneBy"];
+            notes?: string;
+        };
+        PartnerProductCode: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            partnerId: string;
+            partnerCode: string;
+            partnerName: string;
+            /** Format: uuid */
+            productId: string;
+            productSku?: string | null;
+            productName?: string | null;
+            articleCode: string;
+            barcode: string;
+            description: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+        };
+        PartnerProductCodeList: components["schemas"]["Pagination"] & {
+            items: components["schemas"]["PartnerProductCode"][];
+        };
+        PartnerProductCodeUpdate: {
+            articleCode: string;
+            barcode?: string;
+            description?: string;
+        };
+        PartnerProductCodeInput: components["schemas"]["PartnerProductCodeUpdate"] & {
+            /** Format: uuid */
+            partnerId: string;
+            /**
+             * Format: uuid
+             * @description Produk di modul catalog.
+             */
+            productId: string;
+        };
+        /**
+         * @description `toll_manufacturer` = maklon.
+         * @enum {string}
+         */
+        SupplierType: "supplier" | "toll_manufacturer";
+        SupplierBankAccount: {
+            /** Format: uuid */
+            id: string;
+            bankName: string;
+            /** @example ••••••7890 */
+            accountNumberMasked: string;
+            accountName: string;
+            isDefault: boolean;
+        };
+        Supplier: {
+            /** Format: uuid */
+            id: string;
+            code: string;
+            name: string;
+            supplierType: components["schemas"]["SupplierType"];
+            isBusinessEntity: boolean;
+            hasNpwp: boolean;
+            npwpMasked?: string | null;
+            defaultWithholding: components["schemas"]["WithholdingType"];
+            paymentTermDays: number;
+            address: string;
+            phone: string;
+            email: string;
+            picName: string;
+            notes: string;
+            bankAccounts: components["schemas"]["SupplierBankAccount"][];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+        };
+        SupplierList: components["schemas"]["Pagination"] & {
+            items: components["schemas"]["Supplier"][];
+        };
+        SupplierBankAccountInput: {
+            /**
+             * Format: uuid
+             * @description Kosong = rekening baru.
+             */
+            id?: string;
+            bankName: string;
+            /** @description Wajib untuk rekening baru; kosong pada rekening lama = nomor tidak berubah. */
+            accountNumber?: string;
+            accountName: string;
+            isDefault: boolean;
+        };
+        SupplierInput: {
+            code: string;
+            name: string;
+            supplierType: components["schemas"]["SupplierType"];
+            /** @description Badan usaha (PT/CV) atau perorangan. */
+            isBusinessEntity: boolean;
+            npwp?: string | null;
+            defaultWithholding: components["schemas"]["WithholdingType"];
+            paymentTermDays: number;
+            address?: string;
+            phone?: string;
+            email?: string;
+            picName?: string;
+            notes?: string;
+            bankAccounts: components["schemas"]["SupplierBankAccountInput"][];
+        };
+        PartyUserOption: {
+            /** Format: uuid */
+            id: string;
+            fullName: string;
+            email: string;
+        };
+        /**
+         * @description `resigned` juga untuk resign terjadwal; lihat `isActive` untuk status hari ini.
+         * @enum {string}
+         */
+        EmploymentStatus: "active" | "resigned";
+        Employee: {
+            /** Format: uuid */
+            id: string;
+            employeeNumber: string;
+            fullName: string;
+            /** Format: uuid */
+            divisionId?: string | null;
+            positionTitle: string;
+            employmentStatus: components["schemas"]["EmploymentStatus"];
+            /** @description Aktif pada hari ini (WIB). */
+            isActive: boolean;
+            joinDate: components["schemas"]["BusinessDate"];
+            resignDate?: components["schemas"]["BusinessDate"] | null;
+            resignReason: string;
+            workEmail: string;
+            phone: string;
+            hasNik: boolean;
+            nikMasked?: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+        };
+        EmployeeList: components["schemas"]["Pagination"] & {
+            items: components["schemas"]["Employee"][];
+        };
+        EmployeeInput: {
+            /** @description Disimpan huruf besar; diabaikan saat update. */
+            employeeNumber: string;
+            fullName: string;
+            /** Format: uuid */
+            divisionId?: string | null;
+            positionTitle: string;
+            joinDate: components["schemas"]["BusinessDate"];
+            workEmail?: string;
+            phone?: string;
+            /** @description 16 digit NIK KTP. */
+            nik?: string | null;
+        };
+        EmployeeResignInput: {
+            resignDate: components["schemas"]["BusinessDate"];
+            reason: string;
+            version: number;
+        };
+        EmployeeOption: {
+            /** Format: uuid */
+            id: string;
+            employeeNumber: string;
+            fullName: string;
+            isActive: boolean;
+        };
+        FileUploadInput: {
+            /**
+             * @description Jenis pemilik file, mis. `partner_agreement` (PDF PKS).
+             * @example partner_agreement
+             */
+            ownerType: string;
+            fileName: string;
+            /** @example application/pdf */
+            contentType: string;
+            /** Format: int64 */
+            sizeBytes: number;
+        };
+        FileUploadTarget: {
+            /** Format: uuid */
+            fileId: string;
+            /** @description URL relatif untuk `PUT` isi file. */
+            uploadUrl: string;
+            /** Format: date-time */
+            expiresAt: string;
+            /** Format: int64 */
+            maxSizeBytes: number;
+        };
+        FileObject: {
+            /** Format: uuid */
+            id: string;
+            fileName: string;
+            contentType: string;
+            /** Format: int64 */
+            sizeBytes: number;
+            ownerType: string;
+            /** Format: uuid */
+            ownerId?: string | null;
+            /** @enum {string} */
+            status: "pending" | "uploaded";
+            /** Format: date-time */
+            uploadedAt?: string | null;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        FileDownloadTarget: {
+            url: string;
+            /** Format: date-time */
+            expiresAt: string;
+        };
+        /**
+         * @description Cakupan daftar harga (BRD 5.18): `base` Harga Dasar & HET, `channel` per channel/sub-channel, `partner` per
+         *     mitra, `reseller` per level reseller (Fase 2), `employee` harga karyawan, `vending` per channel vending/mesin.
+         * @enum {string}
+         */
+        PriceListType: "base" | "channel" | "partner" | "reseller" | "employee" | "vending";
+        /**
+         * @description `fixed` harga per produk; `percent` persentase dari daftar harga acuan.
+         * @enum {string}
+         */
+        PriceListBasis: "fixed" | "percent";
+        /** @enum {string} */
+        PriceListVersionStatus: "draft" | "pending_approval" | "active" | "rejected" | "cancelled";
+        /**
+         * @description Persen desimal maks. 4 angka di belakang koma, mis. `12.5`.
+         * @example 10
+         */
+        PricingPercent: string;
+        PriceListVersionSummary: {
+            /** Format: uuid */
+            id: string;
+            versionNo: number;
+            status: components["schemas"]["PriceListVersionStatus"];
+            validFrom: components["schemas"]["BusinessDate"];
+            validTo?: components["schemas"]["BusinessDate"] | null;
+            percent?: components["schemas"]["PricingPercent"] | null;
+            itemCount: number;
+            notes: string;
+            /** Format: date-time */
+            submittedAt?: string | null;
+            /** Format: date-time */
+            decidedAt?: string | null;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+        };
+        PriceList: {
+            /** Format: uuid */
+            id: string;
+            /** @example MT-BELI-PUTUS */
+            code: string;
+            name: string;
+            priceListType: components["schemas"]["PriceListType"];
+            /** Format: uuid */
+            channelId?: string | null;
+            /** Format: uuid */
+            subChannelId?: string | null;
+            /** Format: uuid */
+            partnerId?: string | null;
+            partnerName?: string | null;
+            resellerLevel: string;
+            basis: components["schemas"]["PriceListBasis"];
+            /** Format: uuid */
+            referencePriceListId?: string | null;
+            referencePriceListName?: string | null;
+            description: string;
+            isActive: boolean;
+            /** Format: date-time */
+            deletedAt?: string | null;
+            /** @description Versi yang berlaku hari ini. */
+            currentVersion?: components["schemas"]["PriceListVersionSummary"] | null;
+            /** @description Versi aktif terdekat yang mulai berlaku setelah hari ini. */
+            nextVersion?: components["schemas"]["PriceListVersionSummary"] | null;
+            /** @description Versi draft atau yang sedang diajukan. */
+            openVersion?: components["schemas"]["PriceListVersionSummary"] | null;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+        };
+        PriceListFields: {
+            name: string;
+            /** Format: uuid */
+            channelId?: string | null;
+            /** Format: uuid */
+            subChannelId?: string | null;
+            /** Format: uuid */
+            partnerId?: string | null;
+            resellerLevel?: string;
+            basis?: components["schemas"]["PriceListBasis"];
+            /** Format: uuid */
+            referencePriceListId?: string | null;
+            description?: string;
+            isActive: boolean;
+        };
+        PriceListInput: components["schemas"]["PriceListFields"] & {
+            code: string;
+            priceListType: components["schemas"]["PriceListType"];
+        };
+        PriceListDetail: components["schemas"]["PriceList"] & {
+            /** @description Riwayat versi, terbaru dulu. */
+            versions: components["schemas"]["PriceListVersionSummary"][];
+            /** @description update, create_version, delete, restore */
+            allowedActions: string[];
+        };
+        PriceListOption: {
+            /** Format: uuid */
+            id: string;
+            code: string;
+            name: string;
+            priceListType: components["schemas"]["PriceListType"];
+            basis: components["schemas"]["PriceListBasis"];
+        };
+        PriceListUpdate: components["schemas"]["PriceListFields"] & components["schemas"]["VersionInput"];
+        PriceListItemInput: {
+            /** Format: uuid */
+            productId: string;
+            priceAmount: components["schemas"]["Money"];
+            maxRetailPriceAmount?: components["schemas"]["Money"] | null;
+        };
+        PriceListVersionFields: {
+            validFrom: components["schemas"]["BusinessDate"];
+            validTo?: components["schemas"]["BusinessDate"] | null;
+            /** @description Wajib untuk daftar harga basis percent. */
+            percent?: components["schemas"]["PricingPercent"] | null;
+            notes?: string;
+            items: components["schemas"]["PriceListItemInput"][];
+        };
+        PriceListVersionInput: components["schemas"]["PriceListVersionFields"] & {
+            /** Format: uuid */
+            copyFromVersionId?: string | null;
+        };
+        PriceListItem: {
+            /** Format: uuid */
+            productId: string;
+            productSku: string;
+            productName: string;
+            priceAmount: components["schemas"]["Money"];
+            /** @description HET, hanya di Harga Dasar & HET. */
+            maxRetailPriceAmount?: components["schemas"]["Money"] | null;
+        };
+        PriceListVersion: components["schemas"]["PriceListVersionSummary"] & {
+            /** Format: uuid */
+            priceListId: string;
+            priceListCode: string;
+            priceListName: string;
+            priceListType: components["schemas"]["PriceListType"];
+            basis: components["schemas"]["PriceListBasis"];
+            items: components["schemas"]["PriceListItem"][];
+            /** @description update, cancel, submit, withdraw */
+            allowedActions: string[];
+        };
+        PriceListVersionUpdate: components["schemas"]["PriceListVersionFields"] & components["schemas"]["VersionInput"];
+        /** @enum {string} */
+        SpecialPricePartyType: "customer" | "partner";
+        /**
+         * @description Posisi periode berlaku terhadap hari ini.
+         * @enum {string}
+         */
+        PricingPeriodStatus: "scheduled" | "active" | "expired";
+        SpecialPrice: {
+            /** Format: uuid */
+            id: string;
+            partyType: components["schemas"]["SpecialPricePartyType"];
+            /** Format: uuid */
+            partyId: string;
+            partyCode: string;
+            partyName: string;
+            /** Format: uuid */
+            productId: string;
+            productSku: string;
+            productName: string;
+            priceAmount: components["schemas"]["Money"];
+            validFrom: components["schemas"]["BusinessDate"];
+            validTo?: components["schemas"]["BusinessDate"] | null;
+            status: components["schemas"]["PricingPeriodStatus"];
+            notes: string;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+        };
+        SpecialPriceInput: {
+            partyType: components["schemas"]["SpecialPricePartyType"];
+            /** Format: uuid */
+            partyId: string;
+            /** Format: uuid */
+            productId: string;
+            priceAmount: components["schemas"]["Money"];
+            validFrom: components["schemas"]["BusinessDate"];
+            validTo?: components["schemas"]["BusinessDate"] | null;
+            notes?: string;
+        };
+        PricingEndInput: {
+            validTo: components["schemas"]["BusinessDate"];
+            version: number;
+        };
+        PromotionItem: {
+            /** Format: uuid */
+            productId: string;
+            productSku: string;
+            productName: string;
+            priceAmount?: components["schemas"]["Money"] | null;
+            discountPercent?: components["schemas"]["PricingPercent"] | null;
+        };
+        Promotion: {
+            /** Format: uuid */
+            id: string;
+            /** @example PROMO-1111 */
+            code: string;
+            name: string;
+            /**
+             * Format: uuid
+             * @description Kosong = semua channel.
+             */
+            channelId?: string | null;
+            /** Format: uuid */
+            subChannelId?: string | null;
+            validFrom: components["schemas"]["BusinessDate"];
+            validTo: components["schemas"]["BusinessDate"];
+            isActive: boolean;
+            description: string;
+            status: components["schemas"]["PricingPeriodStatus"];
+            itemCount: number;
+            /** @description Hanya di detail. */
+            items?: components["schemas"]["PromotionItem"][];
+            /** @description update, delete */
+            allowedActions: string[];
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+        };
+        /** @description Isi salah satu dari harga promo atau potongan persen dari harga normal. */
+        PromotionItemInput: {
+            /** Format: uuid */
+            productId: string;
+            priceAmount?: components["schemas"]["Money"] | null;
+            discountPercent?: components["schemas"]["PricingPercent"] | null;
+        };
+        PromotionFields: {
+            name: string;
+            /** Format: uuid */
+            channelId?: string | null;
+            /** Format: uuid */
+            subChannelId?: string | null;
+            validFrom: components["schemas"]["BusinessDate"];
+            validTo: components["schemas"]["BusinessDate"];
+            isActive: boolean;
+            description?: string;
+            items: components["schemas"]["PromotionItemInput"][];
+        };
+        PromotionInput: components["schemas"]["PromotionFields"] & {
+            code: string;
+        };
+        PromotionUpdate: components["schemas"]["PromotionFields"] & components["schemas"]["VersionInput"];
+        /**
+         * @description Kuantitas desimal maks. 3 angka di belakang koma.
+         * @example 12
+         */
+        PricingQuantity: string;
+        TieredPrice: {
+            /** Format: uuid */
+            id: string;
+            /**
+             * Format: uuid
+             * @description Kosong = berlaku untuk semua daftar harga.
+             */
+            priceListId?: string | null;
+            priceListCode?: string | null;
+            priceListName?: string | null;
+            /** Format: uuid */
+            productId: string;
+            productSku: string;
+            productName: string;
+            minQty: components["schemas"]["PricingQuantity"];
+            priceAmount: components["schemas"]["Money"];
+            validFrom: components["schemas"]["BusinessDate"];
+            validTo?: components["schemas"]["BusinessDate"] | null;
+            status: components["schemas"]["PricingPeriodStatus"];
+            notes: string;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+        };
+        TieredPriceInput: {
+            /** Format: uuid */
+            priceListId?: string | null;
+            /** Format: uuid */
+            productId: string;
+            minQty: components["schemas"]["PricingQuantity"];
+            priceAmount: components["schemas"]["Money"];
+            validFrom: components["schemas"]["BusinessDate"];
+            validTo?: components["schemas"]["BusinessDate"] | null;
+            notes?: string;
+        };
+        DiscountLimit: {
+            /** Format: uuid */
+            id: string;
+            roleCode: string;
+            roleName: string;
+            maxLineDiscountPercent: components["schemas"]["PricingPercent"];
+            maxDocumentDiscountPercent: components["schemas"]["PricingPercent"];
+            validFrom: components["schemas"]["BusinessDate"];
+            validTo?: components["schemas"]["BusinessDate"] | null;
+            status: components["schemas"]["PricingPeriodStatus"];
+            notes: string;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+        };
+        DiscountLimitInput: {
+            roleCode: string;
+            maxLineDiscountPercent: components["schemas"]["PricingPercent"];
+            maxDocumentDiscountPercent: components["schemas"]["PricingPercent"];
+            validFrom: components["schemas"]["BusinessDate"];
+            validTo?: components["schemas"]["BusinessDate"] | null;
+            notes?: string;
+        };
+        DiscountLimitRole: {
+            code: string;
+            name: string;
+        };
+        PriceQuoteRequest: {
+            /** Format: uuid */
+            productId: string;
+            qty: components["schemas"]["PricingQuantity"];
+            /** Format: uuid */
+            channelId?: string | null;
+            /** Format: uuid */
+            subChannelId?: string | null;
+            /** Format: uuid */
+            customerId?: string | null;
+            /** Format: uuid */
+            partnerId?: string | null;
+            date: components["schemas"]["BusinessDate"];
+        };
+        /**
+         * @description Aturan harga yang menghasilkan harga baris transaksi (BRD 5.18, disimpan sebagai `price_rule`): harga khusus,
+         *     promo, harga bertingkat, daftar harga channel/mitra/karyawan, atau Harga Dasar & HET.
+         * @enum {string}
+         */
+        PriceRule: "special_price" | "promotion" | "tiered_price" | "price_list" | "base_price";
+        PriceQuote: {
+            unitPrice: components["schemas"]["Money"];
+            rule: components["schemas"]["PriceRule"];
+            /**
+             * Format: uuid
+             * @description Disimpan di baris transaksi sebagai `price_source_id`.
+             */
+            sourceId: string;
+            /** Format: uuid */
+            priceListId?: string | null;
+            /** Format: uuid */
+            priceListVersionId?: string | null;
+            /** Format: uuid */
+            promotionId?: string | null;
+            /** Format: uuid */
+            specialPriceId?: string | null;
+            /** Format: uuid */
+            tieredPriceId?: string | null;
+            /** @description Harga tanpa promo (dasar potongan persen promo). */
+            regularPrice?: components["schemas"]["Money"] | null;
+            /** @description HET bila harga berasal dari Harga Dasar & HET. */
+            maxRetailPrice?: components["schemas"]["Money"] | null;
+            description: string;
+        };
+        /**
+         * @description Bentuk diskon manual (MD-05) — persen dari dasar atau nominal rupiah.
+         * @enum {string}
+         */
+        DiscountKind: "percent" | "amount";
+        DiscountValue: {
+            kind: components["schemas"]["DiscountKind"];
+            /** @description Persen (maks. 4 desimal) atau nominal rupiah (maks. 2 desimal) sebagai string desimal. */
+            value: string;
+        };
+        DiscountCheckLine: {
+            grossAmount: components["schemas"]["Money"];
+            discount?: components["schemas"]["DiscountValue"] | null;
+        };
+        DiscountCheckRequest: {
+            lines: components["schemas"]["DiscountCheckLine"][];
+            documentDiscount?: components["schemas"]["DiscountValue"] | null;
+        };
+        DiscountCheckOutcome: {
+            discountAmount: components["schemas"]["Money"];
+            discountPercent: components["schemas"]["PricingPercent"];
+            exceedsLimit: boolean;
+        };
+        DiscountCheckResult: {
+            maxLineDiscountPercent: components["schemas"]["PricingPercent"];
+            maxDocumentDiscountPercent: components["schemas"]["PricingPercent"];
+            lines: components["schemas"]["DiscountCheckOutcome"][];
+            document: components["schemas"]["DiscountCheckOutcome"];
+            subtotalAmount: components["schemas"]["Money"];
+            totalDiscountAmount: components["schemas"]["Money"];
+            /** @description Diskon di atas batas → Sales Order butuh approval `sales_order_discount` (Head Sales). */
+            requiresApproval: boolean;
+        };
+        DataExchangeColumn: {
+            /** @description Nama field (dipakai di `values` dan `errors[].column` preview). */
+            key: string;
+            header: string;
+            required: boolean;
+            /** @enum {string} */
+            columnType: "text" | "integer" | "decimal" | "date" | "choice" | "bool";
+            options: string[];
+            sensitive?: boolean;
+        };
+        DataExchangeKind: {
+            /** @example catalog.product */
+            kind: string;
+            /** @example Produk */
+            label: string;
+            canImport: boolean;
+            canExport: boolean;
+            /** @example import.catalog.product */
+            uploadOwnerType: string;
+            /** Format: int64 */
+            maxFileBytes?: number;
+            columns: components["schemas"]["DataExchangeColumn"][];
+        };
+        DataExchangeKindList: {
+            items: components["schemas"]["DataExchangeKind"][];
+        };
+        ImportJob: {
+            /** Format: uuid */
+            id: string;
+            kind: string;
+            kindLabel: string;
+            fileName: string;
+            /** @enum {string} */
+            status: "uploaded" | "validating" | "validated" | "committing" | "completed" | "failed" | "cancelled";
+            totalRows: number;
+            processedRows: number;
+            validRows: number;
+            errorRows: number;
+            committedRows: number;
+            progress: number;
+            /** @description Alasan gagal untuk status `failed`. */
+            message: string;
+            allowedActions: ("commit" | "cancel" | "download_errors")[];
+            /** Format: date-time */
+            validatedAt?: string | null;
+            /** Format: date-time */
+            completedAt?: string | null;
+            /** Format: uuid */
+            createdBy: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        ImportJobList: {
+            items: components["schemas"]["ImportJob"][];
+            pagination: components["schemas"]["Pagination"];
+        };
+        ImportJobInput: {
+            kind: string;
+            /** Format: uuid */
+            fileId: string;
+        };
+        ImportJobRowError: {
+            /** @description Key kolom; kosong = error baris. */
+            column?: string;
+            message: string;
+        };
+        ImportJobRow: {
+            /** @description Nomor baris di Excel (header = 1). */
+            rowNumber: number;
+            isValid: boolean;
+            values: {
+                [key: string]: string;
+            };
+            errors: components["schemas"]["ImportJobRowError"][];
+        };
+        ImportJobRowList: {
+            items: components["schemas"]["ImportJobRow"][];
+            pagination: components["schemas"]["Pagination"];
+        };
+        DataExchangeFileLink: {
+            url: string;
+            /** Format: date-time */
+            expiresAt: string;
+        };
+        ExportJob: {
+            /** Format: uuid */
+            id: string;
+            kind: string;
+            kindLabel: string;
+            /** @enum {string} */
+            status: "queued" | "running" | "completed" | "failed";
+            totalRows: number;
+            fileName: string;
+            message: string;
+            /** Format: date-time */
+            completedAt?: string | null;
+            /** Format: uuid */
+            createdBy: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        ExportJobList: {
+            items: components["schemas"]["ExportJob"][];
+            pagination: components["schemas"]["Pagination"];
+        };
+        ExportJobInput: {
+            kind: string;
+            /**
+             * @description Parameter ekspor laporan (mis. `year`, `month`, `dateFrom`, `dateTo`, `accountId`, `divisionId` untuk
+             *     Neraca Saldo / Buku Besar). Jenis data master mengabaikannya.
+             */
+            params?: {
+                [key: string]: string;
+            };
+        };
+        PurchaseOption: {
+            /** Format: uuid */
+            id: string;
+            code: string;
+            name: string;
+        };
+        /** @enum {string} */
+        PurchaseRequestStatus: "draft" | "pending_approval" | "approved" | "rejected" | "completed" | "closed" | "cancelled";
+        PurchaseRequestSummary: {
+            /** Format: uuid */
+            id: string;
+            /** @description Nomor PR, diisi saat diajukan. */
+            number?: string | null;
+            /** Format: uuid */
+            divisionId: string;
+            divisionName: string;
+            /** Format: uuid */
+            requestedById: string;
+            requestedByName: string;
+            businessDate: components["schemas"]["BusinessDate"];
+            neededDate?: components["schemas"]["BusinessDate"] | null;
+            note: string;
+            estimatedTotal: components["schemas"]["Money"];
+            status: components["schemas"]["PurchaseRequestStatus"];
+            closeReason: string;
+            /** Format: date-time */
+            submittedAt?: string | null;
+            /** Format: date-time */
+            decidedAt?: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+        };
+        PurchaseRequestList: components["schemas"]["Pagination"] & {
+            items: components["schemas"]["PurchaseRequestSummary"][];
+        };
+        /**
+         * @description Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+         * @example 10000.000
+         */
+        PurchaseQuantity: string;
+        PurchaseRequestLineInput: {
+            /** Format: uuid */
+            productId?: string | null;
+            description?: string;
+            qty: components["schemas"]["PurchaseQuantity"];
+            estimatedPrice: components["schemas"]["Money"];
+            note?: string;
+        };
+        PurchaseRequestFields: {
+            /** Format: uuid */
+            divisionId: string;
+            businessDate: components["schemas"]["BusinessDate"];
+            neededDate?: components["schemas"]["BusinessDate"] | null;
+            note?: string;
+            lines: components["schemas"]["PurchaseRequestLineInput"][];
+        };
+        PurchaseProductRef: {
+            /** Format: uuid */
+            id: string;
+            sku: string;
+            name: string;
+            uom: string;
+        };
+        PurchaseRequestLine: {
+            /** Format: uuid */
+            id: string;
+            lineNo: number;
+            product?: components["schemas"]["PurchaseProductRef"] | null;
+            description: string;
+            qty: components["schemas"]["PurchaseQuantity"];
+            estimatedPrice: components["schemas"]["Money"];
+            estimatedAmount: components["schemas"]["Money"];
+            fulfilledQty: components["schemas"]["PurchaseQuantity"];
+            remainingQty: components["schemas"]["PurchaseQuantity"];
+            note: string;
+        };
+        /** @enum {string} */
+        PurchaseOrderStatus: "draft" | "pending_approval" | "approved" | "rejected" | "partially_received" | "received" | "completed" | "closed" | "cancelled";
+        PurchaseRequestOrderRef: {
+            /** Format: uuid */
+            purchaseOrderId: string;
+            purchaseOrderNumber?: string | null;
+            status: components["schemas"]["PurchaseOrderStatus"];
+            /** Format: uuid */
+            purchaseRequestLineId: string;
+            orderedQty: components["schemas"]["PurchaseQuantity"];
+            receivedQty: components["schemas"]["PurchaseQuantity"];
+        };
+        PurchaseRequest: components["schemas"]["PurchaseRequestSummary"] & {
+            lines: components["schemas"]["PurchaseRequestLine"][];
+            orders: components["schemas"]["PurchaseRequestOrderRef"][];
+            allowedActions: ("edit" | "submit" | "cancel" | "revise" | "close" | "create_order")[];
+        };
+        PurchaseRequestUpdate: components["schemas"]["PurchaseRequestFields"] & components["schemas"]["VersionInput"];
+        PurchaseReasonInput: {
+            version: number;
+            reason: string;
+        };
+        /**
+         * @description Jenis PO: `goods` barang, `packaging` packaging (RM), `toll_manufacturing` jasa maklon per batch,
+         *     `reprocess` reprocess bahan GM di maklon, `other` lainnya (baris boleh berupa uraian).
+         * @enum {string}
+         */
+        PurchaseOrderType: "goods" | "packaging" | "toll_manufacturing" | "reprocess" | "other";
+        PurchaseOrderSummary: {
+            /** Format: uuid */
+            id: string;
+            /** @description Nomor PO, diisi saat diajukan. */
+            number?: string | null;
+            orderType: components["schemas"]["PurchaseOrderType"];
+            orderTypeLabel: string;
+            /** Format: uuid */
+            supplierId: string;
+            supplierCode: string;
+            supplierName: string;
+            /** Format: uuid */
+            divisionId: string;
+            divisionName: string;
+            businessDate: components["schemas"]["BusinessDate"];
+            expectedDate: components["schemas"]["BusinessDate"];
+            paymentTermDays: number;
+            totalAmount: components["schemas"]["Money"];
+            status: components["schemas"]["PurchaseOrderStatus"];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+        };
+        PurchaseOrderList: components["schemas"]["Pagination"] & {
+            items: components["schemas"]["PurchaseOrderSummary"][];
+        };
+        PurchaseOrderLineInput: {
+            /** Format: uuid */
+            productId?: string | null;
+            description?: string;
+            qty: components["schemas"]["PurchaseQuantity"];
+            unitPrice: components["schemas"]["Money"];
+            /** Format: uuid */
+            purchaseRequestLineId?: string | null;
+            note?: string;
+        };
+        PurchaseOrderMaterialInput: {
+            /** Format: uuid */
+            productId: string;
+            plannedQty: components["schemas"]["PurchaseQuantity"];
+            note?: string;
+        };
+        PurchaseOrderFields: {
+            /** Format: uuid */
+            supplierId: string;
+            /** Format: uuid */
+            divisionId: string;
+            businessDate: components["schemas"]["BusinessDate"];
+            expectedDate: components["schemas"]["BusinessDate"];
+            /** @description Kosong = termin default pemasok. */
+            paymentTermDays?: number | null;
+            note?: string;
+            /**
+             * Format: uuid
+             * @description Lokasi asal bahan — wajib Gudang GM – GM untuk reprocess, opsional Gudang GM – RM untuk maklon.
+             */
+            materialSourceLocationId?: string | null;
+            lines: components["schemas"]["PurchaseOrderLineInput"][];
+            materials?: components["schemas"]["PurchaseOrderMaterialInput"][];
+        };
+        PurchaseOrderInput: components["schemas"]["PurchaseOrderFields"] & {
+            orderType: components["schemas"]["PurchaseOrderType"];
+        };
+        PurchaseOrderSupplier: {
+            /** Format: uuid */
+            id: string;
+            code: string;
+            name: string;
+            address: string;
+            phone: string;
+            email: string;
+            picName: string;
+        };
+        PurchaseLocationRef: {
+            /** Format: uuid */
+            id: string;
+            code: string;
+            name: string;
+        };
+        PurchaseOrderLine: {
+            /** Format: uuid */
+            id: string;
+            lineNo: number;
+            product?: components["schemas"]["PurchaseProductRef"] | null;
+            description: string;
+            orderedQty: components["schemas"]["PurchaseQuantity"];
+            unitPrice: components["schemas"]["Money"];
+            amount: components["schemas"]["Money"];
+            receivedQty: components["schemas"]["PurchaseQuantity"];
+            billedQty: components["schemas"]["PurchaseQuantity"];
+            outstandingQty: components["schemas"]["PurchaseQuantity"];
+            /** Format: uuid */
+            purchaseRequestLineId?: string | null;
+            /** Format: uuid */
+            purchaseRequestId?: string | null;
+            purchaseRequestNumber?: string | null;
+            note: string;
+        };
+        PurchaseOrderMaterial: {
+            /** Format: uuid */
+            id: string;
+            lineNo: number;
+            product: components["schemas"]["PurchaseProductRef"];
+            plannedQty: components["schemas"]["PurchaseQuantity"];
+            note: string;
+        };
+        /** @enum {string} */
+        PurchaseAdvanceStatus: "draft" | "posted" | "cancelled";
+        PurchaseAdvance: {
+            /** Format: uuid */
+            id: string;
+            /** @description Nomor BYR, diisi saat diposting. */
+            number?: string | null;
+            /** Format: uuid */
+            purchaseOrderId: string;
+            purchaseOrderNumber: string;
+            /** Format: uuid */
+            supplierId: string;
+            supplierName: string;
+            /** Format: uuid */
+            divisionId: string;
+            amount: components["schemas"]["Money"];
+            paymentDate: components["schemas"]["BusinessDate"];
+            bankAccountCode: string;
+            note: string;
+            appliedAmount: components["schemas"]["Money"];
+            outstandingAmount: components["schemas"]["Money"];
+            status: components["schemas"]["PurchaseAdvanceStatus"];
+            /** Format: uuid */
+            journalEntryId?: string | null;
+            /** Format: uuid */
+            reversalJournalEntryId?: string | null;
+            cancelReason: string;
+            /** Format: date-time */
+            postedAt?: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+            allowedActions: ("edit" | "post" | "cancel")[];
+        };
+        PurchaseOrder: components["schemas"]["PurchaseOrderSummary"] & {
+            note: string;
+            subtotalAmount: components["schemas"]["Money"];
+            closeReason: string;
+            cancelReason: string;
+            /** Format: date-time */
+            submittedAt?: string | null;
+            /** Format: date-time */
+            approvedAt?: string | null;
+            createdByName: string;
+            supplier?: components["schemas"]["PurchaseOrderSupplier"] | null;
+            tollLocation?: components["schemas"]["PurchaseLocationRef"] | null;
+            materialSourceLocation?: components["schemas"]["PurchaseLocationRef"] | null;
+            lines: components["schemas"]["PurchaseOrderLine"][];
+            materials: components["schemas"]["PurchaseOrderMaterial"][];
+            advances: components["schemas"]["PurchaseAdvance"][];
+            advancePaidAmount: components["schemas"]["Money"];
+            advanceOutstandingAmount: components["schemas"]["Money"];
+            allowedActions: ("edit" | "submit" | "cancel" | "revise" | "close" | "print" | "create_advance")[];
+        };
+        PurchaseOrderUpdate: components["schemas"]["PurchaseOrderFields"] & components["schemas"]["VersionInput"];
+        PurchaseCancelInput: {
+            version: number;
+            /** @description Wajib untuk PO Disetujui dan uang muka Diposting. */
+            reason?: string;
+        };
+        PurchaseAdvanceList: components["schemas"]["Pagination"] & {
+            items: components["schemas"]["PurchaseAdvance"][];
+        };
+        PurchaseAdvanceFields: {
+            amount: components["schemas"]["Money"];
+            paymentDate: components["schemas"]["BusinessDate"];
+            /** @example 1111 */
+            bankAccountCode: string;
+            note?: string;
+        };
+        PurchaseAdvanceInput: components["schemas"]["PurchaseAdvanceFields"] & {
+            /** Format: uuid */
+            purchaseOrderId: string;
+        };
+        PurchaseAdvanceUpdate: components["schemas"]["PurchaseAdvanceFields"] & components["schemas"]["VersionInput"];
+    };
     responses: {
-      /** @description Proses berjalan */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["HealthStatus"]
-        }
-      }
-    }
-  }
-  getReadiness: {
+        /** @description Error standar (problem+json) */
+        Problem: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/problem+json": components["schemas"]["Problem"];
+            };
+        };
+    };
     parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Siap */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ReadinessStatus"]
-        }
-      }
-      /** @description Belum siap */
-      503: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ReadinessStatus"]
-        }
-      }
-    }
-  }
-  getSystemInfo: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Informasi sistem */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SystemInfo"]
-        }
-      }
-      /** @description Kesalahan sistem */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["Problem"]
-        }
-      }
-    }
-  }
-  receiveMidtransWebhook: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["MidtransNotification"]
-      }
-    }
-    responses: {
-      /** @description Event diterima atau sudah pernah diterima */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["WebhookAck"]
-        }
-      }
-      /** @description Payload tidak bisa dibaca */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["Problem"]
-        }
-      }
-      /** @description Signature tidak valid */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["Problem"]
-        }
-      }
-    }
-  }
-  listReturnReasons: {
-    parameters: {
-      query?: {
-        includeInactive?: boolean
-        appliesTo?: components["schemas"]["ReturnReasonScope"]
-        q?: components["parameters"]["Search"]
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Alasan retur urut kode */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ReturnReason"][]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createReturnReason: {
-    parameters: {
-      query?: never
-      header: {
+        Search: string;
         /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ReturnReasonInput"]
-      }
-    }
-    responses: {
-      /** @description Alasan retur dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ReturnReason"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  updateReturnReason: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ReturnReasonUpdate"]
-      }
-    }
-    responses: {
-      /** @description Alasan retur diperbarui */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ReturnReason"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  deleteReturnReason: {
-    parameters: {
-      query: {
-        /** @description Versi terakhir yang dilihat user (optimistic locking). */
-        version: number
-      }
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Alasan retur dihapus */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  receiveBiteshipWebhook: {
-    parameters: {
-      query?: never
-      header: {
-        "X-Biteship-Signature": string
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["BiteshipNotification"]
-      }
-    }
-    responses: {
-      /** @description Event diterima atau sudah pernah diterima */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["WebhookAck"]
-        }
-      }
-      /** @description Payload tidak bisa dibaca */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["Problem"]
-        }
-      }
-      /** @description Signature tidak valid */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/problem+json": components["schemas"]["Problem"]
-        }
-      }
-    }
-  }
-  login: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["LoginRequest"]
-      }
-    }
-    responses: {
-      /** @description Berhasil masuk */
-      200: {
-        headers: {
-          "Set-Cookie"?: string
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["AccessToken"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  refreshSession: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: {
-        balans_refresh?: components["parameters"]["RefreshCookie"]
-      }
-    }
-    requestBody?: never
-    responses: {
-      /** @description Access token baru */
-      200: {
-        headers: {
-          "Set-Cookie"?: string
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["AccessToken"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  logout: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: {
-        balans_refresh?: components["parameters"]["RefreshCookie"]
-      }
-    }
-    requestBody?: never
-    responses: {
-      /** @description Sesi dicabut */
-      204: {
-        headers: {
-          "Set-Cookie"?: string
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  reauthenticate: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ReauthRequest"]
-      }
-    }
-    responses: {
-      /** @description Access token baru */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["AccessToken"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  requestPasswordReset: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PasswordForgotRequest"]
-      }
-    }
-    responses: {
-      /** @description Diterima */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getPasswordToken: {
-    parameters: {
-      query: {
-        token: string
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Tautan berlaku */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PasswordTokenInfo"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  setupPassword: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PasswordSetupRequest"]
-      }
-    }
-    responses: {
-      /** @description Password tersimpan; semua sesi lama dicabut */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  changePassword: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PasswordChangeRequest"]
-      }
-    }
-    responses: {
-      /** @description Password diganti; sesi lain dicabut */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  setupMfa: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Secret dan QR code */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["MfaSetup"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  activateMfa: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["MfaActivateRequest"]
-      }
-    }
-    responses: {
-      /** @description MFA aktif */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getCurrentUser: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Data user */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["CurrentUser"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listUsers: {
-    parameters: {
-      query?: {
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
+        IdempotencyKey: string;
+        Id: string;
+        RefreshCookie: string;
+        Page: number;
+        PageSize: number;
         /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
-        sort?: components["parameters"]["Sort"]
-        q?: components["parameters"]["Search"]
-        isActive?: boolean
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Daftar pengguna */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["UserList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createUser: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["UserInput"]
-      }
-    }
-    responses: {
-      /** @description Pengguna dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["User"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getUser: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Pengguna */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["User"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  updateUser: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["UserUpdate"]
-      }
-    }
-    responses: {
-      /** @description Pengguna diubah */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["User"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  activateUser: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["VersionInput"]
-      }
-    }
-    responses: {
-      /** @description Pengguna aktif */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["User"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  deactivateUser: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["VersionInput"]
-      }
-    }
-    responses: {
-      /** @description Pengguna nonaktif */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["User"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  resendUserInvitation: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Undangan dikirim */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  resetUserMfa: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description MFA direset */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listRoles: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Daftar role */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Role"][]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  setRolePermissions: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RolePermissionsInput"]
-      }
-    }
-    responses: {
-      /** @description Role diubah */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Role"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listPermissions: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Katalog permission */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Permission"][]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listAuditLogs: {
-    parameters: {
-      query?: {
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
-        entityType?: string
-        entityId?: string
-        actorId?: string
-        action?: components["schemas"]["AuditAction"]
-        createdFrom?: string
-        createdTo?: string
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Riwayat perubahan */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["AuditLogList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listApprovalInbox: {
-    parameters: {
-      query?: {
-        subjectType?: string
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Dokumen menunggu keputusan */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ApprovalInbox"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getApprovalInboxCount: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Jumlah dokumen */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ApprovalInboxCount"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listApprovalSubjectTypes: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Jenis dokumen */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ApprovalSubjectType"][]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listApprovalUserOptions: {
-    parameters: {
-      query?: {
-        q?: string
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Maksimal 20 pengguna */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ApprovalUserOption"][]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listApprovalRequests: {
-    parameters: {
-      query?: {
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
-        scope?: "requested" | "decided" | "all"
-        status?: components["schemas"]["ApprovalStatus"]
-        subjectType?: string
-        subjectId?: string
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Permintaan persetujuan, terbaru lebih dulu */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ApprovalRequestList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getApprovalRequest: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Permintaan persetujuan */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ApprovalRequest"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  approveApprovalRequest: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ApprovalApproveInput"]
-      }
-    }
-    responses: {
-      /** @description Keputusan tersimpan */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ApprovalRequest"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  rejectApprovalRequest: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ApprovalRejectInput"]
-      }
-    }
-    responses: {
-      /** @description Dokumen ditolak */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ApprovalRequest"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listApprovalPolicies: {
-    parameters: {
-      query?: {
-        subjectType?: string
-        includeEnded?: boolean
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Kebijakan per jenis dokumen dan level */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ApprovalPolicy"][]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createApprovalPolicy: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ApprovalPolicyInput"]
-      }
-    }
-    responses: {
-      /** @description Kebijakan dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ApprovalPolicy"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  updateApprovalPolicy: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ApprovalPolicyUpdate"]
-      }
-    }
-    responses: {
-      /** @description Versi baru kebijakan */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ApprovalPolicy"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  endApprovalPolicy: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["VersionInput"]
-      }
-    }
-    responses: {
-      /** @description Kebijakan dihentikan */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ApprovalPolicy"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listApprovalDelegations: {
-    parameters: {
-      query?: {
-        all?: boolean
-        includePast?: boolean
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Delegasi, terbaru lebih dulu */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ApprovalDelegation"][]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createApprovalDelegation: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ApprovalDelegationInput"]
-      }
-    }
-    responses: {
-      /** @description Delegasi dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ApprovalDelegation"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  cancelApprovalDelegation: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["VersionInput"]
-      }
-    }
-    responses: {
-      /** @description Delegasi dihentikan */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ApprovalDelegation"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listNotifications: {
-    parameters: {
-      query?: {
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
-        unreadOnly?: boolean
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Daftar notifikasi, terbaru lebih dulu */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["NotificationList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getNotificationUnreadCount: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Jumlah notifikasi belum dibaca */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["NotificationUnreadCount"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  markAllNotificationsRead: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Semua ditandai sudah dibaca */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  markNotificationRead: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Ditandai sudah dibaca */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listProducts: {
-    parameters: {
-      query?: {
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
-        /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
-        sort?: components["parameters"]["Sort"]
-        q?: components["parameters"]["Search"]
-        /** @description Bisa lebih dari satu, mis. `productType=packaging&productType=reprocess_material`. */
-        productType?: components["schemas"]["ProductType"][]
-        isBundle?: boolean
-        categoryId?: string
-        isActive?: boolean
-        deleted?: boolean
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Daftar produk; field sort yang diizinkan `sku`, `name`, `createdAt` */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ProductList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createProduct: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ProductInput"]
-      }
-    }
-    responses: {
-      /** @description Produk dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Product"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  lookupProduct: {
-    parameters: {
-      query: {
-        code: string
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Produk dengan SKU atau barcode tersebut */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Product"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getProduct: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Detail produk */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Product"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  updateProduct: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ProductUpdate"]
-      }
-    }
-    responses: {
-      /** @description Produk diubah */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Product"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  deleteProduct: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Produk dihapus */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  restoreProduct: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Produk dipulihkan */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Product"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listProductCategories: {
-    parameters: {
-      query?: {
-        deleted?: boolean
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Kategori urut kode */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ProductCategory"][]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createProductCategory: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ProductCategoryInput"]
-      }
-    }
-    responses: {
-      /** @description Kategori dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ProductCategory"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  updateProductCategory: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ProductCategoryUpdate"]
-      }
-    }
-    responses: {
-      /** @description Kategori diubah */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ProductCategory"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  deleteProductCategory: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Kategori dihapus */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  restoreProductCategory: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Kategori dipulihkan */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ProductCategory"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listWarehouses: {
-    parameters: {
-      query?: {
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
-        /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
-        sort?: components["parameters"]["Sort"]
-        q?: components["parameters"]["Search"]
-        isActive?: boolean
-        deleted?: boolean
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Daftar gudang; field sort yang diizinkan `code`, `name`, `createdAt` */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["WarehouseList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createWarehouse: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["WarehouseInput"]
-      }
-    }
-    responses: {
-      /** @description Gudang dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Warehouse"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getWarehouse: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Detail gudang */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Warehouse"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  updateWarehouse: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["WarehouseUpdate"]
-      }
-    }
-    responses: {
-      /** @description Gudang diubah */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Warehouse"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  deleteWarehouse: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Gudang dihapus */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  restoreWarehouse: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Gudang dipulihkan */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Warehouse"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listLocations: {
-    parameters: {
-      query?: {
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
-        /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
-        sort?: components["parameters"]["Sort"]
-        q?: components["parameters"]["Search"]
-        warehouseId?: string
-        /** @description Bisa lebih dari satu. */
-        locationType?: components["schemas"]["LocationType"][]
-        /** @description `true` hanya lokasi eksternal, `false` hanya lokasi di dalam gudang. */
-        external?: boolean
-        externalPartyType?: components["schemas"]["ExternalPartyType"]
-        externalPartyId?: string
-        isActive?: boolean
-        deleted?: boolean
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Daftar lokasi; field sort yang diizinkan `code`, `name`, `createdAt` */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["LocationList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createLocation: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["LocationInput"]
-      }
-    }
-    responses: {
-      /** @description Lokasi dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Location"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listAccounts: {
-    parameters: {
-      query?: {
-        includeInactive?: boolean
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Akun COA */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Account"][]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createAccount: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["AccountInput"]
-      }
-    }
-    responses: {
-      /** @description Akun dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Account"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getAccount: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Akun */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Account"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  updateAccount: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["AccountUpdate"]
-      }
-    }
-    responses: {
-      /** @description Akun diperbarui */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Account"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  deleteAccount: {
-    parameters: {
-      query: {
+        Sort: string;
         /** @description Versi terakhir yang dilihat user (optimistic locking). */
-        version: components["parameters"]["Version"]
-      }
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Akun dihapus */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listChannels: {
-    parameters: {
-      query?: {
-        includeInactive?: components["parameters"]["IncludeInactive"]
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Channel */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Dimension"][]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createChannel: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["DimensionInput"]
-      }
-    }
-    responses: {
-      /** @description Channel dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Dimension"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  updateChannel: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["DimensionUpdate"]
-      }
-    }
-    responses: {
-      /** @description Channel diperbarui */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Dimension"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  deleteChannel: {
-    parameters: {
-      query: {
+        Version: number;
+        IncludeInactive: boolean;
         /** @description Versi terakhir yang dilihat user (optimistic locking). */
-        version: components["parameters"]["Version"]
-      }
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Channel dihapus */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listSubChannels: {
-    parameters: {
-      query?: {
-        includeInactive?: components["parameters"]["IncludeInactive"]
-        channelId?: string
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Sub-channel */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Dimension"][]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createSubChannel: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SubChannelInput"]
-      }
-    }
-    responses: {
-      /** @description Sub-channel dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Dimension"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  updateSubChannel: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SubChannelUpdate"]
-      }
-    }
-    responses: {
-      /** @description Sub-channel diperbarui */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Dimension"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  deleteSubChannel: {
-    parameters: {
-      query: {
-        /** @description Versi terakhir yang dilihat user (optimistic locking). */
-        version: components["parameters"]["Version"]
-      }
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Sub-channel dihapus */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listDivisions: {
-    parameters: {
-      query?: {
-        includeInactive?: components["parameters"]["IncludeInactive"]
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Divisi */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Dimension"][]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createDivision: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["DimensionInput"]
-      }
-    }
-    responses: {
-      /** @description Divisi dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Dimension"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  updateDivision: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["DimensionUpdate"]
-      }
-    }
-    responses: {
-      /** @description Divisi diperbarui */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Dimension"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  deleteDivision: {
-    parameters: {
-      query: {
-        /** @description Versi terakhir yang dilihat user (optimistic locking). */
-        version: components["parameters"]["Version"]
-      }
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Divisi dihapus */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listCampaigns: {
-    parameters: {
-      query?: {
-        includeInactive?: components["parameters"]["IncludeInactive"]
-        q?: components["parameters"]["Search"]
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Kampanye, terbaru lebih dulu */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Dimension"][]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createCampaign: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CampaignInput"]
-      }
-    }
-    responses: {
-      /** @description Kampanye dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Dimension"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  updateCampaign: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CampaignUpdate"]
-      }
-    }
-    responses: {
-      /** @description Kampanye diperbarui */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Dimension"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  deleteCampaign: {
-    parameters: {
-      query: {
-        /** @description Versi terakhir yang dilihat user (optimistic locking). */
-        version: components["parameters"]["Version"]
-      }
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Kampanye dihapus */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listExpenseTypes: {
-    parameters: {
-      query?: {
-        includeInactive?: components["parameters"]["IncludeInactive"]
-        q?: components["parameters"]["Search"]
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Jenis biaya urut kode */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ExpenseType"][]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createExpenseType: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ExpenseTypeInput"]
-      }
-    }
-    responses: {
-      /** @description Jenis biaya dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ExpenseType"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  updateExpenseType: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ExpenseTypeUpdate"]
-      }
-    }
-    responses: {
-      /** @description Jenis biaya diperbarui */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ExpenseType"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  deleteExpenseType: {
-    parameters: {
-      query: {
-        /** @description Versi terakhir yang dilihat user (optimistic locking). */
-        version: components["parameters"]["Version"]
-      }
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Jenis biaya dihapus */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listFiscalPeriods: {
-    parameters: {
-      query?: {
-        year?: number
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Periode terbaru lebih dulu */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["FiscalPeriod"][]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  ensureFiscalPeriods: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Jumlah periode yang dibuat */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": {
-            created: number
-          }
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listPostingRules: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Posting rule urut kode */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PostingRule"][]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listJournalEntries: {
-    parameters: {
-      query?: {
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
-        q?: components["parameters"]["Search"]
-        status?: components["schemas"]["JournalStatus"]
-        entryType?: components["schemas"]["JournalEntryType"]
-        dateFrom?: components["schemas"]["BusinessDate"]
-        dateTo?: components["schemas"]["BusinessDate"]
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Jurnal terbaru lebih dulu; draft tanpa nomor di atas */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["JournalEntryList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createJournalEntry: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ManualJournalFields"]
-      }
-    }
-    responses: {
-      /** @description Draft dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["JournalEntry"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getJournalEntry: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Jurnal */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["JournalEntry"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  updateJournalEntry: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ManualJournalUpdate"]
-      }
-    }
-    responses: {
-      /** @description Draft diperbarui */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["JournalEntry"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  deleteJournalEntry: {
-    parameters: {
-      query: {
-        /** @description Versi terakhir yang dilihat user (optimistic locking). */
-        version: components["parameters"]["Version"]
-      }
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Draft dihapus */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  postJournalEntry: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["VersionInput"]
-      }
-    }
-    responses: {
-      /** @description Jurnal diposting */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["JournalEntry"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  reverseJournalEntry: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["JournalReverseInput"]
-      }
-    }
-    responses: {
-      /** @description Jurnal pembalik */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["JournalEntry"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getGeneralLedger: {
-    parameters: {
-      query: {
-        accountId: string
-        dateFrom: components["schemas"]["BusinessDate"]
-        dateTo: components["schemas"]["BusinessDate"]
-        channelId?: string
-        subChannelId?: string
-        divisionId?: string
-        campaignId?: string
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Buku Besar */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["GeneralLedger"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listDocumentSequences: {
-    parameters: {
-      query?: {
-        year?: number
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Semua kode dokumen beserta nomor terakhir pada tahun tersebut */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["DocumentSequenceList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getLocation: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Detail lokasi */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Location"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  updateLocation: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["LocationUpdate"]
-      }
-    }
-    responses: {
-      /** @description Lokasi diubah */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Location"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  deleteLocation: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Lokasi dihapus */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  restoreLocation: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Lokasi dipulihkan */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Location"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listInbounds: {
-    parameters: {
-      query?: {
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
-        q?: components["parameters"]["Search"]
-        status?: components["schemas"]["InboundStatus"]
-        sourceType?: string
-        warehouseId?: string
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Daftar Inbound */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["InboundList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getInbound: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Detail Inbound */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Inbound"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  recordInboundQc: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-        lineId: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["InboundQcInput"]
-      }
-    }
-    responses: {
-      /** @description Inbound setelah QC */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Inbound"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listStockTransfers: {
-    parameters: {
-      query?: {
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
-        q?: components["parameters"]["Search"]
-        transferType?: components["schemas"]["StockTransferType"]
-        /** @description Bisa lebih dari satu. */
-        status?: components["schemas"]["StockTransferStatus"][]
-        locationId?: string
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Daftar transfer */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["StockTransferList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createStockTransfer: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["StockTransferInput"]
-      }
-    }
-    responses: {
-      /** @description Transfer dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["StockTransfer"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listStockInTransit: {
-    parameters: {
-      query?: {
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
-        locationId?: string
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Baris Dalam Pengiriman */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["StockInTransitList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getStockTransfer: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Detail transfer */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["StockTransfer"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  updateStockTransfer: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["StockTransferInput"] &
-          components["schemas"]["VersionInput"]
-      }
-    }
-    responses: {
-      /** @description Transfer diubah */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["StockTransfer"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  actOnStockTransfer: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["StockTransferActionInput"]
-      }
-    }
-    responses: {
-      /** @description Transfer setelah aksi */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["StockTransfer"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listStockCounts: {
-    parameters: {
-      query?: {
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
-        q?: components["parameters"]["Search"]
-        /** @description Bisa lebih dari satu. */
-        status?: components["schemas"]["StockCountStatus"][]
-        countType?: components["schemas"]["StockCountType"]
-        locationId?: string
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Daftar stock count */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["StockCountList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createStockCounts: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["StockCountInput"]
-      }
-    }
-    responses: {
-      /** @description Stock count dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": {
-            items: components["schemas"]["StockCountSummary"][]
-          }
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getStockCount: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Detail stock count */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["StockCount"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  saveStockCountEntries: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["StockCountEntriesInput"]
-      }
-    }
-    responses: {
-      /** @description Stock count setelah disimpan */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["StockCount"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  actOnStockCount: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["StockCountActionInput"]
-      }
-    }
-    responses: {
-      /** @description Stock count setelah aksi */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["StockCount"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listStockCountSchedules: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Jadwal */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": {
-            items: components["schemas"]["StockCountSchedule"][]
-          }
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createStockCountSchedule: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["StockCountScheduleInput"]
-      }
-    }
-    responses: {
-      /** @description Jadwal dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["StockCountSchedule"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  updateStockCountSchedule: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["StockCountScheduleInput"] &
-          components["schemas"]["VersionInput"]
-      }
-    }
-    responses: {
-      /** @description Jadwal diubah */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["StockCountSchedule"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listStockBalances: {
-    parameters: {
-      query?: {
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
-        productId?: string
-        /** @description Bisa lebih dari satu. */
-        locationId?: string[]
-        batchId?: string
-        /** @description Bisa lebih dari satu. */
-        status?: components["schemas"]["StockStatus"][]
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Saldo stok */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["StockBalanceList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getStockCard: {
-    parameters: {
-      query: {
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
-        productId: string
-        locationId?: string
-        batchId?: string
-        status?: components["schemas"]["StockStatus"]
-        dateFrom: string
-        dateTo: string
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Kartu stok */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["StockCard"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listBatches: {
-    parameters: {
-      query?: {
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
-        q?: components["parameters"]["Search"]
-        productId?: string
-        expiryState?: components["schemas"]["ExpiryState"]
-        /** @description Batas hari "Segera kedaluwarsa" (default 90). */
-        nearExpiryDays?: number
-        /** @description Default `true` — hanya batch yang masih punya stok. */
-        withStock?: boolean
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Daftar batch */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["BatchList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  suggestBatches: {
-    parameters: {
-      query: {
-        productId: string
-        locationId: string
-        qty: components["schemas"]["StockQuantity"]
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Saran batch */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["BatchSuggestion"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listCostLayers: {
-    parameters: {
-      query?: {
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
-        productId?: string
-        batchId?: string
-        /** @description Hanya layer yang masih bersisa. */
-        openOnly?: boolean
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Cost layer */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["CostLayerList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listCostLayerConsumptions: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Jejak konsumsi */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["CostLayerConsumptionList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listBundleAvailability: {
-    parameters: {
-      query: {
-        /** @description Maks. 200. */
-        bundleId: string[]
-        locationId?: string
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Stok tersedia per bundel */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["BundleAvailabilityList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listCustomers: {
-    parameters: {
-      query?: {
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
-        /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
-        sort?: components["parameters"]["Sort"]
-        q?: components["parameters"]["Search"]
-        phone?: string
-        customerType?: components["schemas"]["CustomerType"]
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Daftar pelanggan; field sort yang diizinkan `code`, `fullName`, `createdAt` */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["CustomerList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createCustomer: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CustomerInput"]
-      }
-    }
-    responses: {
-      /** @description Pelanggan dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Customer"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getCustomer: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Pelanggan */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Customer"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  updateCustomer: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CustomerInput"] &
-          components["schemas"]["VersionInput"]
-      }
-    }
-    responses: {
-      /** @description Pelanggan diperbarui */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Customer"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  deleteCustomer: {
-    parameters: {
-      query: {
-        /** @description Versi terakhir yang dilihat user (optimistic locking). */
-        version: components["parameters"]["PartyVersion"]
-      }
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Pelanggan dihapus */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listPartners: {
-    parameters: {
-      query?: {
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
-        /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
-        sort?: components["parameters"]["Sort"]
-        q?: components["parameters"]["Search"]
-        partnerType?: components["schemas"]["PartnerType"]
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Daftar mitra; field sort yang diizinkan `code`, `name`, `createdAt` */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PartnerList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createPartner: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PartnerInput"]
-      }
-    }
-    responses: {
-      /** @description Mitra dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Partner"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getPartner: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Mitra */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Partner"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  updatePartner: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PartnerInput"] &
-          components["schemas"]["VersionInput"]
-      }
-    }
-    responses: {
-      /** @description Mitra diperbarui */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Partner"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  deletePartner: {
-    parameters: {
-      query: {
-        /** @description Versi terakhir yang dilihat user (optimistic locking). */
-        version: components["parameters"]["PartyVersion"]
-      }
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Mitra dihapus */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listPartnerAgreements: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description PKS mitra */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PartnerAgreement"][]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createPartnerAgreement: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PartnerAgreementInput"]
-      }
-    }
-    responses: {
-      /** @description PKS dicatat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PartnerAgreement"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  updatePartnerAgreement: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PartnerAgreementInput"] &
-          components["schemas"]["VersionInput"]
-      }
-    }
-    responses: {
-      /** @description PKS diperbarui */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PartnerAgreement"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  deletePartnerAgreement: {
-    parameters: {
-      query: {
-        /** @description Versi terakhir yang dilihat user (optimistic locking). */
-        version: components["parameters"]["PartyVersion"]
-      }
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description PKS dihapus */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listPartnerProductCodes: {
-    parameters: {
-      query?: {
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
-        q?: components["parameters"]["Search"]
-        partnerId?: string
-        productId?: string
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Kode produk mitra, urut mitra lalu kode artikel */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PartnerProductCodeList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createPartnerProductCode: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PartnerProductCodeInput"]
-      }
-    }
-    responses: {
-      /** @description Kode dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PartnerProductCode"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  updatePartnerProductCode: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PartnerProductCodeUpdate"] &
-          components["schemas"]["VersionInput"]
-      }
-    }
-    responses: {
-      /** @description Kode diperbarui */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PartnerProductCode"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  deletePartnerProductCode: {
-    parameters: {
-      query: {
-        /** @description Versi terakhir yang dilihat user (optimistic locking). */
-        version: components["parameters"]["PartyVersion"]
-      }
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Kode dihapus */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listSuppliers: {
-    parameters: {
-      query?: {
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
-        /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
-        sort?: components["parameters"]["Sort"]
-        q?: components["parameters"]["Search"]
-        supplierType?: components["schemas"]["SupplierType"]
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Daftar pemasok; field sort yang diizinkan `code`, `name`, `createdAt` */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SupplierList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createSupplier: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SupplierInput"]
-      }
-    }
-    responses: {
-      /** @description Pemasok dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Supplier"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getSupplier: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Pemasok */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Supplier"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  updateSupplier: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SupplierInput"] &
-          components["schemas"]["VersionInput"]
-      }
-    }
-    responses: {
-      /** @description Pemasok diperbarui */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Supplier"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  deleteSupplier: {
-    parameters: {
-      query: {
-        /** @description Versi terakhir yang dilihat user (optimistic locking). */
-        version: components["parameters"]["PartyVersion"]
-      }
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Pemasok dihapus */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listPartyUserOptions: {
-    parameters: {
-      query?: {
-        q?: components["parameters"]["Search"]
-        /** @description Batasi ke pemegang role, mis. `merchandiser` atau `sales_mt`. */
-        role?: string
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Maksimal 20 pengguna */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PartyUserOption"][]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listEmployees: {
-    parameters: {
-      query?: {
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
-        /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
-        sort?: components["parameters"]["Sort"]
-        q?: components["parameters"]["Search"]
-        nik?: string
-        status?: components["schemas"]["EmploymentStatus"]
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Daftar karyawan; field sort yang diizinkan `employeeNumber`, `fullName`, `joinDate` */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["EmployeeList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createEmployee: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["EmployeeInput"]
-      }
-    }
-    responses: {
-      /** @description Karyawan dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Employee"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getEmployee: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Karyawan */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Employee"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  updateEmployee: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["EmployeeInput"] &
-          components["schemas"]["VersionInput"]
-      }
-    }
-    responses: {
-      /** @description Karyawan diperbarui */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Employee"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  resignEmployee: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["EmployeeResignInput"]
-      }
-    }
-    responses: {
-      /** @description Resign tercatat */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Employee"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listEmployeeOptions: {
-    parameters: {
-      query?: {
-        q?: components["parameters"]["Search"]
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Maksimal 20 karyawan aktif */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["EmployeeOption"][]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createFileUpload: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["FileUploadInput"]
-      }
-    }
-    responses: {
-      /** @description URL upload */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["FileUploadTarget"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getFile: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Metadata file */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["FileObject"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getFileDownloadUrl: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description URL unduhan */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["FileDownloadTarget"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getFileContent: {
-    parameters: {
-      query: {
+        PartyVersion: number;
         /** @description Waktu kedaluwarsa URL (Unix detik). */
-        exp: components["parameters"]["FileExpires"]
-        sig: components["parameters"]["FileSignature"]
-      }
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Isi file dengan Content-Type aslinya */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/octet-stream": string
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  putFileContent: {
-    parameters: {
-      query: {
-        /** @description Waktu kedaluwarsa URL (Unix detik). */
-        exp: components["parameters"]["FileExpires"]
-        sig: components["parameters"]["FileSignature"]
-      }
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/octet-stream": string
-      }
-    }
-    responses: {
-      /** @description File tersimpan */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listPriceLists: {
-    parameters: {
-      query?: {
-        q?: components["parameters"]["Search"]
-        priceListType?: components["schemas"]["PriceListType"]
-        includeInactive?: boolean
-        deleted?: boolean
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Daftar harga beserta versi yang berlaku, versi terjadwal, dan versi yang sedang disiapkan */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PriceList"][]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createPriceList: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PriceListInput"]
-      }
-    }
-    responses: {
-      /** @description Daftar harga dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PriceListDetail"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listPriceListOptions: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Daftar harga aktif yang belum dihapus */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PriceListOption"][]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getPriceList: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Daftar harga */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PriceListDetail"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  updatePriceList: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PriceListUpdate"]
-      }
-    }
-    responses: {
-      /** @description Daftar harga diperbarui */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PriceListDetail"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  deletePriceList: {
-    parameters: {
-      query: {
+        FileExpires: number;
+        FileSignature: string;
         /** @description Versi terakhir yang dilihat user (optimistic locking). */
-        version: components["parameters"]["PricingVersion"]
-      }
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Daftar harga dihapus */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  restorePriceList: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["VersionInput"]
-      }
-    }
-    responses: {
-      /** @description Daftar harga dipulihkan */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PriceListDetail"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createPriceListVersion: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PriceListVersionInput"]
-      }
-    }
-    responses: {
-      /** @description Versi draft dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PriceListVersion"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getPriceListVersion: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Versi daftar harga */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PriceListVersion"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  updatePriceListVersion: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PriceListVersionUpdate"]
-      }
-    }
-    responses: {
-      /** @description Versi diperbarui */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PriceListVersion"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  submitPriceListVersion: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["VersionInput"]
-      }
-    }
-    responses: {
-      /** @description Versi diajukan */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PriceListVersion"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  withdrawPriceListVersion: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["VersionInput"]
-      }
-    }
-    responses: {
-      /** @description Pengajuan ditarik */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PriceListVersion"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  cancelPriceListVersion: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["VersionInput"]
-      }
-    }
-    responses: {
-      /** @description Versi dibatalkan */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PriceListVersion"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listSpecialPrices: {
-    parameters: {
-      query?: {
-        partyType?: components["schemas"]["SpecialPricePartyType"]
-        partyId?: string
-        productId?: string
+        PricingVersion: number;
         /** @description Tampilkan juga data yang periodenya sudah berakhir (riwayat). */
-        includeEnded?: components["parameters"]["PricingIncludeEnded"]
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Harga khusus */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SpecialPrice"][]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createSpecialPrice: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SpecialPriceInput"]
-      }
-    }
-    responses: {
-      /** @description Harga khusus dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SpecialPrice"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  deleteSpecialPrice: {
-    parameters: {
-      query: {
-        /** @description Versi terakhir yang dilihat user (optimistic locking). */
-        version: components["parameters"]["PricingVersion"]
-      }
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Harga khusus dihapus */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  endSpecialPrice: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PricingEndInput"]
-      }
-    }
-    responses: {
-      /** @description Harga khusus diakhiri */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SpecialPrice"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listPromotions: {
-    parameters: {
-      query?: {
-        q?: components["parameters"]["Search"]
-        channelId?: string
-        /** @description Tampilkan juga data yang periodenya sudah berakhir (riwayat). */
-        includeEnded?: components["parameters"]["PricingIncludeEnded"]
-        deleted?: boolean
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Promo tanpa item, terbaru dulu */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Promotion"][]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createPromotion: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PromotionInput"]
-      }
-    }
-    responses: {
-      /** @description Promo dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Promotion"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getPromotion: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Promo */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Promotion"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  updatePromotion: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PromotionUpdate"]
-      }
-    }
-    responses: {
-      /** @description Promo diperbarui */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Promotion"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  deletePromotion: {
-    parameters: {
-      query: {
-        /** @description Versi terakhir yang dilihat user (optimistic locking). */
-        version: components["parameters"]["PricingVersion"]
-      }
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Promo dihapus */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listTieredPrices: {
-    parameters: {
-      query?: {
-        productId?: string
-        priceListId?: string
-        /** @description Tampilkan juga data yang periodenya sudah berakhir (riwayat). */
-        includeEnded?: components["parameters"]["PricingIncludeEnded"]
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Harga bertingkat */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["TieredPrice"][]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createTieredPrice: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["TieredPriceInput"]
-      }
-    }
-    responses: {
-      /** @description Harga bertingkat dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["TieredPrice"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  deleteTieredPrice: {
-    parameters: {
-      query: {
-        /** @description Versi terakhir yang dilihat user (optimistic locking). */
-        version: components["parameters"]["PricingVersion"]
-      }
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Harga bertingkat dihapus */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  endTieredPrice: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PricingEndInput"]
-      }
-    }
-    responses: {
-      /** @description Harga bertingkat diakhiri */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["TieredPrice"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listDiscountLimits: {
-    parameters: {
-      query?: {
-        /** @description Tampilkan juga data yang periodenya sudah berakhir (riwayat). */
-        includeEnded?: components["parameters"]["PricingIncludeEnded"]
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Batas diskon per role */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["DiscountLimit"][]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createDiscountLimit: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["DiscountLimitInput"]
-      }
-    }
-    responses: {
-      /** @description Batas diskon dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["DiscountLimit"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listDiscountLimitRoles: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Role pembuat dokumen penjualan */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["DiscountLimitRole"][]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  deleteDiscountLimit: {
-    parameters: {
-      query: {
-        /** @description Versi terakhir yang dilihat user (optimistic locking). */
-        version: components["parameters"]["PricingVersion"]
-      }
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Batas diskon dihapus */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  endDiscountLimit: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PricingEndInput"]
-      }
-    }
-    responses: {
-      /** @description Batas diskon diakhiri */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["DiscountLimit"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  quotePrice: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PriceQuoteRequest"]
-      }
-    }
-    responses: {
-      /** @description Harga dan aturan yang dipakai */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PriceQuote"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  checkDiscount: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["DiscountCheckRequest"]
-      }
-    }
-    responses: {
-      /** @description Hasil pemeriksaan diskon */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["DiscountCheckResult"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listDataExchangeKinds: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Jenis data */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["DataExchangeKindList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getDataExchangeTemplate: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
+        PricingIncludeEnded: boolean;
         /** @description Jenis data = resource permission, mis. `catalog.product`. */
-        kind: components["parameters"]["DataExchangeKindPath"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description File template */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listImportJobs: {
-    parameters: {
-      query?: {
-        kind?: components["parameters"]["DataExchangeKindQuery"]
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Riwayat impor, terbaru dulu */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ImportJobList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createImportJob: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ImportJobInput"]
-      }
-    }
-    responses: {
-      /** @description Job impor dibuat */
-      202: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ImportJob"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getImportJob: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Job impor */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ImportJob"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listImportJobRows: {
-    parameters: {
-      query?: {
-        /** @description true = hanya baris valid, false = hanya baris error, kosong = semua. */
-        valid?: boolean
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
-      }
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Baris preview */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ImportJobRowList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  commitImportJob: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Penyimpanan dijadwalkan */
-      202: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ImportJob"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  cancelImportJob: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Impor dibatalkan */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ImportJob"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getImportJobErrorFile: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description URL unduhan berumur 5 menit */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["DataExchangeFileLink"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listExportJobs: {
-    parameters: {
-      query?: {
-        kind?: components["parameters"]["DataExchangeKindQuery"]
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Riwayat ekspor, terbaru dulu */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ExportJobList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createExportJob: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ExportJobInput"]
-      }
-    }
-    responses: {
-      /** @description Job ekspor dibuat */
-      202: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ExportJob"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getExportJob: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Job ekspor */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ExportJob"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getExportJobDownloadUrl: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description URL unduhan berumur 5 menit */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["DataExchangeFileLink"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listProcurementDivisionOptions: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Divisi aktif urut kode */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PurchaseOption"][]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listProcurementCashBankAccounts: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Akun aktif yang bisa diposting */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PurchaseOption"][]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listPurchaseRequests: {
-    parameters: {
-      query?: {
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
-        /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
-        sort?: components["parameters"]["Sort"]
-        q?: components["parameters"]["Search"]
-        status?: components["schemas"]["PurchaseRequestStatus"]
-        divisionId?: string
-        /** @description Hanya PR yang diajukan user. */
-        mine?: boolean
-        dateFrom?: components["schemas"]["BusinessDate"]
-        dateTo?: components["schemas"]["BusinessDate"]
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description PR terbaru lebih dulu */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PurchaseRequestList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createPurchaseRequest: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PurchaseRequestFields"]
-      }
-    }
-    responses: {
-      /** @description Draft dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PurchaseRequest"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getPurchaseRequest: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Purchase Request */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PurchaseRequest"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  updatePurchaseRequest: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PurchaseRequestUpdate"]
-      }
-    }
-    responses: {
-      /** @description Draft diperbarui */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PurchaseRequest"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  submitPurchaseRequest: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["VersionInput"]
-      }
-    }
-    responses: {
-      /** @description PR menunggu persetujuan */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PurchaseRequest"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  revisePurchaseRequest: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["VersionInput"]
-      }
-    }
-    responses: {
-      /** @description PR kembali Draft */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PurchaseRequest"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  cancelPurchaseRequest: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["VersionInput"]
-      }
-    }
-    responses: {
-      /** @description PR dibatalkan */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PurchaseRequest"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  closePurchaseRequest: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PurchaseReasonInput"]
-      }
-    }
-    responses: {
-      /** @description PR ditutup */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PurchaseRequest"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listPurchaseOrders: {
-    parameters: {
-      query?: {
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
-        /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
-        sort?: components["parameters"]["Sort"]
-        q?: components["parameters"]["Search"]
-        status?: components["schemas"]["PurchaseOrderStatus"]
-        /** @description Satu atau beberapa jenis PO. */
-        orderType?: components["schemas"]["PurchaseOrderType"][]
-        supplierId?: string
-        divisionId?: string
-        dateFrom?: components["schemas"]["BusinessDate"]
-        dateTo?: components["schemas"]["BusinessDate"]
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description PO terbaru lebih dulu */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PurchaseOrderList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createPurchaseOrder: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PurchaseOrderInput"]
-      }
-    }
-    responses: {
-      /** @description Draft dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PurchaseOrder"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getPurchaseOrder: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Purchase Order */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PurchaseOrder"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  updatePurchaseOrder: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PurchaseOrderUpdate"]
-      }
-    }
-    responses: {
-      /** @description Draft diperbarui */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PurchaseOrder"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  submitPurchaseOrder: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["VersionInput"]
-      }
-    }
-    responses: {
-      /** @description PO menunggu persetujuan */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PurchaseOrder"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  revisePurchaseOrder: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["VersionInput"]
-      }
-    }
-    responses: {
-      /** @description PO kembali Draft */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PurchaseOrder"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  cancelPurchaseOrder: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PurchaseCancelInput"]
-      }
-    }
-    responses: {
-      /** @description PO dibatalkan */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PurchaseOrder"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  closePurchaseOrder: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PurchaseReasonInput"]
-      }
-    }
-    responses: {
-      /** @description PO ditutup */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PurchaseOrder"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  listPurchaseAdvances: {
-    parameters: {
-      query?: {
-        page?: components["parameters"]["Page"]
-        pageSize?: components["parameters"]["PageSize"]
-        q?: components["parameters"]["Search"]
-        status?: components["schemas"]["PurchaseAdvanceStatus"]
-        purchaseOrderId?: string
-        supplierId?: string
-        dateFrom?: components["schemas"]["BusinessDate"]
-        dateTo?: components["schemas"]["BusinessDate"]
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Uang muka terbaru lebih dulu */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PurchaseAdvanceList"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  createPurchaseAdvance: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PurchaseAdvanceInput"]
-      }
-    }
-    responses: {
-      /** @description Draft dibuat */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PurchaseAdvance"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  getPurchaseAdvance: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Uang muka */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PurchaseAdvance"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  updatePurchaseAdvance: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PurchaseAdvanceUpdate"]
-      }
-    }
-    responses: {
-      /** @description Draft diperbarui */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PurchaseAdvance"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  postPurchaseAdvance: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["VersionInput"]
-      }
-    }
-    responses: {
-      /** @description Uang muka diposting */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PurchaseAdvance"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
-  cancelPurchaseAdvance: {
-    parameters: {
-      query?: never
-      header: {
-        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
-        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
-      }
-      path: {
-        id: components["parameters"]["Id"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PurchaseCancelInput"]
-      }
-    }
-    responses: {
-      /** @description Uang muka dibatalkan */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PurchaseAdvance"]
-        }
-      }
-      default: components["responses"]["Problem"]
-    }
-  }
+        DataExchangeKindPath: string;
+        DataExchangeKindQuery: string;
+    };
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
+}
+export type $defs = Record<string, never>;
+export interface operations {
+    getHealth: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Proses berjalan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HealthStatus"];
+                };
+            };
+        };
+    };
+    getReadiness: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Siap */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReadinessStatus"];
+                };
+            };
+            /** @description Belum siap */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReadinessStatus"];
+                };
+            };
+        };
+    };
+    getSystemInfo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Informasi sistem */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemInfo"];
+                };
+            };
+            /** @description Kesalahan sistem */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    receiveMidtransWebhook: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MidtransNotification"];
+            };
+        };
+        responses: {
+            /** @description Event diterima atau sudah pernah diterima */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WebhookAck"];
+                };
+            };
+            /** @description Payload tidak bisa dibaca */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Signature tidak valid */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    listReturnReasons: {
+        parameters: {
+            query?: {
+                includeInactive?: boolean;
+                appliesTo?: components["schemas"]["ReturnReasonScope"];
+                q?: components["parameters"]["Search"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Alasan retur urut kode */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReturnReason"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createReturnReason: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReturnReasonInput"];
+            };
+        };
+        responses: {
+            /** @description Alasan retur dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReturnReason"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updateReturnReason: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReturnReasonUpdate"];
+            };
+        };
+        responses: {
+            /** @description Alasan retur diperbarui */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReturnReason"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    deleteReturnReason: {
+        parameters: {
+            query: {
+                /** @description Versi terakhir yang dilihat user (optimistic locking). */
+                version: number;
+            };
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Alasan retur dihapus */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    receiveBiteshipWebhook: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Biteship-Signature": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BiteshipNotification"];
+            };
+        };
+        responses: {
+            /** @description Event diterima atau sudah pernah diterima */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WebhookAck"];
+                };
+            };
+            /** @description Payload tidak bisa dibaca */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Signature tidak valid */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    login: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoginRequest"];
+            };
+        };
+        responses: {
+            /** @description Berhasil masuk */
+            200: {
+                headers: {
+                    "Set-Cookie"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccessToken"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    refreshSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                balans_refresh?: components["parameters"]["RefreshCookie"];
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Access token baru */
+            200: {
+                headers: {
+                    "Set-Cookie"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccessToken"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    logout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                balans_refresh?: components["parameters"]["RefreshCookie"];
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Sesi dicabut */
+            204: {
+                headers: {
+                    "Set-Cookie"?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    reauthenticate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReauthRequest"];
+            };
+        };
+        responses: {
+            /** @description Access token baru */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccessToken"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    requestPasswordReset: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasswordForgotRequest"];
+            };
+        };
+        responses: {
+            /** @description Diterima */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getPasswordToken: {
+        parameters: {
+            query: {
+                token: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tautan berlaku */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PasswordTokenInfo"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    setupPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasswordSetupRequest"];
+            };
+        };
+        responses: {
+            /** @description Password tersimpan; semua sesi lama dicabut */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    changePassword: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasswordChangeRequest"];
+            };
+        };
+        responses: {
+            /** @description Password diganti; sesi lain dicabut */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    setupMfa: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Secret dan QR code */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MfaSetup"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    activateMfa: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MfaActivateRequest"];
+            };
+        };
+        responses: {
+            /** @description MFA aktif */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getCurrentUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Data user */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CurrentUser"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listUsers: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
+                sort?: components["parameters"]["Sort"];
+                q?: components["parameters"]["Search"];
+                isActive?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Daftar pengguna */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createUser: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserInput"];
+            };
+        };
+        responses: {
+            /** @description Pengguna dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["User"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pengguna */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["User"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updateUser: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserUpdate"];
+            };
+        };
+        responses: {
+            /** @description Pengguna diubah */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["User"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    activateUser: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionInput"];
+            };
+        };
+        responses: {
+            /** @description Pengguna aktif */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["User"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    deactivateUser: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionInput"];
+            };
+        };
+        responses: {
+            /** @description Pengguna nonaktif */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["User"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    resendUserInvitation: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Undangan dikirim */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    resetUserMfa: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description MFA direset */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listRoles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Daftar role */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Role"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    setRolePermissions: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RolePermissionsInput"];
+            };
+        };
+        responses: {
+            /** @description Role diubah */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Role"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listPermissions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Katalog permission */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Permission"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listAuditLogs: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                entityType?: string;
+                entityId?: string;
+                actorId?: string;
+                action?: components["schemas"]["AuditAction"];
+                createdFrom?: string;
+                createdTo?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Riwayat perubahan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditLogList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listApprovalInbox: {
+        parameters: {
+            query?: {
+                subjectType?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Dokumen menunggu keputusan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalInbox"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getApprovalInboxCount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Jumlah dokumen */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalInboxCount"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listApprovalSubjectTypes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Jenis dokumen */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalSubjectType"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listApprovalUserOptions: {
+        parameters: {
+            query?: {
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Maksimal 20 pengguna */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalUserOption"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listApprovalRequests: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                scope?: "requested" | "decided" | "all";
+                status?: components["schemas"]["ApprovalStatus"];
+                subjectType?: string;
+                subjectId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Permintaan persetujuan, terbaru lebih dulu */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalRequestList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getApprovalRequest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Permintaan persetujuan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalRequest"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    approveApprovalRequest: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApprovalApproveInput"];
+            };
+        };
+        responses: {
+            /** @description Keputusan tersimpan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalRequest"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    rejectApprovalRequest: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApprovalRejectInput"];
+            };
+        };
+        responses: {
+            /** @description Dokumen ditolak */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalRequest"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listApprovalPolicies: {
+        parameters: {
+            query?: {
+                subjectType?: string;
+                includeEnded?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Kebijakan per jenis dokumen dan level */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalPolicy"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createApprovalPolicy: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApprovalPolicyInput"];
+            };
+        };
+        responses: {
+            /** @description Kebijakan dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalPolicy"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updateApprovalPolicy: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApprovalPolicyUpdate"];
+            };
+        };
+        responses: {
+            /** @description Versi baru kebijakan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalPolicy"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    endApprovalPolicy: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionInput"];
+            };
+        };
+        responses: {
+            /** @description Kebijakan dihentikan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalPolicy"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listApprovalDelegations: {
+        parameters: {
+            query?: {
+                all?: boolean;
+                includePast?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Delegasi, terbaru lebih dulu */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalDelegation"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createApprovalDelegation: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApprovalDelegationInput"];
+            };
+        };
+        responses: {
+            /** @description Delegasi dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalDelegation"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    cancelApprovalDelegation: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionInput"];
+            };
+        };
+        responses: {
+            /** @description Delegasi dihentikan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalDelegation"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listNotifications: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                unreadOnly?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Daftar notifikasi, terbaru lebih dulu */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getNotificationUnreadCount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Jumlah notifikasi belum dibaca */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationUnreadCount"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    markAllNotificationsRead: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Semua ditandai sudah dibaca */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    markNotificationRead: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Ditandai sudah dibaca */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listProducts: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
+                sort?: components["parameters"]["Sort"];
+                q?: components["parameters"]["Search"];
+                /** @description Bisa lebih dari satu, mis. `productType=packaging&productType=reprocess_material`. */
+                productType?: components["schemas"]["ProductType"][];
+                isBundle?: boolean;
+                categoryId?: string;
+                isActive?: boolean;
+                deleted?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Daftar produk; field sort yang diizinkan `sku`, `name`, `createdAt` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createProduct: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProductInput"];
+            };
+        };
+        responses: {
+            /** @description Produk dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Product"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    lookupProduct: {
+        parameters: {
+            query: {
+                code: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Produk dengan SKU atau barcode tersebut */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Product"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getProduct: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Detail produk */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Product"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updateProduct: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProductUpdate"];
+            };
+        };
+        responses: {
+            /** @description Produk diubah */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Product"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    deleteProduct: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Produk dihapus */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    restoreProduct: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Produk dipulihkan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Product"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listProductCategories: {
+        parameters: {
+            query?: {
+                deleted?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Kategori urut kode */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductCategory"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createProductCategory: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProductCategoryInput"];
+            };
+        };
+        responses: {
+            /** @description Kategori dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductCategory"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updateProductCategory: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProductCategoryUpdate"];
+            };
+        };
+        responses: {
+            /** @description Kategori diubah */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductCategory"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    deleteProductCategory: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Kategori dihapus */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    restoreProductCategory: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Kategori dipulihkan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductCategory"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listWarehouses: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
+                sort?: components["parameters"]["Sort"];
+                q?: components["parameters"]["Search"];
+                isActive?: boolean;
+                deleted?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Daftar gudang; field sort yang diizinkan `code`, `name`, `createdAt` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WarehouseList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createWarehouse: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WarehouseInput"];
+            };
+        };
+        responses: {
+            /** @description Gudang dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Warehouse"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getWarehouse: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Detail gudang */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Warehouse"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updateWarehouse: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WarehouseUpdate"];
+            };
+        };
+        responses: {
+            /** @description Gudang diubah */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Warehouse"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    deleteWarehouse: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Gudang dihapus */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    restoreWarehouse: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Gudang dipulihkan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Warehouse"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listLocations: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
+                sort?: components["parameters"]["Sort"];
+                q?: components["parameters"]["Search"];
+                warehouseId?: string;
+                /** @description Bisa lebih dari satu. */
+                locationType?: components["schemas"]["LocationType"][];
+                /** @description `true` hanya lokasi eksternal, `false` hanya lokasi di dalam gudang. */
+                external?: boolean;
+                externalPartyType?: components["schemas"]["ExternalPartyType"];
+                externalPartyId?: string;
+                isActive?: boolean;
+                deleted?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Daftar lokasi; field sort yang diizinkan `code`, `name`, `createdAt` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LocationList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createLocation: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LocationInput"];
+            };
+        };
+        responses: {
+            /** @description Lokasi dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Location"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listAccounts: {
+        parameters: {
+            query?: {
+                includeInactive?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Akun COA */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Account"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createAccount: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AccountInput"];
+            };
+        };
+        responses: {
+            /** @description Akun dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Account"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getAccount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Akun */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Account"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updateAccount: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AccountUpdate"];
+            };
+        };
+        responses: {
+            /** @description Akun diperbarui */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Account"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    deleteAccount: {
+        parameters: {
+            query: {
+                /** @description Versi terakhir yang dilihat user (optimistic locking). */
+                version: components["parameters"]["Version"];
+            };
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Akun dihapus */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listChannels: {
+        parameters: {
+            query?: {
+                includeInactive?: components["parameters"]["IncludeInactive"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Channel */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dimension"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createChannel: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DimensionInput"];
+            };
+        };
+        responses: {
+            /** @description Channel dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dimension"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updateChannel: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DimensionUpdate"];
+            };
+        };
+        responses: {
+            /** @description Channel diperbarui */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dimension"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    deleteChannel: {
+        parameters: {
+            query: {
+                /** @description Versi terakhir yang dilihat user (optimistic locking). */
+                version: components["parameters"]["Version"];
+            };
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Channel dihapus */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listSubChannels: {
+        parameters: {
+            query?: {
+                includeInactive?: components["parameters"]["IncludeInactive"];
+                channelId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Sub-channel */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dimension"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createSubChannel: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SubChannelInput"];
+            };
+        };
+        responses: {
+            /** @description Sub-channel dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dimension"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updateSubChannel: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SubChannelUpdate"];
+            };
+        };
+        responses: {
+            /** @description Sub-channel diperbarui */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dimension"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    deleteSubChannel: {
+        parameters: {
+            query: {
+                /** @description Versi terakhir yang dilihat user (optimistic locking). */
+                version: components["parameters"]["Version"];
+            };
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Sub-channel dihapus */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listDivisions: {
+        parameters: {
+            query?: {
+                includeInactive?: components["parameters"]["IncludeInactive"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Divisi */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dimension"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createDivision: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DimensionInput"];
+            };
+        };
+        responses: {
+            /** @description Divisi dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dimension"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updateDivision: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DimensionUpdate"];
+            };
+        };
+        responses: {
+            /** @description Divisi diperbarui */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dimension"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    deleteDivision: {
+        parameters: {
+            query: {
+                /** @description Versi terakhir yang dilihat user (optimistic locking). */
+                version: components["parameters"]["Version"];
+            };
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Divisi dihapus */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listCampaigns: {
+        parameters: {
+            query?: {
+                includeInactive?: components["parameters"]["IncludeInactive"];
+                q?: components["parameters"]["Search"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Kampanye, terbaru lebih dulu */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dimension"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createCampaign: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CampaignInput"];
+            };
+        };
+        responses: {
+            /** @description Kampanye dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dimension"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updateCampaign: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CampaignUpdate"];
+            };
+        };
+        responses: {
+            /** @description Kampanye diperbarui */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dimension"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    deleteCampaign: {
+        parameters: {
+            query: {
+                /** @description Versi terakhir yang dilihat user (optimistic locking). */
+                version: components["parameters"]["Version"];
+            };
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Kampanye dihapus */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listExpenseTypes: {
+        parameters: {
+            query?: {
+                includeInactive?: components["parameters"]["IncludeInactive"];
+                q?: components["parameters"]["Search"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Jenis biaya urut kode */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExpenseType"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createExpenseType: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExpenseTypeInput"];
+            };
+        };
+        responses: {
+            /** @description Jenis biaya dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExpenseType"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updateExpenseType: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExpenseTypeUpdate"];
+            };
+        };
+        responses: {
+            /** @description Jenis biaya diperbarui */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExpenseType"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    deleteExpenseType: {
+        parameters: {
+            query: {
+                /** @description Versi terakhir yang dilihat user (optimistic locking). */
+                version: components["parameters"]["Version"];
+            };
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Jenis biaya dihapus */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listFiscalPeriods: {
+        parameters: {
+            query?: {
+                year?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Periode terbaru lebih dulu */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FiscalPeriod"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    ensureFiscalPeriods: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Jumlah periode yang dibuat */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        created: number;
+                    };
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listPostingRules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Posting rule urut kode */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostingRule"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listJournalEntries: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                q?: components["parameters"]["Search"];
+                status?: components["schemas"]["JournalStatus"];
+                entryType?: components["schemas"]["JournalEntryType"];
+                dateFrom?: components["schemas"]["BusinessDate"];
+                dateTo?: components["schemas"]["BusinessDate"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Jurnal terbaru lebih dulu; draft tanpa nomor di atas */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JournalEntryList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createJournalEntry: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ManualJournalFields"];
+            };
+        };
+        responses: {
+            /** @description Draft dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JournalEntry"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getJournalEntry: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Jurnal */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JournalEntry"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updateJournalEntry: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ManualJournalUpdate"];
+            };
+        };
+        responses: {
+            /** @description Draft diperbarui */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JournalEntry"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    deleteJournalEntry: {
+        parameters: {
+            query: {
+                /** @description Versi terakhir yang dilihat user (optimistic locking). */
+                version: components["parameters"]["Version"];
+            };
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Draft dihapus */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    postJournalEntry: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionInput"];
+            };
+        };
+        responses: {
+            /** @description Jurnal diposting */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JournalEntry"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    reverseJournalEntry: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JournalReverseInput"];
+            };
+        };
+        responses: {
+            /** @description Jurnal pembalik */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JournalEntry"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getGeneralLedger: {
+        parameters: {
+            query: {
+                accountId: string;
+                dateFrom: components["schemas"]["BusinessDate"];
+                dateTo: components["schemas"]["BusinessDate"];
+                channelId?: string;
+                subChannelId?: string;
+                divisionId?: string;
+                campaignId?: string;
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Buku Besar */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GeneralLedger"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getTrialBalance: {
+        parameters: {
+            query: {
+                dateFrom: components["schemas"]["BusinessDate"];
+                dateTo: components["schemas"]["BusinessDate"];
+                channelId?: string;
+                subChannelId?: string;
+                divisionId?: string;
+                campaignId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Neraca Saldo */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrialBalance"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listFixedAssetClasses: {
+        parameters: {
+            query?: {
+                includeInactive?: components["parameters"]["IncludeInactive"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Daftar kelas aset */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FixedAssetClass"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createFixedAssetClass: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FixedAssetClassCreate"];
+            };
+        };
+        responses: {
+            /** @description Kelas dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FixedAssetClass"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updateFixedAssetClass: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FixedAssetClassUpdate"];
+            };
+        };
+        responses: {
+            /** @description Kelas diubah */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FixedAssetClass"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listFixedAssets: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                q?: components["parameters"]["Search"];
+                status?: components["schemas"]["FixedAssetStatus"];
+                classId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Daftar aset */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FixedAssetList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createFixedAsset: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FixedAssetCreate"];
+            };
+        };
+        responses: {
+            /** @description Aset dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FixedAssetDetail"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getFixedAsset: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Detail aset */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FixedAssetDetail"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updateFixedAsset: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FixedAssetUpdate"];
+            };
+        };
+        responses: {
+            /** @description Aset diubah */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FixedAssetDetail"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    deleteFixedAsset: {
+        parameters: {
+            query: {
+                /** @description Versi terakhir yang dilihat user (optimistic locking). */
+                version: components["parameters"]["Version"];
+            };
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Aset dihapus */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    activateFixedAsset: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionInput"];
+            };
+        };
+        responses: {
+            /** @description Aset aktif */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FixedAssetDetail"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    disposeFixedAsset: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FixedAssetDisposeInput"];
+            };
+        };
+        responses: {
+            /** @description Aset dilepas */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FixedAssetDetail"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listDepreciationRuns: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Daftar run penyusutan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DepreciationRunList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    runDepreciation: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DepreciationRunInput"];
+            };
+        };
+        responses: {
+            /** @description Hasil penyusutan periode */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DepreciationRunDetail"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getDepreciationRun: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Detail run */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DepreciationRunDetail"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getCloseChecklist: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Checklist */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CloseChecklist"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updateCloseChecklistStep: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+                stepCode: components["schemas"]["CloseStepCode"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CloseChecklistStepInput"];
+            };
+        };
+        responses: {
+            /** @description Checklist terbaru */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CloseChecklist"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    closeFiscalPeriod: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionInput"];
+            };
+        };
+        responses: {
+            /** @description Periode ditutup */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CloseChecklist"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    requestFiscalPeriodReopen: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FiscalPeriodReopenInput"];
+            };
+        };
+        responses: {
+            /** @description Permintaan diajukan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CloseChecklist"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getOpeningBalance: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Saldo awal */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpeningBalance"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    saveOpeningBalanceSet: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpeningBalanceSetInput"];
+            };
+        };
+        responses: {
+            /** @description Saldo awal */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpeningBalance"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    saveOpeningBalanceLine: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpeningBalanceLineInput"];
+            };
+        };
+        responses: {
+            /** @description Saldo awal */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpeningBalance"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    deleteOpeningBalanceLine: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Saldo awal */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpeningBalance"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    postOpeningBalance: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionInput"];
+            };
+        };
+        responses: {
+            /** @description Saldo awal diposting */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpeningBalance"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listOpeningItems: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                q?: components["parameters"]["Search"];
+                itemType?: components["schemas"]["OpeningItemType"];
+                outstandingOnly?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Daftar saldo terbuka */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpeningItemList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getCutoverReconciliation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Hasil rekonsiliasi */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CutoverReconciliation"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listDocumentSequences: {
+        parameters: {
+            query?: {
+                year?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Semua kode dokumen beserta nomor terakhir pada tahun tersebut */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentSequenceList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getLocation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Detail lokasi */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Location"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updateLocation: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LocationUpdate"];
+            };
+        };
+        responses: {
+            /** @description Lokasi diubah */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Location"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    deleteLocation: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Lokasi dihapus */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    restoreLocation: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Lokasi dipulihkan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Location"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listInbounds: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                q?: components["parameters"]["Search"];
+                status?: components["schemas"]["InboundStatus"];
+                sourceType?: string;
+                warehouseId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Daftar Inbound */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InboundList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getInbound: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Detail Inbound */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Inbound"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    recordInboundQc: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+                lineId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InboundQcInput"];
+            };
+        };
+        responses: {
+            /** @description Inbound setelah QC */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Inbound"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listStockTransfers: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                q?: components["parameters"]["Search"];
+                transferType?: components["schemas"]["StockTransferType"];
+                /** @description Bisa lebih dari satu. */
+                status?: components["schemas"]["StockTransferStatus"][];
+                locationId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Daftar transfer */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockTransferList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createStockTransfer: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StockTransferInput"];
+            };
+        };
+        responses: {
+            /** @description Transfer dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockTransfer"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listStockInTransit: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                locationId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Baris Dalam Pengiriman */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockInTransitList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getStockTransfer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Detail transfer */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockTransfer"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updateStockTransfer: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StockTransferInput"] & components["schemas"]["VersionInput"];
+            };
+        };
+        responses: {
+            /** @description Transfer diubah */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockTransfer"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    actOnStockTransfer: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StockTransferActionInput"];
+            };
+        };
+        responses: {
+            /** @description Transfer setelah aksi */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockTransfer"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listStockCounts: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                q?: components["parameters"]["Search"];
+                /** @description Bisa lebih dari satu. */
+                status?: components["schemas"]["StockCountStatus"][];
+                countType?: components["schemas"]["StockCountType"];
+                locationId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Daftar stock count */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockCountList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createStockCounts: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StockCountInput"];
+            };
+        };
+        responses: {
+            /** @description Stock count dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: components["schemas"]["StockCountSummary"][];
+                    };
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getStockCount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Detail stock count */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockCount"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    saveStockCountEntries: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StockCountEntriesInput"];
+            };
+        };
+        responses: {
+            /** @description Stock count setelah disimpan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockCount"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    actOnStockCount: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StockCountActionInput"];
+            };
+        };
+        responses: {
+            /** @description Stock count setelah aksi */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockCount"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listStockCountSchedules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Jadwal */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: components["schemas"]["StockCountSchedule"][];
+                    };
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createStockCountSchedule: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StockCountScheduleInput"];
+            };
+        };
+        responses: {
+            /** @description Jadwal dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockCountSchedule"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updateStockCountSchedule: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StockCountScheduleInput"] & components["schemas"]["VersionInput"];
+            };
+        };
+        responses: {
+            /** @description Jadwal diubah */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockCountSchedule"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listStockBalances: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                productId?: string;
+                /** @description Bisa lebih dari satu. */
+                locationId?: string[];
+                batchId?: string;
+                /** @description Bisa lebih dari satu. */
+                status?: components["schemas"]["StockStatus"][];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Saldo stok */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockBalanceList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getStockCard: {
+        parameters: {
+            query: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                productId: string;
+                locationId?: string;
+                batchId?: string;
+                status?: components["schemas"]["StockStatus"];
+                dateFrom: string;
+                dateTo: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Kartu stok */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockCard"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listBatches: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                q?: components["parameters"]["Search"];
+                productId?: string;
+                expiryState?: components["schemas"]["ExpiryState"];
+                /** @description Batas hari "Segera kedaluwarsa" (default 90). */
+                nearExpiryDays?: number;
+                /** @description Default `true` — hanya batch yang masih punya stok. */
+                withStock?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Daftar batch */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BatchList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    suggestBatches: {
+        parameters: {
+            query: {
+                productId: string;
+                locationId: string;
+                qty: components["schemas"]["StockQuantity"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Saran batch */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BatchSuggestion"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listCostLayers: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                productId?: string;
+                batchId?: string;
+                /** @description Hanya layer yang masih bersisa. */
+                openOnly?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Cost layer */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CostLayerList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listCostLayerConsumptions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Jejak konsumsi */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CostLayerConsumptionList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listBundleAvailability: {
+        parameters: {
+            query: {
+                /** @description Maks. 200. */
+                bundleId: string[];
+                locationId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Stok tersedia per bundel */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BundleAvailabilityList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listCustomers: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
+                sort?: components["parameters"]["Sort"];
+                q?: components["parameters"]["Search"];
+                phone?: string;
+                customerType?: components["schemas"]["CustomerType"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Daftar pelanggan; field sort yang diizinkan `code`, `fullName`, `createdAt` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createCustomer: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerInput"];
+            };
+        };
+        responses: {
+            /** @description Pelanggan dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Customer"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getCustomer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pelanggan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Customer"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updateCustomer: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerInput"] & components["schemas"]["VersionInput"];
+            };
+        };
+        responses: {
+            /** @description Pelanggan diperbarui */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Customer"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    deleteCustomer: {
+        parameters: {
+            query: {
+                /** @description Versi terakhir yang dilihat user (optimistic locking). */
+                version: components["parameters"]["PartyVersion"];
+            };
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pelanggan dihapus */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listPartners: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
+                sort?: components["parameters"]["Sort"];
+                q?: components["parameters"]["Search"];
+                partnerType?: components["schemas"]["PartnerType"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Daftar mitra; field sort yang diizinkan `code`, `name`, `createdAt` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartnerList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createPartner: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PartnerInput"];
+            };
+        };
+        responses: {
+            /** @description Mitra dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Partner"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getPartner: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Mitra */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Partner"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updatePartner: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PartnerInput"] & components["schemas"]["VersionInput"];
+            };
+        };
+        responses: {
+            /** @description Mitra diperbarui */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Partner"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    deletePartner: {
+        parameters: {
+            query: {
+                /** @description Versi terakhir yang dilihat user (optimistic locking). */
+                version: components["parameters"]["PartyVersion"];
+            };
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Mitra dihapus */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listPartnerAgreements: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description PKS mitra */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartnerAgreement"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createPartnerAgreement: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PartnerAgreementInput"];
+            };
+        };
+        responses: {
+            /** @description PKS dicatat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartnerAgreement"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updatePartnerAgreement: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PartnerAgreementInput"] & components["schemas"]["VersionInput"];
+            };
+        };
+        responses: {
+            /** @description PKS diperbarui */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartnerAgreement"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    deletePartnerAgreement: {
+        parameters: {
+            query: {
+                /** @description Versi terakhir yang dilihat user (optimistic locking). */
+                version: components["parameters"]["PartyVersion"];
+            };
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description PKS dihapus */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listPartnerProductCodes: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                q?: components["parameters"]["Search"];
+                partnerId?: string;
+                productId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Kode produk mitra, urut mitra lalu kode artikel */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartnerProductCodeList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createPartnerProductCode: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PartnerProductCodeInput"];
+            };
+        };
+        responses: {
+            /** @description Kode dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartnerProductCode"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updatePartnerProductCode: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PartnerProductCodeUpdate"] & components["schemas"]["VersionInput"];
+            };
+        };
+        responses: {
+            /** @description Kode diperbarui */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartnerProductCode"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    deletePartnerProductCode: {
+        parameters: {
+            query: {
+                /** @description Versi terakhir yang dilihat user (optimistic locking). */
+                version: components["parameters"]["PartyVersion"];
+            };
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Kode dihapus */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listSuppliers: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
+                sort?: components["parameters"]["Sort"];
+                q?: components["parameters"]["Search"];
+                supplierType?: components["schemas"]["SupplierType"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Daftar pemasok; field sort yang diizinkan `code`, `name`, `createdAt` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupplierList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createSupplier: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SupplierInput"];
+            };
+        };
+        responses: {
+            /** @description Pemasok dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Supplier"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getSupplier: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pemasok */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Supplier"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updateSupplier: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SupplierInput"] & components["schemas"]["VersionInput"];
+            };
+        };
+        responses: {
+            /** @description Pemasok diperbarui */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Supplier"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    deleteSupplier: {
+        parameters: {
+            query: {
+                /** @description Versi terakhir yang dilihat user (optimistic locking). */
+                version: components["parameters"]["PartyVersion"];
+            };
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pemasok dihapus */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listPartyUserOptions: {
+        parameters: {
+            query?: {
+                q?: components["parameters"]["Search"];
+                /** @description Batasi ke pemegang role, mis. `merchandiser` atau `sales_mt`. */
+                role?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Maksimal 20 pengguna */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartyUserOption"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listEmployees: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
+                sort?: components["parameters"]["Sort"];
+                q?: components["parameters"]["Search"];
+                nik?: string;
+                status?: components["schemas"]["EmploymentStatus"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Daftar karyawan; field sort yang diizinkan `employeeNumber`, `fullName`, `joinDate` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmployeeList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createEmployee: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmployeeInput"];
+            };
+        };
+        responses: {
+            /** @description Karyawan dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Employee"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getEmployee: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Karyawan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Employee"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updateEmployee: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmployeeInput"] & components["schemas"]["VersionInput"];
+            };
+        };
+        responses: {
+            /** @description Karyawan diperbarui */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Employee"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    resignEmployee: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmployeeResignInput"];
+            };
+        };
+        responses: {
+            /** @description Resign tercatat */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Employee"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listEmployeeOptions: {
+        parameters: {
+            query?: {
+                q?: components["parameters"]["Search"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Maksimal 20 karyawan aktif */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmployeeOption"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createFileUpload: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FileUploadInput"];
+            };
+        };
+        responses: {
+            /** @description URL upload */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileUploadTarget"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Metadata file */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileObject"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getFileDownloadUrl: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description URL unduhan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileDownloadTarget"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getFileContent: {
+        parameters: {
+            query: {
+                /** @description Waktu kedaluwarsa URL (Unix detik). */
+                exp: components["parameters"]["FileExpires"];
+                sig: components["parameters"]["FileSignature"];
+            };
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Isi file dengan Content-Type aslinya */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/octet-stream": string;
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    putFileContent: {
+        parameters: {
+            query: {
+                /** @description Waktu kedaluwarsa URL (Unix detik). */
+                exp: components["parameters"]["FileExpires"];
+                sig: components["parameters"]["FileSignature"];
+            };
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/octet-stream": string;
+            };
+        };
+        responses: {
+            /** @description File tersimpan */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listPriceLists: {
+        parameters: {
+            query?: {
+                q?: components["parameters"]["Search"];
+                priceListType?: components["schemas"]["PriceListType"];
+                includeInactive?: boolean;
+                deleted?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Daftar harga beserta versi yang berlaku, versi terjadwal, dan versi yang sedang disiapkan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceList"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createPriceList: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PriceListInput"];
+            };
+        };
+        responses: {
+            /** @description Daftar harga dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceListDetail"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listPriceListOptions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Daftar harga aktif yang belum dihapus */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceListOption"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getPriceList: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Daftar harga */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceListDetail"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updatePriceList: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PriceListUpdate"];
+            };
+        };
+        responses: {
+            /** @description Daftar harga diperbarui */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceListDetail"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    deletePriceList: {
+        parameters: {
+            query: {
+                /** @description Versi terakhir yang dilihat user (optimistic locking). */
+                version: components["parameters"]["PricingVersion"];
+            };
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Daftar harga dihapus */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    restorePriceList: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionInput"];
+            };
+        };
+        responses: {
+            /** @description Daftar harga dipulihkan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceListDetail"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createPriceListVersion: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PriceListVersionInput"];
+            };
+        };
+        responses: {
+            /** @description Versi draft dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceListVersion"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getPriceListVersion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Versi daftar harga */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceListVersion"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updatePriceListVersion: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PriceListVersionUpdate"];
+            };
+        };
+        responses: {
+            /** @description Versi diperbarui */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceListVersion"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    submitPriceListVersion: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionInput"];
+            };
+        };
+        responses: {
+            /** @description Versi diajukan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceListVersion"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    withdrawPriceListVersion: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionInput"];
+            };
+        };
+        responses: {
+            /** @description Pengajuan ditarik */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceListVersion"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    cancelPriceListVersion: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionInput"];
+            };
+        };
+        responses: {
+            /** @description Versi dibatalkan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceListVersion"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listSpecialPrices: {
+        parameters: {
+            query?: {
+                partyType?: components["schemas"]["SpecialPricePartyType"];
+                partyId?: string;
+                productId?: string;
+                /** @description Tampilkan juga data yang periodenya sudah berakhir (riwayat). */
+                includeEnded?: components["parameters"]["PricingIncludeEnded"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Harga khusus */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecialPrice"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createSpecialPrice: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SpecialPriceInput"];
+            };
+        };
+        responses: {
+            /** @description Harga khusus dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecialPrice"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    deleteSpecialPrice: {
+        parameters: {
+            query: {
+                /** @description Versi terakhir yang dilihat user (optimistic locking). */
+                version: components["parameters"]["PricingVersion"];
+            };
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Harga khusus dihapus */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    endSpecialPrice: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PricingEndInput"];
+            };
+        };
+        responses: {
+            /** @description Harga khusus diakhiri */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecialPrice"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listPromotions: {
+        parameters: {
+            query?: {
+                q?: components["parameters"]["Search"];
+                channelId?: string;
+                /** @description Tampilkan juga data yang periodenya sudah berakhir (riwayat). */
+                includeEnded?: components["parameters"]["PricingIncludeEnded"];
+                deleted?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Promo tanpa item, terbaru dulu */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Promotion"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createPromotion: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PromotionInput"];
+            };
+        };
+        responses: {
+            /** @description Promo dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Promotion"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getPromotion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Promo */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Promotion"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updatePromotion: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PromotionUpdate"];
+            };
+        };
+        responses: {
+            /** @description Promo diperbarui */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Promotion"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    deletePromotion: {
+        parameters: {
+            query: {
+                /** @description Versi terakhir yang dilihat user (optimistic locking). */
+                version: components["parameters"]["PricingVersion"];
+            };
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Promo dihapus */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listTieredPrices: {
+        parameters: {
+            query?: {
+                productId?: string;
+                priceListId?: string;
+                /** @description Tampilkan juga data yang periodenya sudah berakhir (riwayat). */
+                includeEnded?: components["parameters"]["PricingIncludeEnded"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Harga bertingkat */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TieredPrice"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createTieredPrice: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TieredPriceInput"];
+            };
+        };
+        responses: {
+            /** @description Harga bertingkat dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TieredPrice"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    deleteTieredPrice: {
+        parameters: {
+            query: {
+                /** @description Versi terakhir yang dilihat user (optimistic locking). */
+                version: components["parameters"]["PricingVersion"];
+            };
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Harga bertingkat dihapus */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    endTieredPrice: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PricingEndInput"];
+            };
+        };
+        responses: {
+            /** @description Harga bertingkat diakhiri */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TieredPrice"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listDiscountLimits: {
+        parameters: {
+            query?: {
+                /** @description Tampilkan juga data yang periodenya sudah berakhir (riwayat). */
+                includeEnded?: components["parameters"]["PricingIncludeEnded"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Batas diskon per role */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiscountLimit"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createDiscountLimit: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DiscountLimitInput"];
+            };
+        };
+        responses: {
+            /** @description Batas diskon dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiscountLimit"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listDiscountLimitRoles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Role pembuat dokumen penjualan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiscountLimitRole"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    deleteDiscountLimit: {
+        parameters: {
+            query: {
+                /** @description Versi terakhir yang dilihat user (optimistic locking). */
+                version: components["parameters"]["PricingVersion"];
+            };
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Batas diskon dihapus */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    endDiscountLimit: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PricingEndInput"];
+            };
+        };
+        responses: {
+            /** @description Batas diskon diakhiri */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiscountLimit"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    quotePrice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PriceQuoteRequest"];
+            };
+        };
+        responses: {
+            /** @description Harga dan aturan yang dipakai */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceQuote"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    checkDiscount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DiscountCheckRequest"];
+            };
+        };
+        responses: {
+            /** @description Hasil pemeriksaan diskon */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiscountCheckResult"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listDataExchangeKinds: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Jenis data */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataExchangeKindList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getDataExchangeTemplate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Jenis data = resource permission, mis. `catalog.product`. */
+                kind: components["parameters"]["DataExchangeKindPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description File template */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listImportJobs: {
+        parameters: {
+            query?: {
+                kind?: components["parameters"]["DataExchangeKindQuery"];
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Riwayat impor, terbaru dulu */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportJobList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createImportJob: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportJobInput"];
+            };
+        };
+        responses: {
+            /** @description Job impor dibuat */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportJob"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getImportJob: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Job impor */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportJob"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listImportJobRows: {
+        parameters: {
+            query?: {
+                /** @description true = hanya baris valid, false = hanya baris error, kosong = semua. */
+                valid?: boolean;
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+            };
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Baris preview */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportJobRowList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    commitImportJob: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Penyimpanan dijadwalkan */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportJob"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    cancelImportJob: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Impor dibatalkan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportJob"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getImportJobErrorFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description URL unduhan berumur 5 menit */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataExchangeFileLink"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listExportJobs: {
+        parameters: {
+            query?: {
+                kind?: components["parameters"]["DataExchangeKindQuery"];
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Riwayat ekspor, terbaru dulu */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExportJobList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createExportJob: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExportJobInput"];
+            };
+        };
+        responses: {
+            /** @description Job ekspor dibuat */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExportJob"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getExportJob: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Job ekspor */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExportJob"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getExportJobDownloadUrl: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description URL unduhan berumur 5 menit */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataExchangeFileLink"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listProcurementDivisionOptions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Divisi aktif urut kode */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseOption"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listProcurementCashBankAccounts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Akun aktif yang bisa diposting */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseOption"][];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listPurchaseRequests: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
+                sort?: components["parameters"]["Sort"];
+                q?: components["parameters"]["Search"];
+                status?: components["schemas"]["PurchaseRequestStatus"];
+                divisionId?: string;
+                /** @description Hanya PR yang diajukan user. */
+                mine?: boolean;
+                dateFrom?: components["schemas"]["BusinessDate"];
+                dateTo?: components["schemas"]["BusinessDate"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description PR terbaru lebih dulu */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseRequestList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createPurchaseRequest: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PurchaseRequestFields"];
+            };
+        };
+        responses: {
+            /** @description Draft dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseRequest"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getPurchaseRequest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Purchase Request */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseRequest"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updatePurchaseRequest: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PurchaseRequestUpdate"];
+            };
+        };
+        responses: {
+            /** @description Draft diperbarui */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseRequest"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    submitPurchaseRequest: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionInput"];
+            };
+        };
+        responses: {
+            /** @description PR menunggu persetujuan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseRequest"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    revisePurchaseRequest: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionInput"];
+            };
+        };
+        responses: {
+            /** @description PR kembali Draft */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseRequest"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    cancelPurchaseRequest: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionInput"];
+            };
+        };
+        responses: {
+            /** @description PR dibatalkan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseRequest"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    closePurchaseRequest: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PurchaseReasonInput"];
+            };
+        };
+        responses: {
+            /** @description PR ditutup */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseRequest"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listPurchaseOrders: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
+                sort?: components["parameters"]["Sort"];
+                q?: components["parameters"]["Search"];
+                status?: components["schemas"]["PurchaseOrderStatus"];
+                /** @description Satu atau beberapa jenis PO. */
+                orderType?: components["schemas"]["PurchaseOrderType"][];
+                supplierId?: string;
+                divisionId?: string;
+                dateFrom?: components["schemas"]["BusinessDate"];
+                dateTo?: components["schemas"]["BusinessDate"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description PO terbaru lebih dulu */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseOrderList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createPurchaseOrder: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PurchaseOrderInput"];
+            };
+        };
+        responses: {
+            /** @description Draft dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseOrder"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getPurchaseOrder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Purchase Order */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseOrder"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updatePurchaseOrder: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PurchaseOrderUpdate"];
+            };
+        };
+        responses: {
+            /** @description Draft diperbarui */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseOrder"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    submitPurchaseOrder: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionInput"];
+            };
+        };
+        responses: {
+            /** @description PO menunggu persetujuan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseOrder"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    revisePurchaseOrder: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionInput"];
+            };
+        };
+        responses: {
+            /** @description PO kembali Draft */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseOrder"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    cancelPurchaseOrder: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PurchaseCancelInput"];
+            };
+        };
+        responses: {
+            /** @description PO dibatalkan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseOrder"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    closePurchaseOrder: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PurchaseReasonInput"];
+            };
+        };
+        responses: {
+            /** @description PO ditutup */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseOrder"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    listPurchaseAdvances: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                pageSize?: components["parameters"]["PageSize"];
+                q?: components["parameters"]["Search"];
+                status?: components["schemas"]["PurchaseAdvanceStatus"];
+                purchaseOrderId?: string;
+                supplierId?: string;
+                dateFrom?: components["schemas"]["BusinessDate"];
+                dateTo?: components["schemas"]["BusinessDate"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Uang muka terbaru lebih dulu */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseAdvanceList"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    createPurchaseAdvance: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PurchaseAdvanceInput"];
+            };
+        };
+        responses: {
+            /** @description Draft dibuat */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseAdvance"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    getPurchaseAdvance: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Uang muka */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseAdvance"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    updatePurchaseAdvance: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PurchaseAdvanceUpdate"];
+            };
+        };
+        responses: {
+            /** @description Draft diperbarui */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseAdvance"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    postPurchaseAdvance: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionInput"];
+            };
+        };
+        responses: {
+            /** @description Uang muka diposting */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseAdvance"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
+    cancelPurchaseAdvance: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PurchaseCancelInput"];
+            };
+        };
+        responses: {
+            /** @description Uang muka dibatalkan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseAdvance"];
+                };
+            };
+            default: components["responses"]["Problem"];
+        };
+    };
 }

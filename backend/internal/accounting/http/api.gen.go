@@ -17,6 +17,126 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
+// Defines values for CloseChecklistAllowedActions.
+const (
+	Close         CloseChecklistAllowedActions = "close"
+	EditChecklist CloseChecklistAllowedActions = "edit_checklist"
+	RequestReopen CloseChecklistAllowedActions = "request_reopen"
+)
+
+// Valid indicates whether the value is a known member of the CloseChecklistAllowedActions enum.
+func (e CloseChecklistAllowedActions) Valid() bool {
+	switch e {
+	case Close:
+		return true
+	case EditChecklist:
+		return true
+	case RequestReopen:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for CloseStepCode.
+const (
+	BankPettyCashReconciliation      CloseStepCode = "bank_petty_cash_reconciliation"
+	ConsignmentVendingReconciliation CloseStepCode = "consignment_vending_reconciliation"
+	Depreciation                     CloseStepCode = "depreciation"
+	FinancialReview                  CloseStepCode = "financial_review"
+	InventoryReview                  CloseStepCode = "inventory_review"
+	OperationalDocuments             CloseStepCode = "operational_documents"
+	Payroll                          CloseStepCode = "payroll"
+	SettlementReconciliation         CloseStepCode = "settlement_reconciliation"
+	TaxRecap                         CloseStepCode = "tax_recap"
+)
+
+// Valid indicates whether the value is a known member of the CloseStepCode enum.
+func (e CloseStepCode) Valid() bool {
+	switch e {
+	case BankPettyCashReconciliation:
+		return true
+	case ConsignmentVendingReconciliation:
+		return true
+	case Depreciation:
+		return true
+	case FinancialReview:
+		return true
+	case InventoryReview:
+		return true
+	case OperationalDocuments:
+		return true
+	case Payroll:
+		return true
+	case SettlementReconciliation:
+		return true
+	case TaxRecap:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for CloseStepStatus.
+const (
+	CloseStepStatusDone    CloseStepStatus = "done"
+	CloseStepStatusPending CloseStepStatus = "pending"
+	CloseStepStatusSkipped CloseStepStatus = "skipped"
+)
+
+// Valid indicates whether the value is a known member of the CloseStepStatus enum.
+func (e CloseStepStatus) Valid() bool {
+	switch e {
+	case CloseStepStatusDone:
+		return true
+	case CloseStepStatusPending:
+		return true
+	case CloseStepStatusSkipped:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for CutoverReconciliationLedgerSource.
+const (
+	CutoverReconciliationLedgerSourceDraft  CutoverReconciliationLedgerSource = "draft"
+	CutoverReconciliationLedgerSourcePosted CutoverReconciliationLedgerSource = "posted"
+)
+
+// Valid indicates whether the value is a known member of the CutoverReconciliationLedgerSource enum.
+func (e CutoverReconciliationLedgerSource) Valid() bool {
+	switch e {
+	case CutoverReconciliationLedgerSourceDraft:
+		return true
+	case CutoverReconciliationLedgerSourcePosted:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for CutoverReconciliationCheckStatus.
+const (
+	CutoverReconciliationCheckStatusFailed  CutoverReconciliationCheckStatus = "failed"
+	CutoverReconciliationCheckStatusOk      CutoverReconciliationCheckStatus = "ok"
+	CutoverReconciliationCheckStatusSkipped CutoverReconciliationCheckStatus = "skipped"
+)
+
+// Valid indicates whether the value is a known member of the CutoverReconciliationCheckStatus enum.
+func (e CutoverReconciliationCheckStatus) Valid() bool {
+	switch e {
+	case CutoverReconciliationCheckStatusFailed:
+		return true
+	case CutoverReconciliationCheckStatusOk:
+		return true
+	case CutoverReconciliationCheckStatusSkipped:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for DimensionKind.
 const (
 	Campaign   DimensionKind = "campaign"
@@ -176,18 +296,105 @@ func (e ExpenseApprovalSubject) Valid() bool {
 	}
 }
 
+// Defines values for FiscalPeriodReopenRequestStatus.
+const (
+	FiscalPeriodReopenRequestStatusApproved        FiscalPeriodReopenRequestStatus = "approved"
+	FiscalPeriodReopenRequestStatusPendingApproval FiscalPeriodReopenRequestStatus = "pending_approval"
+	FiscalPeriodReopenRequestStatusRejected        FiscalPeriodReopenRequestStatus = "rejected"
+)
+
+// Valid indicates whether the value is a known member of the FiscalPeriodReopenRequestStatus enum.
+func (e FiscalPeriodReopenRequestStatus) Valid() bool {
+	switch e {
+	case FiscalPeriodReopenRequestStatusApproved:
+		return true
+	case FiscalPeriodReopenRequestStatusPendingApproval:
+		return true
+	case FiscalPeriodReopenRequestStatusRejected:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for FiscalPeriodStatus.
 const (
-	Closed FiscalPeriodStatus = "closed"
-	Open   FiscalPeriodStatus = "open"
+	FiscalPeriodStatusClosed          FiscalPeriodStatus = "closed"
+	FiscalPeriodStatusOpen            FiscalPeriodStatus = "open"
+	FiscalPeriodStatusPendingApproval FiscalPeriodStatus = "pending_approval"
 )
 
 // Valid indicates whether the value is a known member of the FiscalPeriodStatus enum.
 func (e FiscalPeriodStatus) Valid() bool {
 	switch e {
-	case Closed:
+	case FiscalPeriodStatusClosed:
 		return true
-	case Open:
+	case FiscalPeriodStatusOpen:
+		return true
+	case FiscalPeriodStatusPendingApproval:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for FixedAssetAllowedActions.
+const (
+	FixedAssetAllowedActionsActivate FixedAssetAllowedActions = "activate"
+	FixedAssetAllowedActionsDelete   FixedAssetAllowedActions = "delete"
+	FixedAssetAllowedActionsDispose  FixedAssetAllowedActions = "dispose"
+	FixedAssetAllowedActionsEdit     FixedAssetAllowedActions = "edit"
+)
+
+// Valid indicates whether the value is a known member of the FixedAssetAllowedActions enum.
+func (e FixedAssetAllowedActions) Valid() bool {
+	switch e {
+	case FixedAssetAllowedActionsActivate:
+		return true
+	case FixedAssetAllowedActionsDelete:
+		return true
+	case FixedAssetAllowedActionsDispose:
+		return true
+	case FixedAssetAllowedActionsEdit:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for FixedAssetSource.
+const (
+	Opening  FixedAssetSource = "opening"
+	Purchase FixedAssetSource = "purchase"
+)
+
+// Valid indicates whether the value is a known member of the FixedAssetSource enum.
+func (e FixedAssetSource) Valid() bool {
+	switch e {
+	case Opening:
+		return true
+	case Purchase:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for FixedAssetStatus.
+const (
+	FixedAssetStatusActive   FixedAssetStatus = "active"
+	FixedAssetStatusDisposed FixedAssetStatus = "disposed"
+	FixedAssetStatusDraft    FixedAssetStatus = "draft"
+)
+
+// Valid indicates whether the value is a known member of the FixedAssetStatus enum.
+func (e FixedAssetStatus) Valid() bool {
+	switch e {
+	case FixedAssetStatusActive:
+		return true
+	case FixedAssetStatusDisposed:
+		return true
+	case FixedAssetStatusDraft:
 		return true
 	default:
 		return false
@@ -196,22 +403,22 @@ func (e FiscalPeriodStatus) Valid() bool {
 
 // Defines values for JournalEntryAllowedActions.
 const (
-	Delete  JournalEntryAllowedActions = "delete"
-	Edit    JournalEntryAllowedActions = "edit"
-	Post    JournalEntryAllowedActions = "post"
-	Reverse JournalEntryAllowedActions = "reverse"
+	JournalEntryAllowedActionsDelete  JournalEntryAllowedActions = "delete"
+	JournalEntryAllowedActionsEdit    JournalEntryAllowedActions = "edit"
+	JournalEntryAllowedActionsPost    JournalEntryAllowedActions = "post"
+	JournalEntryAllowedActionsReverse JournalEntryAllowedActions = "reverse"
 )
 
 // Valid indicates whether the value is a known member of the JournalEntryAllowedActions enum.
 func (e JournalEntryAllowedActions) Valid() bool {
 	switch e {
-	case Delete:
+	case JournalEntryAllowedActionsDelete:
 		return true
-	case Edit:
+	case JournalEntryAllowedActionsEdit:
 		return true
-	case Post:
+	case JournalEntryAllowedActionsPost:
 		return true
-	case Reverse:
+	case JournalEntryAllowedActionsReverse:
 		return true
 	default:
 		return false
@@ -241,16 +448,16 @@ func (e JournalEntryType) Valid() bool {
 
 // Defines values for JournalStatus.
 const (
-	Draft  JournalStatus = "draft"
-	Posted JournalStatus = "posted"
+	JournalStatusDraft  JournalStatus = "draft"
+	JournalStatusPosted JournalStatus = "posted"
 )
 
 // Valid indicates whether the value is a known member of the JournalStatus enum.
 func (e JournalStatus) Valid() bool {
 	switch e {
-	case Draft:
+	case JournalStatusDraft:
 		return true
-	case Posted:
+	case JournalStatusPosted:
 		return true
 	default:
 		return false
@@ -269,6 +476,81 @@ func (e NormalBalance) Valid() bool {
 	case Credit:
 		return true
 	case Debit:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for OpeningBalanceAllowedActions.
+const (
+	OpeningBalanceAllowedActionsEdit OpeningBalanceAllowedActions = "edit"
+	OpeningBalanceAllowedActionsPost OpeningBalanceAllowedActions = "post"
+)
+
+// Valid indicates whether the value is a known member of the OpeningBalanceAllowedActions enum.
+func (e OpeningBalanceAllowedActions) Valid() bool {
+	switch e {
+	case OpeningBalanceAllowedActionsEdit:
+		return true
+	case OpeningBalanceAllowedActionsPost:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for OpeningBalanceStatus.
+const (
+	OpeningBalanceStatusDraft  OpeningBalanceStatus = "draft"
+	OpeningBalanceStatusPosted OpeningBalanceStatus = "posted"
+)
+
+// Valid indicates whether the value is a known member of the OpeningBalanceStatus enum.
+func (e OpeningBalanceStatus) Valid() bool {
+	switch e {
+	case OpeningBalanceStatusDraft:
+		return true
+	case OpeningBalanceStatusPosted:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for OpeningItemPartyType.
+const (
+	Customer OpeningItemPartyType = "customer"
+	Partner  OpeningItemPartyType = "partner"
+	Supplier OpeningItemPartyType = "supplier"
+)
+
+// Valid indicates whether the value is a known member of the OpeningItemPartyType enum.
+func (e OpeningItemPartyType) Valid() bool {
+	switch e {
+	case Customer:
+		return true
+	case Partner:
+		return true
+	case Supplier:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for OpeningItemType.
+const (
+	Payable    OpeningItemType = "payable"
+	Receivable OpeningItemType = "receivable"
+)
+
+// Valid indicates whether the value is a known member of the OpeningItemType enum.
+func (e OpeningItemType) Valid() bool {
+	switch e {
+	case Payable:
+		return true
+	case Receivable:
 		return true
 	default:
 		return false
@@ -423,6 +705,172 @@ type CampaignUpdate struct {
 	Version int `json:"version"`
 }
 
+// CloseCheckResult defines model for CloseCheckResult.
+type CloseCheckResult struct {
+	Link    *string `json:"link,omitempty"`
+	Message string  `json:"message"`
+	Ok      bool    `json:"ok"`
+	Source  string  `json:"source"`
+}
+
+// CloseChecklist defines model for CloseChecklist.
+type CloseChecklist struct {
+	AllowedActions []CloseChecklistAllowedActions `json:"allowedActions"`
+
+	// Blockers Alasan periode belum bisa ditutup.
+	Blockers       []string                    `json:"blockers"`
+	Period         FiscalPeriod                `json:"period"`
+	ReopenRequests []FiscalPeriodReopenRequest `json:"reopenRequests"`
+	Steps          []CloseChecklistStep        `json:"steps"`
+}
+
+// CloseChecklistAllowedActions defines model for CloseChecklist.AllowedActions.
+type CloseChecklistAllowedActions string
+
+// CloseChecklistStep defines model for CloseChecklistStep.
+type CloseChecklistStep struct {
+	Automatic       bool                `json:"automatic"`
+	Checks          []CloseCheckResult  `json:"checks"`
+	CompletedAt     *time.Time          `json:"completedAt,omitempty"`
+	CompletedBy     *openapi_types.UUID `json:"completedBy,omitempty"`
+	CompletedByName *string             `json:"completedByName,omitempty"`
+	Note            string              `json:"note"`
+	Order           int                 `json:"order"`
+
+	// PicLabel PIC default BRD 5.15.
+	PicLabel    string              `json:"picLabel"`
+	PicUserId   *openapi_types.UUID `json:"picUserId,omitempty"`
+	PicUserName *string             `json:"picUserName,omitempty"`
+
+	// Status `pending` Belum, `done` Selesai, `skipped` Tidak Berlaku.
+	Status   CloseStepStatus `json:"status"`
+	StepCode CloseStepCode   `json:"stepCode"`
+	Title    string          `json:"title"`
+
+	// Version 0 = langkah belum pernah disimpan.
+	Version int `json:"version"`
+}
+
+// CloseChecklistStepInput defines model for CloseChecklistStepInput.
+type CloseChecklistStepInput struct {
+	Note      *string             `json:"note,omitempty"`
+	PicUserId *openapi_types.UUID `json:"picUserId,omitempty"`
+
+	// Status `pending` Belum, `done` Selesai, `skipped` Tidak Berlaku.
+	Status  CloseStepStatus `json:"status"`
+	Version int             `json:"version"`
+}
+
+// CloseStepCode defines model for CloseStepCode.
+type CloseStepCode string
+
+// CloseStepStatus `pending` Belum, `done` Selesai, `skipped` Tidak Berlaku.
+type CloseStepStatus string
+
+// CutoverReconciliation defines model for CutoverReconciliation.
+type CutoverReconciliation struct {
+	Checks      []CutoverReconciliationCheck `json:"checks"`
+	CutoverDate *BusinessDate                `json:"cutoverDate,omitempty"`
+
+	// LedgerSource `posted` = saldo GL terposting s.d. cut-over; `draft` = Neraca Saldo Awal belum diposting.
+	LedgerSource *CutoverReconciliationLedgerSource `json:"ledgerSource,omitempty"`
+	Passed       bool                               `json:"passed"`
+}
+
+// CutoverReconciliationLedgerSource `posted` = saldo GL terposting s.d. cut-over; `draft` = Neraca Saldo Awal belum diposting.
+type CutoverReconciliationLedgerSource string
+
+// CutoverReconciliationCheck defines model for CutoverReconciliationCheck.
+type CutoverReconciliationCheck struct {
+	AccountCode string `json:"accountCode"`
+	Code        string `json:"code"`
+
+	// Difference Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Difference Money  `json:"difference"`
+	Label      string `json:"label"`
+
+	// Ledger Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Ledger Money                            `json:"ledger"`
+	Note   string                           `json:"note"`
+	Status CutoverReconciliationCheckStatus `json:"status"`
+
+	// Subledger Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Subledger Money `json:"subledger"`
+}
+
+// CutoverReconciliationCheckStatus defines model for CutoverReconciliationCheck.Status.
+type CutoverReconciliationCheckStatus string
+
+// DepreciationLine defines model for DepreciationLine.
+type DepreciationLine struct {
+	// Accumulated Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Accumulated Money `json:"accumulated"`
+
+	// Amount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Amount    Money              `json:"amount"`
+	AssetCode string             `json:"assetCode"`
+	AssetId   openapi_types.UUID `json:"assetId"`
+	AssetName string             `json:"assetName"`
+
+	// BookValue Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	BookValue      Money              `json:"bookValue"`
+	Id             openapi_types.UUID `json:"id"`
+	JournalEntryId openapi_types.UUID `json:"journalEntryId"`
+	JournalNumber  string             `json:"journalNumber"`
+	PeriodLabel    string             `json:"periodLabel"`
+	RunId          openapi_types.UUID `json:"runId"`
+}
+
+// DepreciationRun defines model for DepreciationRun.
+type DepreciationRun struct {
+	AssetCount  int                `json:"assetCount"`
+	Id          openapi_types.UUID `json:"id"`
+	LastRunAt   time.Time          `json:"lastRunAt"`
+	Month       int                `json:"month"`
+	PeriodId    openapi_types.UUID `json:"periodId"`
+	PeriodLabel string             `json:"periodLabel"`
+	RunCount    int                `json:"runCount"`
+
+	// Total Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Total Money `json:"total"`
+	Year  int   `json:"year"`
+}
+
+// DepreciationRunDetail defines model for DepreciationRunDetail.
+type DepreciationRunDetail struct {
+	Lines []DepreciationLine `json:"lines"`
+	Run   DepreciationRun    `json:"run"`
+}
+
+// DepreciationRunInput defines model for DepreciationRunInput.
+type DepreciationRunInput struct {
+	Month int `json:"month"`
+	Year  int `json:"year"`
+}
+
+// DepreciationRunList defines model for DepreciationRunList.
+type DepreciationRunList struct {
+	Items      []DepreciationRun `json:"items"`
+	Page       int               `json:"page"`
+	PageSize   int               `json:"pageSize"`
+	TotalItems int64             `json:"totalItems"`
+	TotalPages int               `json:"totalPages"`
+}
+
 // Dimension Master dimensi jurnal. Field channel/pihak hanya untuk sub-channel; periode/anggaran hanya kampanye.
 type Dimension struct {
 	BudgetAmount *Money              `json:"budgetAmount,omitempty"`
@@ -567,14 +1015,296 @@ type FiscalPeriod struct {
 	// StartDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
 	//
 	// Example: 2026-10-19
-	StartDate BusinessDate       `json:"startDate"`
-	Status    FiscalPeriodStatus `json:"status"`
-	Version   int                `json:"version"`
-	Year      int                `json:"year"`
+	StartDate BusinessDate `json:"startDate"`
+
+	// Status `open` Terbuka, `closed` Ditutup, `pending_approval` Menunggu Persetujuan buka kembali (tetap terkunci).
+	Status  FiscalPeriodStatus `json:"status"`
+	Version int                `json:"version"`
+	Year    int                `json:"year"`
 }
 
-// FiscalPeriodStatus defines model for FiscalPeriodStatus.
+// FiscalPeriodReopenInput defines model for FiscalPeriodReopenInput.
+type FiscalPeriodReopenInput struct {
+	Reason  string `json:"reason"`
+	Version int    `json:"version"`
+}
+
+// FiscalPeriodReopenRequest defines model for FiscalPeriodReopenRequest.
+type FiscalPeriodReopenRequest struct {
+	DecidedAt       *time.Time                      `json:"decidedAt,omitempty"`
+	DecisionNote    string                          `json:"decisionNote"`
+	Id              openapi_types.UUID              `json:"id"`
+	Reason          string                          `json:"reason"`
+	RequestedAt     time.Time                       `json:"requestedAt"`
+	RequestedBy     openapi_types.UUID              `json:"requestedBy"`
+	RequestedByName *string                         `json:"requestedByName,omitempty"`
+	Status          FiscalPeriodReopenRequestStatus `json:"status"`
+}
+
+// FiscalPeriodReopenRequestStatus defines model for FiscalPeriodReopenRequest.Status.
+type FiscalPeriodReopenRequestStatus string
+
+// FiscalPeriodStatus `open` Terbuka, `closed` Ditutup, `pending_approval` Menunggu Persetujuan buka kembali (tetap terkunci).
 type FiscalPeriodStatus string
+
+// FixedAsset defines model for FixedAsset.
+type FixedAsset struct {
+	// Accumulated Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Accumulated Money `json:"accumulated"`
+
+	// AcquisitionDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	AcquisitionDate      BusinessDate               `json:"acquisitionDate"`
+	AcquisitionJournalId *openapi_types.UUID        `json:"acquisitionJournalId,omitempty"`
+	AllowedActions       []FixedAssetAllowedActions `json:"allowedActions"`
+
+	// BookValue Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	BookValue Money              `json:"bookValue"`
+	ClassId   openapi_types.UUID `json:"classId"`
+	ClassName string             `json:"className"`
+	Code      string             `json:"code"`
+
+	// Cost Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Cost Money `json:"cost"`
+
+	// DepreciationStart Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	DepreciationStart BusinessDate        `json:"depreciationStart"`
+	DisposalAccountId *openapi_types.UUID `json:"disposalAccountId,omitempty"`
+	DisposalDate      *BusinessDate       `json:"disposalDate,omitempty"`
+	DisposalJournalId *openapi_types.UUID `json:"disposalJournalId,omitempty"`
+	DisposalProceeds  *Money              `json:"disposalProceeds,omitempty"`
+	DisposalReason    string              `json:"disposalReason"`
+	DivisionId        openapi_types.UUID  `json:"divisionId"`
+	Id                openapi_types.UUID  `json:"id"`
+	LocationId        *openapi_types.UUID `json:"locationId,omitempty"`
+	LocationLabel     string              `json:"locationLabel"`
+
+	// MonthlyDepreciation Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	MonthlyDepreciation Money  `json:"monthlyDepreciation"`
+	Name                string `json:"name"`
+	Note                string `json:"note"`
+
+	// OpeningAccumulated Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	OpeningAccumulated       Money               `json:"openingAccumulated"`
+	OpeningDepreciatedMonths int                 `json:"openingDepreciatedMonths"`
+	PaymentAccountId         *openapi_types.UUID `json:"paymentAccountId,omitempty"`
+
+	// Salvage Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Salvage Money `json:"salvage"`
+
+	// Source `purchase` pembelian setelah go-live, `opening` saldo awal migrasi.
+	Source FixedAssetSource `json:"source"`
+
+	// Status `draft` Draft, `active` Aktif, `disposed` Dilepas.
+	Status           FixedAssetStatus `json:"status"`
+	UpdatedAt        time.Time        `json:"updatedAt"`
+	UsefulLifeMonths int              `json:"usefulLifeMonths"`
+	Version          int              `json:"version"`
+}
+
+// FixedAssetAllowedActions defines model for FixedAsset.AllowedActions.
+type FixedAssetAllowedActions string
+
+// FixedAssetClass defines model for FixedAssetClass.
+type FixedAssetClass struct {
+	AccumulatedAccountCode string             `json:"accumulatedAccountCode"`
+	AccumulatedAccountId   openapi_types.UUID `json:"accumulatedAccountId"`
+	AssetAccountCode       string             `json:"assetAccountCode"`
+	AssetAccountId         openapi_types.UUID `json:"assetAccountId"`
+	Code                   string             `json:"code"`
+	Id                     openapi_types.UUID `json:"id"`
+	IsActive               bool               `json:"isActive"`
+	Name                   string             `json:"name"`
+	UsefulLifeMonths       int                `json:"usefulLifeMonths"`
+	Version                int                `json:"version"`
+}
+
+// FixedAssetClassCreate defines model for FixedAssetClassCreate.
+type FixedAssetClassCreate struct {
+	AccumulatedAccountId openapi_types.UUID `json:"accumulatedAccountId"`
+	AssetAccountId       openapi_types.UUID `json:"assetAccountId"`
+
+	// Code Example: vending_machine
+	Code             string `json:"code"`
+	IsActive         bool   `json:"isActive"`
+	Name             string `json:"name"`
+	UsefulLifeMonths int    `json:"usefulLifeMonths"`
+}
+
+// FixedAssetClassUpdate defines model for FixedAssetClassUpdate.
+type FixedAssetClassUpdate struct {
+	AccumulatedAccountId openapi_types.UUID `json:"accumulatedAccountId"`
+	AssetAccountId       openapi_types.UUID `json:"assetAccountId"`
+	IsActive             bool               `json:"isActive"`
+	Name                 string             `json:"name"`
+	UsefulLifeMonths     int                `json:"usefulLifeMonths"`
+	Version              int                `json:"version"`
+}
+
+// FixedAssetCreate defines model for FixedAssetCreate.
+type FixedAssetCreate struct {
+	// AcquisitionDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	AcquisitionDate BusinessDate       `json:"acquisitionDate"`
+	ClassId         openapi_types.UUID `json:"classId"`
+
+	// Code Example: AST-VM-001
+	Code string `json:"code"`
+
+	// Cost Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Cost          Money               `json:"cost"`
+	DivisionId    openapi_types.UUID  `json:"divisionId"`
+	LocationId    *openapi_types.UUID `json:"locationId,omitempty"`
+	LocationLabel *string             `json:"locationLabel,omitempty"`
+	Name          string              `json:"name"`
+	Note          *string             `json:"note,omitempty"`
+
+	// OpeningAccumulated Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	OpeningAccumulated *Money              `json:"openingAccumulated,omitempty"`
+	PaymentAccountId   *openapi_types.UUID `json:"paymentAccountId,omitempty"`
+
+	// Salvage Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Salvage *Money `json:"salvage,omitempty"`
+
+	// Source `purchase` pembelian setelah go-live, `opening` saldo awal migrasi.
+	Source FixedAssetSource `json:"source"`
+
+	// UsefulLifeMonths Kosong/0 = umur manfaat kelas.
+	UsefulLifeMonths *int `json:"usefulLifeMonths,omitempty"`
+}
+
+// FixedAssetDetail defines model for FixedAssetDetail.
+type FixedAssetDetail struct {
+	Asset        FixedAsset         `json:"asset"`
+	Depreciation []DepreciationLine `json:"depreciation"`
+}
+
+// FixedAssetDisposeInput defines model for FixedAssetDisposeInput.
+type FixedAssetDisposeInput struct {
+	DisposalAccountId *openapi_types.UUID `json:"disposalAccountId,omitempty"`
+
+	// DisposalDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	DisposalDate BusinessDate `json:"disposalDate"`
+
+	// Proceeds Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Proceeds Money  `json:"proceeds"`
+	Reason   string `json:"reason"`
+	Version  int    `json:"version"`
+}
+
+// FixedAssetFields defines model for FixedAssetFields.
+type FixedAssetFields struct {
+	// AcquisitionDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	AcquisitionDate BusinessDate       `json:"acquisitionDate"`
+	ClassId         openapi_types.UUID `json:"classId"`
+
+	// Cost Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Cost          Money               `json:"cost"`
+	DivisionId    openapi_types.UUID  `json:"divisionId"`
+	LocationId    *openapi_types.UUID `json:"locationId,omitempty"`
+	LocationLabel *string             `json:"locationLabel,omitempty"`
+	Name          string              `json:"name"`
+	Note          *string             `json:"note,omitempty"`
+
+	// OpeningAccumulated Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	OpeningAccumulated *Money              `json:"openingAccumulated,omitempty"`
+	PaymentAccountId   *openapi_types.UUID `json:"paymentAccountId,omitempty"`
+
+	// Salvage Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Salvage *Money `json:"salvage,omitempty"`
+
+	// Source `purchase` pembelian setelah go-live, `opening` saldo awal migrasi.
+	Source FixedAssetSource `json:"source"`
+
+	// UsefulLifeMonths Kosong/0 = umur manfaat kelas.
+	UsefulLifeMonths *int `json:"usefulLifeMonths,omitempty"`
+}
+
+// FixedAssetList defines model for FixedAssetList.
+type FixedAssetList struct {
+	Items      []FixedAsset `json:"items"`
+	Page       int          `json:"page"`
+	PageSize   int          `json:"pageSize"`
+	TotalItems int64        `json:"totalItems"`
+	TotalPages int          `json:"totalPages"`
+}
+
+// FixedAssetSource `purchase` pembelian setelah go-live, `opening` saldo awal migrasi.
+type FixedAssetSource string
+
+// FixedAssetStatus `draft` Draft, `active` Aktif, `disposed` Dilepas.
+type FixedAssetStatus string
+
+// FixedAssetUpdate defines model for FixedAssetUpdate.
+type FixedAssetUpdate struct {
+	// AcquisitionDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	AcquisitionDate BusinessDate       `json:"acquisitionDate"`
+	ClassId         openapi_types.UUID `json:"classId"`
+
+	// Cost Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Cost          Money               `json:"cost"`
+	DivisionId    openapi_types.UUID  `json:"divisionId"`
+	LocationId    *openapi_types.UUID `json:"locationId,omitempty"`
+	LocationLabel *string             `json:"locationLabel,omitempty"`
+	Name          string              `json:"name"`
+	Note          *string             `json:"note,omitempty"`
+
+	// OpeningAccumulated Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	OpeningAccumulated *Money              `json:"openingAccumulated,omitempty"`
+	PaymentAccountId   *openapi_types.UUID `json:"paymentAccountId,omitempty"`
+
+	// Salvage Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Salvage *Money `json:"salvage,omitempty"`
+
+	// Source `purchase` pembelian setelah go-live, `opening` saldo awal migrasi.
+	Source FixedAssetSource `json:"source"`
+
+	// UsefulLifeMonths Kosong/0 = umur manfaat kelas.
+	UsefulLifeMonths *int `json:"usefulLifeMonths,omitempty"`
+	Version          int  `json:"version"`
+}
 
 // GeneralLedger defines model for GeneralLedger.
 type GeneralLedger struct {
@@ -646,6 +1376,7 @@ type GeneralLedgerLine struct {
 	LineNo      int                `json:"lineNo"`
 	Memo        string             `json:"memo"`
 	Number      *string            `json:"number,omitempty"`
+	SourceId    openapi_types.UUID `json:"sourceId"`
 	SourceLabel string             `json:"sourceLabel"`
 	SourceType  string             `json:"sourceType"`
 	SubChannel  *DimensionRef      `json:"subChannel,omitempty"`
@@ -833,6 +1564,153 @@ type Money = string
 // NormalBalance defines model for NormalBalance.
 type NormalBalance string
 
+// OpeningBalance defines model for OpeningBalance.
+type OpeningBalance struct {
+	AllowedActions []OpeningBalanceAllowedActions `json:"allowedActions"`
+	CutoverDate    *BusinessDate                  `json:"cutoverDate,omitempty"`
+
+	// Difference Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Difference     Money                `json:"difference"`
+	Id             *openapi_types.UUID  `json:"id,omitempty"`
+	JournalEntryId *openapi_types.UUID  `json:"journalEntryId,omitempty"`
+	JournalNumber  *string              `json:"journalNumber,omitempty"`
+	Lines          []OpeningBalanceLine `json:"lines"`
+	PostedAt       *time.Time           `json:"postedAt,omitempty"`
+
+	// Status `draft` Draft, `posted` Diposting.
+	Status *OpeningBalanceStatus `json:"status,omitempty"`
+
+	// TotalCredit Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	TotalCredit Money `json:"totalCredit"`
+
+	// TotalDebit Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	TotalDebit Money `json:"totalDebit"`
+	Version    *int  `json:"version,omitempty"`
+}
+
+// OpeningBalanceAllowedActions defines model for OpeningBalance.AllowedActions.
+type OpeningBalanceAllowedActions string
+
+// OpeningBalanceStatus `draft` Draft, `posted` Diposting.
+type OpeningBalanceStatus string
+
+// OpeningBalanceLine defines model for OpeningBalanceLine.
+type OpeningBalanceLine struct {
+	AccountCode string             `json:"accountCode"`
+	AccountId   openapi_types.UUID `json:"accountId"`
+	AccountName string             `json:"accountName"`
+
+	// Credit Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Credit Money `json:"credit"`
+
+	// Debit Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Debit Money              `json:"debit"`
+	Id    openapi_types.UUID `json:"id"`
+	Note  string             `json:"note"`
+}
+
+// OpeningBalanceLineInput defines model for OpeningBalanceLineInput.
+type OpeningBalanceLineInput struct {
+	AccountId openapi_types.UUID `json:"accountId"`
+
+	// Credit Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Credit Money `json:"credit"`
+
+	// Debit Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Debit Money   `json:"debit"`
+	Note  *string `json:"note,omitempty"`
+}
+
+// OpeningBalanceSetInput defines model for OpeningBalanceSetInput.
+type OpeningBalanceSetInput struct {
+	// CutoverDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	CutoverDate BusinessDate `json:"cutoverDate"`
+
+	// Version 0 saat membuat saldo awal pertama kali.
+	Version int `json:"version"`
+}
+
+// OpeningItem defines model for OpeningItem.
+type OpeningItem struct {
+	AccountCode string `json:"accountCode"`
+
+	// Amount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Amount    Money               `json:"amount"`
+	ChannelId *openapi_types.UUID `json:"channelId,omitempty"`
+
+	// DocumentDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	DocumentDate   BusinessDate `json:"documentDate"`
+	DocumentNumber string       `json:"documentNumber"`
+
+	// DueDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	DueDate BusinessDate       `json:"dueDate"`
+	Id      openapi_types.UUID `json:"id"`
+
+	// ItemType `receivable` piutang, `payable` utang.
+	ItemType OpeningItemType `json:"itemType"`
+	Note     string          `json:"note"`
+
+	// OpenAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	OpenAmount Money `json:"openAmount"`
+
+	// Outstanding Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Outstanding Money                `json:"outstanding"`
+	PartyCode   string               `json:"partyCode"`
+	PartyId     openapi_types.UUID   `json:"partyId"`
+	PartyType   OpeningItemPartyType `json:"partyType"`
+
+	// SettledAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	SettledAmount Money `json:"settledAmount"`
+}
+
+// OpeningItemPartyType defines model for OpeningItem.PartyType.
+type OpeningItemPartyType string
+
+// OpeningItemList defines model for OpeningItemList.
+type OpeningItemList struct {
+	Items []OpeningItem `json:"items"`
+
+	// OutstandingTotal Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	OutstandingTotal Money `json:"outstandingTotal"`
+	Page             int   `json:"page"`
+	PageSize         int   `json:"pageSize"`
+	TotalItems       int64 `json:"totalItems"`
+	TotalPages       int   `json:"totalPages"`
+}
+
+// OpeningItemType `receivable` piutang, `payable` utang.
+type OpeningItemType string
+
 // Pagination Metadata pagination standar (Technical Guideline 8.2).
 type Pagination struct {
 	Page       int   `json:"page"`
@@ -906,6 +1784,96 @@ type SubChannelUpdate struct {
 
 	// Version Versi terakhir yang dilihat user (optimistic locking).
 	Version int `json:"version"`
+}
+
+// TrialBalance defines model for TrialBalance.
+type TrialBalance struct {
+	Balanced bool `json:"balanced"`
+
+	// DateFrom Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	DateFrom BusinessDate `json:"dateFrom"`
+
+	// DateTo Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	DateTo BusinessDate       `json:"dateTo"`
+	Rows   []TrialBalanceRow  `json:"rows"`
+	Totals TrialBalanceTotals `json:"totals"`
+}
+
+// TrialBalanceRow defines model for TrialBalanceRow.
+type TrialBalanceRow struct {
+	AccountCode string             `json:"accountCode"`
+	AccountId   openapi_types.UUID `json:"accountId"`
+	AccountName string             `json:"accountName"`
+
+	// ClosingCredit Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	ClosingCredit Money `json:"closingCredit"`
+
+	// ClosingDebit Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	ClosingDebit  Money         `json:"closingDebit"`
+	Group         int           `json:"group"`
+	GroupLabel    string        `json:"groupLabel"`
+	NormalBalance NormalBalance `json:"normalBalance"`
+
+	// OpeningCredit Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	OpeningCredit Money `json:"openingCredit"`
+
+	// OpeningDebit Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	OpeningDebit Money `json:"openingDebit"`
+
+	// PeriodCredit Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	PeriodCredit Money `json:"periodCredit"`
+
+	// PeriodDebit Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	PeriodDebit Money `json:"periodDebit"`
+}
+
+// TrialBalanceTotals defines model for TrialBalanceTotals.
+type TrialBalanceTotals struct {
+	// ClosingCredit Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	ClosingCredit Money `json:"closingCredit"`
+
+	// ClosingDebit Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	ClosingDebit Money `json:"closingDebit"`
+
+	// OpeningCredit Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	OpeningCredit Money `json:"openingCredit"`
+
+	// OpeningDebit Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	OpeningDebit Money `json:"openingDebit"`
+
+	// PeriodCredit Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	PeriodCredit Money `json:"periodCredit"`
+
+	// PeriodDebit Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	PeriodDebit Money `json:"periodDebit"`
 }
 
 // VersionInput defines model for VersionInput.
@@ -1017,6 +1985,18 @@ type UpdateChannelParams struct {
 	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
 }
 
+// ListDepreciationRunsParams defines parameters for ListDepreciationRuns.
+type ListDepreciationRunsParams struct {
+	Page     *Page     `form:"page,omitempty" json:"page,omitempty"`
+	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+}
+
+// RunDepreciationParams defines parameters for RunDepreciation.
+type RunDepreciationParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
 // ListDivisionsParams defines parameters for ListDivisions.
 type ListDivisionsParams struct {
 	IncludeInactive *IncludeInactive `form:"includeInactive,omitempty" json:"includeInactive,omitempty"`
@@ -1081,6 +2061,83 @@ type EnsureFiscalPeriodsParams struct {
 	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
 }
 
+// CloseFiscalPeriodParams defines parameters for CloseFiscalPeriod.
+type CloseFiscalPeriodParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// UpdateCloseChecklistStepParams defines parameters for UpdateCloseChecklistStep.
+type UpdateCloseChecklistStepParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// RequestFiscalPeriodReopenParams defines parameters for RequestFiscalPeriodReopen.
+type RequestFiscalPeriodReopenParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// ListFixedAssetClassesParams defines parameters for ListFixedAssetClasses.
+type ListFixedAssetClassesParams struct {
+	IncludeInactive *IncludeInactive `form:"includeInactive,omitempty" json:"includeInactive,omitempty"`
+}
+
+// CreateFixedAssetClassParams defines parameters for CreateFixedAssetClass.
+type CreateFixedAssetClassParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// UpdateFixedAssetClassParams defines parameters for UpdateFixedAssetClass.
+type UpdateFixedAssetClassParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// ListFixedAssetsParams defines parameters for ListFixedAssets.
+type ListFixedAssetsParams struct {
+	Page     *Page               `form:"page,omitempty" json:"page,omitempty"`
+	PageSize *PageSize           `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+	Q        *Search             `form:"q,omitempty" json:"q,omitempty"`
+	Status   *FixedAssetStatus   `form:"status,omitempty" json:"status,omitempty"`
+	ClassId  *openapi_types.UUID `form:"classId,omitempty" json:"classId,omitempty"`
+}
+
+// CreateFixedAssetParams defines parameters for CreateFixedAsset.
+type CreateFixedAssetParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// DeleteFixedAssetParams defines parameters for DeleteFixedAsset.
+type DeleteFixedAssetParams struct {
+	// Version Versi terakhir yang dilihat user (optimistic locking).
+	Version Version `form:"version" json:"version"`
+
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// UpdateFixedAssetParams defines parameters for UpdateFixedAsset.
+type UpdateFixedAssetParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// ActivateFixedAssetParams defines parameters for ActivateFixedAsset.
+type ActivateFixedAssetParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// DisposeFixedAssetParams defines parameters for DisposeFixedAsset.
+type DisposeFixedAssetParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
 // GetGeneralLedgerParams defines parameters for GetGeneralLedger.
 type GetGeneralLedgerParams struct {
 	AccountId    openapi_types.UUID  `form:"accountId" json:"accountId"`
@@ -1138,6 +2195,39 @@ type ReverseJournalEntryParams struct {
 	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
 }
 
+// SaveOpeningBalanceSetParams defines parameters for SaveOpeningBalanceSet.
+type SaveOpeningBalanceSetParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// SaveOpeningBalanceLineParams defines parameters for SaveOpeningBalanceLine.
+type SaveOpeningBalanceLineParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// DeleteOpeningBalanceLineParams defines parameters for DeleteOpeningBalanceLine.
+type DeleteOpeningBalanceLineParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// PostOpeningBalanceParams defines parameters for PostOpeningBalance.
+type PostOpeningBalanceParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// ListOpeningItemsParams defines parameters for ListOpeningItems.
+type ListOpeningItemsParams struct {
+	Page            *Page            `form:"page,omitempty" json:"page,omitempty"`
+	PageSize        *PageSize        `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+	Q               *Search          `form:"q,omitempty" json:"q,omitempty"`
+	ItemType        *OpeningItemType `form:"itemType,omitempty" json:"itemType,omitempty"`
+	OutstandingOnly *bool            `form:"outstandingOnly,omitempty" json:"outstandingOnly,omitempty"`
+}
+
 // ListSubChannelsParams defines parameters for ListSubChannels.
 type ListSubChannelsParams struct {
 	IncludeInactive *IncludeInactive    `form:"includeInactive,omitempty" json:"includeInactive,omitempty"`
@@ -1165,6 +2255,16 @@ type UpdateSubChannelParams struct {
 	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
 }
 
+// GetTrialBalanceParams defines parameters for GetTrialBalance.
+type GetTrialBalanceParams struct {
+	DateFrom     BusinessDate        `form:"dateFrom" json:"dateFrom"`
+	DateTo       BusinessDate        `form:"dateTo" json:"dateTo"`
+	ChannelId    *openapi_types.UUID `form:"channelId,omitempty" json:"channelId,omitempty"`
+	SubChannelId *openapi_types.UUID `form:"subChannelId,omitempty" json:"subChannelId,omitempty"`
+	DivisionId   *openapi_types.UUID `form:"divisionId,omitempty" json:"divisionId,omitempty"`
+	CampaignId   *openapi_types.UUID `form:"campaignId,omitempty" json:"campaignId,omitempty"`
+}
+
 // CreateAccountJSONRequestBody defines body for CreateAccount for application/json ContentType.
 type CreateAccountJSONRequestBody = AccountInput
 
@@ -1183,6 +2283,9 @@ type CreateChannelJSONRequestBody = DimensionInput
 // UpdateChannelJSONRequestBody defines body for UpdateChannel for application/json ContentType.
 type UpdateChannelJSONRequestBody = DimensionUpdate
 
+// RunDepreciationJSONRequestBody defines body for RunDepreciation for application/json ContentType.
+type RunDepreciationJSONRequestBody = DepreciationRunInput
+
 // CreateDivisionJSONRequestBody defines body for CreateDivision for application/json ContentType.
 type CreateDivisionJSONRequestBody = DimensionInput
 
@@ -1195,6 +2298,33 @@ type CreateExpenseTypeJSONRequestBody = ExpenseTypeInput
 // UpdateExpenseTypeJSONRequestBody defines body for UpdateExpenseType for application/json ContentType.
 type UpdateExpenseTypeJSONRequestBody = ExpenseTypeUpdate
 
+// CloseFiscalPeriodJSONRequestBody defines body for CloseFiscalPeriod for application/json ContentType.
+type CloseFiscalPeriodJSONRequestBody = VersionInput
+
+// UpdateCloseChecklistStepJSONRequestBody defines body for UpdateCloseChecklistStep for application/json ContentType.
+type UpdateCloseChecklistStepJSONRequestBody = CloseChecklistStepInput
+
+// RequestFiscalPeriodReopenJSONRequestBody defines body for RequestFiscalPeriodReopen for application/json ContentType.
+type RequestFiscalPeriodReopenJSONRequestBody = FiscalPeriodReopenInput
+
+// CreateFixedAssetClassJSONRequestBody defines body for CreateFixedAssetClass for application/json ContentType.
+type CreateFixedAssetClassJSONRequestBody = FixedAssetClassCreate
+
+// UpdateFixedAssetClassJSONRequestBody defines body for UpdateFixedAssetClass for application/json ContentType.
+type UpdateFixedAssetClassJSONRequestBody = FixedAssetClassUpdate
+
+// CreateFixedAssetJSONRequestBody defines body for CreateFixedAsset for application/json ContentType.
+type CreateFixedAssetJSONRequestBody = FixedAssetCreate
+
+// UpdateFixedAssetJSONRequestBody defines body for UpdateFixedAsset for application/json ContentType.
+type UpdateFixedAssetJSONRequestBody = FixedAssetUpdate
+
+// ActivateFixedAssetJSONRequestBody defines body for ActivateFixedAsset for application/json ContentType.
+type ActivateFixedAssetJSONRequestBody = VersionInput
+
+// DisposeFixedAssetJSONRequestBody defines body for DisposeFixedAsset for application/json ContentType.
+type DisposeFixedAssetJSONRequestBody = FixedAssetDisposeInput
+
 // CreateJournalEntryJSONRequestBody defines body for CreateJournalEntry for application/json ContentType.
 type CreateJournalEntryJSONRequestBody = ManualJournalFields
 
@@ -1206,6 +2336,15 @@ type PostJournalEntryJSONRequestBody = VersionInput
 
 // ReverseJournalEntryJSONRequestBody defines body for ReverseJournalEntry for application/json ContentType.
 type ReverseJournalEntryJSONRequestBody = JournalReverseInput
+
+// SaveOpeningBalanceSetJSONRequestBody defines body for SaveOpeningBalanceSet for application/json ContentType.
+type SaveOpeningBalanceSetJSONRequestBody = OpeningBalanceSetInput
+
+// SaveOpeningBalanceLineJSONRequestBody defines body for SaveOpeningBalanceLine for application/json ContentType.
+type SaveOpeningBalanceLineJSONRequestBody = OpeningBalanceLineInput
+
+// PostOpeningBalanceJSONRequestBody defines body for PostOpeningBalance for application/json ContentType.
+type PostOpeningBalanceJSONRequestBody = VersionInput
 
 // CreateSubChannelJSONRequestBody defines body for CreateSubChannel for application/json ContentType.
 type CreateSubChannelJSONRequestBody = SubChannelInput
@@ -1254,6 +2393,18 @@ type ServerInterface interface {
 	// UpdateChannel Mengubah channel (kode tetap)
 	// (PUT /api/v1/channels/{id})
 	UpdateChannel(w http.ResponseWriter, r *http.Request, id Id, params UpdateChannelParams)
+	// GetCutoverReconciliation Pengecekan rekonsiliasi cut-over (sub-ledger vs GL)
+	// (GET /api/v1/cutover-reconciliation)
+	GetCutoverReconciliation(w http.ResponseWriter, r *http.Request)
+	// ListDepreciationRuns Riwayat penyusutan per periode
+	// (GET /api/v1/depreciation-runs)
+	ListDepreciationRuns(w http.ResponseWriter, r *http.Request, params ListDepreciationRunsParams)
+	// RunDepreciation Menjalankan penyusutan satu periode (A-31)
+	// (POST /api/v1/depreciation-runs)
+	RunDepreciation(w http.ResponseWriter, r *http.Request, params RunDepreciationParams)
+	// GetDepreciationRun Detail penyusutan per aset satu periode
+	// (GET /api/v1/depreciation-runs/{id})
+	GetDepreciationRun(w http.ResponseWriter, r *http.Request, id Id)
 	// ListDivisions Master divisi (dimensi D)
 	// (GET /api/v1/divisions)
 	ListDivisions(w http.ResponseWriter, r *http.Request, params ListDivisionsParams)
@@ -1284,6 +2435,48 @@ type ServerInterface interface {
 	// EnsureFiscalPeriods Membuat periode bulan berjalan dan bulan berikutnya bila belum ada
 	// (POST /api/v1/fiscal-periods/ensure)
 	EnsureFiscalPeriods(w http.ResponseWriter, r *http.Request, params EnsureFiscalPeriodsParams)
+	// CloseFiscalPeriod Tutup Periode (★ re-autentikasi)
+	// (POST /api/v1/fiscal-periods/{id}/close)
+	CloseFiscalPeriod(w http.ResponseWriter, r *http.Request, id Id, params CloseFiscalPeriodParams)
+	// GetCloseChecklist Checklist Tutup Buku 9 langkah satu periode (BRD 5.15)
+	// (GET /api/v1/fiscal-periods/{id}/close-checklist)
+	GetCloseChecklist(w http.ResponseWriter, r *http.Request, id Id)
+	// UpdateCloseChecklistStep Mengubah status, PIC, atau catatan satu langkah
+	// (PUT /api/v1/fiscal-periods/{id}/close-checklist/{stepCode})
+	UpdateCloseChecklistStep(w http.ResponseWriter, r *http.Request, id Id, stepCode CloseStepCode, params UpdateCloseChecklistStepParams)
+	// RequestFiscalPeriodReopen Ajukan Buka Kembali periode (★ re-autentikasi, approval Head F&A → Direksi)
+	// (POST /api/v1/fiscal-periods/{id}/reopen)
+	RequestFiscalPeriodReopen(w http.ResponseWriter, r *http.Request, id Id, params RequestFiscalPeriodReopenParams)
+	// ListFixedAssetClasses Kelas aset tetap (umur manfaat & akun A-31)
+	// (GET /api/v1/fixed-asset-classes)
+	ListFixedAssetClasses(w http.ResponseWriter, r *http.Request, params ListFixedAssetClassesParams)
+	// CreateFixedAssetClass Menambah kelas aset
+	// (POST /api/v1/fixed-asset-classes)
+	CreateFixedAssetClass(w http.ResponseWriter, r *http.Request, params CreateFixedAssetClassParams)
+	// UpdateFixedAssetClass Mengubah kelas aset
+	// (PUT /api/v1/fixed-asset-classes/{id})
+	UpdateFixedAssetClass(w http.ResponseWriter, r *http.Request, id Id, params UpdateFixedAssetClassParams)
+	// ListFixedAssets Register Aset Tetap (ACC-21)
+	// (GET /api/v1/fixed-assets)
+	ListFixedAssets(w http.ResponseWriter, r *http.Request, params ListFixedAssetsParams)
+	// CreateFixedAsset Menambah aset tetap (Draft)
+	// (POST /api/v1/fixed-assets)
+	CreateFixedAsset(w http.ResponseWriter, r *http.Request, params CreateFixedAssetParams)
+	// DeleteFixedAsset Menghapus aset Draft
+	// (DELETE /api/v1/fixed-assets/{id})
+	DeleteFixedAsset(w http.ResponseWriter, r *http.Request, id Id, params DeleteFixedAssetParams)
+	// GetFixedAsset Detail aset beserta riwayat penyusutan
+	// (GET /api/v1/fixed-assets/{id})
+	GetFixedAsset(w http.ResponseWriter, r *http.Request, id Id)
+	// UpdateFixedAsset Mengubah aset Draft
+	// (PUT /api/v1/fixed-assets/{id})
+	UpdateFixedAsset(w http.ResponseWriter, r *http.Request, id Id, params UpdateFixedAssetParams)
+	// ActivateFixedAsset Mengaktifkan aset (jurnal A-31 perolehan untuk aset pembelian)
+	// (POST /api/v1/fixed-assets/{id}/activate)
+	ActivateFixedAsset(w http.ResponseWriter, r *http.Request, id Id, params ActivateFixedAssetParams)
+	// DisposeFixedAsset Melepas aset (dijual/dihapusbukukan, jurnal A-31 pelepasan)
+	// (POST /api/v1/fixed-assets/{id}/dispose)
+	DisposeFixedAsset(w http.ResponseWriter, r *http.Request, id Id, params DisposeFixedAssetParams)
 	// GetGeneralLedger Buku Besar per akun dengan saldo berjalan
 	// (GET /api/v1/general-ledger)
 	GetGeneralLedger(w http.ResponseWriter, r *http.Request, params GetGeneralLedgerParams)
@@ -1308,6 +2501,24 @@ type ServerInterface interface {
 	// ReverseJournalEntry Balik Jurnal (S-128)
 	// (POST /api/v1/journal-entries/{id}/reverse)
 	ReverseJournalEntry(w http.ResponseWriter, r *http.Request, id Id, params ReverseJournalEntryParams)
+	// GetOpeningBalance Saldo Awal — tanggal cut-over dan Neraca Saldo Awal (A-36)
+	// (GET /api/v1/opening-balance)
+	GetOpeningBalance(w http.ResponseWriter, r *http.Request)
+	// SaveOpeningBalanceSet Mengisi tanggal cut-over (akhir bulan)
+	// (PUT /api/v1/opening-balance)
+	SaveOpeningBalanceSet(w http.ResponseWriter, r *http.Request, params SaveOpeningBalanceSetParams)
+	// SaveOpeningBalanceLine Mengisi saldo awal satu akun neraca (akun yang sama diganti)
+	// (POST /api/v1/opening-balance/lines)
+	SaveOpeningBalanceLine(w http.ResponseWriter, r *http.Request, params SaveOpeningBalanceLineParams)
+	// DeleteOpeningBalanceLine Menghapus saldo awal satu akun
+	// (DELETE /api/v1/opening-balance/lines/{id})
+	DeleteOpeningBalanceLine(w http.ResponseWriter, r *http.Request, id Id, params DeleteOpeningBalanceLineParams)
+	// PostOpeningBalance Memposting saldo awal sebagai jurnal A-36 (selisih ke 3901)
+	// (POST /api/v1/opening-balance/post)
+	PostOpeningBalance(w http.ResponseWriter, r *http.Request, params PostOpeningBalanceParams)
+	// ListOpeningItems Piutang & utang terbuka saldo awal per dokumen lama
+	// (GET /api/v1/opening-items)
+	ListOpeningItems(w http.ResponseWriter, r *http.Request, params ListOpeningItemsParams)
 	// ListPostingRules Posting rule jurnal otomatis dan pemetaan akun yang berlaku hari ini (S-130)
 	// (GET /api/v1/posting-rules)
 	ListPostingRules(w http.ResponseWriter, r *http.Request)
@@ -1323,6 +2534,9 @@ type ServerInterface interface {
 	// UpdateSubChannel Mengubah sub-channel (kode dan channel tetap)
 	// (PUT /api/v1/sub-channels/{id})
 	UpdateSubChannel(w http.ResponseWriter, r *http.Request, id Id, params UpdateSubChannelParams)
+	// GetTrialBalance Neraca Saldo per rentang & dimensi (ACC-18)
+	// (GET /api/v1/trial-balance)
+	GetTrialBalance(w http.ResponseWriter, r *http.Request, params GetTrialBalanceParams)
 }
 
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
@@ -1407,6 +2621,30 @@ func (_ Unimplemented) UpdateChannel(w http.ResponseWriter, r *http.Request, id 
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GetCutoverReconciliation Pengecekan rekonsiliasi cut-over (sub-ledger vs GL)
+// (GET /api/v1/cutover-reconciliation)
+func (_ Unimplemented) GetCutoverReconciliation(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListDepreciationRuns Riwayat penyusutan per periode
+// (GET /api/v1/depreciation-runs)
+func (_ Unimplemented) ListDepreciationRuns(w http.ResponseWriter, r *http.Request, params ListDepreciationRunsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// RunDepreciation Menjalankan penyusutan satu periode (A-31)
+// (POST /api/v1/depreciation-runs)
+func (_ Unimplemented) RunDepreciation(w http.ResponseWriter, r *http.Request, params RunDepreciationParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetDepreciationRun Detail penyusutan per aset satu periode
+// (GET /api/v1/depreciation-runs/{id})
+func (_ Unimplemented) GetDepreciationRun(w http.ResponseWriter, r *http.Request, id Id) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
 // ListDivisions Master divisi (dimensi D)
 // (GET /api/v1/divisions)
 func (_ Unimplemented) ListDivisions(w http.ResponseWriter, r *http.Request, params ListDivisionsParams) {
@@ -1467,6 +2705,90 @@ func (_ Unimplemented) EnsureFiscalPeriods(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// CloseFiscalPeriod Tutup Periode (★ re-autentikasi)
+// (POST /api/v1/fiscal-periods/{id}/close)
+func (_ Unimplemented) CloseFiscalPeriod(w http.ResponseWriter, r *http.Request, id Id, params CloseFiscalPeriodParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetCloseChecklist Checklist Tutup Buku 9 langkah satu periode (BRD 5.15)
+// (GET /api/v1/fiscal-periods/{id}/close-checklist)
+func (_ Unimplemented) GetCloseChecklist(w http.ResponseWriter, r *http.Request, id Id) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// UpdateCloseChecklistStep Mengubah status, PIC, atau catatan satu langkah
+// (PUT /api/v1/fiscal-periods/{id}/close-checklist/{stepCode})
+func (_ Unimplemented) UpdateCloseChecklistStep(w http.ResponseWriter, r *http.Request, id Id, stepCode CloseStepCode, params UpdateCloseChecklistStepParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// RequestFiscalPeriodReopen Ajukan Buka Kembali periode (★ re-autentikasi, approval Head F&A → Direksi)
+// (POST /api/v1/fiscal-periods/{id}/reopen)
+func (_ Unimplemented) RequestFiscalPeriodReopen(w http.ResponseWriter, r *http.Request, id Id, params RequestFiscalPeriodReopenParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListFixedAssetClasses Kelas aset tetap (umur manfaat & akun A-31)
+// (GET /api/v1/fixed-asset-classes)
+func (_ Unimplemented) ListFixedAssetClasses(w http.ResponseWriter, r *http.Request, params ListFixedAssetClassesParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// CreateFixedAssetClass Menambah kelas aset
+// (POST /api/v1/fixed-asset-classes)
+func (_ Unimplemented) CreateFixedAssetClass(w http.ResponseWriter, r *http.Request, params CreateFixedAssetClassParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// UpdateFixedAssetClass Mengubah kelas aset
+// (PUT /api/v1/fixed-asset-classes/{id})
+func (_ Unimplemented) UpdateFixedAssetClass(w http.ResponseWriter, r *http.Request, id Id, params UpdateFixedAssetClassParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListFixedAssets Register Aset Tetap (ACC-21)
+// (GET /api/v1/fixed-assets)
+func (_ Unimplemented) ListFixedAssets(w http.ResponseWriter, r *http.Request, params ListFixedAssetsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// CreateFixedAsset Menambah aset tetap (Draft)
+// (POST /api/v1/fixed-assets)
+func (_ Unimplemented) CreateFixedAsset(w http.ResponseWriter, r *http.Request, params CreateFixedAssetParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// DeleteFixedAsset Menghapus aset Draft
+// (DELETE /api/v1/fixed-assets/{id})
+func (_ Unimplemented) DeleteFixedAsset(w http.ResponseWriter, r *http.Request, id Id, params DeleteFixedAssetParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetFixedAsset Detail aset beserta riwayat penyusutan
+// (GET /api/v1/fixed-assets/{id})
+func (_ Unimplemented) GetFixedAsset(w http.ResponseWriter, r *http.Request, id Id) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// UpdateFixedAsset Mengubah aset Draft
+// (PUT /api/v1/fixed-assets/{id})
+func (_ Unimplemented) UpdateFixedAsset(w http.ResponseWriter, r *http.Request, id Id, params UpdateFixedAssetParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ActivateFixedAsset Mengaktifkan aset (jurnal A-31 perolehan untuk aset pembelian)
+// (POST /api/v1/fixed-assets/{id}/activate)
+func (_ Unimplemented) ActivateFixedAsset(w http.ResponseWriter, r *http.Request, id Id, params ActivateFixedAssetParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// DisposeFixedAsset Melepas aset (dijual/dihapusbukukan, jurnal A-31 pelepasan)
+// (POST /api/v1/fixed-assets/{id}/dispose)
+func (_ Unimplemented) DisposeFixedAsset(w http.ResponseWriter, r *http.Request, id Id, params DisposeFixedAssetParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
 // GetGeneralLedger Buku Besar per akun dengan saldo berjalan
 // (GET /api/v1/general-ledger)
 func (_ Unimplemented) GetGeneralLedger(w http.ResponseWriter, r *http.Request, params GetGeneralLedgerParams) {
@@ -1515,6 +2837,42 @@ func (_ Unimplemented) ReverseJournalEntry(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// GetOpeningBalance Saldo Awal — tanggal cut-over dan Neraca Saldo Awal (A-36)
+// (GET /api/v1/opening-balance)
+func (_ Unimplemented) GetOpeningBalance(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// SaveOpeningBalanceSet Mengisi tanggal cut-over (akhir bulan)
+// (PUT /api/v1/opening-balance)
+func (_ Unimplemented) SaveOpeningBalanceSet(w http.ResponseWriter, r *http.Request, params SaveOpeningBalanceSetParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// SaveOpeningBalanceLine Mengisi saldo awal satu akun neraca (akun yang sama diganti)
+// (POST /api/v1/opening-balance/lines)
+func (_ Unimplemented) SaveOpeningBalanceLine(w http.ResponseWriter, r *http.Request, params SaveOpeningBalanceLineParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// DeleteOpeningBalanceLine Menghapus saldo awal satu akun
+// (DELETE /api/v1/opening-balance/lines/{id})
+func (_ Unimplemented) DeleteOpeningBalanceLine(w http.ResponseWriter, r *http.Request, id Id, params DeleteOpeningBalanceLineParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// PostOpeningBalance Memposting saldo awal sebagai jurnal A-36 (selisih ke 3901)
+// (POST /api/v1/opening-balance/post)
+func (_ Unimplemented) PostOpeningBalance(w http.ResponseWriter, r *http.Request, params PostOpeningBalanceParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListOpeningItems Piutang & utang terbuka saldo awal per dokumen lama
+// (GET /api/v1/opening-items)
+func (_ Unimplemented) ListOpeningItems(w http.ResponseWriter, r *http.Request, params ListOpeningItemsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
 // ListPostingRules Posting rule jurnal otomatis dan pemetaan akun yang berlaku hari ini (S-130)
 // (GET /api/v1/posting-rules)
 func (_ Unimplemented) ListPostingRules(w http.ResponseWriter, r *http.Request) {
@@ -1542,6 +2900,12 @@ func (_ Unimplemented) DeleteSubChannel(w http.ResponseWriter, r *http.Request, 
 // UpdateSubChannel Mengubah sub-channel (kode dan channel tetap)
 // (PUT /api/v1/sub-channels/{id})
 func (_ Unimplemented) UpdateSubChannel(w http.ResponseWriter, r *http.Request, id Id, params UpdateSubChannelParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetTrialBalance Neraca Saldo per rentang & dimensi (ACC-18)
+// (GET /api/v1/trial-balance)
+func (_ Unimplemented) GetTrialBalance(w http.ResponseWriter, r *http.Request, params GetTrialBalanceParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -2190,6 +3554,137 @@ func (siw *ServerInterfaceWrapper) UpdateChannel(w http.ResponseWriter, r *http.
 	handler.ServeHTTP(w, r)
 }
 
+// GetCutoverReconciliation operation middleware
+func (siw *ServerInterfaceWrapper) GetCutoverReconciliation(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetCutoverReconciliation(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListDepreciationRuns operation middleware
+func (siw *ServerInterfaceWrapper) ListDepreciationRuns(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListDepreciationRunsParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", r.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "page"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "pageSize", r.URL.Query(), &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "pageSize"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListDepreciationRuns(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// RunDepreciation operation middleware
+func (siw *ServerInterfaceWrapper) RunDepreciation(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params RunDepreciationParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.RunDepreciation(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetDepreciationRun operation middleware
+func (siw *ServerInterfaceWrapper) GetDepreciationRun(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetDepreciationRun(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // ListDivisions operation middleware
 func (siw *ServerInterfaceWrapper) ListDivisions(w http.ResponseWriter, r *http.Request) {
 
@@ -2670,6 +4165,720 @@ func (siw *ServerInterfaceWrapper) EnsureFiscalPeriods(w http.ResponseWriter, r 
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.EnsureFiscalPeriods(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CloseFiscalPeriod operation middleware
+func (siw *ServerInterfaceWrapper) CloseFiscalPeriod(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CloseFiscalPeriodParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CloseFiscalPeriod(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetCloseChecklist operation middleware
+func (siw *ServerInterfaceWrapper) GetCloseChecklist(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetCloseChecklist(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateCloseChecklistStep operation middleware
+func (siw *ServerInterfaceWrapper) UpdateCloseChecklistStep(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "stepCode" -------------
+	var stepCode CloseStepCode
+
+	err = runtime.BindStyledParameterWithOptions("simple", "stepCode", chi.URLParam(r, "stepCode"), &stepCode, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "stepCode", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params UpdateCloseChecklistStepParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateCloseChecklistStep(w, r, id, stepCode, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// RequestFiscalPeriodReopen operation middleware
+func (siw *ServerInterfaceWrapper) RequestFiscalPeriodReopen(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params RequestFiscalPeriodReopenParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.RequestFiscalPeriodReopen(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListFixedAssetClasses operation middleware
+func (siw *ServerInterfaceWrapper) ListFixedAssetClasses(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListFixedAssetClassesParams
+
+	// ------------- Optional query parameter "includeInactive" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "includeInactive", r.URL.Query(), &params.IncludeInactive, runtime.BindQueryParameterOptions{Type: "boolean", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "includeInactive"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "includeInactive", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListFixedAssetClasses(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateFixedAssetClass operation middleware
+func (siw *ServerInterfaceWrapper) CreateFixedAssetClass(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateFixedAssetClassParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateFixedAssetClass(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateFixedAssetClass operation middleware
+func (siw *ServerInterfaceWrapper) UpdateFixedAssetClass(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params UpdateFixedAssetClassParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateFixedAssetClass(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListFixedAssets operation middleware
+func (siw *ServerInterfaceWrapper) ListFixedAssets(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListFixedAssetsParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", r.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "page"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "pageSize", r.URL.Query(), &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "pageSize"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "q" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "q", r.URL.Query(), &params.Q, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "q"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "q", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "status" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "status", r.URL.Query(), &params.Status, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "status"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "status", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "classId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "classId", r.URL.Query(), &params.ClassId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "classId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "classId", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListFixedAssets(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateFixedAsset operation middleware
+func (siw *ServerInterfaceWrapper) CreateFixedAsset(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateFixedAssetParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateFixedAsset(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// DeleteFixedAsset operation middleware
+func (siw *ServerInterfaceWrapper) DeleteFixedAsset(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params DeleteFixedAssetParams
+
+	// ------------- Required query parameter "version" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "version", r.URL.Query(), &params.Version, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "version"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "version", Err: err})
+		}
+		return
+	}
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteFixedAsset(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetFixedAsset operation middleware
+func (siw *ServerInterfaceWrapper) GetFixedAsset(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetFixedAsset(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateFixedAsset operation middleware
+func (siw *ServerInterfaceWrapper) UpdateFixedAsset(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params UpdateFixedAssetParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateFixedAsset(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ActivateFixedAsset operation middleware
+func (siw *ServerInterfaceWrapper) ActivateFixedAsset(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ActivateFixedAssetParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ActivateFixedAsset(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// DisposeFixedAsset operation middleware
+func (siw *ServerInterfaceWrapper) DisposeFixedAsset(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params DisposeFixedAssetParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DisposeFixedAsset(w, r, id, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -3227,6 +5436,294 @@ func (siw *ServerInterfaceWrapper) ReverseJournalEntry(w http.ResponseWriter, r 
 	handler.ServeHTTP(w, r)
 }
 
+// GetOpeningBalance operation middleware
+func (siw *ServerInterfaceWrapper) GetOpeningBalance(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetOpeningBalance(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// SaveOpeningBalanceSet operation middleware
+func (siw *ServerInterfaceWrapper) SaveOpeningBalanceSet(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params SaveOpeningBalanceSetParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.SaveOpeningBalanceSet(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// SaveOpeningBalanceLine operation middleware
+func (siw *ServerInterfaceWrapper) SaveOpeningBalanceLine(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params SaveOpeningBalanceLineParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.SaveOpeningBalanceLine(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// DeleteOpeningBalanceLine operation middleware
+func (siw *ServerInterfaceWrapper) DeleteOpeningBalanceLine(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params DeleteOpeningBalanceLineParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteOpeningBalanceLine(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostOpeningBalance operation middleware
+func (siw *ServerInterfaceWrapper) PostOpeningBalance(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params PostOpeningBalanceParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostOpeningBalance(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListOpeningItems operation middleware
+func (siw *ServerInterfaceWrapper) ListOpeningItems(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListOpeningItemsParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", r.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "page"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "pageSize", r.URL.Query(), &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "pageSize"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "q" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "q", r.URL.Query(), &params.Q, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "q"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "q", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "itemType" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "itemType", r.URL.Query(), &params.ItemType, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "itemType"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "itemType", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "outstandingOnly" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "outstandingOnly", r.URL.Query(), &params.OutstandingOnly, runtime.BindQueryParameterOptions{Type: "boolean", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "outstandingOnly"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "outstandingOnly", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListOpeningItems(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // ListPostingRules operation middleware
 func (siw *ServerInterfaceWrapper) ListPostingRules(w http.ResponseWriter, r *http.Request) {
 
@@ -3444,6 +5941,104 @@ func (siw *ServerInterfaceWrapper) UpdateSubChannel(w http.ResponseWriter, r *ht
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.UpdateSubChannel(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetTrialBalance operation middleware
+func (siw *ServerInterfaceWrapper) GetTrialBalance(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetTrialBalanceParams
+
+	// ------------- Required query parameter "dateFrom" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "dateFrom", r.URL.Query(), &params.DateFrom, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dateFrom"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dateFrom", Err: err})
+		}
+		return
+	}
+
+	// ------------- Required query parameter "dateTo" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "dateTo", r.URL.Query(), &params.DateTo, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dateTo"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dateTo", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "channelId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "channelId", r.URL.Query(), &params.ChannelId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "channelId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "channelId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "subChannelId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "subChannelId", r.URL.Query(), &params.SubChannelId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "subChannelId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "subChannelId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "divisionId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "divisionId", r.URL.Query(), &params.DivisionId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "divisionId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "divisionId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "campaignId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "campaignId", r.URL.Query(), &params.CampaignId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "campaignId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "campaignId", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetTrialBalance(w, r, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -3673,6 +6268,81 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/api/v1/general-ledger", wrapper.GetGeneralLedger)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/trial-balance", wrapper.GetTrialBalance)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/fixed-asset-classes", wrapper.ListFixedAssetClasses)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/fixed-asset-classes", wrapper.CreateFixedAssetClass)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/fixed-asset-classes/{id}", wrapper.UpdateFixedAssetClass)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/fixed-assets", wrapper.ListFixedAssets)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/fixed-assets", wrapper.CreateFixedAsset)
+	})
+	r.Group(func(r chi.Router) {
+		r.Delete(options.BaseURL+"/api/v1/fixed-assets/{id}", wrapper.DeleteFixedAsset)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/fixed-assets/{id}", wrapper.GetFixedAsset)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/fixed-assets/{id}", wrapper.UpdateFixedAsset)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/fixed-assets/{id}/activate", wrapper.ActivateFixedAsset)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/fixed-assets/{id}/dispose", wrapper.DisposeFixedAsset)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/depreciation-runs", wrapper.ListDepreciationRuns)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/depreciation-runs", wrapper.RunDepreciation)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/depreciation-runs/{id}", wrapper.GetDepreciationRun)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/fiscal-periods/{id}/close-checklist", wrapper.GetCloseChecklist)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/fiscal-periods/{id}/close-checklist/{stepCode}", wrapper.UpdateCloseChecklistStep)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/fiscal-periods/{id}/close", wrapper.CloseFiscalPeriod)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/fiscal-periods/{id}/reopen", wrapper.RequestFiscalPeriodReopen)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/opening-balance", wrapper.GetOpeningBalance)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/opening-balance", wrapper.SaveOpeningBalanceSet)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/opening-balance/lines", wrapper.SaveOpeningBalanceLine)
+	})
+	r.Group(func(r chi.Router) {
+		r.Delete(options.BaseURL+"/api/v1/opening-balance/lines/{id}", wrapper.DeleteOpeningBalanceLine)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/opening-balance/post", wrapper.PostOpeningBalance)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/opening-items", wrapper.ListOpeningItems)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/cutover-reconciliation", wrapper.GetCutoverReconciliation)
 	})
 
 	return r
@@ -4181,6 +6851,162 @@ func (response UpdateChanneldefaultApplicationProblemPlusJSONResponse) VisitUpda
 	return err
 }
 
+type GetCutoverReconciliationRequestObject struct {
+}
+
+type GetCutoverReconciliationResponseObject interface {
+	VisitGetCutoverReconciliationResponse(w http.ResponseWriter) error
+}
+
+type GetCutoverReconciliation200JSONResponse CutoverReconciliation
+
+func (response GetCutoverReconciliation200JSONResponse) VisitGetCutoverReconciliationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetCutoverReconciliationdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetCutoverReconciliationdefaultApplicationProblemPlusJSONResponse) VisitGetCutoverReconciliationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListDepreciationRunsRequestObject struct {
+	Params ListDepreciationRunsParams
+}
+
+type ListDepreciationRunsResponseObject interface {
+	VisitListDepreciationRunsResponse(w http.ResponseWriter) error
+}
+
+type ListDepreciationRuns200JSONResponse DepreciationRunList
+
+func (response ListDepreciationRuns200JSONResponse) VisitListDepreciationRunsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListDepreciationRunsdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListDepreciationRunsdefaultApplicationProblemPlusJSONResponse) VisitListDepreciationRunsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RunDepreciationRequestObject struct {
+	Params RunDepreciationParams
+	Body   *RunDepreciationJSONRequestBody
+}
+
+type RunDepreciationResponseObject interface {
+	VisitRunDepreciationResponse(w http.ResponseWriter) error
+}
+
+type RunDepreciation200JSONResponse DepreciationRunDetail
+
+func (response RunDepreciation200JSONResponse) VisitRunDepreciationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RunDepreciationdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response RunDepreciationdefaultApplicationProblemPlusJSONResponse) VisitRunDepreciationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetDepreciationRunRequestObject struct {
+	Id Id `json:"id"`
+}
+
+type GetDepreciationRunResponseObject interface {
+	VisitGetDepreciationRunResponse(w http.ResponseWriter) error
+}
+
+type GetDepreciationRun200JSONResponse DepreciationRunDetail
+
+func (response GetDepreciationRun200JSONResponse) VisitGetDepreciationRunResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetDepreciationRundefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetDepreciationRundefaultApplicationProblemPlusJSONResponse) VisitGetDepreciationRunResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type ListDivisionsRequestObject struct {
 	Params ListDivisionsParams
 }
@@ -4569,6 +7395,564 @@ func (response EnsureFiscalPeriodsdefaultApplicationProblemPlusJSONResponse) Vis
 	return err
 }
 
+type CloseFiscalPeriodRequestObject struct {
+	Id     Id `json:"id"`
+	Params CloseFiscalPeriodParams
+	Body   *CloseFiscalPeriodJSONRequestBody
+}
+
+type CloseFiscalPeriodResponseObject interface {
+	VisitCloseFiscalPeriodResponse(w http.ResponseWriter) error
+}
+
+type CloseFiscalPeriod200JSONResponse CloseChecklist
+
+func (response CloseFiscalPeriod200JSONResponse) VisitCloseFiscalPeriodResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CloseFiscalPerioddefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response CloseFiscalPerioddefaultApplicationProblemPlusJSONResponse) VisitCloseFiscalPeriodResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetCloseChecklistRequestObject struct {
+	Id Id `json:"id"`
+}
+
+type GetCloseChecklistResponseObject interface {
+	VisitGetCloseChecklistResponse(w http.ResponseWriter) error
+}
+
+type GetCloseChecklist200JSONResponse CloseChecklist
+
+func (response GetCloseChecklist200JSONResponse) VisitGetCloseChecklistResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetCloseChecklistdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetCloseChecklistdefaultApplicationProblemPlusJSONResponse) VisitGetCloseChecklistResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateCloseChecklistStepRequestObject struct {
+	Id       Id            `json:"id"`
+	StepCode CloseStepCode `json:"stepCode"`
+	Params   UpdateCloseChecklistStepParams
+	Body     *UpdateCloseChecklistStepJSONRequestBody
+}
+
+type UpdateCloseChecklistStepResponseObject interface {
+	VisitUpdateCloseChecklistStepResponse(w http.ResponseWriter) error
+}
+
+type UpdateCloseChecklistStep200JSONResponse CloseChecklist
+
+func (response UpdateCloseChecklistStep200JSONResponse) VisitUpdateCloseChecklistStepResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateCloseChecklistStepdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response UpdateCloseChecklistStepdefaultApplicationProblemPlusJSONResponse) VisitUpdateCloseChecklistStepResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RequestFiscalPeriodReopenRequestObject struct {
+	Id     Id `json:"id"`
+	Params RequestFiscalPeriodReopenParams
+	Body   *RequestFiscalPeriodReopenJSONRequestBody
+}
+
+type RequestFiscalPeriodReopenResponseObject interface {
+	VisitRequestFiscalPeriodReopenResponse(w http.ResponseWriter) error
+}
+
+type RequestFiscalPeriodReopen200JSONResponse CloseChecklist
+
+func (response RequestFiscalPeriodReopen200JSONResponse) VisitRequestFiscalPeriodReopenResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RequestFiscalPeriodReopendefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response RequestFiscalPeriodReopendefaultApplicationProblemPlusJSONResponse) VisitRequestFiscalPeriodReopenResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListFixedAssetClassesRequestObject struct {
+	Params ListFixedAssetClassesParams
+}
+
+type ListFixedAssetClassesResponseObject interface {
+	VisitListFixedAssetClassesResponse(w http.ResponseWriter) error
+}
+
+type ListFixedAssetClasses200JSONResponse []FixedAssetClass
+
+func (response ListFixedAssetClasses200JSONResponse) VisitListFixedAssetClassesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListFixedAssetClassesdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListFixedAssetClassesdefaultApplicationProblemPlusJSONResponse) VisitListFixedAssetClassesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateFixedAssetClassRequestObject struct {
+	Params CreateFixedAssetClassParams
+	Body   *CreateFixedAssetClassJSONRequestBody
+}
+
+type CreateFixedAssetClassResponseObject interface {
+	VisitCreateFixedAssetClassResponse(w http.ResponseWriter) error
+}
+
+type CreateFixedAssetClass201JSONResponse FixedAssetClass
+
+func (response CreateFixedAssetClass201JSONResponse) VisitCreateFixedAssetClassResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateFixedAssetClassdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response CreateFixedAssetClassdefaultApplicationProblemPlusJSONResponse) VisitCreateFixedAssetClassResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateFixedAssetClassRequestObject struct {
+	Id     Id `json:"id"`
+	Params UpdateFixedAssetClassParams
+	Body   *UpdateFixedAssetClassJSONRequestBody
+}
+
+type UpdateFixedAssetClassResponseObject interface {
+	VisitUpdateFixedAssetClassResponse(w http.ResponseWriter) error
+}
+
+type UpdateFixedAssetClass200JSONResponse FixedAssetClass
+
+func (response UpdateFixedAssetClass200JSONResponse) VisitUpdateFixedAssetClassResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateFixedAssetClassdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response UpdateFixedAssetClassdefaultApplicationProblemPlusJSONResponse) VisitUpdateFixedAssetClassResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListFixedAssetsRequestObject struct {
+	Params ListFixedAssetsParams
+}
+
+type ListFixedAssetsResponseObject interface {
+	VisitListFixedAssetsResponse(w http.ResponseWriter) error
+}
+
+type ListFixedAssets200JSONResponse FixedAssetList
+
+func (response ListFixedAssets200JSONResponse) VisitListFixedAssetsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListFixedAssetsdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListFixedAssetsdefaultApplicationProblemPlusJSONResponse) VisitListFixedAssetsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateFixedAssetRequestObject struct {
+	Params CreateFixedAssetParams
+	Body   *CreateFixedAssetJSONRequestBody
+}
+
+type CreateFixedAssetResponseObject interface {
+	VisitCreateFixedAssetResponse(w http.ResponseWriter) error
+}
+
+type CreateFixedAsset201JSONResponse FixedAssetDetail
+
+func (response CreateFixedAsset201JSONResponse) VisitCreateFixedAssetResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateFixedAssetdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response CreateFixedAssetdefaultApplicationProblemPlusJSONResponse) VisitCreateFixedAssetResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteFixedAssetRequestObject struct {
+	Id     Id `json:"id"`
+	Params DeleteFixedAssetParams
+}
+
+type DeleteFixedAssetResponseObject interface {
+	VisitDeleteFixedAssetResponse(w http.ResponseWriter) error
+}
+
+type DeleteFixedAsset204Response struct {
+}
+
+func (response DeleteFixedAsset204Response) VisitDeleteFixedAssetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type DeleteFixedAssetdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response DeleteFixedAssetdefaultApplicationProblemPlusJSONResponse) VisitDeleteFixedAssetResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetFixedAssetRequestObject struct {
+	Id Id `json:"id"`
+}
+
+type GetFixedAssetResponseObject interface {
+	VisitGetFixedAssetResponse(w http.ResponseWriter) error
+}
+
+type GetFixedAsset200JSONResponse FixedAssetDetail
+
+func (response GetFixedAsset200JSONResponse) VisitGetFixedAssetResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetFixedAssetdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetFixedAssetdefaultApplicationProblemPlusJSONResponse) VisitGetFixedAssetResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateFixedAssetRequestObject struct {
+	Id     Id `json:"id"`
+	Params UpdateFixedAssetParams
+	Body   *UpdateFixedAssetJSONRequestBody
+}
+
+type UpdateFixedAssetResponseObject interface {
+	VisitUpdateFixedAssetResponse(w http.ResponseWriter) error
+}
+
+type UpdateFixedAsset200JSONResponse FixedAssetDetail
+
+func (response UpdateFixedAsset200JSONResponse) VisitUpdateFixedAssetResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateFixedAssetdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response UpdateFixedAssetdefaultApplicationProblemPlusJSONResponse) VisitUpdateFixedAssetResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ActivateFixedAssetRequestObject struct {
+	Id     Id `json:"id"`
+	Params ActivateFixedAssetParams
+	Body   *ActivateFixedAssetJSONRequestBody
+}
+
+type ActivateFixedAssetResponseObject interface {
+	VisitActivateFixedAssetResponse(w http.ResponseWriter) error
+}
+
+type ActivateFixedAsset200JSONResponse FixedAssetDetail
+
+func (response ActivateFixedAsset200JSONResponse) VisitActivateFixedAssetResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ActivateFixedAssetdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ActivateFixedAssetdefaultApplicationProblemPlusJSONResponse) VisitActivateFixedAssetResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DisposeFixedAssetRequestObject struct {
+	Id     Id `json:"id"`
+	Params DisposeFixedAssetParams
+	Body   *DisposeFixedAssetJSONRequestBody
+}
+
+type DisposeFixedAssetResponseObject interface {
+	VisitDisposeFixedAssetResponse(w http.ResponseWriter) error
+}
+
+type DisposeFixedAsset200JSONResponse FixedAssetDetail
+
+func (response DisposeFixedAsset200JSONResponse) VisitDisposeFixedAssetResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DisposeFixedAssetdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response DisposeFixedAssetdefaultApplicationProblemPlusJSONResponse) VisitDisposeFixedAssetResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type GetGeneralLedgerRequestObject struct {
 	Params GetGeneralLedgerParams
 }
@@ -4883,6 +8267,243 @@ func (response ReverseJournalEntrydefaultApplicationProblemPlusJSONResponse) Vis
 	return err
 }
 
+type GetOpeningBalanceRequestObject struct {
+}
+
+type GetOpeningBalanceResponseObject interface {
+	VisitGetOpeningBalanceResponse(w http.ResponseWriter) error
+}
+
+type GetOpeningBalance200JSONResponse OpeningBalance
+
+func (response GetOpeningBalance200JSONResponse) VisitGetOpeningBalanceResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetOpeningBalancedefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetOpeningBalancedefaultApplicationProblemPlusJSONResponse) VisitGetOpeningBalanceResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SaveOpeningBalanceSetRequestObject struct {
+	Params SaveOpeningBalanceSetParams
+	Body   *SaveOpeningBalanceSetJSONRequestBody
+}
+
+type SaveOpeningBalanceSetResponseObject interface {
+	VisitSaveOpeningBalanceSetResponse(w http.ResponseWriter) error
+}
+
+type SaveOpeningBalanceSet200JSONResponse OpeningBalance
+
+func (response SaveOpeningBalanceSet200JSONResponse) VisitSaveOpeningBalanceSetResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SaveOpeningBalanceSetdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response SaveOpeningBalanceSetdefaultApplicationProblemPlusJSONResponse) VisitSaveOpeningBalanceSetResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SaveOpeningBalanceLineRequestObject struct {
+	Params SaveOpeningBalanceLineParams
+	Body   *SaveOpeningBalanceLineJSONRequestBody
+}
+
+type SaveOpeningBalanceLineResponseObject interface {
+	VisitSaveOpeningBalanceLineResponse(w http.ResponseWriter) error
+}
+
+type SaveOpeningBalanceLine200JSONResponse OpeningBalance
+
+func (response SaveOpeningBalanceLine200JSONResponse) VisitSaveOpeningBalanceLineResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SaveOpeningBalanceLinedefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response SaveOpeningBalanceLinedefaultApplicationProblemPlusJSONResponse) VisitSaveOpeningBalanceLineResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteOpeningBalanceLineRequestObject struct {
+	Id     Id `json:"id"`
+	Params DeleteOpeningBalanceLineParams
+}
+
+type DeleteOpeningBalanceLineResponseObject interface {
+	VisitDeleteOpeningBalanceLineResponse(w http.ResponseWriter) error
+}
+
+type DeleteOpeningBalanceLine200JSONResponse OpeningBalance
+
+func (response DeleteOpeningBalanceLine200JSONResponse) VisitDeleteOpeningBalanceLineResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteOpeningBalanceLinedefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response DeleteOpeningBalanceLinedefaultApplicationProblemPlusJSONResponse) VisitDeleteOpeningBalanceLineResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostOpeningBalanceRequestObject struct {
+	Params PostOpeningBalanceParams
+	Body   *PostOpeningBalanceJSONRequestBody
+}
+
+type PostOpeningBalanceResponseObject interface {
+	VisitPostOpeningBalanceResponse(w http.ResponseWriter) error
+}
+
+type PostOpeningBalance200JSONResponse OpeningBalance
+
+func (response PostOpeningBalance200JSONResponse) VisitPostOpeningBalanceResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostOpeningBalancedefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response PostOpeningBalancedefaultApplicationProblemPlusJSONResponse) VisitPostOpeningBalanceResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListOpeningItemsRequestObject struct {
+	Params ListOpeningItemsParams
+}
+
+type ListOpeningItemsResponseObject interface {
+	VisitListOpeningItemsResponse(w http.ResponseWriter) error
+}
+
+type ListOpeningItems200JSONResponse OpeningItemList
+
+func (response ListOpeningItems200JSONResponse) VisitListOpeningItemsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListOpeningItemsdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListOpeningItemsdefaultApplicationProblemPlusJSONResponse) VisitListOpeningItemsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type ListPostingRulesRequestObject struct {
 }
 
@@ -5075,6 +8696,45 @@ func (response UpdateSubChanneldefaultApplicationProblemPlusJSONResponse) VisitU
 	return err
 }
 
+type GetTrialBalanceRequestObject struct {
+	Params GetTrialBalanceParams
+}
+
+type GetTrialBalanceResponseObject interface {
+	VisitGetTrialBalanceResponse(w http.ResponseWriter) error
+}
+
+type GetTrialBalance200JSONResponse TrialBalance
+
+func (response GetTrialBalance200JSONResponse) VisitGetTrialBalanceResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetTrialBalancedefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetTrialBalancedefaultApplicationProblemPlusJSONResponse) VisitGetTrialBalanceResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
 	// ListAccounts Chart of Accounts urut kode
@@ -5116,6 +8776,18 @@ type StrictServerInterface interface {
 	// UpdateChannel Mengubah channel (kode tetap)
 	// (PUT /api/v1/channels/{id})
 	UpdateChannel(ctx context.Context, request UpdateChannelRequestObject) (UpdateChannelResponseObject, error)
+	// GetCutoverReconciliation Pengecekan rekonsiliasi cut-over (sub-ledger vs GL)
+	// (GET /api/v1/cutover-reconciliation)
+	GetCutoverReconciliation(ctx context.Context, request GetCutoverReconciliationRequestObject) (GetCutoverReconciliationResponseObject, error)
+	// ListDepreciationRuns Riwayat penyusutan per periode
+	// (GET /api/v1/depreciation-runs)
+	ListDepreciationRuns(ctx context.Context, request ListDepreciationRunsRequestObject) (ListDepreciationRunsResponseObject, error)
+	// RunDepreciation Menjalankan penyusutan satu periode (A-31)
+	// (POST /api/v1/depreciation-runs)
+	RunDepreciation(ctx context.Context, request RunDepreciationRequestObject) (RunDepreciationResponseObject, error)
+	// GetDepreciationRun Detail penyusutan per aset satu periode
+	// (GET /api/v1/depreciation-runs/{id})
+	GetDepreciationRun(ctx context.Context, request GetDepreciationRunRequestObject) (GetDepreciationRunResponseObject, error)
 	// ListDivisions Master divisi (dimensi D)
 	// (GET /api/v1/divisions)
 	ListDivisions(ctx context.Context, request ListDivisionsRequestObject) (ListDivisionsResponseObject, error)
@@ -5146,6 +8818,48 @@ type StrictServerInterface interface {
 	// EnsureFiscalPeriods Membuat periode bulan berjalan dan bulan berikutnya bila belum ada
 	// (POST /api/v1/fiscal-periods/ensure)
 	EnsureFiscalPeriods(ctx context.Context, request EnsureFiscalPeriodsRequestObject) (EnsureFiscalPeriodsResponseObject, error)
+	// CloseFiscalPeriod Tutup Periode (★ re-autentikasi)
+	// (POST /api/v1/fiscal-periods/{id}/close)
+	CloseFiscalPeriod(ctx context.Context, request CloseFiscalPeriodRequestObject) (CloseFiscalPeriodResponseObject, error)
+	// GetCloseChecklist Checklist Tutup Buku 9 langkah satu periode (BRD 5.15)
+	// (GET /api/v1/fiscal-periods/{id}/close-checklist)
+	GetCloseChecklist(ctx context.Context, request GetCloseChecklistRequestObject) (GetCloseChecklistResponseObject, error)
+	// UpdateCloseChecklistStep Mengubah status, PIC, atau catatan satu langkah
+	// (PUT /api/v1/fiscal-periods/{id}/close-checklist/{stepCode})
+	UpdateCloseChecklistStep(ctx context.Context, request UpdateCloseChecklistStepRequestObject) (UpdateCloseChecklistStepResponseObject, error)
+	// RequestFiscalPeriodReopen Ajukan Buka Kembali periode (★ re-autentikasi, approval Head F&A → Direksi)
+	// (POST /api/v1/fiscal-periods/{id}/reopen)
+	RequestFiscalPeriodReopen(ctx context.Context, request RequestFiscalPeriodReopenRequestObject) (RequestFiscalPeriodReopenResponseObject, error)
+	// ListFixedAssetClasses Kelas aset tetap (umur manfaat & akun A-31)
+	// (GET /api/v1/fixed-asset-classes)
+	ListFixedAssetClasses(ctx context.Context, request ListFixedAssetClassesRequestObject) (ListFixedAssetClassesResponseObject, error)
+	// CreateFixedAssetClass Menambah kelas aset
+	// (POST /api/v1/fixed-asset-classes)
+	CreateFixedAssetClass(ctx context.Context, request CreateFixedAssetClassRequestObject) (CreateFixedAssetClassResponseObject, error)
+	// UpdateFixedAssetClass Mengubah kelas aset
+	// (PUT /api/v1/fixed-asset-classes/{id})
+	UpdateFixedAssetClass(ctx context.Context, request UpdateFixedAssetClassRequestObject) (UpdateFixedAssetClassResponseObject, error)
+	// ListFixedAssets Register Aset Tetap (ACC-21)
+	// (GET /api/v1/fixed-assets)
+	ListFixedAssets(ctx context.Context, request ListFixedAssetsRequestObject) (ListFixedAssetsResponseObject, error)
+	// CreateFixedAsset Menambah aset tetap (Draft)
+	// (POST /api/v1/fixed-assets)
+	CreateFixedAsset(ctx context.Context, request CreateFixedAssetRequestObject) (CreateFixedAssetResponseObject, error)
+	// DeleteFixedAsset Menghapus aset Draft
+	// (DELETE /api/v1/fixed-assets/{id})
+	DeleteFixedAsset(ctx context.Context, request DeleteFixedAssetRequestObject) (DeleteFixedAssetResponseObject, error)
+	// GetFixedAsset Detail aset beserta riwayat penyusutan
+	// (GET /api/v1/fixed-assets/{id})
+	GetFixedAsset(ctx context.Context, request GetFixedAssetRequestObject) (GetFixedAssetResponseObject, error)
+	// UpdateFixedAsset Mengubah aset Draft
+	// (PUT /api/v1/fixed-assets/{id})
+	UpdateFixedAsset(ctx context.Context, request UpdateFixedAssetRequestObject) (UpdateFixedAssetResponseObject, error)
+	// ActivateFixedAsset Mengaktifkan aset (jurnal A-31 perolehan untuk aset pembelian)
+	// (POST /api/v1/fixed-assets/{id}/activate)
+	ActivateFixedAsset(ctx context.Context, request ActivateFixedAssetRequestObject) (ActivateFixedAssetResponseObject, error)
+	// DisposeFixedAsset Melepas aset (dijual/dihapusbukukan, jurnal A-31 pelepasan)
+	// (POST /api/v1/fixed-assets/{id}/dispose)
+	DisposeFixedAsset(ctx context.Context, request DisposeFixedAssetRequestObject) (DisposeFixedAssetResponseObject, error)
 	// GetGeneralLedger Buku Besar per akun dengan saldo berjalan
 	// (GET /api/v1/general-ledger)
 	GetGeneralLedger(ctx context.Context, request GetGeneralLedgerRequestObject) (GetGeneralLedgerResponseObject, error)
@@ -5170,6 +8884,24 @@ type StrictServerInterface interface {
 	// ReverseJournalEntry Balik Jurnal (S-128)
 	// (POST /api/v1/journal-entries/{id}/reverse)
 	ReverseJournalEntry(ctx context.Context, request ReverseJournalEntryRequestObject) (ReverseJournalEntryResponseObject, error)
+	// GetOpeningBalance Saldo Awal — tanggal cut-over dan Neraca Saldo Awal (A-36)
+	// (GET /api/v1/opening-balance)
+	GetOpeningBalance(ctx context.Context, request GetOpeningBalanceRequestObject) (GetOpeningBalanceResponseObject, error)
+	// SaveOpeningBalanceSet Mengisi tanggal cut-over (akhir bulan)
+	// (PUT /api/v1/opening-balance)
+	SaveOpeningBalanceSet(ctx context.Context, request SaveOpeningBalanceSetRequestObject) (SaveOpeningBalanceSetResponseObject, error)
+	// SaveOpeningBalanceLine Mengisi saldo awal satu akun neraca (akun yang sama diganti)
+	// (POST /api/v1/opening-balance/lines)
+	SaveOpeningBalanceLine(ctx context.Context, request SaveOpeningBalanceLineRequestObject) (SaveOpeningBalanceLineResponseObject, error)
+	// DeleteOpeningBalanceLine Menghapus saldo awal satu akun
+	// (DELETE /api/v1/opening-balance/lines/{id})
+	DeleteOpeningBalanceLine(ctx context.Context, request DeleteOpeningBalanceLineRequestObject) (DeleteOpeningBalanceLineResponseObject, error)
+	// PostOpeningBalance Memposting saldo awal sebagai jurnal A-36 (selisih ke 3901)
+	// (POST /api/v1/opening-balance/post)
+	PostOpeningBalance(ctx context.Context, request PostOpeningBalanceRequestObject) (PostOpeningBalanceResponseObject, error)
+	// ListOpeningItems Piutang & utang terbuka saldo awal per dokumen lama
+	// (GET /api/v1/opening-items)
+	ListOpeningItems(ctx context.Context, request ListOpeningItemsRequestObject) (ListOpeningItemsResponseObject, error)
 	// ListPostingRules Posting rule jurnal otomatis dan pemetaan akun yang berlaku hari ini (S-130)
 	// (GET /api/v1/posting-rules)
 	ListPostingRules(ctx context.Context, request ListPostingRulesRequestObject) (ListPostingRulesResponseObject, error)
@@ -5185,6 +8917,9 @@ type StrictServerInterface interface {
 	// UpdateSubChannel Mengubah sub-channel (kode dan channel tetap)
 	// (PUT /api/v1/sub-channels/{id})
 	UpdateSubChannel(ctx context.Context, request UpdateSubChannelRequestObject) (UpdateSubChannelResponseObject, error)
+	// GetTrialBalance Neraca Saldo per rentang & dimensi (ACC-18)
+	// (GET /api/v1/trial-balance)
+	GetTrialBalance(ctx context.Context, request GetTrialBalanceRequestObject) (GetTrialBalanceResponseObject, error)
 }
 
 type StrictHandlerFunc func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error)
@@ -5612,6 +9347,115 @@ func (sh *strictHandler) UpdateChannel(w http.ResponseWriter, r *http.Request, i
 	}
 }
 
+// GetCutoverReconciliation operation middleware
+func (sh *strictHandler) GetCutoverReconciliation(w http.ResponseWriter, r *http.Request) {
+	var request GetCutoverReconciliationRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetCutoverReconciliation(ctx, request.(GetCutoverReconciliationRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetCutoverReconciliation")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetCutoverReconciliationResponseObject); ok {
+		if err := validResponse.VisitGetCutoverReconciliationResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListDepreciationRuns operation middleware
+func (sh *strictHandler) ListDepreciationRuns(w http.ResponseWriter, r *http.Request, params ListDepreciationRunsParams) {
+	var request ListDepreciationRunsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListDepreciationRuns(ctx, request.(ListDepreciationRunsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListDepreciationRuns")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListDepreciationRunsResponseObject); ok {
+		if err := validResponse.VisitListDepreciationRunsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// RunDepreciation operation middleware
+func (sh *strictHandler) RunDepreciation(w http.ResponseWriter, r *http.Request, params RunDepreciationParams) {
+	var request RunDepreciationRequestObject
+
+	request.Params = params
+
+	var body RunDepreciationJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.RunDepreciation(ctx, request.(RunDepreciationRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RunDepreciation")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(RunDepreciationResponseObject); ok {
+		if err := validResponse.VisitRunDepreciationResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetDepreciationRun operation middleware
+func (sh *strictHandler) GetDepreciationRun(w http.ResponseWriter, r *http.Request, id Id) {
+	var request GetDepreciationRunRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetDepreciationRun(ctx, request.(GetDepreciationRunRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetDepreciationRun")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetDepreciationRunResponseObject); ok {
+		if err := validResponse.VisitGetDepreciationRunResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // ListDivisions operation middleware
 func (sh *strictHandler) ListDivisions(w http.ResponseWriter, r *http.Request, params ListDivisionsParams) {
 	var request ListDivisionsRequestObject
@@ -5904,6 +9748,442 @@ func (sh *strictHandler) EnsureFiscalPeriods(w http.ResponseWriter, r *http.Requ
 	}
 }
 
+// CloseFiscalPeriod operation middleware
+func (sh *strictHandler) CloseFiscalPeriod(w http.ResponseWriter, r *http.Request, id Id, params CloseFiscalPeriodParams) {
+	var request CloseFiscalPeriodRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body CloseFiscalPeriodJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CloseFiscalPeriod(ctx, request.(CloseFiscalPeriodRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CloseFiscalPeriod")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CloseFiscalPeriodResponseObject); ok {
+		if err := validResponse.VisitCloseFiscalPeriodResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetCloseChecklist operation middleware
+func (sh *strictHandler) GetCloseChecklist(w http.ResponseWriter, r *http.Request, id Id) {
+	var request GetCloseChecklistRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetCloseChecklist(ctx, request.(GetCloseChecklistRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetCloseChecklist")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetCloseChecklistResponseObject); ok {
+		if err := validResponse.VisitGetCloseChecklistResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateCloseChecklistStep operation middleware
+func (sh *strictHandler) UpdateCloseChecklistStep(w http.ResponseWriter, r *http.Request, id Id, stepCode CloseStepCode, params UpdateCloseChecklistStepParams) {
+	var request UpdateCloseChecklistStepRequestObject
+
+	request.Id = id
+	request.StepCode = stepCode
+	request.Params = params
+
+	var body UpdateCloseChecklistStepJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateCloseChecklistStep(ctx, request.(UpdateCloseChecklistStepRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateCloseChecklistStep")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdateCloseChecklistStepResponseObject); ok {
+		if err := validResponse.VisitUpdateCloseChecklistStepResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// RequestFiscalPeriodReopen operation middleware
+func (sh *strictHandler) RequestFiscalPeriodReopen(w http.ResponseWriter, r *http.Request, id Id, params RequestFiscalPeriodReopenParams) {
+	var request RequestFiscalPeriodReopenRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body RequestFiscalPeriodReopenJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.RequestFiscalPeriodReopen(ctx, request.(RequestFiscalPeriodReopenRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RequestFiscalPeriodReopen")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(RequestFiscalPeriodReopenResponseObject); ok {
+		if err := validResponse.VisitRequestFiscalPeriodReopenResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListFixedAssetClasses operation middleware
+func (sh *strictHandler) ListFixedAssetClasses(w http.ResponseWriter, r *http.Request, params ListFixedAssetClassesParams) {
+	var request ListFixedAssetClassesRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListFixedAssetClasses(ctx, request.(ListFixedAssetClassesRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListFixedAssetClasses")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListFixedAssetClassesResponseObject); ok {
+		if err := validResponse.VisitListFixedAssetClassesResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreateFixedAssetClass operation middleware
+func (sh *strictHandler) CreateFixedAssetClass(w http.ResponseWriter, r *http.Request, params CreateFixedAssetClassParams) {
+	var request CreateFixedAssetClassRequestObject
+
+	request.Params = params
+
+	var body CreateFixedAssetClassJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CreateFixedAssetClass(ctx, request.(CreateFixedAssetClassRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateFixedAssetClass")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreateFixedAssetClassResponseObject); ok {
+		if err := validResponse.VisitCreateFixedAssetClassResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateFixedAssetClass operation middleware
+func (sh *strictHandler) UpdateFixedAssetClass(w http.ResponseWriter, r *http.Request, id Id, params UpdateFixedAssetClassParams) {
+	var request UpdateFixedAssetClassRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body UpdateFixedAssetClassJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateFixedAssetClass(ctx, request.(UpdateFixedAssetClassRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateFixedAssetClass")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdateFixedAssetClassResponseObject); ok {
+		if err := validResponse.VisitUpdateFixedAssetClassResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListFixedAssets operation middleware
+func (sh *strictHandler) ListFixedAssets(w http.ResponseWriter, r *http.Request, params ListFixedAssetsParams) {
+	var request ListFixedAssetsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListFixedAssets(ctx, request.(ListFixedAssetsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListFixedAssets")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListFixedAssetsResponseObject); ok {
+		if err := validResponse.VisitListFixedAssetsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreateFixedAsset operation middleware
+func (sh *strictHandler) CreateFixedAsset(w http.ResponseWriter, r *http.Request, params CreateFixedAssetParams) {
+	var request CreateFixedAssetRequestObject
+
+	request.Params = params
+
+	var body CreateFixedAssetJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CreateFixedAsset(ctx, request.(CreateFixedAssetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateFixedAsset")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreateFixedAssetResponseObject); ok {
+		if err := validResponse.VisitCreateFixedAssetResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// DeleteFixedAsset operation middleware
+func (sh *strictHandler) DeleteFixedAsset(w http.ResponseWriter, r *http.Request, id Id, params DeleteFixedAssetParams) {
+	var request DeleteFixedAssetRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.DeleteFixedAsset(ctx, request.(DeleteFixedAssetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DeleteFixedAsset")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(DeleteFixedAssetResponseObject); ok {
+		if err := validResponse.VisitDeleteFixedAssetResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetFixedAsset operation middleware
+func (sh *strictHandler) GetFixedAsset(w http.ResponseWriter, r *http.Request, id Id) {
+	var request GetFixedAssetRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetFixedAsset(ctx, request.(GetFixedAssetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetFixedAsset")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetFixedAssetResponseObject); ok {
+		if err := validResponse.VisitGetFixedAssetResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateFixedAsset operation middleware
+func (sh *strictHandler) UpdateFixedAsset(w http.ResponseWriter, r *http.Request, id Id, params UpdateFixedAssetParams) {
+	var request UpdateFixedAssetRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body UpdateFixedAssetJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateFixedAsset(ctx, request.(UpdateFixedAssetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateFixedAsset")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdateFixedAssetResponseObject); ok {
+		if err := validResponse.VisitUpdateFixedAssetResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ActivateFixedAsset operation middleware
+func (sh *strictHandler) ActivateFixedAsset(w http.ResponseWriter, r *http.Request, id Id, params ActivateFixedAssetParams) {
+	var request ActivateFixedAssetRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body ActivateFixedAssetJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ActivateFixedAsset(ctx, request.(ActivateFixedAssetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ActivateFixedAsset")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ActivateFixedAssetResponseObject); ok {
+		if err := validResponse.VisitActivateFixedAssetResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// DisposeFixedAsset operation middleware
+func (sh *strictHandler) DisposeFixedAsset(w http.ResponseWriter, r *http.Request, id Id, params DisposeFixedAssetParams) {
+	var request DisposeFixedAssetRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body DisposeFixedAssetJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.DisposeFixedAsset(ctx, request.(DisposeFixedAssetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DisposeFixedAsset")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(DisposeFixedAssetResponseObject); ok {
+		if err := validResponse.VisitDisposeFixedAssetResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // GetGeneralLedger operation middleware
 func (sh *strictHandler) GetGeneralLedger(w http.ResponseWriter, r *http.Request, params GetGeneralLedgerParams) {
 	var request GetGeneralLedgerRequestObject
@@ -6144,6 +10424,182 @@ func (sh *strictHandler) ReverseJournalEntry(w http.ResponseWriter, r *http.Requ
 	}
 }
 
+// GetOpeningBalance operation middleware
+func (sh *strictHandler) GetOpeningBalance(w http.ResponseWriter, r *http.Request) {
+	var request GetOpeningBalanceRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetOpeningBalance(ctx, request.(GetOpeningBalanceRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetOpeningBalance")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetOpeningBalanceResponseObject); ok {
+		if err := validResponse.VisitGetOpeningBalanceResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// SaveOpeningBalanceSet operation middleware
+func (sh *strictHandler) SaveOpeningBalanceSet(w http.ResponseWriter, r *http.Request, params SaveOpeningBalanceSetParams) {
+	var request SaveOpeningBalanceSetRequestObject
+
+	request.Params = params
+
+	var body SaveOpeningBalanceSetJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.SaveOpeningBalanceSet(ctx, request.(SaveOpeningBalanceSetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "SaveOpeningBalanceSet")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(SaveOpeningBalanceSetResponseObject); ok {
+		if err := validResponse.VisitSaveOpeningBalanceSetResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// SaveOpeningBalanceLine operation middleware
+func (sh *strictHandler) SaveOpeningBalanceLine(w http.ResponseWriter, r *http.Request, params SaveOpeningBalanceLineParams) {
+	var request SaveOpeningBalanceLineRequestObject
+
+	request.Params = params
+
+	var body SaveOpeningBalanceLineJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.SaveOpeningBalanceLine(ctx, request.(SaveOpeningBalanceLineRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "SaveOpeningBalanceLine")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(SaveOpeningBalanceLineResponseObject); ok {
+		if err := validResponse.VisitSaveOpeningBalanceLineResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// DeleteOpeningBalanceLine operation middleware
+func (sh *strictHandler) DeleteOpeningBalanceLine(w http.ResponseWriter, r *http.Request, id Id, params DeleteOpeningBalanceLineParams) {
+	var request DeleteOpeningBalanceLineRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.DeleteOpeningBalanceLine(ctx, request.(DeleteOpeningBalanceLineRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DeleteOpeningBalanceLine")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(DeleteOpeningBalanceLineResponseObject); ok {
+		if err := validResponse.VisitDeleteOpeningBalanceLineResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostOpeningBalance operation middleware
+func (sh *strictHandler) PostOpeningBalance(w http.ResponseWriter, r *http.Request, params PostOpeningBalanceParams) {
+	var request PostOpeningBalanceRequestObject
+
+	request.Params = params
+
+	var body PostOpeningBalanceJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostOpeningBalance(ctx, request.(PostOpeningBalanceRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostOpeningBalance")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostOpeningBalanceResponseObject); ok {
+		if err := validResponse.VisitPostOpeningBalanceResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListOpeningItems operation middleware
+func (sh *strictHandler) ListOpeningItems(w http.ResponseWriter, r *http.Request, params ListOpeningItemsParams) {
+	var request ListOpeningItemsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListOpeningItems(ctx, request.(ListOpeningItemsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListOpeningItems")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListOpeningItemsResponseObject); ok {
+		if err := validResponse.VisitListOpeningItemsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // ListPostingRules operation middleware
 func (sh *strictHandler) ListPostingRules(w http.ResponseWriter, r *http.Request) {
 	var request ListPostingRulesRequestObject
@@ -6281,6 +10737,32 @@ func (sh *strictHandler) UpdateSubChannel(w http.ResponseWriter, r *http.Request
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(UpdateSubChannelResponseObject); ok {
 		if err := validResponse.VisitUpdateSubChannelResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetTrialBalance operation middleware
+func (sh *strictHandler) GetTrialBalance(w http.ResponseWriter, r *http.Request, params GetTrialBalanceParams) {
+	var request GetTrialBalanceRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetTrialBalance(ctx, request.(GetTrialBalanceRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetTrialBalance")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetTrialBalanceResponseObject); ok {
+		if err := validResponse.VisitGetTrialBalanceResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

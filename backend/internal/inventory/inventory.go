@@ -205,5 +205,14 @@ func (m *Module) BundleAvailability(ctx context.Context, bundleIDs []uuid.UUID, 
 	return m.svc.BundleAvailability(ctx, bundleIDs, locationID)
 }
 
+// StockValue adalah qty & nilai persediaan satu produk di satu lokasi.
+type StockValue = postgres.StockValue
+
+// StockValues mengembalikan qty & nilai persediaan (Σ HPP ledger) per produk & lokasi s.d. tanggal, tanpa cek
+// permission (rekonsiliasi cut-over).
+func (m *Module) StockValues(ctx context.Context, asOf clock.BusinessDate) ([]StockValue, error) {
+	return m.svc.StockValues(ctx, asOf)
+}
+
 // ReleaseExpired melepas reservasi yang melewati expires_at (dipakai job dan test).
 func (m *Module) ReleaseExpired(ctx context.Context) (int, error) { return m.svc.ReleaseExpired(ctx) }

@@ -62,6 +62,13 @@ const (
 	ContentTypeXLSX = workbook.ContentType
 )
 
+// ExportParams adalah parameter ekspor (periode, akun, dimensi) job ekspor yang sedang berjalan; dibaca exporter
+// laporan di adapter wiring.
+func ExportParams(ctx context.Context) map[string]string { return service.ExportParams(ctx) }
+
+// ParamsValidator opsional pada Exporter: memeriksa parameter saat job ekspor dibuat.
+type ParamsValidator = service.ParamsValidator
+
 // RowKey adalah kunci idempotensi baris (ID job + nomor baris) untuk importer batch.
 var RowKey = service.RowKey
 
@@ -122,6 +129,23 @@ func (m *Module) RegisterExporter(exp Exporter) { m.svc.RegisterExporter(exp) }
 // dan test.
 func (m *Module) RunImport(ctx context.Context, jobID uuid.UUID) error {
 	return m.svc.RunImport(ctx, jobID)
+}
+
+// FileResult adalah hasil impor satu file satu jenis data (cmd/cutover).
+type FileResult = service.FileResult
+
+// HasSheet memeriksa apakah file memuat sheet jenis data.
+func (m *Module) HasSheet(kind string, data []byte) (bool, error) { return m.svc.HasSheet(kind, data) }
+
+// ApplyFileRows memeriksa & menerapkan baris file di transaksi aktif tanpa job (dry-run cmd/cutover; pemanggil
+// membatalkan transaksinya).
+func (m *Module) ApplyFileRows(ctx context.Context, kind string, data []byte) (FileResult, error) {
+	return m.svc.ApplyFileRows(ctx, kind, data)
+}
+
+// RunFile mengimpor file lewat alur job secara sinkron, idempotent per file (SHA-256) per jenis data.
+func (m *Module) RunFile(ctx context.Context, kind, name string, data []byte) (FileResult, error) {
+	return m.svc.RunFile(ctx, kind, name, data)
 }
 
 // RunExport menjalankan job ekspor secara sinkron; dipakai worker dan test.

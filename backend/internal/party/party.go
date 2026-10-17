@@ -253,6 +253,11 @@ func (m *Module) ExportProductCodes(ctx context.Context, emit func(tabular.Row) 
 	return m.svc.ExportProductCodes(ctx, emit)
 }
 
+// CustomerIDByCode mencari pelanggan (belum dihapus) dari kode (impor piutang terbuka).
+func (m *Module) CustomerIDByCode(ctx context.Context, code string) (uuid.UUID, bool, error) {
+	return m.svc.Store.CustomerIDByCode(ctx, code)
+}
+
 // SupplierIDByCode mencari pemasok dari kode (dipakai impor lokasi maklon).
 func (m *Module) SupplierIDByCode(ctx context.Context, code string) (uuid.UUID, bool, error) {
 	return m.svc.Store.SupplierIDByCode(ctx, code)
