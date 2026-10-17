@@ -44,6 +44,7 @@ func (a *App) buildProcurement(mailer *notification.Module) error {
 	// Barang reject QC Outbound dari pemasok/maklon langsung diretur dari Karantina tanpa approval (D-24, S-311).
 	a.warehouse.SetQCReturns(outboundQCReturns{procurement: m, clock: a.Clock})
 	registerAuditEntities(a.audit, procurement.AuditEntities())
+	a.procurement = m
 	a.modules = append(a.modules, m)
 	return nil
 }

@@ -557,10 +557,13 @@ func (q *Queries) LockSupplierBill(ctx context.Context, id uuid.UUID) (uuid.UUID
 
 const openSupplierPayables = `-- name: OpenSupplierPayables :many
 SELECT id, document_type, document_id, document_number, supplier_id, purchase_order_id, division_id, business_date, due_date, amount, open_amount, created_at, created_by, updated_at, updated_by, version FROM supplier_payables
-WHERE supplier_id = $1 AND open_amount <> 0
+WHERE ($1::uuid = '00000000-0000-0000-0000-000000000000'::uuid OR supplier_id = $1)
+  AND open_amount <> 0
 ORDER BY due_date, business_date, document_number
+LIMIT 500
 `
 
+// supplier_id uuid nil = semua pemasok (kandidat rekonsiliasi bank, maks. 500).
 func (q *Queries) OpenSupplierPayables(ctx context.Context, supplierID uuid.UUID) ([]SupplierPayable, error) {
 	rows, err := q.db.Query(ctx, openSupplierPayables, supplierID)
 	if err != nil {

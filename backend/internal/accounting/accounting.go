@@ -22,6 +22,7 @@ import (
 	"balans/internal/platform/httpx"
 	"balans/internal/platform/jobqueue"
 	"balans/internal/platform/money"
+	"balans/internal/platform/pii"
 	"balans/internal/platform/tabular"
 )
 
@@ -111,6 +112,9 @@ type Deps struct {
 	Responder *httpx.Responder
 	Audit     audit.Recorder
 	Numberer  Numberer
+	// Cipher mengenkripsi nomor rekening dan NPWP penerima bukti potong (R1.4). Nil = fitur keuangan R1.4 tidak
+	// bisa menyimpan data terenkripsi.
+	Cipher *pii.Cipher
 }
 
 // Module adalah modul accounting.
@@ -126,6 +130,7 @@ var _ Poster = (*Module)(nil)
 func New(d Deps) *Module {
 	svc := service.New(service.Deps{
 		Store: postgres.NewStore(d.Pool), Tx: d.Tx, Numberer: d.Numberer, Audit: d.Audit, Clock: d.Clock, Log: d.Log,
+		FinanceDeps: service.FinanceDeps{Finance: postgres.NewFinanceStore(d.Pool, d.Cipher)},
 	})
 	return &Module{svc: svc, rs: d.Responder, h: accountinghttp.NewHandler(svc)}
 }
@@ -139,14 +144,17 @@ func (m *Module) RegisterRoutes(r chi.Router) { accountinghttp.Register(r, m.h, 
 // RegisterWorkers mendaftarkan worker pembuatan periode.
 func (m *Module) RegisterWorkers(w *river.Workers) {
 	river.AddWorker(w, service.NewEnsurePeriodsWorker(m.svc))
+	river.AddWorker(w, service.NewDepreciateWorker(m.svc))
 }
 
-// PeriodicJobs menjadwalkan accounting.ensure_fiscal_periods harian 00.05 WIB, juga saat worker mulai.
+// PeriodicJobs menjadwalkan accounting.ensure_fiscal_periods harian 00.05 WIB (juga saat worker mulai) dan
+// accounting.depreciate tanggal 1 pukul 01.00 WIB untuk bulan sebelumnya.
 func (m *Module) PeriodicJobs() []*river.PeriodicJob {
 	return []*river.PeriodicJob{
 		river.NewPeriodicJob(jobqueue.DailyAt{Hour: 0, Minute: 5},
 			func() (river.JobArgs, *river.InsertOpts) { return service.EnsurePeriodsArgs{}, nil },
 			&river.PeriodicJobOpts{ID: service.EnsurePeriodsArgs{}.Kind(), RunOnStart: true}),
+		depreciationPeriodicJob(),
 	}
 }
 

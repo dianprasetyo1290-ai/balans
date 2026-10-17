@@ -12,14 +12,21 @@ import { exportPermission, importPermission } from "../api/dataexchange-api"
  * Tombol Impor/Ekspor di halaman master yang membuka Integrasi › Import/Export Excel dengan jenis data
  * terpilih (S-125). Tampil jika modul dataexchange aktif dan user punya `<kind>.import`/`<kind>.export`.
  */
-export function DataExchangeButtons({ kind }: { kind: string }) {
+export function DataExchangeButtons({
+  kind,
+  resource = kind,
+}: {
+  kind: string
+  /** Resource permission bila berbeda dari kind, mis. `dataexchange.transaction` untuk data transaksi. */
+  resource?: string
+}) {
   const { can } = usePermissions()
   const info = useQuery(systemInfoQuery)
   if (!info.data?.enabledModules.includes("dataexchange")) {
     return null
   }
-  const canImport = can(importPermission(kind))
-  const canExport = can(exportPermission(kind))
+  const canImport = can(importPermission(resource))
+  const canExport = can(exportPermission(resource))
   return (
     <>
       {canImport ? (

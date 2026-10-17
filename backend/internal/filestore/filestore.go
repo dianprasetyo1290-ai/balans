@@ -42,6 +42,7 @@ const (
 	TypePNG  = domain.TypePNG
 	TypeWebP = domain.TypeWebP
 	TypeXLSX = domain.TypeXLSX
+	TypeCSV  = domain.TypeCSV
 )
 
 // Deps adalah dependensi modul.

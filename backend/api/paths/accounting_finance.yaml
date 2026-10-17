@@ -1,0 +1,3174 @@
+# Kas & Bank, Rekonsiliasi Bank, Biaya Operasional, Kas Kecil, Pajak & Bukti Potong (R1.4: S-401, S-402, S-404 – S-407).
+# Tag `accounting`; handler di backend/internal/accounting/http/finance*.go.
+cashBankAccounts:
+  get:
+    operationId: listCashBankAccounts
+    tags:
+    - accounting
+    summary: Kas & Bank › Rekening
+    description: Butuh `accounting.payment.read` (atau hak baca rekonsiliasi, kas kecil, pajak, verifikasi biaya untuk dropdown). Nomor
+      rekening tersamar.
+    parameters:
+    - name: includeInactive
+      in: query
+      schema:
+        type: boolean
+        default: false
+    - name: deleted
+      in: query
+      schema:
+        type: boolean
+        default: false
+      description: Daftar Dihapus
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/CashBankAccount'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+  post:
+    operationId: createCashBankAccount
+    tags:
+    - accounting
+    summary: Menambah rekening kas/bank
+    description: Akun GL wajib akun Kas & Bank 11xx yang bisa diposting (bukan 1102 Kas Kecil); satu akun hanya untuk satu rekening.
+      Nomor rekening disimpan terenkripsi.
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CashBankAccountInput'
+    responses:
+      '201':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CashBankAccount'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+cashBankAccount:
+  get:
+    operationId: getCashBankAccount
+    tags:
+    - accounting
+    summary: Detail rekening (nomor rekening lengkap)
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CashBankAccount'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+  put:
+    operationId: updateCashBankAccount
+    tags:
+    - accounting
+    summary: Mengubah rekening
+    description: Akun GL tidak bisa diganti setelah rekening dipakai transaksi.
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CashBankAccountUpdate'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CashBankAccount'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+  delete:
+    operationId: deleteCashBankAccount
+    tags:
+    - accounting
+    summary: Menghapus rekening (soft delete)
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    - $ref: '#/components/parameters/Version'
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    responses:
+      '204':
+        description: Rekening dihapus
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+cashBankAccountRestore:
+  post:
+    operationId: restoreCashBankAccount
+    tags:
+    - accounting
+    summary: Memulihkan rekening terhapus (Admin Sistem)
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../components/common.yaml#/VersionInput
+    responses:
+      '204':
+        description: Rekening dipulihkan
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+cashBankMutations:
+  get:
+    operationId: listCashBankMutations
+    tags:
+    - accounting
+    summary: Mutasi rekening dengan saldo berjalan
+    description: 'Baris jurnal akun GL rekening (semua sumber: pembayaran, kas kecil, pajak, jurnal umum) urut tanggal; `balance` =
+      saldo awal + kumulatif.'
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    - name: dateFrom
+      in: query
+      schema:
+        $ref: ../components/common.yaml#/BusinessDate
+      required: true
+    - name: dateTo
+      in: query
+      schema:
+        $ref: ../components/common.yaml#/BusinessDate
+      required: true
+    - $ref: ../components/common.yaml#/parameters/Page
+    - $ref: ../components/common.yaml#/parameters/PageSize
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BankMutationList'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+cashPayments:
+  get:
+    operationId: listCashPayments
+    tags:
+    - accounting
+    summary: Kas & Bank › Pembayaran masuk/keluar
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Page
+    - $ref: ../components/common.yaml#/parameters/PageSize
+    - $ref: ../components/common.yaml#/parameters/Search
+    - name: bankAccountId
+      in: query
+      schema:
+        type: string
+        format: uuid
+    - name: direction
+      in: query
+      schema:
+        $ref: ../components/common.yaml#/PaymentDirection
+    - name: status
+      in: query
+      schema:
+        $ref: '#/components/schemas/CashPaymentStatus'
+    - name: dateFrom
+      in: query
+      schema:
+        $ref: ../components/common.yaml#/BusinessDate
+    - name: dateTo
+      in: query
+      schema:
+        $ref: ../components/common.yaml#/BusinessDate
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CashPaymentList'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+  post:
+    operationId: createCashPayment
+    tags:
+    - accounting
+    summary: Menyimpan draft pembayaran manual
+    description: Akun lawan wajib akun yang boleh dipakai jurnal manual (bukan akun kontrol piutang/utang).
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CashPaymentInput'
+    responses:
+      '201':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CashPayment'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+cashPayment:
+  get:
+    operationId: getCashPayment
+    tags:
+    - accounting
+    summary: Detail pembayaran
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CashPayment'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+  put:
+    operationId: updateCashPayment
+    tags:
+    - accounting
+    summary: Mengubah draft pembayaran
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CashPaymentUpdate'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CashPayment'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+cashPaymentPost:
+  post:
+    operationId: postCashPayment
+    tags:
+    - accounting
+    summary: Posting pembayaran (nomor BYR, jurnal A-PB)
+    description: Pembayaran keluar butuh re-autentikasi `accounting.payment.post` (★, `AUTH_REAUTH_REQUIRED`).
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../components/common.yaml#/VersionInput
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CashPayment'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+cashPaymentCancel:
+  post:
+    operationId: cancelCashPayment
+    tags:
+    - accounting
+    summary: Membatalkan pembayaran
+    description: Draft dibatalkan biasa; pembayaran manual Diposting yang belum direkonsiliasi dibatalkan dengan jurnal pembalik.
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FinanceCancelInput'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CashPayment'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+bankStatements:
+  get:
+    operationId: listBankStatements
+    tags:
+    - accounting
+    summary: Rekonsiliasi Bank › File mutasi
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Page
+    - $ref: ../components/common.yaml#/parameters/PageSize
+    - name: bankAccountId
+      in: query
+      schema:
+        type: string
+        format: uuid
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BankStatementList'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+  post:
+    operationId: importBankStatement
+    tags:
+    - accounting
+    summary: Impor file mutasi rekening (CSV/Excel)
+    description: Unggah file lebih dulu ke filestore dengan ownerType `bank_statement`. Kolom dikenali dari judul umum (Tanggal, Keterangan,
+      Referensi, Debit/Kredit atau Nominal + D/K, Saldo). Pencocokan otomatis dijalankan setelah impor. Butuh `accounting.bank_reconciliation.import`.
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BankStatementImportInput'
+    responses:
+      '201':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BankStatementDetail'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+bankStatement:
+  get:
+    operationId: getBankStatement
+    tags:
+    - accounting
+    summary: Detail file mutasi beserta baris dan usulan
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BankStatementDetail'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+bankStatementAutoMatch:
+  post:
+    operationId: autoMatchBankStatement
+    tags:
+    - accounting
+    summary: Jalankan ulang pencocokan otomatis
+    description: 'Aturan berurutan: referensi persis → nominal + tanggal (±3 hari) → manual. Usulan lama baris belum direkonsiliasi
+      diganti.'
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BankStatementDetail'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+bankStatementConfirm:
+  post:
+    operationId: confirmBankStatementSuggestions
+    tags:
+    - accounting
+    summary: Konfirmasi semua usulan pencocokan
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BankConfirmResult'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+bankStatementLineCandidates:
+  get:
+    operationId: listBankStatementLineCandidates
+    tags:
+    - accounting
+    summary: Calon pasangan manual satu baris mutasi
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/BankMatchCandidate'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+bankStatementLineConfirm:
+  post:
+    operationId: confirmBankStatementLine
+    tags:
+    - accounting
+    summary: Konfirmasi usulan satu baris
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../components/common.yaml#/VersionInput
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BankStatementLine'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+bankStatementLineMatch:
+  post:
+    operationId: matchBankStatementLine
+    tags:
+    - accounting
+    summary: Cocokkan manual
+    description: Isi `journalLineId` (baris jurnal akun rekening, nominal sama) atau `source` + `documentId` (dokumen terbuka penyedia
+      kandidat; pembayaran BYR dibuat otomatis).
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BankLineMatchInput'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BankStatementLine'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+bankStatementLineEntry:
+  post:
+    operationId: createBankStatementLineEntry
+    tags:
+    - accounting
+    summary: Buat jurnal dari baris tak cocok
+    description: Membuat pembayaran Diposting (A-PB) ke akun lawan (mis. 7202 Beban Bank, 7101 Pendapatan Lain-lain) lalu menandai baris
+      direkonsiliasi.
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BankLineEntryInput'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BankStatementLine'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+bankStatementLineUnmatch:
+  post:
+    operationId: unmatchBankStatementLine
+    tags:
+    - accounting
+    summary: Lepas pencocokan
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../components/common.yaml#/VersionInput
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BankStatementLine'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+expenseClaimOptions:
+  get:
+    operationId: getExpenseClaimOptions
+    tags:
+    - accounting
+    summary: Pilihan form pengajuan (divisi, kampanye, jenis biaya)
+    description: Butuh `accounting.expense_claim.read` saja agar semua divisi bisa mengajukan.
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseClaimOptions'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+expenseClaims:
+  get:
+    operationId: listExpenseClaims
+    tags:
+    - accounting
+    summary: Biaya Operasional › Pengajuan biaya
+    description: Pengaju tanpa hak verifikasi/approve hanya melihat pengajuannya sendiri.
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Page
+    - $ref: ../components/common.yaml#/parameters/PageSize
+    - $ref: ../components/common.yaml#/parameters/Search
+    - name: status
+      in: query
+      schema:
+        $ref: '#/components/schemas/ExpenseClaimStatus'
+    - name: divisionId
+      in: query
+      schema:
+        type: string
+        format: uuid
+    - name: dateFrom
+      in: query
+      schema:
+        $ref: ../components/common.yaml#/BusinessDate
+    - name: dateTo
+      in: query
+      schema:
+        $ref: ../components/common.yaml#/BusinessDate
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseClaimList'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+  post:
+    operationId: createExpenseClaim
+    tags:
+    - accounting
+    summary: Menyimpan draft pengajuan biaya
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ExpenseClaimInput'
+    responses:
+      '201':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseClaimDetail'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+expenseClaim:
+  get:
+    operationId: getExpenseClaim
+    tags:
+    - accounting
+    summary: Detail pengajuan biaya
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseClaimDetail'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+  put:
+    operationId: updateExpenseClaim
+    tags:
+    - accounting
+    summary: Mengubah draft (hanya pengaju)
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ExpenseClaimUpdate'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseClaimDetail'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+expenseClaimSubmit:
+  post:
+    operationId: submitExpenseClaim
+    tags:
+    - accounting
+    summary: Ajukan (nomor EXP, approval `expense_claim`)
+    description: Bukti wajib untuk jenis biaya yang mewajibkan; kampanye wajib untuk jenis biaya bertanda kampanye. Approval berjenjang
+      per nominal & divisi.
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../components/common.yaml#/VersionInput
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseClaimDetail'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+expenseClaimRevise:
+  post:
+    operationId: reviseExpenseClaim
+    tags:
+    - accounting
+    summary: Revisi pengajuan ditolak menjadi draft
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../components/common.yaml#/VersionInput
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseClaimDetail'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+expenseClaimCancel:
+  post:
+    operationId: cancelExpenseClaim
+    tags:
+    - accounting
+    summary: Batalkan draft/pengajuan ditolak
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FinanceCancelInput'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseClaimDetail'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+expenseClaimVerifyPreview:
+  post:
+    operationId: previewExpenseClaimVerification
+    tags:
+    - accounting
+    summary: Pratinjau PPh verifikasi F&A
+    description: Menghitung PPh per jenis + objek pajak dengan tarif berlaku hari ini tanpa menyimpan. Butuh `accounting.expense_claim.post`.
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ExpenseClaimVerifyInput'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseClaimVerifyPreview'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+expenseClaimVerify:
+  post:
+    operationId: verifyExpenseClaim
+    tags:
+    - accounting
+    summary: Verifikasi F&A (bukti + PPh, jurnal A-15)
+    description: 'Pengajuan Disetujui → Menunggu Pembayaran. Jurnal A-15: Dr beban jenis biaya / Cr 2103 Utang Biaya + utang PPh; data
+      bukti potong dicatat.'
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ExpenseClaimVerifyInput'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseClaimDetail'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+expenseClaimPay:
+  post:
+    operationId: payExpenseClaim
+    tags:
+    - accounting
+    summary: Bayar pengajuan (BYR, A-PB Dr 2103 / Cr bank)
+    description: Butuh re-autentikasi `accounting.payment.post` (★).
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ExpenseClaimPayInput'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseClaimDetail'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+pettyCashFunds:
+  get:
+    operationId: listPettyCashFunds
+    tags:
+    - accounting
+    summary: Kas Kecil › Dana kas kecil (rekap saldo)
+    parameters:
+    - name: includeInactive
+      in: query
+      schema:
+        type: boolean
+        default: false
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PettyCashFundList'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+  post:
+    operationId: createPettyCashFund
+    tags:
+    - accounting
+    summary: Menambah dana kas kecil
+    description: Saldo awal nol; diisi lewat pengisian kembali.
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PettyCashFundInput'
+    responses:
+      '201':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PettyCashFund'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+pettyCashFund:
+  put:
+    operationId: updatePettyCashFund
+    tags:
+    - accounting
+    summary: Mengubah dana kas kecil
+    description: Plafon tidak boleh di bawah saldo.
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PettyCashFundUpdate'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PettyCashFund'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+pettyCashTransactions:
+  get:
+    operationId: listPettyCashTransactions
+    tags:
+    - accounting
+    summary: Kas Kecil › Transaksi
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Page
+    - $ref: ../components/common.yaml#/parameters/PageSize
+    - name: fundId
+      in: query
+      schema:
+        type: string
+        format: uuid
+    - name: type
+      in: query
+      schema:
+        $ref: '#/components/schemas/PettyCashType'
+    - name: status
+      in: query
+      schema:
+        $ref: '#/components/schemas/PettyCashStatus'
+    - name: dateFrom
+      in: query
+      schema:
+        $ref: ../components/common.yaml#/BusinessDate
+    - name: dateTo
+      in: query
+      schema:
+        $ref: ../components/common.yaml#/BusinessDate
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PettyCashTransactionList'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+  post:
+    operationId: createPettyCashTransaction
+    tags:
+    - accounting
+    summary: Menyimpan draft pengeluaran/pengisian kembali
+    description: Divisi kosong = divisi dana; nominal pengisian kosong = plafon − saldo.
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PettyCashTransactionInput'
+    responses:
+      '201':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PettyCashTransaction'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+pettyCashTransaction:
+  get:
+    operationId: getPettyCashTransaction
+    tags:
+    - accounting
+    summary: Detail transaksi kas kecil
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PettyCashTransaction'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+  put:
+    operationId: updatePettyCashTransaction
+    tags:
+    - accounting
+    summary: Mengubah draft transaksi kas kecil
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PettyCashTransactionUpdate'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PettyCashTransaction'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+pettyCashSubmit:
+  post:
+    operationId: submitPettyCashTransaction
+    tags:
+    - accounting
+    summary: Ajukan pengisian kembali (approval `petty_cash_replenishment`)
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../components/common.yaml#/VersionInput
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PettyCashTransaction'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+pettyCashRevise:
+  post:
+    operationId: revisePettyCashTransaction
+    tags:
+    - accounting
+    summary: Revisi pengisian ditolak menjadi draft
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ../components/common.yaml#/VersionInput
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PettyCashTransaction'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+pettyCashCancel:
+  post:
+    operationId: cancelPettyCashTransaction
+    tags:
+    - accounting
+    summary: Batalkan transaksi kas kecil yang belum diposting
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FinanceCancelInput'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PettyCashTransaction'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+pettyCashPost:
+  post:
+    operationId: postPettyCashTransaction
+    tags:
+    - accounting
+    summary: Posting transaksi kas kecil
+    description: 'Pengeluaran: bukti wajib, maks. per transaksi, saldo cukup, jurnal A-17. Pengisian kembali (sudah disetujui): rekening
+      sumber wajib, re-autentikasi, jurnal A-16.'
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PettyCashPostInput'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PettyCashTransaction'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+taxRates:
+  get:
+    operationId: listTaxRates
+    tags:
+    - accounting
+    summary: Pajak & Bukti Potong › Tarif (effective-dated)
+    parameters:
+    - name: taxType
+      in: query
+      schema:
+        $ref: ../components/common.yaml#/TaxType
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/TaxRate'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+  post:
+    operationId: createTaxRate
+    tags:
+    - accounting
+    summary: Menambah versi tarif
+    description: Versi terakhir objek pajak yang sama ditutup sehari sebelum tanggal berlaku versi baru.
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TaxRateInput'
+    responses:
+      '201':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaxRate'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+withholdings:
+  get:
+    operationId: listWithholdingSlips
+    tags:
+    - accounting
+    summary: Rekap bukti potong satu masa
+    parameters:
+    - name: year
+      in: query
+      schema:
+        type: integer
+      required: true
+    - name: month
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 12
+      required: true
+    - name: taxType
+      in: query
+      schema:
+        $ref: ../components/common.yaml#/TaxType
+    - name: includeCancelled
+      in: query
+      schema:
+        type: boolean
+        default: false
+    - $ref: ../components/common.yaml#/parameters/Page
+    - $ref: ../components/common.yaml#/parameters/PageSize
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WithholdingSlipList'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+withholdingSummary:
+  get:
+    operationId: listWithholdingSummary
+    tags:
+    - accounting
+    summary: Ringkasan utang PPh potong per masa setahun
+    parameters:
+    - name: year
+      in: query
+      schema:
+        type: integer
+      required: true
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/WithholdingSummaryRow'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+withholdingSlipNumber:
+  put:
+    operationId: setWithholdingSlipNumber
+    tags:
+    - accounting
+    summary: Catat nomor bukti potong dari Coretax
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/Id
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/WithholdingSlipNumberInput'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WithholdingSlip'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+withholdingExport:
+  post:
+    operationId: exportWithholdingRecap
+    tags:
+    - accounting
+    summary: Ekspor rekap bukti potong (Excel) untuk Coretax
+    description: Sheet per jenis PPh; mengembalikan tautan unduhan bertanda tangan (5 menit). Butuh `accounting.withholding.export`.
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/WithholdingExportInput'
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinanceDownloadLink'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+taxDeposits:
+  get:
+    operationId: listTaxDeposits
+    tags:
+    - accounting
+    summary: Penyetoran pajak setahun
+    parameters:
+    - name: year
+      in: query
+      schema:
+        type: integer
+      required: true
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/TaxDeposit'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+  post:
+    operationId: createTaxDeposit
+    tags:
+    - accounting
+    summary: Setor pajak satu jenis satu masa (A-29)
+    description: Nominal = PPh dipotong belum disetor (atau PPh Final masa itu). Re-autentikasi (★) karena dana keluar.
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TaxDepositInput'
+    responses:
+      '201':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaxDeposit'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+finalTax:
+  get:
+    operationId: getFinalTaxSummary
+    tags:
+    - accounting
+    summary: 'PPh Final UMKM: omzet bulanan, perhitungan, batas Rp4,8 M'
+    parameters:
+    - name: year
+      in: query
+      schema:
+        type: integer
+      required: true
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinalTaxSummary'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+finalTaxSettings:
+  post:
+    operationId: createFinalTaxSetting
+    tags:
+    - accounting
+    summary: Aktifkan/nonaktifkan PPh Final UMKM mulai tanggal tertentu
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FinalTaxSettingInput'
+    responses:
+      '201':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinalTaxSetting'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+finalTaxRuns:
+  post:
+    operationId: runFinalTax
+    tags:
+    - accounting
+    summary: Hitung PPh Final satu masa (A-30)
+    description: Masa harus sudah berakhir dan PPh Final aktif. Omzet bruto = kredit − debit akun pendapatan 4xxx masa itu.
+    parameters:
+    - $ref: ../components/common.yaml#/parameters/IdempotencyKey
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FinalTaxRunInput'
+    responses:
+      '201':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinalTaxRun'
+      default:
+        $ref: ../components/common.yaml#/responses/Problem
+components:
+  parameters:
+    Version:
+      name: version
+      in: query
+      required: true
+      description: Versi terakhir yang dilihat user (optimistic locking).
+      schema:
+        type: integer
+  schemas:
+    TaxPercent:
+      type: string
+      description: Persentase desimal maks. 4 angka di belakang koma, mis. `2` atau `0.5`.
+      pattern: ^[0-9]{1,3}(\.[0-9]{1,4})?$
+      example: '2'
+    FinanceCancelInput:
+      type: object
+      required:
+      - version
+      - reason
+      properties:
+        version:
+          type: integer
+        reason:
+          type: string
+          maxLength: 400
+    FinanceDownloadLink:
+      type: object
+      required:
+      - fileId
+      - url
+      - expiresAt
+      properties:
+        fileId:
+          type: string
+          format: uuid
+        url:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+    FinanceAction:
+      type: string
+      enum:
+      - edit
+      - post
+      - cancel
+      - submit
+      - revise
+      - verify
+      - pay
+      - delete
+      - restore
+    CashBankAccountKind:
+      type: string
+      enum:
+      - bank
+      - cash
+    CashBankAccountInput:
+      type: object
+      required:
+      - code
+      - name
+      - kind
+      - accountId
+      - isActive
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+          maxLength: 150
+        kind:
+          $ref: '#/components/schemas/CashBankAccountKind'
+        bankName:
+          type: string
+        accountNumber:
+          type: string
+          description: Wajib untuk rekening bank (5–30 angka).
+        accountHolder:
+          type: string
+        accountId:
+          type: string
+          format: uuid
+        isActive:
+          type: boolean
+        description:
+          type: string
+    CashBankAccountUpdate:
+      type: object
+      required:
+      - version
+      - name
+      - kind
+      - accountId
+      - isActive
+      properties:
+        version:
+          type: integer
+        name:
+          type: string
+          maxLength: 150
+        kind:
+          $ref: '#/components/schemas/CashBankAccountKind'
+        bankName:
+          type: string
+        accountNumber:
+          type: string
+          description: Wajib untuk rekening bank (5–30 angka).
+        accountHolder:
+          type: string
+        accountId:
+          type: string
+          format: uuid
+        isActive:
+          type: boolean
+        description:
+          type: string
+    CashBankAccount:
+      type: object
+      required:
+      - id
+      - code
+      - name
+      - kind
+      - bankName
+      - accountNumberMasked
+      - accountHolder
+      - accountId
+      - accountCode
+      - accountName
+      - isActive
+      - description
+      - updatedAt
+      - version
+      - allowedActions
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        kind:
+          $ref: '#/components/schemas/CashBankAccountKind'
+        bankName:
+          type: string
+        accountNumberMasked:
+          type: string
+        accountNumber:
+          type: string
+          description: Hanya di detail.
+        accountHolder:
+          type: string
+        accountId:
+          type: string
+          format: uuid
+        accountCode:
+          type: string
+        accountName:
+          type: string
+        isActive:
+          type: boolean
+        description:
+          type: string
+        deletedAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+        allowedActions:
+          type: array
+          items:
+            $ref: '#/components/schemas/FinanceAction'
+    BankMutation:
+      type: object
+      required:
+      - journalLineId
+      - journalEntryId
+      - journalNumber
+      - businessDate
+      - description
+      - sourceType
+      - sourceLabel
+      - memo
+      - amount
+      - balance
+      - reconciled
+      properties:
+        journalLineId:
+          type: string
+          format: uuid
+        journalEntryId:
+          type: string
+          format: uuid
+        journalNumber:
+          type: string
+        businessDate:
+          $ref: ../components/common.yaml#/BusinessDate
+        description:
+          type: string
+        sourceType:
+          type: string
+        sourceLabel:
+          type: string
+        memo:
+          type: string
+        amount:
+          $ref: ../components/common.yaml#/Money
+          description: Masuk positif, keluar negatif.
+        balance:
+          $ref: ../components/common.yaml#/Money
+        reconciled:
+          type: boolean
+    BankMutationList:
+      allOf:
+      - $ref: ../components/common.yaml#/Pagination
+      - type: object
+        required:
+        - account
+        - openingBalance
+        - items
+        properties:
+          account:
+            $ref: '#/components/schemas/CashBankAccount'
+          openingBalance:
+            $ref: ../components/common.yaml#/Money
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/BankMutation'
+    CashPaymentStatus:
+      type: string
+      enum:
+      - draft
+      - posted
+      - cancelled
+    CashPaymentInput:
+      type: object
+      required:
+      - direction
+      - bankAccountId
+      - paymentDate
+      - amount
+      - counterAccountId
+      properties:
+        direction:
+          $ref: ../components/common.yaml#/PaymentDirection
+        bankAccountId:
+          type: string
+          format: uuid
+        paymentDate:
+          $ref: ../components/common.yaml#/BusinessDate
+        amount:
+          $ref: ../components/common.yaml#/Money
+        counterAccountId:
+          type: string
+          format: uuid
+        partyName:
+          type: string
+        reference:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        proofFileId:
+          type: string
+          format: uuid
+    CashPaymentUpdate:
+      type: object
+      required:
+      - version
+      - direction
+      - bankAccountId
+      - paymentDate
+      - amount
+      - counterAccountId
+      properties:
+        version:
+          type: integer
+        direction:
+          $ref: ../components/common.yaml#/PaymentDirection
+        bankAccountId:
+          type: string
+          format: uuid
+        paymentDate:
+          $ref: ../components/common.yaml#/BusinessDate
+        amount:
+          $ref: ../components/common.yaml#/Money
+        counterAccountId:
+          type: string
+          format: uuid
+        partyName:
+          type: string
+        reference:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        proofFileId:
+          type: string
+          format: uuid
+    CashPayment:
+      type: object
+      required:
+      - id
+      - direction
+      - bankAccountId
+      - bankAccountCode
+      - bankAccountName
+      - paymentDate
+      - amount
+      - counterAccountId
+      - counterAccountCode
+      - counterAccountName
+      - partyName
+      - reference
+      - description
+      - sourceType
+      - sourceLabel
+      - status
+      - cancelReason
+      - reconciled
+      - createdAt
+      - updatedAt
+      - version
+      - allowedActions
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        direction:
+          $ref: ../components/common.yaml#/PaymentDirection
+        bankAccountId:
+          type: string
+          format: uuid
+        bankAccountCode:
+          type: string
+        bankAccountName:
+          type: string
+        paymentDate:
+          $ref: ../components/common.yaml#/BusinessDate
+        amount:
+          $ref: ../components/common.yaml#/Money
+        counterAccountId:
+          type: string
+          format: uuid
+        counterAccountCode:
+          type: string
+        counterAccountName:
+          type: string
+        partyType:
+          type: string
+        partyId:
+          type: string
+          format: uuid
+        partyName:
+          type: string
+        reference:
+          type: string
+        description:
+          type: string
+        proofFileId:
+          type: string
+          format: uuid
+        sourceType:
+          type: string
+        sourceId:
+          type: string
+          format: uuid
+        sourceLabel:
+          type: string
+        status:
+          $ref: '#/components/schemas/CashPaymentStatus'
+        journalEntryId:
+          type: string
+          format: uuid
+        journalNumber:
+          type: string
+        postedAt:
+          type: string
+          format: date-time
+        cancelReason:
+          type: string
+        reconciled:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+        allowedActions:
+          type: array
+          items:
+            $ref: '#/components/schemas/FinanceAction'
+    CashPaymentList:
+      allOf:
+      - $ref: ../components/common.yaml#/Pagination
+      - type: object
+        required:
+        - items
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/CashPayment'
+    BankStatementImportInput:
+      type: object
+      required:
+      - bankAccountId
+      - fileId
+      properties:
+        bankAccountId:
+          type: string
+          format: uuid
+        fileId:
+          type: string
+          format: uuid
+    BankStatement:
+      type: object
+      required:
+      - id
+      - bankAccountId
+      - bankAccountCode
+      - bankAccountName
+      - fileId
+      - fileName
+      - periodFrom
+      - periodTo
+      - lineCount
+      - totalIn
+      - totalOut
+      - matchedCount
+      - suggestedCount
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        bankAccountId:
+          type: string
+          format: uuid
+        bankAccountCode:
+          type: string
+        bankAccountName:
+          type: string
+        fileId:
+          type: string
+          format: uuid
+        fileName:
+          type: string
+        periodFrom:
+          $ref: ../components/common.yaml#/BusinessDate
+        periodTo:
+          $ref: ../components/common.yaml#/BusinessDate
+        lineCount:
+          type: integer
+        totalIn:
+          $ref: ../components/common.yaml#/Money
+        totalOut:
+          $ref: ../components/common.yaml#/Money
+        matchedCount:
+          type: integer
+        suggestedCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+    BankStatementList:
+      allOf:
+      - $ref: ../components/common.yaml#/Pagination
+      - type: object
+        required:
+        - items
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/BankStatement'
+    BankLineStatus:
+      type: string
+      enum:
+      - unmatched
+      - suggested
+      - matched
+    BankMatchKind:
+      type: string
+      enum:
+      - journal_line
+      - document
+      - new_entry
+    BankMatchRule:
+      type: string
+      enum:
+      - reference
+      - amount_date
+      - manual
+    BankLineAction:
+      type: string
+      enum:
+      - confirm
+      - match
+      - create_entry
+      - unmatch
+    BankStatementLine:
+      type: object
+      required:
+      - id
+      - statementId
+      - lineNo
+      - transactionDate
+      - description
+      - reference
+      - amount
+      - status
+      - candidateLabel
+      - version
+      - allowedActions
+      properties:
+        id:
+          type: string
+          format: uuid
+        statementId:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        transactionDate:
+          $ref: ../components/common.yaml#/BusinessDate
+        description:
+          type: string
+        reference:
+          type: string
+        amount:
+          $ref: ../components/common.yaml#/Money
+          description: Masuk positif, keluar negatif.
+        balance:
+          $ref: ../components/common.yaml#/Money
+        status:
+          $ref: '#/components/schemas/BankLineStatus'
+        matchKind:
+          $ref: '#/components/schemas/BankMatchKind'
+        matchRule:
+          $ref: '#/components/schemas/BankMatchRule'
+        journalLineId:
+          type: string
+          format: uuid
+        journalEntryId:
+          type: string
+          format: uuid
+        journalNumber:
+          type: string
+        candidateSource:
+          type: string
+        candidateDocumentId:
+          type: string
+          format: uuid
+        candidateLabel:
+          type: string
+        paymentId:
+          type: string
+          format: uuid
+        matchedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+        allowedActions:
+          type: array
+          items:
+            $ref: '#/components/schemas/BankLineAction'
+    BankStatementDetail:
+      allOf:
+      - $ref: '#/components/schemas/BankStatement'
+      - type: object
+        required:
+        - lines
+        properties:
+          lines:
+            type: array
+            items:
+              $ref: '#/components/schemas/BankStatementLine'
+    BankConfirmResult:
+      type: object
+      required:
+      - confirmed
+      - statement
+      properties:
+        confirmed:
+          type: integer
+        statement:
+          $ref: '#/components/schemas/BankStatementDetail'
+    BankMatchCandidate:
+      type: object
+      required:
+      - kind
+      - label
+      - date
+      - amount
+      properties:
+        kind:
+          $ref: '#/components/schemas/BankMatchKind'
+        journalLineId:
+          type: string
+          format: uuid
+        journalEntryId:
+          type: string
+          format: uuid
+        source:
+          type: string
+        documentId:
+          type: string
+          format: uuid
+        label:
+          type: string
+        date:
+          $ref: ../components/common.yaml#/BusinessDate
+        amount:
+          $ref: ../components/common.yaml#/Money
+    BankLineMatchInput:
+      type: object
+      required:
+      - version
+      properties:
+        version:
+          type: integer
+        journalLineId:
+          type: string
+          format: uuid
+        source:
+          type: string
+        documentId:
+          type: string
+          format: uuid
+    BankLineEntryInput:
+      type: object
+      required:
+      - version
+      - counterAccountId
+      properties:
+        version:
+          type: integer
+        counterAccountId:
+          type: string
+          format: uuid
+        description:
+          type: string
+    ExpenseClaimStatus:
+      type: string
+      enum:
+      - draft
+      - pending_approval
+      - approved
+      - rejected
+      - awaiting_payment
+      - paid
+      - cancelled
+    ExpenseClaimType:
+      type: string
+      enum:
+      - expense
+      - reimbursement
+    ExpenseClaimPayeeType:
+      type: string
+      enum:
+      - employee
+      - supplier
+      - other
+      description: '`employee` = pengaju sendiri (reimbursement); `supplier` = pemasok; `other` = pihak lain.'
+    ExpenseClaimOption:
+      type: object
+      required:
+      - id
+      - code
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+    ExpenseClaimTypeOption:
+      type: object
+      required:
+      - id
+      - code
+      - name
+      - withholdingType
+      - requiresReceipt
+      - requiresCampaign
+      - expenseAccountCode
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        withholdingType:
+          $ref: ../components/common.yaml#/WithholdingType
+        requiresReceipt:
+          type: boolean
+        requiresCampaign:
+          type: boolean
+        expenseAccountCode:
+          type: string
+    ExpenseClaimOptions:
+      type: object
+      required:
+      - divisions
+      - campaigns
+      - expenseTypes
+      properties:
+        divisions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpenseClaimOption'
+        campaigns:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpenseClaimOption'
+        expenseTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpenseClaimTypeOption'
+    ExpenseClaimSummary:
+      type: object
+      required:
+      - id
+      - claimType
+      - requesterId
+      - requesterName
+      - divisionId
+      - divisionName
+      - payeeType
+      - payeeName
+      - claimDate
+      - description
+      - totalAmount
+      - withholdingAmount
+      - payableAmount
+      - status
+      - createdAt
+      - updatedAt
+      - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        claimType:
+          $ref: '#/components/schemas/ExpenseClaimType'
+        requesterId:
+          type: string
+          format: uuid
+        requesterName:
+          type: string
+        divisionId:
+          type: string
+          format: uuid
+        divisionName:
+          type: string
+        campaignId:
+          type: string
+          format: uuid
+        campaignName:
+          type: string
+        payeeType:
+          $ref: '#/components/schemas/ExpenseClaimPayeeType'
+        payeeName:
+          type: string
+        claimDate:
+          $ref: ../components/common.yaml#/BusinessDate
+        description:
+          type: string
+        totalAmount:
+          $ref: ../components/common.yaml#/Money
+        withholdingAmount:
+          $ref: ../components/common.yaml#/Money
+        payableAmount:
+          $ref: ../components/common.yaml#/Money
+        status:
+          $ref: '#/components/schemas/ExpenseClaimStatus'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    ExpenseClaimList:
+      allOf:
+      - $ref: ../components/common.yaml#/Pagination
+      - type: object
+        required:
+        - items
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/ExpenseClaimSummary'
+    ExpenseClaimLine:
+      type: object
+      required:
+      - id
+      - lineNo
+      - expenseTypeId
+      - expenseTypeCode
+      - expenseTypeName
+      - expenseAccountCode
+      - description
+      - amount
+      - withholdingType
+      - objectCode
+      - withholdingRate
+      - withholdingAmount
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        expenseTypeId:
+          type: string
+          format: uuid
+        expenseTypeCode:
+          type: string
+        expenseTypeName:
+          type: string
+        expenseAccountCode:
+          type: string
+        description:
+          type: string
+        amount:
+          $ref: ../components/common.yaml#/Money
+        receiptFileId:
+          type: string
+          format: uuid
+        receiptFileName:
+          type: string
+        withholdingType:
+          $ref: ../components/common.yaml#/WithholdingType
+        objectCode:
+          type: string
+        withholdingRate:
+          $ref: '#/components/schemas/TaxPercent'
+        withholdingAmount:
+          $ref: ../components/common.yaml#/Money
+    ExpenseClaimDetail:
+      allOf:
+      - $ref: '#/components/schemas/ExpenseClaimSummary'
+      - type: object
+        required:
+        - lines
+        - payeeHasTaxId
+        - decisionNote
+        - cancelReason
+        - withholdings
+        - allowedActions
+        properties:
+          payeeId:
+            type: string
+            format: uuid
+          payeeTaxIdMasked:
+            type: string
+          payeeHasTaxId:
+            type: boolean
+          lines:
+            type: array
+            items:
+              $ref: '#/components/schemas/ExpenseClaimLine'
+          submittedAt:
+            type: string
+            format: date-time
+          decidedAt:
+            type: string
+            format: date-time
+          decisionNote:
+            type: string
+          verifiedAt:
+            type: string
+            format: date-time
+          verifyDate:
+            $ref: ../components/common.yaml#/BusinessDate
+          journalEntryId:
+            type: string
+            format: uuid
+          journalNumber:
+            type: string
+          paymentId:
+            type: string
+            format: uuid
+          paymentNumber:
+            type: string
+          paidAt:
+            type: string
+            format: date-time
+          cancelReason:
+            type: string
+          withholdings:
+            type: array
+            items:
+              $ref: '#/components/schemas/WithholdingSlip'
+          allowedActions:
+            type: array
+            items:
+              $ref: '#/components/schemas/FinanceAction'
+    ExpenseClaimLineInput:
+      type: object
+      required:
+      - expenseTypeId
+      - amount
+      properties:
+        expenseTypeId:
+          type: string
+          format: uuid
+        description:
+          type: string
+        amount:
+          $ref: ../components/common.yaml#/Money
+        receiptFileId:
+          type: string
+          format: uuid
+    ExpenseClaimInput:
+      type: object
+      required:
+      - claimType
+      - divisionId
+      - payeeType
+      - claimDate
+      - lines
+      properties:
+        claimType:
+          $ref: '#/components/schemas/ExpenseClaimType'
+        divisionId:
+          type: string
+          format: uuid
+        campaignId:
+          type: string
+          format: uuid
+        payeeType:
+          $ref: '#/components/schemas/ExpenseClaimPayeeType'
+        payeeId:
+          type: string
+          format: uuid
+        payeeName:
+          type: string
+        payeeTaxId:
+          type: string
+          description: NPWP/NIK penerima (opsional, terenkripsi).
+        claimDate:
+          $ref: ../components/common.yaml#/BusinessDate
+        description:
+          type: string
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpenseClaimLineInput'
+    ExpenseClaimUpdate:
+      type: object
+      required:
+      - version
+      - claimType
+      - divisionId
+      - payeeType
+      - claimDate
+      - lines
+      properties:
+        version:
+          type: integer
+        claimType:
+          $ref: '#/components/schemas/ExpenseClaimType'
+        divisionId:
+          type: string
+          format: uuid
+        campaignId:
+          type: string
+          format: uuid
+        payeeType:
+          $ref: '#/components/schemas/ExpenseClaimPayeeType'
+        payeeId:
+          type: string
+          format: uuid
+        payeeName:
+          type: string
+        payeeTaxId:
+          type: string
+          description: NPWP/NIK penerima (opsional, terenkripsi).
+        claimDate:
+          $ref: ../components/common.yaml#/BusinessDate
+        description:
+          type: string
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpenseClaimLineInput'
+    ExpenseClaimTaxChoice:
+      type: object
+      required:
+      - lineId
+      - withholdingType
+      properties:
+        lineId:
+          type: string
+          format: uuid
+        withholdingType:
+          $ref: ../components/common.yaml#/WithholdingType
+        objectCode:
+          type: string
+    ExpenseClaimVerifyInput:
+      type: object
+      required:
+      - version
+      - lines
+      properties:
+        version:
+          type: integer
+        payeeTaxId:
+          type: string
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpenseClaimTaxChoice'
+    ExpenseClaimVerifyPreview:
+      type: object
+      required:
+      - withholdings
+      - totalWithholding
+      - payableAmount
+      properties:
+        withholdings:
+          type: array
+          items:
+            $ref: '#/components/schemas/WithholdingSlip'
+        totalWithholding:
+          $ref: ../components/common.yaml#/Money
+        payableAmount:
+          $ref: ../components/common.yaml#/Money
+    ExpenseClaimPayInput:
+      type: object
+      required:
+      - version
+      - bankAccountId
+      - paymentDate
+      properties:
+        version:
+          type: integer
+        bankAccountId:
+          type: string
+          format: uuid
+        paymentDate:
+          $ref: ../components/common.yaml#/BusinessDate
+        reference:
+          type: string
+        proofFileId:
+          type: string
+          format: uuid
+    PettyCashType:
+      type: string
+      enum:
+      - expense
+      - replenishment
+    PettyCashStatus:
+      type: string
+      enum:
+      - draft
+      - pending_approval
+      - approved
+      - rejected
+      - posted
+      - cancelled
+    PettyCashFundInput:
+      type: object
+      required:
+      - code
+      - name
+      - holderUserId
+      - divisionId
+      - isActive
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        holderUserId:
+          type: string
+          format: uuid
+        divisionId:
+          type: string
+          format: uuid
+        ceilingAmount:
+          $ref: ../components/common.yaml#/Money
+        isActive:
+          type: boolean
+        description:
+          type: string
+    PettyCashFundUpdate:
+      type: object
+      required:
+      - version
+      - name
+      - holderUserId
+      - divisionId
+      - ceilingAmount
+      - isActive
+      properties:
+        version:
+          type: integer
+        name:
+          type: string
+        holderUserId:
+          type: string
+          format: uuid
+        divisionId:
+          type: string
+          format: uuid
+        ceilingAmount:
+          $ref: ../components/common.yaml#/Money
+        isActive:
+          type: boolean
+        description:
+          type: string
+    PettyCashFund:
+      type: object
+      required:
+      - id
+      - code
+      - name
+      - holderUserId
+      - holderName
+      - divisionId
+      - divisionName
+      - ceilingAmount
+      - balanceAmount
+      - shortfallAmount
+      - isActive
+      - description
+      - updatedAt
+      - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        holderUserId:
+          type: string
+          format: uuid
+        holderName:
+          type: string
+        divisionId:
+          type: string
+          format: uuid
+        divisionName:
+          type: string
+        ceilingAmount:
+          $ref: ../components/common.yaml#/Money
+        balanceAmount:
+          $ref: ../components/common.yaml#/Money
+        shortfallAmount:
+          $ref: ../components/common.yaml#/Money
+        isActive:
+          type: boolean
+        description:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    PettyCashFundList:
+      type: object
+      required:
+      - items
+      - maxPerTransaction
+      - defaultCeiling
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PettyCashFund'
+        maxPerTransaction:
+          $ref: ../components/common.yaml#/Money
+        defaultCeiling:
+          $ref: ../components/common.yaml#/Money
+    PettyCashTransactionInput:
+      type: object
+      required:
+      - type
+      - fundId
+      - businessDate
+      properties:
+        type:
+          $ref: '#/components/schemas/PettyCashType'
+        fundId:
+          type: string
+          format: uuid
+        businessDate:
+          $ref: ../components/common.yaml#/BusinessDate
+        expenseTypeId:
+          type: string
+          format: uuid
+        divisionId:
+          type: string
+          format: uuid
+        campaignId:
+          type: string
+          format: uuid
+        description:
+          type: string
+        amount:
+          $ref: ../components/common.yaml#/Money
+        receiptFileId:
+          type: string
+          format: uuid
+    PettyCashTransactionUpdate:
+      type: object
+      required:
+      - version
+      - businessDate
+      - amount
+      properties:
+        version:
+          type: integer
+        businessDate:
+          $ref: ../components/common.yaml#/BusinessDate
+        expenseTypeId:
+          type: string
+          format: uuid
+        divisionId:
+          type: string
+          format: uuid
+        campaignId:
+          type: string
+          format: uuid
+        description:
+          type: string
+        amount:
+          $ref: ../components/common.yaml#/Money
+        receiptFileId:
+          type: string
+          format: uuid
+    PettyCashTransaction:
+      type: object
+      required:
+      - id
+      - fundId
+      - fundCode
+      - fundName
+      - type
+      - businessDate
+      - expenseTypeCode
+      - expenseTypeName
+      - divisionId
+      - divisionName
+      - campaignName
+      - description
+      - amount
+      - status
+      - decisionNote
+      - cancelReason
+      - createdAt
+      - updatedAt
+      - version
+      - allowedActions
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        fundId:
+          type: string
+          format: uuid
+        fundCode:
+          type: string
+        fundName:
+          type: string
+        type:
+          $ref: '#/components/schemas/PettyCashType'
+        businessDate:
+          $ref: ../components/common.yaml#/BusinessDate
+        expenseTypeId:
+          type: string
+          format: uuid
+        expenseTypeCode:
+          type: string
+        expenseTypeName:
+          type: string
+        divisionId:
+          type: string
+          format: uuid
+        divisionName:
+          type: string
+        campaignId:
+          type: string
+          format: uuid
+        campaignName:
+          type: string
+        description:
+          type: string
+        amount:
+          $ref: ../components/common.yaml#/Money
+        receiptFileId:
+          type: string
+          format: uuid
+        receiptFileName:
+          type: string
+        bankAccountId:
+          type: string
+          format: uuid
+        bankAccountName:
+          type: string
+        status:
+          $ref: '#/components/schemas/PettyCashStatus'
+        decisionNote:
+          type: string
+        journalEntryId:
+          type: string
+          format: uuid
+        journalNumber:
+          type: string
+        postedAt:
+          type: string
+          format: date-time
+        cancelReason:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+        allowedActions:
+          type: array
+          items:
+            $ref: '#/components/schemas/FinanceAction'
+    PettyCashTransactionList:
+      allOf:
+      - $ref: ../components/common.yaml#/Pagination
+      - type: object
+        required:
+        - items
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/PettyCashTransaction'
+    PettyCashPostInput:
+      type: object
+      required:
+      - version
+      properties:
+        version:
+          type: integer
+        bankAccountId:
+          type: string
+          format: uuid
+    TaxRateBracket:
+      type: object
+      required:
+      - ratePercent
+      properties:
+        upTo:
+          $ref: ../components/common.yaml#/Money
+          description: Kosong = lapisan teratas tanpa batas.
+        ratePercent:
+          $ref: '#/components/schemas/TaxPercent'
+    TaxRateInput:
+      type: object
+      required:
+      - taxType
+      - objectCode
+      - name
+      - isDefault
+      - validFrom
+      properties:
+        taxType:
+          $ref: ../components/common.yaml#/TaxType
+        objectCode:
+          type: string
+        name:
+          type: string
+        ratePercent:
+          $ref: '#/components/schemas/TaxPercent'
+        brackets:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxRateBracket'
+        basePercent:
+          $ref: '#/components/schemas/TaxPercent'
+        noTaxIdSurchargePercent:
+          $ref: '#/components/schemas/TaxPercent'
+        isDefault:
+          type: boolean
+        validFrom:
+          $ref: ../components/common.yaml#/BusinessDate
+        note:
+          type: string
+    TaxRate:
+      type: object
+      required:
+      - id
+      - taxType
+      - objectCode
+      - name
+      - ratePercent
+      - brackets
+      - basePercent
+      - noTaxIdSurchargePercent
+      - isDefault
+      - validFrom
+      - note
+      - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        taxType:
+          $ref: ../components/common.yaml#/TaxType
+        objectCode:
+          type: string
+        name:
+          type: string
+        ratePercent:
+          $ref: '#/components/schemas/TaxPercent'
+        brackets:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxRateBracket'
+        basePercent:
+          $ref: '#/components/schemas/TaxPercent'
+        noTaxIdSurchargePercent:
+          $ref: '#/components/schemas/TaxPercent'
+        isDefault:
+          type: boolean
+        validFrom:
+          $ref: ../components/common.yaml#/BusinessDate
+        note:
+          type: string
+        validTo:
+          $ref: ../components/common.yaml#/BusinessDate
+        version:
+          type: integer
+    WithholdingSlipStatus:
+      type: string
+      enum:
+      - recorded
+      - deposited
+      - cancelled
+    WithholdingSlip:
+      type: object
+      required:
+      - sourceType
+      - sourceId
+      - sourceLabel
+      - businessDate
+      - taxYear
+      - taxMonth
+      - taxType
+      - objectCode
+      - objectName
+      - taxpayerName
+      - taxpayerTaxIdMasked
+      - hasTaxId
+      - grossAmount
+      - taxableBase
+      - ratePercent
+      - taxAmount
+      - status
+      - slipNumber
+      - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        sourceType:
+          type: string
+        sourceId:
+          type: string
+          format: uuid
+        sourceLabel:
+          type: string
+        businessDate:
+          $ref: ../components/common.yaml#/BusinessDate
+        taxYear:
+          type: integer
+        taxMonth:
+          type: integer
+        taxType:
+          $ref: ../components/common.yaml#/TaxType
+        objectCode:
+          type: string
+        objectName:
+          type: string
+        taxpayerName:
+          type: string
+        taxpayerTaxIdMasked:
+          type: string
+        hasTaxId:
+          type: boolean
+        grossAmount:
+          $ref: ../components/common.yaml#/Money
+        taxableBase:
+          $ref: ../components/common.yaml#/Money
+        ratePercent:
+          $ref: '#/components/schemas/TaxPercent'
+        taxAmount:
+          $ref: ../components/common.yaml#/Money
+        status:
+          $ref: '#/components/schemas/WithholdingSlipStatus'
+        depositId:
+          type: string
+          format: uuid
+        depositNumber:
+          type: string
+        slipNumber:
+          type: string
+        version:
+          type: integer
+    WithholdingSlipList:
+      allOf:
+      - $ref: ../components/common.yaml#/Pagination
+      - type: object
+        required:
+        - items
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/WithholdingSlip'
+    WithholdingSummaryRow:
+      type: object
+      required:
+      - taxType
+      - taxYear
+      - taxMonth
+      - slipCount
+      - openAmount
+      - depositedAmount
+      properties:
+        taxType:
+          $ref: ../components/common.yaml#/TaxType
+        taxYear:
+          type: integer
+        taxMonth:
+          type: integer
+        slipCount:
+          type: integer
+        openAmount:
+          $ref: ../components/common.yaml#/Money
+        depositedAmount:
+          $ref: ../components/common.yaml#/Money
+    WithholdingSlipNumberInput:
+      type: object
+      required:
+      - version
+      - slipNumber
+      properties:
+        version:
+          type: integer
+        slipNumber:
+          type: string
+    WithholdingExportInput:
+      type: object
+      required:
+      - year
+      - month
+      properties:
+        year:
+          type: integer
+        month:
+          type: integer
+          minimum: 1
+          maximum: 12
+        taxType:
+          $ref: ../components/common.yaml#/TaxType
+    TaxDepositInput:
+      type: object
+      required:
+      - taxType
+      - taxYear
+      - taxMonth
+      - bankAccountId
+      - depositDate
+      properties:
+        taxType:
+          $ref: ../components/common.yaml#/TaxType
+        taxYear:
+          type: integer
+        taxMonth:
+          type: integer
+          minimum: 1
+          maximum: 12
+        bankAccountId:
+          type: string
+          format: uuid
+        depositDate:
+          $ref: ../components/common.yaml#/BusinessDate
+        billingCode:
+          type: string
+        ntpn:
+          type: string
+    TaxDeposit:
+      type: object
+      required:
+      - id
+      - number
+      - taxType
+      - taxYear
+      - taxMonth
+      - bankAccountId
+      - bankAccountName
+      - depositDate
+      - amount
+      - billingCode
+      - ntpn
+      - journalEntryId
+      - journalNumber
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        taxType:
+          $ref: ../components/common.yaml#/TaxType
+        taxYear:
+          type: integer
+        taxMonth:
+          type: integer
+        bankAccountId:
+          type: string
+          format: uuid
+        bankAccountName:
+          type: string
+        depositDate:
+          $ref: ../components/common.yaml#/BusinessDate
+        amount:
+          $ref: ../components/common.yaml#/Money
+        billingCode:
+          type: string
+        ntpn:
+          type: string
+        journalEntryId:
+          type: string
+          format: uuid
+        journalNumber:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    FinalTaxSetting:
+      type: object
+      required:
+      - id
+      - validFrom
+      - isEnabled
+      - openingTurnover
+      - note
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        validFrom:
+          $ref: ../components/common.yaml#/BusinessDate
+        isEnabled:
+          type: boolean
+        openingYear:
+          type: integer
+        openingTurnover:
+          $ref: ../components/common.yaml#/Money
+        note:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    FinalTaxSettingInput:
+      type: object
+      required:
+      - validFrom
+      - isEnabled
+      properties:
+        validFrom:
+          $ref: ../components/common.yaml#/BusinessDate
+        isEnabled:
+          type: boolean
+        openingYear:
+          type: integer
+        openingTurnover:
+          $ref: ../components/common.yaml#/Money
+          description: Omzet bruto kumulatif tahun `openingYear` sebelum cut-over.
+        note:
+          type: string
+    FinalTaxRun:
+      type: object
+      required:
+      - id
+      - taxYear
+      - taxMonth
+      - grossRevenue
+      - ratePercent
+      - taxAmount
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        taxYear:
+          type: integer
+        taxMonth:
+          type: integer
+        grossRevenue:
+          $ref: ../components/common.yaml#/Money
+        ratePercent:
+          $ref: '#/components/schemas/TaxPercent'
+        taxAmount:
+          $ref: ../components/common.yaml#/Money
+        journalEntryId:
+          type: string
+          format: uuid
+        journalNumber:
+          type: string
+        depositId:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+    FinalTaxRunInput:
+      type: object
+      required:
+      - year
+      - month
+      properties:
+        year:
+          type: integer
+        month:
+          type: integer
+          minimum: 1
+          maximum: 12
+    FinalTaxMonth:
+      type: object
+      required:
+      - taxYear
+      - taxMonth
+      - grossRevenue
+      - cumulative
+      properties:
+        taxYear:
+          type: integer
+        taxMonth:
+          type: integer
+        grossRevenue:
+          $ref: ../components/common.yaml#/Money
+        cumulative:
+          $ref: ../components/common.yaml#/Money
+        run:
+          $ref: '#/components/schemas/FinalTaxRun'
+    FinalTaxThresholdStatus:
+      type: string
+      enum:
+      - below
+      - approaching
+      - exceeded
+    FinalTaxThreshold:
+      type: object
+      required:
+      - cumulative
+      - limit
+      - remaining
+      - usedPercent
+      - status
+      properties:
+        cumulative:
+          $ref: ../components/common.yaml#/Money
+        limit:
+          $ref: ../components/common.yaml#/Money
+        remaining:
+          $ref: ../components/common.yaml#/Money
+        usedPercent:
+          type: string
+        status:
+          $ref: '#/components/schemas/FinalTaxThresholdStatus'
+    FinalTaxSummary:
+      type: object
+      required:
+      - year
+      - enabled
+      - settings
+      - openingTurnover
+      - months
+      - threshold
+      properties:
+        year:
+          type: integer
+        enabled:
+          type: boolean
+        setting:
+          $ref: '#/components/schemas/FinalTaxSetting'
+        settings:
+          type: array
+          items:
+            $ref: '#/components/schemas/FinalTaxSetting'
+        ratePercent:
+          $ref: '#/components/schemas/TaxPercent'
+        openingTurnover:
+          $ref: ../components/common.yaml#/Money
+        months:
+          type: array
+          items:
+            $ref: '#/components/schemas/FinalTaxMonth'
+        threshold:
+          $ref: '#/components/schemas/FinalTaxThreshold'

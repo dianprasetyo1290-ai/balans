@@ -48,6 +48,7 @@ import {
   type DimensionRef,
   type JournalEntry,
 } from "../api/accounting-api"
+import { SourceDocumentLink } from "./source-document-link"
 
 function dim(ref: DimensionRef | null | undefined) {
   return ref ? ref.name || ref.code : "—"
@@ -150,10 +151,17 @@ function JournalDetail({ entry }: { entry: JournalEntry }) {
           value={entry.postedAt ? formatDateTime(entry.postedAt) : "—"}
         />
         {entry.entryType === "automatic" ? (
-          <Info
-            label="Dokumen Sumber"
-            value={`${entry.postingRuleCode ?? ""} · ${entry.sourceLabel || entry.sourceType}`}
-          />
+          <div>
+            <dt className="text-muted-foreground">Dokumen Sumber</dt>
+            <dd>
+              {entry.postingRuleCode ?? ""} ·{" "}
+              <SourceDocumentLink
+                sourceType={entry.sourceType}
+                sourceId={entry.sourceId}
+                label={entry.sourceLabel}
+              />
+            </dd>
+          </div>
         ) : null}
         {entry.reversalOfId ? (
           <div>

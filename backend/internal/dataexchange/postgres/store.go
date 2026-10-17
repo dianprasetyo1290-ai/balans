@@ -80,7 +80,16 @@ func toExportJob(r sqlcgen.ExportJob) domain.ExportJob {
 		ID: r.ID, Kind: r.Kind, Status: domain.ExportStatus(r.Status), TotalRows: int(r.TotalRows),
 		FileID: ptrUUID(r.FileID), FileName: r.FileName, Message: r.Message, CompletedAt: r.CompletedAt,
 		CreatedBy: r.CreatedBy, CreatedAt: r.CreatedAt, UpdatedAt: r.UpdatedAt, Version: int(r.Version),
+		Params: decodeParams(r.Params),
 	}
+}
+
+func decodeParams(b []byte) map[string]string {
+	out := map[string]string{}
+	if len(b) > 0 {
+		_ = json.Unmarshal(b, &out) //nolint:errcheck // kolom jsonb selalu objek string dari InsertExportJob
+	}
+	return out
 }
 
 func i32(n int) int32 { return int32(min(n, 1<<31-1)) } //nolint:gosec // dibatasi
@@ -89,7 +98,8 @@ func i32(n int) int32 { return int32(min(n, 1<<31-1)) } //nolint:gosec // dibata
 // ditolak IMPORT_ALREADY_PROCESSED.
 func (s *Store) InsertImportJob(ctx context.Context, j domain.ImportJob, actorID uuid.UUID) (domain.ImportJob, error) {
 	r, err := s.q(ctx).InsertImportJob(ctx, sqlcgen.InsertImportJobParams{
-		Kind: j.Kind, FileID: j.FileID, FileName: j.FileName, FileSha256: j.FileSHA256, ActorID: actorID,
+		ID: uuid.NullUUID{UUID: j.ID, Valid: j.ID != uuid.Nil}, Kind: j.Kind, FileID: j.FileID, FileName: j.FileName,
+		FileSha256: j.FileSHA256, ActorID: actorID,
 	})
 	var pgErr *pgconn.PgError
 	if errors.As(err, &pgErr) && pgErr.Code == "23505" {
@@ -99,6 +109,18 @@ func (s *Store) InsertImportJob(ctx context.Context, j domain.ImportJob, actorID
 		return domain.ImportJob{}, fmt.Errorf("insert import job: %w", err)
 	}
 	return toImportJob(r), nil
+}
+
+// ImportJobBySHA mencari job impor aktif untuk file yang sama per jenis data; ok false bila belum ada.
+func (s *Store) ImportJobBySHA(ctx context.Context, kind string, sha []byte) (domain.ImportJob, bool, error) {
+	r, err := s.q(ctx).GetImportJobBySHA(ctx, sqlcgen.GetImportJobBySHAParams{Kind: kind, FileSha256: sha})
+	if errors.Is(err, pgx.ErrNoRows) {
+		return domain.ImportJob{}, false, nil
+	}
+	if err != nil {
+		return domain.ImportJob{}, false, fmt.Errorf("get import job by sha: %w", err)
+	}
+	return toImportJob(r), true, nil
 }
 
 // GetImportJob membaca job; forUpdate mengunci baris.
@@ -264,8 +286,15 @@ func (s *Store) SetRowErrors(ctx context.Context, jobID uuid.UUID, row int, errs
 }
 
 // InsertExportJob mencatat permintaan ekspor.
-func (s *Store) InsertExportJob(ctx context.Context, kind string, actorID uuid.UUID) (domain.ExportJob, error) {
-	r, err := s.q(ctx).InsertExportJob(ctx, sqlcgen.InsertExportJobParams{Kind: kind, ActorID: actorID})
+func (s *Store) InsertExportJob(ctx context.Context, kind string, params map[string]string, actorID uuid.UUID) (domain.ExportJob, error) {
+	if params == nil {
+		params = map[string]string{}
+	}
+	b, err := json.Marshal(params)
+	if err != nil {
+		return domain.ExportJob{}, fmt.Errorf("encode export params: %w", err)
+	}
+	r, err := s.q(ctx).InsertExportJob(ctx, sqlcgen.InsertExportJobParams{Kind: kind, Params: b, ActorID: actorID})
 	if err != nil {
 		return domain.ExportJob{}, fmt.Errorf("insert export job: %w", err)
 	}

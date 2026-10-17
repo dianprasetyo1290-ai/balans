@@ -33,7 +33,7 @@ tags:
   - name: inventory
     description: Ledger stok, batch, HPP FIFO, saran FEFO (R1.2)
   - name: accounting
-    description: COA, dimensi, jenis biaya, periode, posting rule, Jurnal Umum, Buku Besar (R1.1)
+    description: COA, dimensi, jenis biaya, periode, posting rule, Jurnal Umum, Buku Besar (R1.1); aset tetap, Neraca Saldo, tutup buku, saldo awal (R1.4)
   - name: document
     description: Penomoran dokumen (R1.1)
   - name: party
@@ -97,6 +97,38 @@ paths:
     $ref: "./paths/sales.yaml#/customerPaymentCancel"
   /api/v1/sales/receivable-aging:
     $ref: "./paths/sales.yaml#/receivableAging"
+  /api/v1/sales/return-sources:
+    $ref: "./paths/sales_returns.yaml#/salesReturnSources"
+  /api/v1/sales/return-sources/{id}:
+    $ref: "./paths/sales_returns.yaml#/salesReturnSource"
+  /api/v1/sales/return-pickup-users:
+    $ref: "./paths/sales_returns.yaml#/salesReturnPickupUsers"
+  /api/v1/sales/returns:
+    $ref: "./paths/sales_returns.yaml#/salesReturns"
+  /api/v1/sales/returns/{id}:
+    $ref: "./paths/sales_returns.yaml#/salesReturn"
+  /api/v1/sales/returns/{id}/submit:
+    $ref: "./paths/sales_returns.yaml#/salesReturnSubmit"
+  /api/v1/sales/returns/{id}/send-back:
+    $ref: "./paths/sales_returns.yaml#/salesReturnSendBack"
+  /api/v1/sales/returns/{id}/verify:
+    $ref: "./paths/sales_returns.yaml#/salesReturnVerify"
+  /api/v1/sales/returns/{id}/assign-pickup:
+    $ref: "./paths/sales_returns.yaml#/salesReturnAssignPickup"
+  /api/v1/sales/returns/{id}/pickup:
+    $ref: "./paths/sales_returns.yaml#/salesReturnPickup"
+  /api/v1/sales/returns/{id}/receive:
+    $ref: "./paths/sales_returns.yaml#/salesReturnReceive"
+  /api/v1/sales/returns/{id}/cancel:
+    $ref: "./paths/sales_returns.yaml#/salesReturnCancel"
+  /api/v1/sales/credit-notes:
+    $ref: "./paths/sales_returns.yaml#/creditNotes"
+  /api/v1/sales/credit-notes/{id}:
+    $ref: "./paths/sales_returns.yaml#/creditNote"
+  /api/v1/sales/credit-notes/{id}/apply:
+    $ref: "./paths/sales_returns.yaml#/creditNoteApply"
+  /api/v1/sales/credit-notes/{id}/pay-refund:
+    $ref: "./paths/sales_returns.yaml#/creditNotePayRefund"
   /api/v1/webhooks/biteship:
     $ref: "./paths/logistics.yaml#/biteshipWebhook"
   /api/v1/couriers:
@@ -257,6 +289,130 @@ paths:
     $ref: "./paths/accounting.yaml#/journalEntryReverse"
   /api/v1/general-ledger:
     $ref: "./paths/accounting.yaml#/generalLedger"
+  /api/v1/cash-bank-accounts:
+    $ref: "./paths/accounting_finance.yaml#/cashBankAccounts"
+  /api/v1/cash-bank-accounts/{id}:
+    $ref: "./paths/accounting_finance.yaml#/cashBankAccount"
+  /api/v1/cash-bank-accounts/{id}/restore:
+    $ref: "./paths/accounting_finance.yaml#/cashBankAccountRestore"
+  /api/v1/cash-bank-accounts/{id}/mutations:
+    $ref: "./paths/accounting_finance.yaml#/cashBankMutations"
+  /api/v1/cash-payments:
+    $ref: "./paths/accounting_finance.yaml#/cashPayments"
+  /api/v1/cash-payments/{id}:
+    $ref: "./paths/accounting_finance.yaml#/cashPayment"
+  /api/v1/cash-payments/{id}/post:
+    $ref: "./paths/accounting_finance.yaml#/cashPaymentPost"
+  /api/v1/cash-payments/{id}/cancel:
+    $ref: "./paths/accounting_finance.yaml#/cashPaymentCancel"
+  /api/v1/bank-statements:
+    $ref: "./paths/accounting_finance.yaml#/bankStatements"
+  /api/v1/bank-statements/{id}:
+    $ref: "./paths/accounting_finance.yaml#/bankStatement"
+  /api/v1/bank-statements/{id}/auto-match:
+    $ref: "./paths/accounting_finance.yaml#/bankStatementAutoMatch"
+  /api/v1/bank-statements/{id}/confirm-suggestions:
+    $ref: "./paths/accounting_finance.yaml#/bankStatementConfirm"
+  /api/v1/bank-statement-lines/{id}/candidates:
+    $ref: "./paths/accounting_finance.yaml#/bankStatementLineCandidates"
+  /api/v1/bank-statement-lines/{id}/confirm:
+    $ref: "./paths/accounting_finance.yaml#/bankStatementLineConfirm"
+  /api/v1/bank-statement-lines/{id}/match:
+    $ref: "./paths/accounting_finance.yaml#/bankStatementLineMatch"
+  /api/v1/bank-statement-lines/{id}/create-entry:
+    $ref: "./paths/accounting_finance.yaml#/bankStatementLineEntry"
+  /api/v1/bank-statement-lines/{id}/unmatch:
+    $ref: "./paths/accounting_finance.yaml#/bankStatementLineUnmatch"
+  /api/v1/expense-claims/options:
+    $ref: "./paths/accounting_finance.yaml#/expenseClaimOptions"
+  /api/v1/expense-claims:
+    $ref: "./paths/accounting_finance.yaml#/expenseClaims"
+  /api/v1/expense-claims/{id}:
+    $ref: "./paths/accounting_finance.yaml#/expenseClaim"
+  /api/v1/expense-claims/{id}/submit:
+    $ref: "./paths/accounting_finance.yaml#/expenseClaimSubmit"
+  /api/v1/expense-claims/{id}/revise:
+    $ref: "./paths/accounting_finance.yaml#/expenseClaimRevise"
+  /api/v1/expense-claims/{id}/cancel:
+    $ref: "./paths/accounting_finance.yaml#/expenseClaimCancel"
+  /api/v1/expense-claims/{id}/verify-preview:
+    $ref: "./paths/accounting_finance.yaml#/expenseClaimVerifyPreview"
+  /api/v1/expense-claims/{id}/verify:
+    $ref: "./paths/accounting_finance.yaml#/expenseClaimVerify"
+  /api/v1/expense-claims/{id}/pay:
+    $ref: "./paths/accounting_finance.yaml#/expenseClaimPay"
+  /api/v1/petty-cash-funds:
+    $ref: "./paths/accounting_finance.yaml#/pettyCashFunds"
+  /api/v1/petty-cash-funds/{id}:
+    $ref: "./paths/accounting_finance.yaml#/pettyCashFund"
+  /api/v1/petty-cash-transactions:
+    $ref: "./paths/accounting_finance.yaml#/pettyCashTransactions"
+  /api/v1/petty-cash-transactions/{id}:
+    $ref: "./paths/accounting_finance.yaml#/pettyCashTransaction"
+  /api/v1/petty-cash-transactions/{id}/submit:
+    $ref: "./paths/accounting_finance.yaml#/pettyCashSubmit"
+  /api/v1/petty-cash-transactions/{id}/revise:
+    $ref: "./paths/accounting_finance.yaml#/pettyCashRevise"
+  /api/v1/petty-cash-transactions/{id}/cancel:
+    $ref: "./paths/accounting_finance.yaml#/pettyCashCancel"
+  /api/v1/petty-cash-transactions/{id}/post:
+    $ref: "./paths/accounting_finance.yaml#/pettyCashPost"
+  /api/v1/withholding-tax-rates:
+    $ref: "./paths/accounting_finance.yaml#/taxRates"
+  /api/v1/withholding-slips:
+    $ref: "./paths/accounting_finance.yaml#/withholdings"
+  /api/v1/withholding-slips/summary:
+    $ref: "./paths/accounting_finance.yaml#/withholdingSummary"
+  /api/v1/withholding-slips/{id}/slip-number:
+    $ref: "./paths/accounting_finance.yaml#/withholdingSlipNumber"
+  /api/v1/withholding-slips/export:
+    $ref: "./paths/accounting_finance.yaml#/withholdingExport"
+  /api/v1/tax-deposits:
+    $ref: "./paths/accounting_finance.yaml#/taxDeposits"
+  /api/v1/final-tax:
+    $ref: "./paths/accounting_finance.yaml#/finalTax"
+  /api/v1/final-tax/settings:
+    $ref: "./paths/accounting_finance.yaml#/finalTaxSettings"
+  /api/v1/final-tax/runs:
+    $ref: "./paths/accounting_finance.yaml#/finalTaxRuns"
+  /api/v1/trial-balance:
+    $ref: "./paths/accounting_close.yaml#/trialBalance"
+  /api/v1/fixed-asset-classes:
+    $ref: "./paths/accounting_close.yaml#/fixedAssetClasses"
+  /api/v1/fixed-asset-classes/{id}:
+    $ref: "./paths/accounting_close.yaml#/fixedAssetClass"
+  /api/v1/fixed-assets:
+    $ref: "./paths/accounting_close.yaml#/fixedAssets"
+  /api/v1/fixed-assets/{id}:
+    $ref: "./paths/accounting_close.yaml#/fixedAsset"
+  /api/v1/fixed-assets/{id}/activate:
+    $ref: "./paths/accounting_close.yaml#/fixedAssetActivate"
+  /api/v1/fixed-assets/{id}/dispose:
+    $ref: "./paths/accounting_close.yaml#/fixedAssetDispose"
+  /api/v1/depreciation-runs:
+    $ref: "./paths/accounting_close.yaml#/depreciationRuns"
+  /api/v1/depreciation-runs/{id}:
+    $ref: "./paths/accounting_close.yaml#/depreciationRun"
+  /api/v1/fiscal-periods/{id}/close-checklist:
+    $ref: "./paths/accounting_close.yaml#/closeChecklist"
+  /api/v1/fiscal-periods/{id}/close-checklist/{stepCode}:
+    $ref: "./paths/accounting_close.yaml#/closeChecklistStep"
+  /api/v1/fiscal-periods/{id}/close:
+    $ref: "./paths/accounting_close.yaml#/fiscalPeriodClose"
+  /api/v1/fiscal-periods/{id}/reopen:
+    $ref: "./paths/accounting_close.yaml#/fiscalPeriodReopen"
+  /api/v1/opening-balance:
+    $ref: "./paths/accounting_close.yaml#/openingBalance"
+  /api/v1/opening-balance/lines:
+    $ref: "./paths/accounting_close.yaml#/openingBalanceLines"
+  /api/v1/opening-balance/lines/{id}:
+    $ref: "./paths/accounting_close.yaml#/openingBalanceLine"
+  /api/v1/opening-balance/post:
+    $ref: "./paths/accounting_close.yaml#/openingBalancePost"
+  /api/v1/opening-items:
+    $ref: "./paths/accounting_close.yaml#/openingItems"
+  /api/v1/cutover-reconciliation:
+    $ref: "./paths/accounting_close.yaml#/cutoverReconciliation"
   /api/v1/document-sequences:
     $ref: "./paths/document.yaml#/documentSequences"
   /api/v1/locations/{id}:

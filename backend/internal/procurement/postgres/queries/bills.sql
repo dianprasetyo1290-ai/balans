@@ -118,9 +118,12 @@ VALUES (
     sqlc.arg('amount'), sqlc.arg('open_amount'), sqlc.arg('actor_id'), sqlc.arg('actor_id'));
 
 -- name: OpenSupplierPayables :many
+-- supplier_id uuid nil = semua pemasok (kandidat rekonsiliasi bank, maks. 500).
 SELECT * FROM supplier_payables
-WHERE supplier_id = $1 AND open_amount <> 0
-ORDER BY due_date, business_date, document_number;
+WHERE (sqlc.arg('supplier_id')::uuid = '00000000-0000-0000-0000-000000000000'::uuid OR supplier_id = sqlc.arg('supplier_id'))
+  AND open_amount <> 0
+ORDER BY due_date, business_date, document_number
+LIMIT 500;
 
 -- name: GetSupplierPayableForUpdate :one
 SELECT * FROM supplier_payables WHERE id = $1 FOR UPDATE;

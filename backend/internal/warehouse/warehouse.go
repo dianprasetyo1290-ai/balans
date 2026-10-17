@@ -317,6 +317,12 @@ func (m *Module) ExportLocations(ctx context.Context, emit func(tabular.Row) err
 	return m.svc.ExportLocations(ctx, emit)
 }
 
+// InventoryAccount memilih kode akun persediaan dari jenis produk catalog dan jenis lokasi (1301/1302/1311–1314),
+// sama dengan resolver location_inventory_account dokumen gudang.
+func InventoryAccount(productType string, location LocationType) string {
+	return domain.InventoryAccount(productType, location)
+}
+
 // ExternalLocation mengembalikan lokasi eksternal aktif jenis t milik pihak partyID; ok false jika belum ada.
 func (m *Module) ExternalLocation(ctx context.Context, t LocationType, partyID uuid.UUID) (Location, bool, error) {
 	list, err := m.FindLocations(ctx, LocationQuery{Types: []LocationType{t}, PartyID: &partyID})

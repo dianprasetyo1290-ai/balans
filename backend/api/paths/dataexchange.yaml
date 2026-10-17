@@ -439,6 +439,13 @@ components:
       properties:
         kind:
           type: string
+        params:
+          type: object
+          description: |
+            Parameter ekspor laporan (mis. `year`, `month`, `dateFrom`, `dateTo`, `accountId`, `divisionId` untuk
+            Neraca Saldo / Buku Besar). Jenis data master mengabaikannya.
+          additionalProperties:
+            type: string
     ExportJob:
       type: object
       required: [id, kind, kindLabel, status, totalRows, fileName, message, createdBy, createdAt, updatedAt]
