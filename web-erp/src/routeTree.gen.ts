@@ -22,6 +22,8 @@ import { Route as AppFinanceFiscalPeriodsRouteImport } from './routes/_app/finan
 import { Route as AppFinanceGeneralLedgerRouteImport } from './routes/_app/finance/general-ledger'
 import { Route as AppMasterCampaignsRouteImport } from './routes/_app/master/campaigns'
 import { Route as AppMasterChannelsRouteImport } from './routes/_app/master/channels'
+import { Route as AppMasterExpenseTypesRouteImport } from './routes/_app/master/expense-types'
+import { Route as AppMasterReturnReasonsRouteImport } from './routes/_app/master/return-reasons'
 import { Route as AppSettingsApprovalPoliciesRouteImport } from './routes/_app/settings/approval-policies'
 import { Route as AppSettingsAuditLogsRouteImport } from './routes/_app/settings/audit-logs'
 import { Route as AppSettingsDocumentSequencesRouteImport } from './routes/_app/settings/document-sequences'
@@ -97,6 +99,16 @@ const AppMasterChannelsRoute = AppMasterChannelsRouteImport.update({
   path: '/master/channels',
   getParentRoute: () => AppRoute,
 } as any)
+const AppMasterExpenseTypesRoute = AppMasterExpenseTypesRouteImport.update({
+  id: '/master/expense-types',
+  path: '/master/expense-types',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMasterReturnReasonsRoute = AppMasterReturnReasonsRouteImport.update({
+  id: '/master/return-reasons',
+  path: '/master/return-reasons',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppSettingsApprovalPoliciesRoute =
   AppSettingsApprovalPoliciesRouteImport.update({
     id: '/settings/approval-policies',
@@ -165,6 +177,8 @@ export interface FileRoutesByFullPath {
   '/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
   '/master/campaigns': typeof AppMasterCampaignsRoute
   '/master/channels': typeof AppMasterChannelsRoute
+  '/master/expense-types': typeof AppMasterExpenseTypesRoute
+  '/master/return-reasons': typeof AppMasterReturnReasonsRoute
   '/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/settings/audit-logs': typeof AppSettingsAuditLogsRoute
   '/settings/document-sequences': typeof AppSettingsDocumentSequencesRoute
@@ -189,6 +203,8 @@ export interface FileRoutesByTo {
   '/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
   '/master/campaigns': typeof AppMasterCampaignsRoute
   '/master/channels': typeof AppMasterChannelsRoute
+  '/master/expense-types': typeof AppMasterExpenseTypesRoute
+  '/master/return-reasons': typeof AppMasterReturnReasonsRoute
   '/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/settings/audit-logs': typeof AppSettingsAuditLogsRoute
   '/settings/document-sequences': typeof AppSettingsDocumentSequencesRoute
@@ -215,6 +231,8 @@ export interface FileRoutesById {
   '/_app/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
   '/_app/master/campaigns': typeof AppMasterCampaignsRoute
   '/_app/master/channels': typeof AppMasterChannelsRoute
+  '/_app/master/expense-types': typeof AppMasterExpenseTypesRoute
+  '/_app/master/return-reasons': typeof AppMasterReturnReasonsRoute
   '/_app/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/_app/settings/audit-logs': typeof AppSettingsAuditLogsRoute
   '/_app/settings/document-sequences': typeof AppSettingsDocumentSequencesRoute
@@ -241,6 +259,8 @@ export interface FileRouteTypes {
     | '/finance/general-ledger'
     | '/master/campaigns'
     | '/master/channels'
+    | '/master/expense-types'
+    | '/master/return-reasons'
     | '/settings/approval-policies'
     | '/settings/audit-logs'
     | '/settings/document-sequences'
@@ -265,6 +285,8 @@ export interface FileRouteTypes {
     | '/finance/general-ledger'
     | '/master/campaigns'
     | '/master/channels'
+    | '/master/expense-types'
+    | '/master/return-reasons'
     | '/settings/approval-policies'
     | '/settings/audit-logs'
     | '/settings/document-sequences'
@@ -290,6 +312,8 @@ export interface FileRouteTypes {
     | '/_app/finance/general-ledger'
     | '/_app/master/campaigns'
     | '/_app/master/channels'
+    | '/_app/master/expense-types'
+    | '/_app/master/return-reasons'
     | '/_app/settings/approval-policies'
     | '/_app/settings/audit-logs'
     | '/_app/settings/document-sequences'
@@ -404,6 +428,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMasterChannelsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/master/expense-types': {
+      id: '/_app/master/expense-types'
+      path: '/master/expense-types'
+      fullPath: '/master/expense-types'
+      preLoaderRoute: typeof AppMasterExpenseTypesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/master/return-reasons': {
+      id: '/_app/master/return-reasons'
+      path: '/master/return-reasons'
+      fullPath: '/master/return-reasons'
+      preLoaderRoute: typeof AppMasterReturnReasonsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/settings/approval-policies': {
       id: '/_app/settings/approval-policies'
       path: '/settings/approval-policies'
@@ -485,6 +523,8 @@ interface AppRouteChildren {
   AppFinanceGeneralLedgerRoute: typeof AppFinanceGeneralLedgerRoute
   AppMasterCampaignsRoute: typeof AppMasterCampaignsRoute
   AppMasterChannelsRoute: typeof AppMasterChannelsRoute
+  AppMasterExpenseTypesRoute: typeof AppMasterExpenseTypesRoute
+  AppMasterReturnReasonsRoute: typeof AppMasterReturnReasonsRoute
   AppSettingsApprovalPoliciesRoute: typeof AppSettingsApprovalPoliciesRoute
   AppSettingsAuditLogsRoute: typeof AppSettingsAuditLogsRoute
   AppSettingsDocumentSequencesRoute: typeof AppSettingsDocumentSequencesRoute
@@ -505,6 +545,8 @@ const AppRouteChildren: AppRouteChildren = {
   AppFinanceGeneralLedgerRoute: AppFinanceGeneralLedgerRoute,
   AppMasterCampaignsRoute: AppMasterCampaignsRoute,
   AppMasterChannelsRoute: AppMasterChannelsRoute,
+  AppMasterExpenseTypesRoute: AppMasterExpenseTypesRoute,
+  AppMasterReturnReasonsRoute: AppMasterReturnReasonsRoute,
   AppSettingsApprovalPoliciesRoute: AppSettingsApprovalPoliciesRoute,
   AppSettingsAuditLogsRoute: AppSettingsAuditLogsRoute,
   AppSettingsDocumentSequencesRoute: AppSettingsDocumentSequencesRoute,

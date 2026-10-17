@@ -86,3 +86,9 @@ sql:
       go:
         <<: *go
         out: internal/accounting/postgres/sqlcgen
+  - <<: *pkg
+    queries: internal/sales/postgres/queries
+    gen:
+      go:
+        <<: *go
+        out: internal/sales/postgres/sqlcgen

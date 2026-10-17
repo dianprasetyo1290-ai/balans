@@ -193,8 +193,11 @@ func (a *App) buildModules() error {
 			PublicBaseURL: cfg.PublicBaseURL,
 			WebhookURL:    cfg.InternalAPIURL + "/api/v1/webhooks/midtrans",
 		})
-		a.modules = append(a.modules, sales.New(sales.Deps{Gateway: gateway, Inbox: inbox, Responder: a.Responder, Log: a.Log}))
+		a.modules = append(a.modules, sales.New(sales.Deps{
+			Pool: a.Pool, Tx: a.Tx, Audit: a.audit, Gateway: gateway, Inbox: inbox, Responder: a.Responder, Log: a.Log,
+		}))
 		console.Payments = gateway
+		a.audit.RegisterEntity("return_reason", "sales.return_reason.read")
 	}
 	if cfg.IsEnabled(logistics.Name) {
 		if cfg.ShipmentProvider != config.ProviderMock {

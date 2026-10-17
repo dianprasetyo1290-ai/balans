@@ -33,6 +33,99 @@ midtransWebhook:
           application/problem+json:
             schema:
               $ref: "../components/problem.yaml#/Problem"
+returnReasons:
+  get:
+    operationId: listReturnReasons
+    tags: [sales]
+    summary: Data Master › Alasan Retur
+    description: |
+      Butuh `sales.return_reason.read`, `sales.sales_return.read`, atau `procurement.purchase_return.read`
+      (dropdown dokumen retur). Filter `appliesTo` mengembalikan alasan untuk jenis itu dan alasan `both`.
+    parameters:
+      - name: includeInactive
+        in: query
+        schema:
+          type: boolean
+          default: false
+      - name: appliesTo
+        in: query
+        schema:
+          $ref: "#/components/schemas/ReturnReasonScope"
+      - $ref: "../components/common.yaml#/parameters/Search"
+    responses:
+      "200":
+        description: Alasan retur urut kode
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/ReturnReason"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createReturnReason
+    tags: [sales]
+    summary: Menambah alasan retur
+    description: Kode unik permanen.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ReturnReasonInput"
+    responses:
+      "201":
+        description: Alasan retur dibuat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReturnReason"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+returnReason:
+  put:
+    operationId: updateReturnReason
+    tags: [sales]
+    summary: Mengubah alasan retur (kode tetap)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ReturnReasonUpdate"
+    responses:
+      "200":
+        description: Alasan retur diperbarui
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReturnReason"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  delete:
+    operationId: deleteReturnReason
+    tags: [sales]
+    summary: Menghapus (soft delete) alasan retur
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+      - name: version
+        in: query
+        required: true
+        description: Versi terakhir yang dilihat user (optimistic locking).
+        schema:
+          type: integer
+    responses:
+      "204":
+        description: Alasan retur dihapus
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
 components:
   schemas:
     MidtransNotification:
@@ -62,3 +155,73 @@ components:
           type: boolean
         duplicate:
           type: boolean
+    ReturnReasonAppliesTo:
+      type: string
+      description: Dokumen yang memakai alasan ini.
+      enum: [sales_return, purchase_return, both]
+    ReturnReasonScope:
+      type: string
+      enum: [sales_return, purchase_return]
+    ReturnDisposition:
+      type: string
+      description: Disposisi barang retur (Disposisi Retur, WMS-07).
+      enum: [restock, repack, reprocess, marketing_sample, dispose]
+    ReturnReason:
+      type: object
+      required: [id, code, name, appliesTo, description, isActive, updatedAt, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: DAMAGED_SHIPPING
+        name:
+          type: string
+        appliesTo:
+          $ref: "#/components/schemas/ReturnReasonAppliesTo"
+        defaultDisposition:
+          allOf:
+            - $ref: "#/components/schemas/ReturnDisposition"
+          nullable: true
+          description: Usulan awal disposisi; staf gudang tetap memilih saat QC.
+        description:
+          type: string
+        isActive:
+          type: boolean
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    ReturnReasonFields:
+      type: object
+      required: [name, appliesTo, isActive]
+      properties:
+        name:
+          type: string
+          maxLength: 150
+        appliesTo:
+          $ref: "#/components/schemas/ReturnReasonAppliesTo"
+        defaultDisposition:
+          allOf:
+            - $ref: "#/components/schemas/ReturnDisposition"
+          nullable: true
+        description:
+          type: string
+          maxLength: 500
+        isActive:
+          type: boolean
+    ReturnReasonInput:
+      allOf:
+        - $ref: "#/components/schemas/ReturnReasonFields"
+        - type: object
+          required: [code]
+          properties:
+            code:
+              type: string
+              example: DAMAGED_SHIPPING
+    ReturnReasonUpdate:
+      allOf:
+        - $ref: "#/components/schemas/ReturnReasonFields"
+        - $ref: "../components/common.yaml#/VersionInput"

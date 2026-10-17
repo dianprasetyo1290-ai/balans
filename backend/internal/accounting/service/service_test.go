@@ -57,7 +57,8 @@ var (
 var allPerms = []string{
 	service.PermAccountRead, service.PermAccountWrite, service.PermPostingRuleRead, service.PermDimensionRead,
 	service.PermDimensionWrite, service.PermFiscalPeriodRead, service.PermFiscalPeriodWrite, service.PermJournalRead,
-	service.PermJournalWrite, service.PermJournalPost, service.PermJournalReverse,
+	service.PermJournalWrite, service.PermJournalPost, service.PermJournalReverse, service.PermExpenseTypeRead,
+	service.PermExpenseTypeWrite,
 }
 
 func as(perms ...string) context.Context {

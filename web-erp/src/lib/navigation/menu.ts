@@ -69,7 +69,15 @@ export const MENU: MenuGroup[] = [
   {
     label: "Data Master",
     icon: DatabaseIcon,
-    modules: ["catalog", "pricing", "party", "warehouse", "hris", "accounting"],
+    modules: [
+      "catalog",
+      "pricing",
+      "party",
+      "warehouse",
+      "hris",
+      "accounting",
+      "sales",
+    ],
     items: [
       ...items(
         "Produk",
@@ -82,10 +90,20 @@ export const MENU: MenuGroup[] = [
         "Reseller",
         "Pemasok & Maklon",
         "Gudang & Lokasi",
-        "Karyawan",
-        "Alasan Retur",
-        "Jenis Biaya"
+        "Karyawan"
       ),
+      {
+        label: "Alasan Retur",
+        to: "/master/return-reasons",
+        permission: "sales.return_reason.read",
+        module: "sales",
+      },
+      {
+        label: "Jenis Biaya",
+        to: "/master/expense-types",
+        permission: "accounting.expense_type.read",
+        module: "accounting",
+      },
       {
         label: "Kampanye",
         to: "/master/campaigns",

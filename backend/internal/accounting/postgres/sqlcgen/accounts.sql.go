@@ -46,19 +46,27 @@ SELECT
     (SELECT count(*) FROM journal_lines l WHERE l.account_id = $1::uuid)::bigint AS journal_lines,
     (SELECT count(*) FROM accounts c WHERE c.parent_id = $1 AND c.deleted_at IS NULL)::bigint AS children,
     (SELECT count(*) FROM posting_rule_accounts m WHERE m.account_id = $1
-        AND (m.valid_to IS NULL OR m.valid_to > CURRENT_DATE))::bigint AS rule_mappings
+        AND (m.valid_to IS NULL OR m.valid_to > CURRENT_DATE))::bigint AS rule_mappings,
+    (SELECT count(*) FROM expense_types e WHERE e.expense_account_id = $1
+        AND e.deleted_at IS NULL)::bigint AS expense_types
 `
 
 type AccountUsageRow struct {
 	JournalLines int64
 	Children     int64
 	RuleMappings int64
+	ExpenseTypes int64
 }
 
 func (q *Queries) AccountUsage(ctx context.Context, id uuid.UUID) (AccountUsageRow, error) {
 	row := q.db.QueryRow(ctx, accountUsage, id)
 	var i AccountUsageRow
-	err := row.Scan(&i.JournalLines, &i.Children, &i.RuleMappings)
+	err := row.Scan(
+		&i.JournalLines,
+		&i.Children,
+		&i.RuleMappings,
+		&i.ExpenseTypes,
+	)
 	return i, err
 }
 

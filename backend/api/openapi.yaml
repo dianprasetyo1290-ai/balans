@@ -13,7 +13,7 @@ tags:
   - name: system
     description: Kesehatan proses dan informasi sistem
   - name: sales
-    description: Penjualan, termasuk webhook payment gateway
+    description: Penjualan, alasan retur, dan webhook payment gateway
   - name: logistics
     description: Pengiriman, termasuk webhook kurir
   - name: identity
@@ -29,7 +29,7 @@ tags:
   - name: warehouse
     description: Gudang dan lokasi stok (R1.1)
   - name: accounting
-    description: COA, dimensi, periode, posting rule, Jurnal Umum, Buku Besar (R1.1)
+    description: COA, dimensi, jenis biaya, periode, posting rule, Jurnal Umum, Buku Besar (R1.1)
   - name: document
     description: Penomoran dokumen (R1.1)
 paths:
@@ -41,6 +41,10 @@ paths:
     $ref: "./paths/system.yaml#/systemInfo"
   /api/v1/webhooks/midtrans:
     $ref: "./paths/sales.yaml#/midtransWebhook"
+  /api/v1/return-reasons:
+    $ref: "./paths/sales.yaml#/returnReasons"
+  /api/v1/return-reasons/{id}:
+    $ref: "./paths/sales.yaml#/returnReason"
   /api/v1/webhooks/biteship:
     $ref: "./paths/logistics.yaml#/biteshipWebhook"
   /api/v1/auth/login:
@@ -147,6 +151,10 @@ paths:
     $ref: "./paths/accounting.yaml#/campaigns"
   /api/v1/campaigns/{id}:
     $ref: "./paths/accounting.yaml#/campaign"
+  /api/v1/expense-types:
+    $ref: "./paths/accounting.yaml#/expenseTypes"
+  /api/v1/expense-types/{id}:
+    $ref: "./paths/accounting.yaml#/expenseType"
   /api/v1/fiscal-periods:
     $ref: "./paths/accounting.yaml#/fiscalPeriods"
   /api/v1/fiscal-periods/ensure:

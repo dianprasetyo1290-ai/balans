@@ -4,10 +4,16 @@
 package http
 
 import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/oapi-codegen/runtime"
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
@@ -128,6 +134,72 @@ func (e ErrorCode) Valid() bool {
 	}
 }
 
+// Defines values for ReturnDisposition.
+const (
+	Dispose         ReturnDisposition = "dispose"
+	MarketingSample ReturnDisposition = "marketing_sample"
+	Repack          ReturnDisposition = "repack"
+	Reprocess       ReturnDisposition = "reprocess"
+	Restock         ReturnDisposition = "restock"
+)
+
+// Valid indicates whether the value is a known member of the ReturnDisposition enum.
+func (e ReturnDisposition) Valid() bool {
+	switch e {
+	case Dispose:
+		return true
+	case MarketingSample:
+		return true
+	case Repack:
+		return true
+	case Reprocess:
+		return true
+	case Restock:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ReturnReasonAppliesTo.
+const (
+	ReturnReasonAppliesToBoth           ReturnReasonAppliesTo = "both"
+	ReturnReasonAppliesToPurchaseReturn ReturnReasonAppliesTo = "purchase_return"
+	ReturnReasonAppliesToSalesReturn    ReturnReasonAppliesTo = "sales_return"
+)
+
+// Valid indicates whether the value is a known member of the ReturnReasonAppliesTo enum.
+func (e ReturnReasonAppliesTo) Valid() bool {
+	switch e {
+	case ReturnReasonAppliesToBoth:
+		return true
+	case ReturnReasonAppliesToPurchaseReturn:
+		return true
+	case ReturnReasonAppliesToSalesReturn:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ReturnReasonScope.
+const (
+	ReturnReasonScopePurchaseReturn ReturnReasonScope = "purchase_return"
+	ReturnReasonScopeSalesReturn    ReturnReasonScope = "sales_return"
+)
+
+// Valid indicates whether the value is a known member of the ReturnReasonScope enum.
+func (e ReturnReasonScope) Valid() bool {
+	switch e {
+	case ReturnReasonScopePurchaseReturn:
+		return true
+	case ReturnReasonScopeSalesReturn:
+		return true
+	default:
+		return false
+	}
+}
+
 // ErrorCode Katalog kode error (Technical Guideline Lampiran A).
 type ErrorCode string
 
@@ -156,6 +228,75 @@ type Problem struct {
 	Type      string             `json:"type"`
 }
 
+// ReturnDisposition Disposisi barang retur (Disposisi Retur, WMS-07).
+type ReturnDisposition string
+
+// ReturnReason defines model for ReturnReason.
+type ReturnReason struct {
+	// AppliesTo Dokumen yang memakai alasan ini.
+	AppliesTo ReturnReasonAppliesTo `json:"appliesTo"`
+
+	// Code Example: DAMAGED_SHIPPING
+	Code string `json:"code"`
+
+	// DefaultDisposition Usulan awal disposisi; staf gudang tetap memilih saat QC.
+	DefaultDisposition *ReturnDisposition `json:"defaultDisposition,omitempty"`
+	Description        string             `json:"description"`
+	Id                 openapi_types.UUID `json:"id"`
+	IsActive           bool               `json:"isActive"`
+	Name               string             `json:"name"`
+	UpdatedAt          time.Time          `json:"updatedAt"`
+	Version            int                `json:"version"`
+}
+
+// ReturnReasonAppliesTo Dokumen yang memakai alasan ini.
+type ReturnReasonAppliesTo string
+
+// ReturnReasonFields defines model for ReturnReasonFields.
+type ReturnReasonFields struct {
+	// AppliesTo Dokumen yang memakai alasan ini.
+	AppliesTo          ReturnReasonAppliesTo `json:"appliesTo"`
+	DefaultDisposition *ReturnDisposition    `json:"defaultDisposition,omitempty"`
+	Description        *string               `json:"description,omitempty"`
+	IsActive           bool                  `json:"isActive"`
+	Name               string                `json:"name"`
+}
+
+// ReturnReasonInput defines model for ReturnReasonInput.
+type ReturnReasonInput struct {
+	// AppliesTo Dokumen yang memakai alasan ini.
+	AppliesTo ReturnReasonAppliesTo `json:"appliesTo"`
+
+	// Code Example: DAMAGED_SHIPPING
+	Code               string             `json:"code"`
+	DefaultDisposition *ReturnDisposition `json:"defaultDisposition,omitempty"`
+	Description        *string            `json:"description,omitempty"`
+	IsActive           bool               `json:"isActive"`
+	Name               string             `json:"name"`
+}
+
+// ReturnReasonScope defines model for ReturnReasonScope.
+type ReturnReasonScope string
+
+// ReturnReasonUpdate defines model for ReturnReasonUpdate.
+type ReturnReasonUpdate struct {
+	// AppliesTo Dokumen yang memakai alasan ini.
+	AppliesTo          ReturnReasonAppliesTo `json:"appliesTo"`
+	DefaultDisposition *ReturnDisposition    `json:"defaultDisposition,omitempty"`
+	Description        *string               `json:"description,omitempty"`
+	IsActive           bool                  `json:"isActive"`
+	Name               string                `json:"name"`
+
+	// Version Versi terakhir yang dilihat user (optimistic locking).
+	Version int `json:"version"`
+}
+
+// VersionInput defines model for VersionInput.
+type VersionInput struct {
+	// Version Versi terakhir yang dilihat user (optimistic locking).
+	Version int `json:"version"`
+}
+
 // WebhookAck defines model for WebhookAck.
 type WebhookAck struct {
 	Duplicate bool `json:"duplicate"`
@@ -165,11 +306,63 @@ type WebhookAck struct {
 // Id defines model for Id.
 type Id = openapi_types.UUID
 
+// IdempotencyKey defines model for IdempotencyKey.
+type IdempotencyKey = openapi_types.UUID
+
+// Search defines model for Search.
+type Search = string
+
+// ListReturnReasonsParams defines parameters for ListReturnReasons.
+type ListReturnReasonsParams struct {
+	IncludeInactive *bool              `form:"includeInactive,omitempty" json:"includeInactive,omitempty"`
+	AppliesTo       *ReturnReasonScope `form:"appliesTo,omitempty" json:"appliesTo,omitempty"`
+	Q               *Search            `form:"q,omitempty" json:"q,omitempty"`
+}
+
+// CreateReturnReasonParams defines parameters for CreateReturnReason.
+type CreateReturnReasonParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// DeleteReturnReasonParams defines parameters for DeleteReturnReason.
+type DeleteReturnReasonParams struct {
+	// Version Versi terakhir yang dilihat user (optimistic locking).
+	Version int `form:"version" json:"version"`
+
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// UpdateReturnReasonParams defines parameters for UpdateReturnReason.
+type UpdateReturnReasonParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// CreateReturnReasonJSONRequestBody defines body for CreateReturnReason for application/json ContentType.
+type CreateReturnReasonJSONRequestBody = ReturnReasonInput
+
+// UpdateReturnReasonJSONRequestBody defines body for UpdateReturnReason for application/json ContentType.
+type UpdateReturnReasonJSONRequestBody = ReturnReasonUpdate
+
 // ReceiveMidtransWebhookJSONRequestBody defines body for ReceiveMidtransWebhook for application/json ContentType.
 type ReceiveMidtransWebhookJSONRequestBody = MidtransNotification
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// ListReturnReasons Data Master › Alasan Retur
+	// (GET /api/v1/return-reasons)
+	ListReturnReasons(w http.ResponseWriter, r *http.Request, params ListReturnReasonsParams)
+	// CreateReturnReason Menambah alasan retur
+	// (POST /api/v1/return-reasons)
+	CreateReturnReason(w http.ResponseWriter, r *http.Request, params CreateReturnReasonParams)
+	// DeleteReturnReason Menghapus (soft delete) alasan retur
+	// (DELETE /api/v1/return-reasons/{id})
+	DeleteReturnReason(w http.ResponseWriter, r *http.Request, id Id, params DeleteReturnReasonParams)
+	// UpdateReturnReason Mengubah alasan retur (kode tetap)
+	// (PUT /api/v1/return-reasons/{id})
+	UpdateReturnReason(w http.ResponseWriter, r *http.Request, id Id, params UpdateReturnReasonParams)
 	// ReceiveMidtransWebhook Notifikasi pembayaran Midtrans
 	// (POST /api/v1/webhooks/midtrans)
 	ReceiveMidtransWebhook(w http.ResponseWriter, r *http.Request)
@@ -178,6 +371,30 @@ type ServerInterface interface {
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
 
 type Unimplemented struct{}
+
+// ListReturnReasons Data Master › Alasan Retur
+// (GET /api/v1/return-reasons)
+func (_ Unimplemented) ListReturnReasons(w http.ResponseWriter, r *http.Request, params ListReturnReasonsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// CreateReturnReason Menambah alasan retur
+// (POST /api/v1/return-reasons)
+func (_ Unimplemented) CreateReturnReason(w http.ResponseWriter, r *http.Request, params CreateReturnReasonParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// DeleteReturnReason Menghapus (soft delete) alasan retur
+// (DELETE /api/v1/return-reasons/{id})
+func (_ Unimplemented) DeleteReturnReason(w http.ResponseWriter, r *http.Request, id Id, params DeleteReturnReasonParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// UpdateReturnReason Mengubah alasan retur (kode tetap)
+// (PUT /api/v1/return-reasons/{id})
+func (_ Unimplemented) UpdateReturnReason(w http.ResponseWriter, r *http.Request, id Id, params UpdateReturnReasonParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
 
 // ReceiveMidtransWebhook Notifikasi pembayaran Midtrans
 // (POST /api/v1/webhooks/midtrans)
@@ -193,6 +410,231 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(http.Handler) http.Handler
+
+// ListReturnReasons operation middleware
+func (siw *ServerInterfaceWrapper) ListReturnReasons(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListReturnReasonsParams
+
+	// ------------- Optional query parameter "includeInactive" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "includeInactive", r.URL.Query(), &params.IncludeInactive, runtime.BindQueryParameterOptions{Type: "boolean", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "includeInactive"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "includeInactive", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "appliesTo" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "appliesTo", r.URL.Query(), &params.AppliesTo, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "appliesTo"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "appliesTo", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "q" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "q", r.URL.Query(), &params.Q, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "q"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "q", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListReturnReasons(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateReturnReason operation middleware
+func (siw *ServerInterfaceWrapper) CreateReturnReason(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateReturnReasonParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateReturnReason(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// DeleteReturnReason operation middleware
+func (siw *ServerInterfaceWrapper) DeleteReturnReason(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params DeleteReturnReasonParams
+
+	// ------------- Required query parameter "version" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "version", r.URL.Query(), &params.Version, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "version"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "version", Err: err})
+		}
+		return
+	}
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteReturnReason(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateReturnReason operation middleware
+func (siw *ServerInterfaceWrapper) UpdateReturnReason(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params UpdateReturnReasonParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateReturnReason(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
 
 // ReceiveMidtransWebhook operation middleware
 func (siw *ServerInterfaceWrapper) ReceiveMidtransWebhook(w http.ResponseWriter, r *http.Request) {
@@ -324,6 +766,433 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/api/v1/webhooks/midtrans", wrapper.ReceiveMidtransWebhook)
 	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/return-reasons", wrapper.ListReturnReasons)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/return-reasons", wrapper.CreateReturnReason)
+	})
+	r.Group(func(r chi.Router) {
+		r.Delete(options.BaseURL+"/api/v1/return-reasons/{id}", wrapper.DeleteReturnReason)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/return-reasons/{id}", wrapper.UpdateReturnReason)
+	})
 
 	return r
+}
+
+type ProblemApplicationProblemPlusJSONResponse Problem
+
+type ListReturnReasonsRequestObject struct {
+	Params ListReturnReasonsParams
+}
+
+type ListReturnReasonsResponseObject interface {
+	VisitListReturnReasonsResponse(w http.ResponseWriter) error
+}
+
+type ListReturnReasons200JSONResponse []ReturnReason
+
+func (response ListReturnReasons200JSONResponse) VisitListReturnReasonsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListReturnReasonsdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListReturnReasonsdefaultApplicationProblemPlusJSONResponse) VisitListReturnReasonsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateReturnReasonRequestObject struct {
+	Params CreateReturnReasonParams
+	Body   *CreateReturnReasonJSONRequestBody
+}
+
+type CreateReturnReasonResponseObject interface {
+	VisitCreateReturnReasonResponse(w http.ResponseWriter) error
+}
+
+type CreateReturnReason201JSONResponse ReturnReason
+
+func (response CreateReturnReason201JSONResponse) VisitCreateReturnReasonResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateReturnReasondefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response CreateReturnReasondefaultApplicationProblemPlusJSONResponse) VisitCreateReturnReasonResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteReturnReasonRequestObject struct {
+	Id     Id `json:"id"`
+	Params DeleteReturnReasonParams
+}
+
+type DeleteReturnReasonResponseObject interface {
+	VisitDeleteReturnReasonResponse(w http.ResponseWriter) error
+}
+
+type DeleteReturnReason204Response struct {
+}
+
+func (response DeleteReturnReason204Response) VisitDeleteReturnReasonResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type DeleteReturnReasondefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response DeleteReturnReasondefaultApplicationProblemPlusJSONResponse) VisitDeleteReturnReasonResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateReturnReasonRequestObject struct {
+	Id     Id `json:"id"`
+	Params UpdateReturnReasonParams
+	Body   *UpdateReturnReasonJSONRequestBody
+}
+
+type UpdateReturnReasonResponseObject interface {
+	VisitUpdateReturnReasonResponse(w http.ResponseWriter) error
+}
+
+type UpdateReturnReason200JSONResponse ReturnReason
+
+func (response UpdateReturnReason200JSONResponse) VisitUpdateReturnReasonResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateReturnReasondefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response UpdateReturnReasondefaultApplicationProblemPlusJSONResponse) VisitUpdateReturnReasonResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ReceiveMidtransWebhookRequestObject struct {
+	Body *ReceiveMidtransWebhookJSONRequestBody
+}
+
+type ReceiveMidtransWebhookResponseObject interface {
+	VisitReceiveMidtransWebhookResponse(w http.ResponseWriter) error
+}
+
+type ReceiveMidtransWebhook200JSONResponse WebhookAck
+
+func (response ReceiveMidtransWebhook200JSONResponse) VisitReceiveMidtransWebhookResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ReceiveMidtransWebhook400ApplicationProblemPlusJSONResponse Problem
+
+func (response ReceiveMidtransWebhook400ApplicationProblemPlusJSONResponse) VisitReceiveMidtransWebhookResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ReceiveMidtransWebhook403ApplicationProblemPlusJSONResponse Problem
+
+func (response ReceiveMidtransWebhook403ApplicationProblemPlusJSONResponse) VisitReceiveMidtransWebhookResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(403)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+// StrictServerInterface represents all server handlers.
+type StrictServerInterface interface {
+	// ListReturnReasons Data Master › Alasan Retur
+	// (GET /api/v1/return-reasons)
+	ListReturnReasons(ctx context.Context, request ListReturnReasonsRequestObject) (ListReturnReasonsResponseObject, error)
+	// CreateReturnReason Menambah alasan retur
+	// (POST /api/v1/return-reasons)
+	CreateReturnReason(ctx context.Context, request CreateReturnReasonRequestObject) (CreateReturnReasonResponseObject, error)
+	// DeleteReturnReason Menghapus (soft delete) alasan retur
+	// (DELETE /api/v1/return-reasons/{id})
+	DeleteReturnReason(ctx context.Context, request DeleteReturnReasonRequestObject) (DeleteReturnReasonResponseObject, error)
+	// UpdateReturnReason Mengubah alasan retur (kode tetap)
+	// (PUT /api/v1/return-reasons/{id})
+	UpdateReturnReason(ctx context.Context, request UpdateReturnReasonRequestObject) (UpdateReturnReasonResponseObject, error)
+	// ReceiveMidtransWebhook Notifikasi pembayaran Midtrans
+	// (POST /api/v1/webhooks/midtrans)
+	ReceiveMidtransWebhook(ctx context.Context, request ReceiveMidtransWebhookRequestObject) (ReceiveMidtransWebhookResponseObject, error)
+}
+
+type StrictHandlerFunc func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error)
+type StrictMiddlewareFunc func(f StrictHandlerFunc, operationID string) StrictHandlerFunc
+
+type StrictHTTPServerOptions struct {
+	RequestErrorHandlerFunc  func(w http.ResponseWriter, r *http.Request, err error)
+	ResponseErrorHandlerFunc func(w http.ResponseWriter, r *http.Request, err error)
+}
+
+func NewStrictHandler(ssi StrictServerInterface, middlewares []StrictMiddlewareFunc) ServerInterface {
+	return &strictHandler{ssi: ssi, middlewares: middlewares, options: StrictHTTPServerOptions{
+		RequestErrorHandlerFunc: func(w http.ResponseWriter, r *http.Request, err error) {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		},
+		ResponseErrorHandlerFunc: func(w http.ResponseWriter, r *http.Request, err error) {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		},
+	}}
+}
+
+func NewStrictHandlerWithOptions(ssi StrictServerInterface, middlewares []StrictMiddlewareFunc, options StrictHTTPServerOptions) ServerInterface {
+	if options.RequestErrorHandlerFunc == nil {
+		options.RequestErrorHandlerFunc = func(w http.ResponseWriter, r *http.Request, err error) {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
+	}
+	if options.ResponseErrorHandlerFunc == nil {
+		options.ResponseErrorHandlerFunc = func(w http.ResponseWriter, r *http.Request, err error) {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}
+	return &strictHandler{ssi: ssi, middlewares: middlewares, options: options}
+}
+
+type strictHandler struct {
+	ssi         StrictServerInterface
+	middlewares []StrictMiddlewareFunc
+	options     StrictHTTPServerOptions
+}
+
+// ListReturnReasons operation middleware
+func (sh *strictHandler) ListReturnReasons(w http.ResponseWriter, r *http.Request, params ListReturnReasonsParams) {
+	var request ListReturnReasonsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListReturnReasons(ctx, request.(ListReturnReasonsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListReturnReasons")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListReturnReasonsResponseObject); ok {
+		if err := validResponse.VisitListReturnReasonsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreateReturnReason operation middleware
+func (sh *strictHandler) CreateReturnReason(w http.ResponseWriter, r *http.Request, params CreateReturnReasonParams) {
+	var request CreateReturnReasonRequestObject
+
+	request.Params = params
+
+	var body CreateReturnReasonJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CreateReturnReason(ctx, request.(CreateReturnReasonRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateReturnReason")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreateReturnReasonResponseObject); ok {
+		if err := validResponse.VisitCreateReturnReasonResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// DeleteReturnReason operation middleware
+func (sh *strictHandler) DeleteReturnReason(w http.ResponseWriter, r *http.Request, id Id, params DeleteReturnReasonParams) {
+	var request DeleteReturnReasonRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.DeleteReturnReason(ctx, request.(DeleteReturnReasonRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DeleteReturnReason")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(DeleteReturnReasonResponseObject); ok {
+		if err := validResponse.VisitDeleteReturnReasonResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateReturnReason operation middleware
+func (sh *strictHandler) UpdateReturnReason(w http.ResponseWriter, r *http.Request, id Id, params UpdateReturnReasonParams) {
+	var request UpdateReturnReasonRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body UpdateReturnReasonJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateReturnReason(ctx, request.(UpdateReturnReasonRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateReturnReason")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdateReturnReasonResponseObject); ok {
+		if err := validResponse.VisitUpdateReturnReasonResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ReceiveMidtransWebhook operation middleware
+func (sh *strictHandler) ReceiveMidtransWebhook(w http.ResponseWriter, r *http.Request) {
+	var request ReceiveMidtransWebhookRequestObject
+
+	var body ReceiveMidtransWebhookJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ReceiveMidtransWebhook(ctx, request.(ReceiveMidtransWebhookRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ReceiveMidtransWebhook")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ReceiveMidtransWebhookResponseObject); ok {
+		if err := validResponse.VisitReceiveMidtransWebhookResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
 }

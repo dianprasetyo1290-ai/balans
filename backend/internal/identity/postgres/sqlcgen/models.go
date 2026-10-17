@@ -182,6 +182,26 @@ type DocumentSequence struct {
 	UpdatedAt    time.Time
 }
 
+type ExpenseType struct {
+	ID               uuid.UUID
+	Code             string
+	Name             string
+	ExpenseAccountID uuid.UUID
+	WithholdingType  string
+	RequiresReceipt  bool
+	RequiresCampaign bool
+	ApprovalSubject  string
+	Description      string
+	IsActive         bool
+	CreatedAt        time.Time
+	CreatedBy        uuid.UUID
+	UpdatedAt        time.Time
+	UpdatedBy        uuid.UUID
+	Version          int32
+	DeletedAt        *time.Time
+	DeletedBy        uuid.NullUUID
+}
+
 type FiscalPeriod struct {
 	ID            uuid.UUID
 	Year          int32
@@ -354,6 +374,23 @@ type PostingRuleAccount struct {
 	UpdatedAt       time.Time
 	UpdatedBy       uuid.UUID
 	Version         int32
+}
+
+type ReturnReason struct {
+	ID                 uuid.UUID
+	Code               string
+	Name               string
+	AppliesTo          string
+	DefaultDisposition pgtype.Text
+	Description        string
+	IsActive           bool
+	CreatedAt          time.Time
+	CreatedBy          uuid.UUID
+	UpdatedAt          time.Time
+	UpdatedBy          uuid.UUID
+	Version            int32
+	DeletedAt          *time.Time
+	DeletedBy          uuid.NullUUID
 }
 
 type Role struct {

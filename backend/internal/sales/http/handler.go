@@ -2,10 +2,15 @@ package http
 
 import (
 	"context"
+	"errors"
 	"io"
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
+
 	"balans/internal/platform/apperr"
+	"balans/internal/platform/httpx"
+	"balans/internal/sales/service"
 )
 
 //go:generate go tool oapi-codegen -config ../../../api/codegen/sales.yaml ../../../api/openapi.bundle.yaml
@@ -21,14 +26,12 @@ type responder interface {
 	Error(w http.ResponseWriter, r *http.Request, err error)
 }
 
-// WebhookHandler mengimplementasikan ServerInterface hasil generate. Webhook memakai handler non-strict
-// karena signature diverifikasi terhadap body asli.
+// WebhookHandler menerima webhook payment gateway. Webhook memakai handler non-strict karena signature
+// diverifikasi terhadap body asli.
 type WebhookHandler struct {
 	webhooks paymentWebhookReceiver
 	rs       responder
 }
-
-var _ ServerInterface = (*WebhookHandler)(nil)
 
 // NewWebhookHandler membuat handler.
 func NewWebhookHandler(webhooks paymentWebhookReceiver, rs responder) *WebhookHandler {
@@ -48,4 +51,43 @@ func (h *WebhookHandler) ReceiveMidtransWebhook(w http.ResponseWriter, r *http.R
 		return
 	}
 	h.rs.JSON(w, r, http.StatusOK, WebhookAck{Received: true, Duplicate: duplicate})
+}
+
+// SalesHandler mengimplementasikan StrictServerInterface untuk endpoint JSON biasa (master alasan retur).
+type SalesHandler struct {
+	reasons *service.ReturnReasonService
+}
+
+var _ StrictServerInterface = (*SalesHandler)(nil)
+
+// NewHandler membuat handler.
+func NewHandler(reasons *service.ReturnReasonService) *SalesHandler {
+	return &SalesHandler{reasons: reasons}
+}
+
+// errWebhookRoute: webhook tidak pernah dirutekan lewat handler strict (lihat router).
+var errWebhookRoute = errors.New("sales: webhook Midtrans ditangani WebhookHandler")
+
+// ReceiveMidtransWebhook tidak dipakai; route webhook diarahkan ke WebhookHandler oleh router.
+func (h *SalesHandler) ReceiveMidtransWebhook(context.Context, ReceiveMidtransWebhookRequestObject) (ReceiveMidtransWebhookResponseObject, error) {
+	return nil, errWebhookRoute
+}
+
+// router menggabungkan handler strict dengan WebhookHandler yang membaca body asli.
+type router struct {
+	ServerInterface
+	webhook *WebhookHandler
+}
+
+func (r router) ReceiveMidtransWebhook(w http.ResponseWriter, req *http.Request) {
+	r.webhook.ReceiveMidtransWebhook(w, req)
+}
+
+// Register mendaftarkan route modul ke router.
+func Register(r chi.Router, h *SalesHandler, webhook *WebhookHandler, rs *httpx.Responder) {
+	strict := NewStrictHandlerWithOptions(h, nil, StrictHTTPServerOptions{
+		RequestErrorHandlerFunc:  rs.RequestError,
+		ResponseErrorHandlerFunc: rs.Error,
+	})
+	HandlerWithOptions(router{ServerInterface: strict, webhook: webhook}, ChiServerOptions{BaseRouter: r, ErrorHandlerFunc: rs.RequestError})
 }

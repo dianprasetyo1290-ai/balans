@@ -158,6 +158,24 @@ func (e ErrorCode) Valid() bool {
 	}
 }
 
+// Defines values for ExpenseApprovalSubject.
+const (
+	ExpenseClaim           ExpenseApprovalSubject = "expense_claim"
+	PettyCashReplenishment ExpenseApprovalSubject = "petty_cash_replenishment"
+)
+
+// Valid indicates whether the value is a known member of the ExpenseApprovalSubject enum.
+func (e ExpenseApprovalSubject) Valid() bool {
+	switch e {
+	case ExpenseClaim:
+		return true
+	case PettyCashReplenishment:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for FiscalPeriodStatus.
 const (
 	Closed FiscalPeriodStatus = "closed"
@@ -251,6 +269,30 @@ func (e NormalBalance) Valid() bool {
 	case Credit:
 		return true
 	case Debit:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for WithholdingType.
+const (
+	None  WithholdingType = "none"
+	Pph21 WithholdingType = "pph21"
+	Pph23 WithholdingType = "pph23"
+	Pph42 WithholdingType = "pph4_2"
+)
+
+// Valid indicates whether the value is a known member of the WithholdingType enum.
+func (e WithholdingType) Valid() bool {
+	switch e {
+	case None:
+		return true
+	case Pph21:
+		return true
+	case Pph23:
+		return true
+	case Pph42:
 		return true
 	default:
 		return false
@@ -425,6 +467,87 @@ type DimensionUpdate struct {
 
 // ErrorCode Katalog kode error (Technical Guideline Lampiran A).
 type ErrorCode string
+
+// ExpenseApprovalSubject Jenis dokumen approval (subject_type) yang dipakai dokumen biaya dengan jenis ini.
+type ExpenseApprovalSubject string
+
+// ExpenseType defines model for ExpenseType.
+type ExpenseType struct {
+	// ApprovalSubject Jenis dokumen approval (subject_type) yang dipakai dokumen biaya dengan jenis ini.
+	ApprovalSubject ExpenseApprovalSubject `json:"approvalSubject"`
+
+	// Code Example: OFFICE_SUPPLY
+	Code        string `json:"code"`
+	Description string `json:"description"`
+
+	// ExpenseAccountCode Example: 6303
+	ExpenseAccountCode string             `json:"expenseAccountCode"`
+	ExpenseAccountId   openapi_types.UUID `json:"expenseAccountId"`
+	ExpenseAccountName string             `json:"expenseAccountName"`
+	Id                 openapi_types.UUID `json:"id"`
+	IsActive           bool               `json:"isActive"`
+	Name               string             `json:"name"`
+
+	// RequiresCampaign Jurnal biaya jenis ini wajib dimensi kampanye.
+	RequiresCampaign bool      `json:"requiresCampaign"`
+	RequiresReceipt  bool      `json:"requiresReceipt"`
+	UpdatedAt        time.Time `json:"updatedAt"`
+	Version          int       `json:"version"`
+
+	// WithholdingType PPh yang dipotong saat biaya dibayar; tarif di master tarif PPh.
+	WithholdingType WithholdingType `json:"withholdingType"`
+}
+
+// ExpenseTypeFields defines model for ExpenseTypeFields.
+type ExpenseTypeFields struct {
+	// ApprovalSubject Jenis dokumen approval (subject_type) yang dipakai dokumen biaya dengan jenis ini.
+	ApprovalSubject  *ExpenseApprovalSubject `json:"approvalSubject,omitempty"`
+	Description      *string                 `json:"description,omitempty"`
+	ExpenseAccountId openapi_types.UUID      `json:"expenseAccountId"`
+	IsActive         bool                    `json:"isActive"`
+	Name             string                  `json:"name"`
+	RequiresCampaign bool                    `json:"requiresCampaign"`
+	RequiresReceipt  bool                    `json:"requiresReceipt"`
+
+	// WithholdingType PPh yang dipotong saat biaya dibayar; tarif di master tarif PPh.
+	WithholdingType WithholdingType `json:"withholdingType"`
+}
+
+// ExpenseTypeInput defines model for ExpenseTypeInput.
+type ExpenseTypeInput struct {
+	// ApprovalSubject Jenis dokumen approval (subject_type) yang dipakai dokumen biaya dengan jenis ini.
+	ApprovalSubject *ExpenseApprovalSubject `json:"approvalSubject,omitempty"`
+
+	// Code Example: OFFICE_SUPPLY
+	Code             string             `json:"code"`
+	Description      *string            `json:"description,omitempty"`
+	ExpenseAccountId openapi_types.UUID `json:"expenseAccountId"`
+	IsActive         bool               `json:"isActive"`
+	Name             string             `json:"name"`
+	RequiresCampaign bool               `json:"requiresCampaign"`
+	RequiresReceipt  bool               `json:"requiresReceipt"`
+
+	// WithholdingType PPh yang dipotong saat biaya dibayar; tarif di master tarif PPh.
+	WithholdingType WithholdingType `json:"withholdingType"`
+}
+
+// ExpenseTypeUpdate defines model for ExpenseTypeUpdate.
+type ExpenseTypeUpdate struct {
+	// ApprovalSubject Jenis dokumen approval (subject_type) yang dipakai dokumen biaya dengan jenis ini.
+	ApprovalSubject  *ExpenseApprovalSubject `json:"approvalSubject,omitempty"`
+	Description      *string                 `json:"description,omitempty"`
+	ExpenseAccountId openapi_types.UUID      `json:"expenseAccountId"`
+	IsActive         bool                    `json:"isActive"`
+	Name             string                  `json:"name"`
+	RequiresCampaign bool                    `json:"requiresCampaign"`
+	RequiresReceipt  bool                    `json:"requiresReceipt"`
+
+	// Version Versi terakhir yang dilihat user (optimistic locking).
+	Version int `json:"version"`
+
+	// WithholdingType PPh yang dipotong saat biaya dibayar; tarif di master tarif PPh.
+	WithholdingType WithholdingType `json:"withholdingType"`
+}
 
 // FiscalPeriod defines model for FiscalPeriod.
 type FiscalPeriod struct {
@@ -791,6 +914,9 @@ type VersionInput struct {
 	Version int `json:"version"`
 }
 
+// WithholdingType PPh yang dipotong saat biaya dibayar; tarif di master tarif PPh.
+type WithholdingType string
+
 // Id defines model for Id.
 type Id = openapi_types.UUID
 
@@ -917,6 +1043,33 @@ type UpdateDivisionParams struct {
 	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
 }
 
+// ListExpenseTypesParams defines parameters for ListExpenseTypes.
+type ListExpenseTypesParams struct {
+	IncludeInactive *IncludeInactive `form:"includeInactive,omitempty" json:"includeInactive,omitempty"`
+	Q               *Search          `form:"q,omitempty" json:"q,omitempty"`
+}
+
+// CreateExpenseTypeParams defines parameters for CreateExpenseType.
+type CreateExpenseTypeParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// DeleteExpenseTypeParams defines parameters for DeleteExpenseType.
+type DeleteExpenseTypeParams struct {
+	// Version Versi terakhir yang dilihat user (optimistic locking).
+	Version Version `form:"version" json:"version"`
+
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// UpdateExpenseTypeParams defines parameters for UpdateExpenseType.
+type UpdateExpenseTypeParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
 // ListFiscalPeriodsParams defines parameters for ListFiscalPeriods.
 type ListFiscalPeriodsParams struct {
 	Year *int `form:"year,omitempty" json:"year,omitempty"`
@@ -1036,6 +1189,12 @@ type CreateDivisionJSONRequestBody = DimensionInput
 // UpdateDivisionJSONRequestBody defines body for UpdateDivision for application/json ContentType.
 type UpdateDivisionJSONRequestBody = DimensionUpdate
 
+// CreateExpenseTypeJSONRequestBody defines body for CreateExpenseType for application/json ContentType.
+type CreateExpenseTypeJSONRequestBody = ExpenseTypeInput
+
+// UpdateExpenseTypeJSONRequestBody defines body for UpdateExpenseType for application/json ContentType.
+type UpdateExpenseTypeJSONRequestBody = ExpenseTypeUpdate
+
 // CreateJournalEntryJSONRequestBody defines body for CreateJournalEntry for application/json ContentType.
 type CreateJournalEntryJSONRequestBody = ManualJournalFields
 
@@ -1107,6 +1266,18 @@ type ServerInterface interface {
 	// UpdateDivision Mengubah divisi (kode tetap)
 	// (PUT /api/v1/divisions/{id})
 	UpdateDivision(w http.ResponseWriter, r *http.Request, id Id, params UpdateDivisionParams)
+	// ListExpenseTypes Data Master › Jenis Biaya
+	// (GET /api/v1/expense-types)
+	ListExpenseTypes(w http.ResponseWriter, r *http.Request, params ListExpenseTypesParams)
+	// CreateExpenseType Menambah jenis biaya
+	// (POST /api/v1/expense-types)
+	CreateExpenseType(w http.ResponseWriter, r *http.Request, params CreateExpenseTypeParams)
+	// DeleteExpenseType Menghapus (soft delete) jenis biaya
+	// (DELETE /api/v1/expense-types/{id})
+	DeleteExpenseType(w http.ResponseWriter, r *http.Request, id Id, params DeleteExpenseTypeParams)
+	// UpdateExpenseType Mengubah jenis biaya (kode tetap)
+	// (PUT /api/v1/expense-types/{id})
+	UpdateExpenseType(w http.ResponseWriter, r *http.Request, id Id, params UpdateExpenseTypeParams)
 	// ListFiscalPeriods Periode akuntansi bulanan (ACC-08)
 	// (GET /api/v1/fiscal-periods)
 	ListFiscalPeriods(w http.ResponseWriter, r *http.Request, params ListFiscalPeriodsParams)
@@ -1257,6 +1428,30 @@ func (_ Unimplemented) DeleteDivision(w http.ResponseWriter, r *http.Request, id
 // UpdateDivision Mengubah divisi (kode tetap)
 // (PUT /api/v1/divisions/{id})
 func (_ Unimplemented) UpdateDivision(w http.ResponseWriter, r *http.Request, id Id, params UpdateDivisionParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListExpenseTypes Data Master › Jenis Biaya
+// (GET /api/v1/expense-types)
+func (_ Unimplemented) ListExpenseTypes(w http.ResponseWriter, r *http.Request, params ListExpenseTypesParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// CreateExpenseType Menambah jenis biaya
+// (POST /api/v1/expense-types)
+func (_ Unimplemented) CreateExpenseType(w http.ResponseWriter, r *http.Request, params CreateExpenseTypeParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// DeleteExpenseType Menghapus (soft delete) jenis biaya
+// (DELETE /api/v1/expense-types/{id})
+func (_ Unimplemented) DeleteExpenseType(w http.ResponseWriter, r *http.Request, id Id, params DeleteExpenseTypeParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// UpdateExpenseType Mengubah jenis biaya (kode tetap)
+// (PUT /api/v1/expense-types/{id})
+func (_ Unimplemented) UpdateExpenseType(w http.ResponseWriter, r *http.Request, id Id, params UpdateExpenseTypeParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -2185,6 +2380,218 @@ func (siw *ServerInterfaceWrapper) UpdateDivision(w http.ResponseWriter, r *http
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.UpdateDivision(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListExpenseTypes operation middleware
+func (siw *ServerInterfaceWrapper) ListExpenseTypes(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListExpenseTypesParams
+
+	// ------------- Optional query parameter "includeInactive" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "includeInactive", r.URL.Query(), &params.IncludeInactive, runtime.BindQueryParameterOptions{Type: "boolean", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "includeInactive"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "includeInactive", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "q" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "q", r.URL.Query(), &params.Q, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "q"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "q", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListExpenseTypes(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateExpenseType operation middleware
+func (siw *ServerInterfaceWrapper) CreateExpenseType(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateExpenseTypeParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateExpenseType(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// DeleteExpenseType operation middleware
+func (siw *ServerInterfaceWrapper) DeleteExpenseType(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params DeleteExpenseTypeParams
+
+	// ------------- Required query parameter "version" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "version", r.URL.Query(), &params.Version, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "version"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "version", Err: err})
+		}
+		return
+	}
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteExpenseType(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateExpenseType operation middleware
+func (siw *ServerInterfaceWrapper) UpdateExpenseType(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params UpdateExpenseTypeParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateExpenseType(w, r, id, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -3223,6 +3630,18 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		r.Put(options.BaseURL+"/api/v1/campaigns/{id}", wrapper.UpdateCampaign)
 	})
 	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/expense-types", wrapper.ListExpenseTypes)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/expense-types", wrapper.CreateExpenseType)
+	})
+	r.Group(func(r chi.Router) {
+		r.Delete(options.BaseURL+"/api/v1/expense-types/{id}", wrapper.DeleteExpenseType)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/expense-types/{id}", wrapper.UpdateExpenseType)
+	})
+	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/api/v1/fiscal-periods", wrapper.ListFiscalPeriods)
 	})
 	r.Group(func(r chi.Router) {
@@ -3916,6 +4335,160 @@ func (response UpdateDivisiondefaultApplicationProblemPlusJSONResponse) VisitUpd
 	return err
 }
 
+type ListExpenseTypesRequestObject struct {
+	Params ListExpenseTypesParams
+}
+
+type ListExpenseTypesResponseObject interface {
+	VisitListExpenseTypesResponse(w http.ResponseWriter) error
+}
+
+type ListExpenseTypes200JSONResponse []ExpenseType
+
+func (response ListExpenseTypes200JSONResponse) VisitListExpenseTypesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListExpenseTypesdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListExpenseTypesdefaultApplicationProblemPlusJSONResponse) VisitListExpenseTypesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateExpenseTypeRequestObject struct {
+	Params CreateExpenseTypeParams
+	Body   *CreateExpenseTypeJSONRequestBody
+}
+
+type CreateExpenseTypeResponseObject interface {
+	VisitCreateExpenseTypeResponse(w http.ResponseWriter) error
+}
+
+type CreateExpenseType201JSONResponse ExpenseType
+
+func (response CreateExpenseType201JSONResponse) VisitCreateExpenseTypeResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateExpenseTypedefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response CreateExpenseTypedefaultApplicationProblemPlusJSONResponse) VisitCreateExpenseTypeResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteExpenseTypeRequestObject struct {
+	Id     Id `json:"id"`
+	Params DeleteExpenseTypeParams
+}
+
+type DeleteExpenseTypeResponseObject interface {
+	VisitDeleteExpenseTypeResponse(w http.ResponseWriter) error
+}
+
+type DeleteExpenseType204Response struct {
+}
+
+func (response DeleteExpenseType204Response) VisitDeleteExpenseTypeResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type DeleteExpenseTypedefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response DeleteExpenseTypedefaultApplicationProblemPlusJSONResponse) VisitDeleteExpenseTypeResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateExpenseTypeRequestObject struct {
+	Id     Id `json:"id"`
+	Params UpdateExpenseTypeParams
+	Body   *UpdateExpenseTypeJSONRequestBody
+}
+
+type UpdateExpenseTypeResponseObject interface {
+	VisitUpdateExpenseTypeResponse(w http.ResponseWriter) error
+}
+
+type UpdateExpenseType200JSONResponse ExpenseType
+
+func (response UpdateExpenseType200JSONResponse) VisitUpdateExpenseTypeResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateExpenseTypedefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response UpdateExpenseTypedefaultApplicationProblemPlusJSONResponse) VisitUpdateExpenseTypeResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type ListFiscalPeriodsRequestObject struct {
 	Params ListFiscalPeriodsParams
 }
@@ -4555,6 +5128,18 @@ type StrictServerInterface interface {
 	// UpdateDivision Mengubah divisi (kode tetap)
 	// (PUT /api/v1/divisions/{id})
 	UpdateDivision(ctx context.Context, request UpdateDivisionRequestObject) (UpdateDivisionResponseObject, error)
+	// ListExpenseTypes Data Master › Jenis Biaya
+	// (GET /api/v1/expense-types)
+	ListExpenseTypes(ctx context.Context, request ListExpenseTypesRequestObject) (ListExpenseTypesResponseObject, error)
+	// CreateExpenseType Menambah jenis biaya
+	// (POST /api/v1/expense-types)
+	CreateExpenseType(ctx context.Context, request CreateExpenseTypeRequestObject) (CreateExpenseTypeResponseObject, error)
+	// DeleteExpenseType Menghapus (soft delete) jenis biaya
+	// (DELETE /api/v1/expense-types/{id})
+	DeleteExpenseType(ctx context.Context, request DeleteExpenseTypeRequestObject) (DeleteExpenseTypeResponseObject, error)
+	// UpdateExpenseType Mengubah jenis biaya (kode tetap)
+	// (PUT /api/v1/expense-types/{id})
+	UpdateExpenseType(ctx context.Context, request UpdateExpenseTypeRequestObject) (UpdateExpenseTypeResponseObject, error)
 	// ListFiscalPeriods Periode akuntansi bulanan (ACC-08)
 	// (GET /api/v1/fiscal-periods)
 	ListFiscalPeriods(ctx context.Context, request ListFiscalPeriodsRequestObject) (ListFiscalPeriodsResponseObject, error)
@@ -5140,6 +5725,126 @@ func (sh *strictHandler) UpdateDivision(w http.ResponseWriter, r *http.Request, 
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(UpdateDivisionResponseObject); ok {
 		if err := validResponse.VisitUpdateDivisionResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListExpenseTypes operation middleware
+func (sh *strictHandler) ListExpenseTypes(w http.ResponseWriter, r *http.Request, params ListExpenseTypesParams) {
+	var request ListExpenseTypesRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListExpenseTypes(ctx, request.(ListExpenseTypesRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListExpenseTypes")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListExpenseTypesResponseObject); ok {
+		if err := validResponse.VisitListExpenseTypesResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreateExpenseType operation middleware
+func (sh *strictHandler) CreateExpenseType(w http.ResponseWriter, r *http.Request, params CreateExpenseTypeParams) {
+	var request CreateExpenseTypeRequestObject
+
+	request.Params = params
+
+	var body CreateExpenseTypeJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CreateExpenseType(ctx, request.(CreateExpenseTypeRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateExpenseType")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreateExpenseTypeResponseObject); ok {
+		if err := validResponse.VisitCreateExpenseTypeResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// DeleteExpenseType operation middleware
+func (sh *strictHandler) DeleteExpenseType(w http.ResponseWriter, r *http.Request, id Id, params DeleteExpenseTypeParams) {
+	var request DeleteExpenseTypeRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.DeleteExpenseType(ctx, request.(DeleteExpenseTypeRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DeleteExpenseType")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(DeleteExpenseTypeResponseObject); ok {
+		if err := validResponse.VisitDeleteExpenseTypeResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateExpenseType operation middleware
+func (sh *strictHandler) UpdateExpenseType(w http.ResponseWriter, r *http.Request, id Id, params UpdateExpenseTypeParams) {
+	var request UpdateExpenseTypeRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body UpdateExpenseTypeJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateExpenseType(ctx, request.(UpdateExpenseTypeRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateExpenseType")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdateExpenseTypeResponseObject); ok {
+		if err := validResponse.VisitUpdateExpenseTypeResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

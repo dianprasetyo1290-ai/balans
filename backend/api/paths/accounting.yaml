@@ -407,6 +407,84 @@ campaign:
         description: Kampanye dihapus
       default:
         $ref: "../components/common.yaml#/responses/Problem"
+expenseTypes:
+  get:
+    operationId: listExpenseTypes
+    tags: [accounting]
+    summary: Data Master › Jenis Biaya
+    description: Butuh `accounting.expense_type.read` atau `accounting.expense_claim.read` (dropdown pengajuan biaya).
+    parameters:
+      - $ref: "#/components/parameters/IncludeInactive"
+      - $ref: "../components/common.yaml#/parameters/Search"
+    responses:
+      "200":
+        description: Jenis biaya urut kode
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/ExpenseType"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createExpenseType
+    tags: [accounting]
+    summary: Menambah jenis biaya
+    description: Kode unik permanen; akun beban wajib akun beban (6xxx/7xxx bersaldo debit) aktif yang bisa diposting.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ExpenseTypeInput"
+    responses:
+      "201":
+        description: Jenis biaya dibuat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExpenseType"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+expenseType:
+  put:
+    operationId: updateExpenseType
+    tags: [accounting]
+    summary: Mengubah jenis biaya (kode tetap)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ExpenseTypeUpdate"
+    responses:
+      "200":
+        description: Jenis biaya diperbarui
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExpenseType"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  delete:
+    operationId: deleteExpenseType
+    tags: [accounting]
+    summary: Menghapus (soft delete) jenis biaya
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+      - $ref: "#/components/parameters/Version"
+    responses:
+      "204":
+        description: Jenis biaya dihapus
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
 fiscalPeriods:
   get:
     operationId: listFiscalPeriods
@@ -1277,3 +1355,85 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/GeneralLedgerLine"
+    WithholdingType:
+      type: string
+      description: PPh yang dipotong saat biaya dibayar; tarif di master tarif PPh.
+      enum: [none, pph21, pph23, pph4_2]
+    ExpenseApprovalSubject:
+      type: string
+      description: Jenis dokumen approval (subject_type) yang dipakai dokumen biaya dengan jenis ini.
+      enum: [expense_claim, petty_cash_replenishment]
+    ExpenseType:
+      type: object
+      required: [id, code, name, expenseAccountId, expenseAccountCode, expenseAccountName, withholdingType, requiresReceipt, requiresCampaign, approvalSubject, description, isActive, updatedAt, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: OFFICE_SUPPLY
+        name:
+          type: string
+        expenseAccountId:
+          type: string
+          format: uuid
+        expenseAccountCode:
+          type: string
+          example: "6303"
+        expenseAccountName:
+          type: string
+        withholdingType:
+          $ref: "#/components/schemas/WithholdingType"
+        requiresReceipt:
+          type: boolean
+        requiresCampaign:
+          type: boolean
+          description: Jurnal biaya jenis ini wajib dimensi kampanye.
+        approvalSubject:
+          $ref: "#/components/schemas/ExpenseApprovalSubject"
+        description:
+          type: string
+        isActive:
+          type: boolean
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    ExpenseTypeFields:
+      type: object
+      required: [name, expenseAccountId, withholdingType, requiresReceipt, requiresCampaign, isActive]
+      properties:
+        name:
+          type: string
+          maxLength: 150
+        expenseAccountId:
+          type: string
+          format: uuid
+        withholdingType:
+          $ref: "#/components/schemas/WithholdingType"
+        requiresReceipt:
+          type: boolean
+        requiresCampaign:
+          type: boolean
+        approvalSubject:
+          $ref: "#/components/schemas/ExpenseApprovalSubject"
+        description:
+          type: string
+          maxLength: 500
+        isActive:
+          type: boolean
+    ExpenseTypeInput:
+      allOf:
+        - $ref: "#/components/schemas/ExpenseTypeFields"
+        - type: object
+          required: [code]
+          properties:
+            code:
+              type: string
+              example: OFFICE_SUPPLY
+    ExpenseTypeUpdate:
+      allOf:
+        - $ref: "#/components/schemas/ExpenseTypeFields"
+        - $ref: "../components/common.yaml#/VersionInput"

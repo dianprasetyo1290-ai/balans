@@ -27,6 +27,7 @@ func registerAccountingAuditEntities(a *audit.Module) {
 		"division":      "accounting.dimension.read",
 		"campaign":      "accounting.dimension.read",
 		"fiscal_period": "accounting.fiscal_period.read",
+		"expense_type":  "accounting.expense_type.read",
 	} {
 		a.RegisterEntity(entity, perm)
 	}

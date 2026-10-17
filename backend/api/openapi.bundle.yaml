@@ -13,7 +13,7 @@ tags:
   - name: system
     description: Kesehatan proses dan informasi sistem
   - name: sales
-    description: Penjualan, termasuk webhook payment gateway
+    description: Penjualan, alasan retur, dan webhook payment gateway
   - name: logistics
     description: Pengiriman, termasuk webhook kurir
   - name: identity
@@ -29,7 +29,7 @@ tags:
   - name: warehouse
     description: Gudang dan lokasi stok (R1.1)
   - name: accounting
-    description: COA, dimensi, periode, posting rule, Jurnal Umum, Buku Besar (R1.1)
+    description: COA, dimensi, jenis biaya, periode, posting rule, Jurnal Umum, Buku Besar (R1.1)
   - name: document
     description: Penomoran dokumen (R1.1)
 paths:
@@ -124,6 +124,103 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+  /api/v1/return-reasons:
+    get:
+      operationId: listReturnReasons
+      tags:
+        - sales
+      summary: Data Master › Alasan Retur
+      description: |
+        Butuh `sales.return_reason.read`, `sales.sales_return.read`, atau `procurement.purchase_return.read`
+        (dropdown dokumen retur). Filter `appliesTo` mengembalikan alasan untuk jenis itu dan alasan `both`.
+      parameters:
+        - name: includeInactive
+          in: query
+          schema:
+            type: boolean
+            default: false
+        - name: appliesTo
+          in: query
+          schema:
+            $ref: '#/components/schemas/ReturnReasonScope'
+        - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: Alasan retur urut kode
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReturnReason'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createReturnReason
+      tags:
+        - sales
+      summary: Menambah alasan retur
+      description: Kode unik permanen.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReturnReasonInput'
+      responses:
+        '201':
+          description: Alasan retur dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReturnReason'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/return-reasons/{id}:
+    put:
+      operationId: updateReturnReason
+      tags:
+        - sales
+      summary: Mengubah alasan retur (kode tetap)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReturnReasonUpdate'
+      responses:
+        '200':
+          description: Alasan retur diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReturnReason'
+        default:
+          $ref: '#/components/responses/Problem'
+    delete:
+      operationId: deleteReturnReason
+      tags:
+        - sales
+      summary: Menghapus (soft delete) alasan retur
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - name: version
+          in: query
+          required: true
+          description: Versi terakhir yang dilihat user (optimistic locking).
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Alasan retur dihapus
+        default:
+          $ref: '#/components/responses/Problem'
   /api/v1/webhooks/biteship:
     post:
       operationId: receiveBiteshipWebhook
@@ -1728,6 +1825,88 @@ paths:
           description: Kampanye dihapus
         default:
           $ref: '#/components/responses/Problem'
+  /api/v1/expense-types:
+    get:
+      operationId: listExpenseTypes
+      tags:
+        - accounting
+      summary: Data Master › Jenis Biaya
+      description: Butuh `accounting.expense_type.read` atau `accounting.expense_claim.read` (dropdown pengajuan biaya).
+      parameters:
+        - $ref: '#/components/parameters/IncludeInactive'
+        - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: Jenis biaya urut kode
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExpenseType'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createExpenseType
+      tags:
+        - accounting
+      summary: Menambah jenis biaya
+      description: Kode unik permanen; akun beban wajib akun beban (6xxx/7xxx bersaldo debit) aktif yang bisa diposting.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseTypeInput'
+      responses:
+        '201':
+          description: Jenis biaya dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseType'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/expense-types/{id}:
+    put:
+      operationId: updateExpenseType
+      tags:
+        - accounting
+      summary: Mengubah jenis biaya (kode tetap)
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseTypeUpdate'
+      responses:
+        '200':
+          description: Jenis biaya diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseType'
+        default:
+          $ref: '#/components/responses/Problem'
+    delete:
+      operationId: deleteExpenseType
+      tags:
+        - accounting
+      summary: Menghapus (soft delete) jenis biaya
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/Version'
+      responses:
+        '204':
+          description: Jenis biaya dihapus
+        default:
+          $ref: '#/components/responses/Problem'
   /api/v1/fiscal-periods:
     get:
       operationId: listFiscalPeriods
@@ -2246,6 +2425,106 @@ components:
           type: boolean
         duplicate:
           type: boolean
+    ReturnReasonScope:
+      type: string
+      enum:
+        - sales_return
+        - purchase_return
+    ReturnReasonAppliesTo:
+      type: string
+      description: Dokumen yang memakai alasan ini.
+      enum:
+        - sales_return
+        - purchase_return
+        - both
+    ReturnDisposition:
+      type: string
+      description: Disposisi barang retur (Disposisi Retur, WMS-07).
+      enum:
+        - restock
+        - repack
+        - reprocess
+        - marketing_sample
+        - dispose
+    ReturnReason:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - appliesTo
+        - description
+        - isActive
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: DAMAGED_SHIPPING
+        name:
+          type: string
+        appliesTo:
+          $ref: '#/components/schemas/ReturnReasonAppliesTo'
+        defaultDisposition:
+          allOf:
+            - $ref: '#/components/schemas/ReturnDisposition'
+          nullable: true
+          description: Usulan awal disposisi; staf gudang tetap memilih saat QC.
+        description:
+          type: string
+        isActive:
+          type: boolean
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    ReturnReasonFields:
+      type: object
+      required:
+        - name
+        - appliesTo
+        - isActive
+      properties:
+        name:
+          type: string
+          maxLength: 150
+        appliesTo:
+          $ref: '#/components/schemas/ReturnReasonAppliesTo'
+        defaultDisposition:
+          allOf:
+            - $ref: '#/components/schemas/ReturnDisposition'
+          nullable: true
+        description:
+          type: string
+          maxLength: 500
+        isActive:
+          type: boolean
+    ReturnReasonInput:
+      allOf:
+        - $ref: '#/components/schemas/ReturnReasonFields'
+        - type: object
+          required:
+            - code
+          properties:
+            code:
+              type: string
+              example: DAMAGED_SHIPPING
+    VersionInput:
+      type: object
+      required:
+        - version
+      properties:
+        version:
+          type: integer
+          description: Versi terakhir yang dilihat user (optimistic locking).
+    ReturnReasonUpdate:
+      allOf:
+        - $ref: '#/components/schemas/ReturnReasonFields'
+        - $ref: '#/components/schemas/VersionInput'
     BiteshipNotification:
       type: object
       description: Payload webhook status order Biteship (nama field milik Biteship).
@@ -2553,14 +2832,6 @@ components:
           nullable: true
         version:
           type: integer
-    VersionInput:
-      type: object
-      required:
-        - version
-      properties:
-        version:
-          type: integer
-          description: Versi terakhir yang dilihat user (optimistic locking).
     Role:
       type: object
       required:
@@ -3707,6 +3978,115 @@ components:
       allOf:
         - $ref: '#/components/schemas/CampaignFields'
         - $ref: '#/components/schemas/VersionInput'
+    WithholdingType:
+      type: string
+      description: PPh yang dipotong saat biaya dibayar; tarif di master tarif PPh.
+      enum:
+        - none
+        - pph21
+        - pph23
+        - pph4_2
+    ExpenseApprovalSubject:
+      type: string
+      description: Jenis dokumen approval (subject_type) yang dipakai dokumen biaya dengan jenis ini.
+      enum:
+        - expense_claim
+        - petty_cash_replenishment
+    ExpenseType:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - expenseAccountId
+        - expenseAccountCode
+        - expenseAccountName
+        - withholdingType
+        - requiresReceipt
+        - requiresCampaign
+        - approvalSubject
+        - description
+        - isActive
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: OFFICE_SUPPLY
+        name:
+          type: string
+        expenseAccountId:
+          type: string
+          format: uuid
+        expenseAccountCode:
+          type: string
+          example: '6303'
+        expenseAccountName:
+          type: string
+        withholdingType:
+          $ref: '#/components/schemas/WithholdingType'
+        requiresReceipt:
+          type: boolean
+        requiresCampaign:
+          type: boolean
+          description: Jurnal biaya jenis ini wajib dimensi kampanye.
+        approvalSubject:
+          $ref: '#/components/schemas/ExpenseApprovalSubject'
+        description:
+          type: string
+        isActive:
+          type: boolean
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    ExpenseTypeFields:
+      type: object
+      required:
+        - name
+        - expenseAccountId
+        - withholdingType
+        - requiresReceipt
+        - requiresCampaign
+        - isActive
+      properties:
+        name:
+          type: string
+          maxLength: 150
+        expenseAccountId:
+          type: string
+          format: uuid
+        withholdingType:
+          $ref: '#/components/schemas/WithholdingType'
+        requiresReceipt:
+          type: boolean
+        requiresCampaign:
+          type: boolean
+        approvalSubject:
+          $ref: '#/components/schemas/ExpenseApprovalSubject'
+        description:
+          type: string
+          maxLength: 500
+        isActive:
+          type: boolean
+    ExpenseTypeInput:
+      allOf:
+        - $ref: '#/components/schemas/ExpenseTypeFields'
+        - type: object
+          required:
+            - code
+          properties:
+            code:
+              type: string
+              example: OFFICE_SUPPLY
+    ExpenseTypeUpdate:
+      allOf:
+        - $ref: '#/components/schemas/ExpenseTypeFields'
+        - $ref: '#/components/schemas/VersionInput'
     FiscalPeriodStatus:
       type: string
       enum:
@@ -4186,18 +4566,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/DocumentSequence'
-  responses:
-    Problem:
-      description: Error standar (problem+json)
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/Problem'
   parameters:
-    RefreshCookie:
-      name: balans_refresh
-      in: cookie
-      required: false
+    Search:
+      name: q
+      in: query
       schema:
         type: string
     IdempotencyKey:
@@ -4208,6 +4580,19 @@ components:
       schema:
         type: string
         format: uuid
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    RefreshCookie:
+      name: balans_refresh
+      in: cookie
+      required: false
+      schema:
+        type: string
     Page:
       name: page
       in: query
@@ -4229,18 +4614,6 @@ components:
       description: Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`.
       schema:
         type: string
-    Search:
-      name: q
-      in: query
-      schema:
-        type: string
-    Id:
-      name: id
-      in: path
-      required: true
-      schema:
-        type: string
-        format: uuid
     Version:
       name: version
       in: query
@@ -4254,3 +4627,10 @@ components:
       schema:
         type: boolean
         default: false
+  responses:
+    Problem:
+      description: Error standar (problem+json)
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'

@@ -142,10 +142,14 @@ type AccountUsage struct {
 	JournalLines int64
 	Children     int64
 	RuleMappings int64
+	// ExpenseTypes: jenis biaya (belum dihapus) yang memakai akun ini sebagai akun beban.
+	ExpenseTypes int64
 }
 
-// Used: akun sudah dipakai jurnal atau posting rule.
-func (u AccountUsage) Used() bool { return u.JournalLines > 0 || u.RuleMappings > 0 }
+// Used: akun sudah dipakai jurnal, posting rule, atau jenis biaya.
+func (u AccountUsage) Used() bool {
+	return u.JournalLines > 0 || u.RuleMappings > 0 || u.ExpenseTypes > 0
+}
 
 // Update menerapkan isian Ubah Akun. Saldo normal dan sifat posting akun yang sudah dipakai tidak bisa
 // diubah karena memengaruhi saldo dan jurnal yang ada; akun yang punya sub-akun harus tetap akun induk.
@@ -161,7 +165,7 @@ func (a *Account) Update(in AccountInput, usage AccountUsage) error {
 		case in.IsPostable && usage.Children > 0:
 			fields["isPostable"] = "Akun yang punya sub-akun harus tetap akun induk"
 		case !in.IsPostable && usage.Used():
-			fields["isPostable"] = "Akun yang sudah dipakai jurnal atau posting rule tidak bisa dijadikan akun induk"
+			fields["isPostable"] = "Akun yang sudah dipakai jurnal, posting rule, atau jenis biaya tidak bisa dijadikan akun induk"
 		}
 	}
 	if len(fields) > 0 {
@@ -179,6 +183,8 @@ func (a Account) CheckDelete(usage AccountUsage) error {
 		return apperr.WithMessage(apperr.CodeInvalidStateTransition, "Akun "+a.Code+" sudah dipakai jurnal dan tidak bisa dihapus. Nonaktifkan akun bila tidak dipakai lagi.")
 	case usage.RuleMappings > 0:
 		return apperr.WithMessage(apperr.CodeInvalidStateTransition, "Akun "+a.Code+" dipakai posting rule dan tidak bisa dihapus.")
+	case usage.ExpenseTypes > 0:
+		return apperr.WithMessage(apperr.CodeInvalidStateTransition, "Akun "+a.Code+" dipakai jenis biaya dan tidak bisa dihapus.")
 	case usage.Children > 0:
 		return apperr.WithMessage(apperr.CodeInvalidStateTransition, "Akun "+a.Code+" masih punya sub-akun.")
 	}
