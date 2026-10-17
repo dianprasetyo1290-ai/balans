@@ -1,0 +1,1279 @@
+accounts:
+  get:
+    operationId: listAccounts
+    tags: [accounting]
+    summary: Chart of Accounts urut kode
+    description: Butuh `accounting.account.read`. Tanpa `includeInactive` hanya akun aktif.
+    parameters:
+      - name: includeInactive
+        in: query
+        schema:
+          type: boolean
+          default: false
+    responses:
+      "200":
+        description: Akun COA
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/Account"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createAccount
+    tags: [accounting]
+    summary: Menambah akun COA (S-126)
+    description: |
+      Kode 4 digit, digit pertama = kelompok 1–7, unik permanen (`DUPLICATE_CODE`, termasuk akun yang sudah dihapus).
+      Induk harus akun judul (tidak bisa diposting) dalam kelompok yang sama.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AccountInput"
+    responses:
+      "201":
+        description: Akun dibuat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Account"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+account:
+  get:
+    operationId: getAccount
+    tags: [accounting]
+    summary: Detail akun
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+    responses:
+      "200":
+        description: Akun
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Account"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  put:
+    operationId: updateAccount
+    tags: [accounting]
+    summary: Mengubah akun
+    description: |
+      Kode tidak berubah. Saldo normal akun yang sudah dipakai jurnal tidak bisa diubah; akun terpakai tidak bisa
+      dijadikan akun induk; akun yang punya sub-akun harus tetap akun induk.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AccountUpdate"
+    responses:
+      "200":
+        description: Akun diperbarui
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Account"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  delete:
+    operationId: deleteAccount
+    tags: [accounting]
+    summary: Menghapus akun yang belum dipakai (soft delete)
+    description: Akun yang sudah dipakai jurnal atau posting rule, atau masih punya sub-akun, ditolak `INVALID_STATE_TRANSITION`.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+      - $ref: "#/components/parameters/Version"
+    responses:
+      "204":
+        description: Akun dihapus
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+channels:
+  get:
+    operationId: listChannels
+    tags: [accounting]
+    summary: Master channel (dimensi C)
+    parameters:
+      - $ref: "#/components/parameters/IncludeInactive"
+    responses:
+      "200":
+        description: Channel
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/Dimension"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createChannel
+    tags: [accounting]
+    summary: Menambah channel
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DimensionInput"
+    responses:
+      "201":
+        description: Channel dibuat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Dimension"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+channel:
+  put:
+    operationId: updateChannel
+    tags: [accounting]
+    summary: Mengubah channel (kode tetap)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DimensionUpdate"
+    responses:
+      "200":
+        description: Channel diperbarui
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Dimension"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  delete:
+    operationId: deleteChannel
+    tags: [accounting]
+    summary: Menghapus channel yang belum dipakai jurnal dan tanpa sub-channel
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+      - $ref: "#/components/parameters/Version"
+    responses:
+      "204":
+        description: Channel dihapus
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+subChannels:
+  get:
+    operationId: listSubChannels
+    tags: [accounting]
+    summary: Master sub-channel (dimensi S)
+    parameters:
+      - $ref: "#/components/parameters/IncludeInactive"
+      - name: channelId
+        in: query
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Sub-channel
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/Dimension"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createSubChannel
+    tags: [accounting]
+    summary: Menambah sub-channel
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/SubChannelInput"
+    responses:
+      "201":
+        description: Sub-channel dibuat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Dimension"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+subChannel:
+  put:
+    operationId: updateSubChannel
+    tags: [accounting]
+    summary: Mengubah sub-channel (kode dan channel tetap)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/SubChannelUpdate"
+    responses:
+      "200":
+        description: Sub-channel diperbarui
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Dimension"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  delete:
+    operationId: deleteSubChannel
+    tags: [accounting]
+    summary: Menghapus sub-channel yang belum dipakai jurnal
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+      - $ref: "#/components/parameters/Version"
+    responses:
+      "204":
+        description: Sub-channel dihapus
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+divisions:
+  get:
+    operationId: listDivisions
+    tags: [accounting]
+    summary: Master divisi (dimensi D)
+    parameters:
+      - $ref: "#/components/parameters/IncludeInactive"
+    responses:
+      "200":
+        description: Divisi
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/Dimension"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createDivision
+    tags: [accounting]
+    summary: Menambah divisi
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DimensionInput"
+    responses:
+      "201":
+        description: Divisi dibuat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Dimension"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+division:
+  put:
+    operationId: updateDivision
+    tags: [accounting]
+    summary: Mengubah divisi (kode tetap)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DimensionUpdate"
+    responses:
+      "200":
+        description: Divisi diperbarui
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Dimension"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  delete:
+    operationId: deleteDivision
+    tags: [accounting]
+    summary: Menghapus divisi yang belum dipakai jurnal
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+      - $ref: "#/components/parameters/Version"
+    responses:
+      "204":
+        description: Divisi dihapus
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+campaigns:
+  get:
+    operationId: listCampaigns
+    tags: [accounting]
+    summary: Data Master › Kampanye (dimensi K)
+    parameters:
+      - $ref: "#/components/parameters/IncludeInactive"
+      - $ref: "../components/common.yaml#/parameters/Search"
+    responses:
+      "200":
+        description: Kampanye, terbaru lebih dulu
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/Dimension"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createCampaign
+    tags: [accounting]
+    summary: Menambah kampanye
+    description: Kode `KMP-YYYYMM-SINGKATAN` unik permanen; periode berlaku wajib.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CampaignInput"
+    responses:
+      "201":
+        description: Kampanye dibuat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Dimension"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+campaign:
+  put:
+    operationId: updateCampaign
+    tags: [accounting]
+    summary: Mengubah kampanye (kode tetap)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CampaignUpdate"
+    responses:
+      "200":
+        description: Kampanye diperbarui
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Dimension"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  delete:
+    operationId: deleteCampaign
+    tags: [accounting]
+    summary: Menghapus kampanye yang belum dipakai jurnal
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+      - $ref: "#/components/parameters/Version"
+    responses:
+      "204":
+        description: Kampanye dihapus
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+fiscalPeriods:
+  get:
+    operationId: listFiscalPeriods
+    tags: [accounting]
+    summary: Periode akuntansi bulanan (ACC-08)
+    parameters:
+      - name: year
+        in: query
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Periode terbaru lebih dulu
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/FiscalPeriod"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+fiscalPeriodsEnsure:
+  post:
+    operationId: ensureFiscalPeriods
+    tags: [accounting]
+    summary: Membuat periode bulan berjalan dan bulan berikutnya bila belum ada
+    description: |
+      Periode juga dibuat otomatis oleh job harian `accounting.ensure_fiscal_periods` dan saat jurnal pertama
+      diposting di bulan tersebut. Butuh `accounting.fiscal_period.write`.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    responses:
+      "200":
+        description: Jumlah periode yang dibuat
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [created]
+              properties:
+                created:
+                  type: integer
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+postingRules:
+  get:
+    operationId: listPostingRules
+    tags: [accounting]
+    summary: Posting rule jurnal otomatis dan pemetaan akun yang berlaku hari ini (S-130)
+    responses:
+      "200":
+        description: Posting rule urut kode
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/PostingRule"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+journalEntries:
+  get:
+    operationId: listJournalEntries
+    tags: [accounting]
+    summary: Daftar jurnal (manual, otomatis, Balik Jurnal)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - $ref: "../components/common.yaml#/parameters/Search"
+      - name: status
+        in: query
+        schema:
+          $ref: "#/components/schemas/JournalStatus"
+      - name: entryType
+        in: query
+        schema:
+          $ref: "#/components/schemas/JournalEntryType"
+      - name: dateFrom
+        in: query
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+      - name: dateTo
+        in: query
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+    responses:
+      "200":
+        description: Jurnal terbaru lebih dulu; draft tanpa nomor di atas
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JournalEntryList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createJournalEntry
+    tags: [accounting]
+    summary: Menyimpan draft Jurnal Umum (S-127)
+    description: |
+      Akun harus bisa diposting manual (akun kontrol hanya diisi jurnal otomatis). Tanggal di periode tertutup
+      ditolak `PERIOD_LOCKED`. Balance dan dimensi wajib diperiksa saat posting.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ManualJournalInput"
+    responses:
+      "201":
+        description: Draft dibuat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JournalEntry"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+journalEntry:
+  get:
+    operationId: getJournalEntry
+    tags: [accounting]
+    summary: Detail jurnal beserta baris dan aksi yang diizinkan
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+    responses:
+      "200":
+        description: Jurnal
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JournalEntry"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  put:
+    operationId: updateJournalEntry
+    tags: [accounting]
+    summary: Mengubah draft Jurnal Umum
+    description: Jurnal yang sudah diposting tidak bisa diubah (`INVALID_STATE_TRANSITION`, ACC-13).
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ManualJournalUpdate"
+    responses:
+      "200":
+        description: Draft diperbarui
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JournalEntry"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  delete:
+    operationId: deleteJournalEntry
+    tags: [accounting]
+    summary: Menghapus draft Jurnal Umum
+    description: Jurnal yang sudah diposting tidak bisa dihapus (`INVALID_STATE_TRANSITION`, ACC-13).
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+      - $ref: "#/components/parameters/Version"
+    responses:
+      "204":
+        description: Draft dihapus
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+journalEntryPost:
+  post:
+    operationId: postJournalEntry
+    tags: [accounting]
+    summary: Memposting draft Jurnal Umum
+    description: |
+      Jurnal harus balance, di periode terbuka (`PERIOD_LOCKED`), dan dimensi wajib terisi (pendapatan: channel +
+      sub-channel; HPP/beban/lain-lain: divisi). Nomor `JV/TAHUN/BULAN/NOMOR` diberikan saat posting.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../components/common.yaml#/VersionInput"
+    responses:
+      "200":
+        description: Jurnal diposting
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JournalEntry"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+journalEntryReverse:
+  post:
+    operationId: reverseJournalEntry
+    tags: [accounting]
+    summary: Balik Jurnal (S-128)
+    description: |
+      Membuat dan memposting JV pembalik (debit/kredit ditukar) yang mereferensikan jurnal asal. Jurnal asal tetap
+      tidak berubah. Satu jurnal hanya bisa dibalik sekali; jurnal otomatis dibalik lewat pembatalan dokumen sumber.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/JournalReverseInput"
+    responses:
+      "201":
+        description: Jurnal pembalik
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JournalEntry"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+generalLedger:
+  get:
+    operationId: getGeneralLedger
+    tags: [accounting]
+    summary: Buku Besar per akun dengan saldo berjalan
+    description: |
+      Hanya jurnal yang sudah diposting. Saldo mengikuti saldo normal akun. Rentang paling panjang 2 tahun.
+      Butuh `accounting.journal.read` atau `accounting.report.read`.
+    parameters:
+      - name: accountId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: dateFrom
+        in: query
+        required: true
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+      - name: dateTo
+        in: query
+        required: true
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+      - name: channelId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: subChannelId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: divisionId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: campaignId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+    responses:
+      "200":
+        description: Buku Besar
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GeneralLedger"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+components:
+  parameters:
+    Version:
+      name: version
+      in: query
+      required: true
+      description: Versi terakhir yang dilihat user (optimistic locking).
+      schema:
+        type: integer
+    IncludeInactive:
+      name: includeInactive
+      in: query
+      schema:
+        type: boolean
+        default: false
+  schemas:
+    NormalBalance:
+      type: string
+      enum: [debit, credit]
+    Account:
+      type: object
+      required: [id, code, name, group, groupLabel, normalBalance, isPostable, allowManualPosting, isActive, description, updatedAt, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: "1111"
+        name:
+          type: string
+        group:
+          type: integer
+          minimum: 1
+          maximum: 7
+        groupLabel:
+          type: string
+        normalBalance:
+          $ref: "#/components/schemas/NormalBalance"
+        parentId:
+          type: string
+          format: uuid
+          nullable: true
+        isPostable:
+          type: boolean
+          description: false = akun induk (judul), tidak bisa diposting.
+        allowManualPosting:
+          type: boolean
+          description: Boleh dipakai di Jurnal Umum manual. Akun kontrol hanya diisi jurnal otomatis.
+        isActive:
+          type: boolean
+        description:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    AccountFields:
+      type: object
+      required: [name, normalBalance, isPostable, allowManualPosting, isActive]
+      properties:
+        name:
+          type: string
+          maxLength: 150
+        normalBalance:
+          $ref: "#/components/schemas/NormalBalance"
+        parentId:
+          type: string
+          format: uuid
+          nullable: true
+        isPostable:
+          type: boolean
+        allowManualPosting:
+          type: boolean
+        isActive:
+          type: boolean
+        description:
+          type: string
+          maxLength: 500
+    AccountInput:
+      allOf:
+        - $ref: "#/components/schemas/AccountFields"
+        - type: object
+          required: [code]
+          properties:
+            code:
+              type: string
+              pattern: "^[1-7][0-9]{3}$"
+    AccountUpdate:
+      allOf:
+        - $ref: "#/components/schemas/AccountFields"
+        - $ref: "../components/common.yaml#/VersionInput"
+    DimensionKind:
+      type: string
+      enum: [channel, sub_channel, division, campaign]
+    Dimension:
+      type: object
+      description: Master dimensi jurnal. Field channel/pihak hanya untuk sub-channel; periode/anggaran hanya kampanye.
+      required: [id, kind, code, name, isActive, updatedAt, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        kind:
+          $ref: "#/components/schemas/DimensionKind"
+        code:
+          type: string
+        name:
+          type: string
+        channelId:
+          type: string
+          format: uuid
+          nullable: true
+        partyType:
+          type: string
+          nullable: true
+        partyId:
+          type: string
+          format: uuid
+          nullable: true
+        validFrom:
+          allOf:
+            - $ref: "../components/common.yaml#/BusinessDate"
+          nullable: true
+        validTo:
+          allOf:
+            - $ref: "../components/common.yaml#/BusinessDate"
+          nullable: true
+        budgetAmount:
+          allOf:
+            - $ref: "../components/common.yaml#/Money"
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        isActive:
+          type: boolean
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    DimensionInput:
+      type: object
+      required: [code, name, isActive]
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+          maxLength: 150
+        isActive:
+          type: boolean
+    DimensionUpdate:
+      type: object
+      required: [name, isActive, version]
+      properties:
+        name:
+          type: string
+          maxLength: 150
+        isActive:
+          type: boolean
+        version:
+          type: integer
+    SubChannelFields:
+      type: object
+      required: [name, isActive]
+      properties:
+        name:
+          type: string
+          maxLength: 150
+        partyType:
+          type: string
+          nullable: true
+        partyId:
+          type: string
+          format: uuid
+          nullable: true
+        isActive:
+          type: boolean
+    SubChannelInput:
+      allOf:
+        - $ref: "#/components/schemas/SubChannelFields"
+        - type: object
+          required: [channelId, code]
+          properties:
+            channelId:
+              type: string
+              format: uuid
+            code:
+              type: string
+    SubChannelUpdate:
+      allOf:
+        - $ref: "#/components/schemas/SubChannelFields"
+        - $ref: "../components/common.yaml#/VersionInput"
+    CampaignFields:
+      type: object
+      required: [name, validFrom, validTo, isActive]
+      properties:
+        name:
+          type: string
+          maxLength: 150
+        validFrom:
+          $ref: "../components/common.yaml#/BusinessDate"
+        validTo:
+          $ref: "../components/common.yaml#/BusinessDate"
+        budgetAmount:
+          allOf:
+            - $ref: "../components/common.yaml#/Money"
+          nullable: true
+        description:
+          type: string
+          maxLength: 500
+        isActive:
+          type: boolean
+    CampaignInput:
+      allOf:
+        - $ref: "#/components/schemas/CampaignFields"
+        - type: object
+          required: [code]
+          properties:
+            code:
+              type: string
+              example: KMP-202701-RAMADAN
+    CampaignUpdate:
+      allOf:
+        - $ref: "#/components/schemas/CampaignFields"
+        - $ref: "../components/common.yaml#/VersionInput"
+    FiscalPeriodStatus:
+      type: string
+      enum: [open, closed]
+    FiscalPeriod:
+      type: object
+      required: [id, year, month, label, status, startDate, endDate, reopenedCount, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        year:
+          type: integer
+        month:
+          type: integer
+          minimum: 1
+          maximum: 12
+        label:
+          type: string
+          example: Okt 2026
+        status:
+          $ref: "#/components/schemas/FiscalPeriodStatus"
+        startDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        endDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        closedAt:
+          type: string
+          format: date-time
+          nullable: true
+        reopenedCount:
+          type: integer
+        version:
+          type: integer
+    PostingRuleAccount:
+      type: object
+      required: [amountKey, side, resolver, accountCode, accountName]
+      properties:
+        amountKey:
+          type: string
+        side:
+          $ref: "#/components/schemas/NormalBalance"
+        resolver:
+          type: string
+          description: "`fixed` = akun tetap; selain itu akun dipilih dokumen sumber (akun di sini = default)."
+        accountCode:
+          type: string
+        accountName:
+          type: string
+    PostingRule:
+      type: object
+      required: [code, name, description, requiredDimensions, release, isActive, accounts]
+      properties:
+        code:
+          type: string
+          example: A-01
+        name:
+          type: string
+        description:
+          type: string
+        requiredDimensions:
+          type: array
+          items:
+            $ref: "#/components/schemas/DimensionKind"
+        release:
+          type: string
+        isActive:
+          type: boolean
+        accounts:
+          type: array
+          items:
+            $ref: "#/components/schemas/PostingRuleAccount"
+    JournalStatus:
+      type: string
+      enum: [draft, posted]
+    JournalEntryType:
+      type: string
+      enum: [manual, automatic, reversal]
+    DimensionRef:
+      type: object
+      required: [id, code, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+    JournalLine:
+      type: object
+      required: [lineNo, accountId, accountCode, accountName, debit, credit, memo]
+      properties:
+        lineNo:
+          type: integer
+        accountId:
+          type: string
+          format: uuid
+        accountCode:
+          type: string
+        accountName:
+          type: string
+        debit:
+          $ref: "../components/common.yaml#/Money"
+        credit:
+          $ref: "../components/common.yaml#/Money"
+        channel:
+          allOf:
+            - $ref: "#/components/schemas/DimensionRef"
+          nullable: true
+        subChannel:
+          allOf:
+            - $ref: "#/components/schemas/DimensionRef"
+          nullable: true
+        division:
+          allOf:
+            - $ref: "#/components/schemas/DimensionRef"
+          nullable: true
+        campaign:
+          allOf:
+            - $ref: "#/components/schemas/DimensionRef"
+          nullable: true
+        partyType:
+          type: string
+          nullable: true
+        partyId:
+          type: string
+          format: uuid
+          nullable: true
+        amountKey:
+          type: string
+          nullable: true
+        memo:
+          type: string
+    JournalEntrySummary:
+      type: object
+      required:
+        - id
+        - businessDate
+        - entryType
+        - sourceType
+        - sourceId
+        - sourceLabel
+        - description
+        - status
+        - totalAmount
+        - createdAt
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+          nullable: true
+          description: Nomor JV, diisi saat posting.
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        entryType:
+          $ref: "#/components/schemas/JournalEntryType"
+        sourceType:
+          type: string
+        sourceId:
+          type: string
+          format: uuid
+        sourceLabel:
+          type: string
+        postingRuleCode:
+          type: string
+          nullable: true
+        description:
+          type: string
+        status:
+          $ref: "#/components/schemas/JournalStatus"
+        totalAmount:
+          $ref: "../components/common.yaml#/Money"
+        reversalOfId:
+          type: string
+          format: uuid
+          nullable: true
+        reversalOfNumber:
+          type: string
+          nullable: true
+        reversedById:
+          type: string
+          format: uuid
+          nullable: true
+        reversedByNumber:
+          type: string
+          nullable: true
+        postedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    JournalEntry:
+      allOf:
+        - $ref: "#/components/schemas/JournalEntrySummary"
+        - type: object
+          required: [lines, totalDebit, totalCredit, allowedActions]
+          properties:
+            lines:
+              type: array
+              items:
+                $ref: "#/components/schemas/JournalLine"
+            totalDebit:
+              $ref: "../components/common.yaml#/Money"
+            totalCredit:
+              $ref: "../components/common.yaml#/Money"
+            allowedActions:
+              type: array
+              items:
+                type: string
+                enum: [edit, delete, post, reverse]
+    JournalEntryList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/JournalEntrySummary"
+    ManualJournalLineInput:
+      type: object
+      required: [accountId, debit, credit]
+      properties:
+        accountId:
+          type: string
+          format: uuid
+        debit:
+          $ref: "../components/common.yaml#/Money"
+        credit:
+          $ref: "../components/common.yaml#/Money"
+        channelId:
+          type: string
+          format: uuid
+          nullable: true
+        subChannelId:
+          type: string
+          format: uuid
+          nullable: true
+        divisionId:
+          type: string
+          format: uuid
+          nullable: true
+        campaignId:
+          type: string
+          format: uuid
+          nullable: true
+        memo:
+          type: string
+          maxLength: 500
+    ManualJournalFields:
+      type: object
+      required: [businessDate, description, lines]
+      properties:
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        description:
+          type: string
+          maxLength: 500
+        lines:
+          type: array
+          maxItems: 200
+          items:
+            $ref: "#/components/schemas/ManualJournalLineInput"
+    ManualJournalInput:
+      $ref: "#/components/schemas/ManualJournalFields"
+    ManualJournalUpdate:
+      allOf:
+        - $ref: "#/components/schemas/ManualJournalFields"
+        - $ref: "../components/common.yaml#/VersionInput"
+    JournalReverseInput:
+      type: object
+      required: [version, businessDate, reason]
+      properties:
+        version:
+          type: integer
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        reason:
+          type: string
+          maxLength: 400
+    GeneralLedgerLine:
+      type: object
+      required: [entryId, businessDate, entryType, sourceType, sourceLabel, description, lineNo, debit, credit, balance, memo]
+      properties:
+        entryId:
+          type: string
+          format: uuid
+        number:
+          type: string
+          nullable: true
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        entryType:
+          $ref: "#/components/schemas/JournalEntryType"
+        sourceType:
+          type: string
+        sourceLabel:
+          type: string
+        description:
+          type: string
+        lineNo:
+          type: integer
+        debit:
+          $ref: "../components/common.yaml#/Money"
+        credit:
+          $ref: "../components/common.yaml#/Money"
+        balance:
+          $ref: "../components/common.yaml#/Money"
+        memo:
+          type: string
+        channel:
+          allOf:
+            - $ref: "#/components/schemas/DimensionRef"
+          nullable: true
+        subChannel:
+          allOf:
+            - $ref: "#/components/schemas/DimensionRef"
+          nullable: true
+        division:
+          allOf:
+            - $ref: "#/components/schemas/DimensionRef"
+          nullable: true
+        campaign:
+          allOf:
+            - $ref: "#/components/schemas/DimensionRef"
+          nullable: true
+    GeneralLedger:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [account, dateFrom, dateTo, openingBalance, periodDebit, periodCredit, closingBalance, items]
+          properties:
+            account:
+              $ref: "#/components/schemas/Account"
+            dateFrom:
+              $ref: "../components/common.yaml#/BusinessDate"
+            dateTo:
+              $ref: "../components/common.yaml#/BusinessDate"
+            openingBalance:
+              $ref: "../components/common.yaml#/Money"
+            periodDebit:
+              $ref: "../components/common.yaml#/Money"
+            periodCredit:
+              $ref: "../components/common.yaml#/Money"
+            closingBalance:
+              $ref: "../components/common.yaml#/Money"
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/GeneralLedgerLine"

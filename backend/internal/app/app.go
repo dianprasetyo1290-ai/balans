@@ -11,8 +11,10 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
+	"balans/internal/accounting"
 	"balans/internal/approval"
 	"balans/internal/audit"
+	"balans/internal/document"
 	"balans/internal/identity"
 	"balans/internal/integration/mockconsole"
 	"balans/internal/integration/mockpayment"
@@ -48,6 +50,8 @@ type App struct {
 	audit       *audit.Module
 	identity    *identity.Module
 	approval    *approval.Module
+	document    *document.Module
+	accounting  *accounting.Module
 	modules     []module
 	console     *mockconsole.Console
 }
@@ -164,6 +168,21 @@ func (a *App) buildModules() error {
 		if cfg.Env == config.EnvLocal {
 			registerDevApprovalHandlers(a.approval, a.Log)
 		}
+	}
+	if cfg.IsEnabled(document.Name) {
+		a.document = document.New(document.Deps{Pool: a.Pool, Clock: a.Clock, Responder: a.Responder})
+		a.modules = append(a.modules, a.document)
+	}
+	if cfg.IsEnabled(accounting.Name) {
+		if a.document == nil {
+			return errors.New("modul accounting membutuhkan modul document untuk nomor jurnal JV")
+		}
+		a.accounting = accounting.New(accounting.Deps{
+			Pool: a.Pool, Tx: a.Tx, Clock: a.Clock, Log: a.Log, Responder: a.Responder, Audit: a.audit,
+			Numberer: journalNumberer{documents: a.document},
+		})
+		a.modules = append(a.modules, a.accounting)
+		registerAccountingAuditEntities(a.audit)
 	}
 	if cfg.IsEnabled(sales.Name) {
 		if cfg.PaymentGateway != config.ProviderMock {

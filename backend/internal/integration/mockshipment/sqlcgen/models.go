@@ -13,6 +13,26 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+type Account struct {
+	ID                 uuid.UUID
+	Code               string
+	Name               string
+	AccountGroup       int16
+	NormalBalance      string
+	ParentID           uuid.NullUUID
+	IsPostable         bool
+	AllowManualPosting bool
+	IsActive           bool
+	Description        string
+	CreatedAt          time.Time
+	CreatedBy          uuid.UUID
+	UpdatedAt          time.Time
+	UpdatedBy          uuid.UUID
+	Version            int32
+	DeletedAt          *time.Time
+	DeletedBy          uuid.NullUUID
+}
+
 type ApprovalDelegation struct {
 	ID          uuid.UUID
 	FromUserID  uuid.UUID
@@ -108,6 +128,75 @@ type AuditLog struct {
 	CreatedAt   time.Time
 }
 
+type Campaign struct {
+	ID           uuid.UUID
+	Code         string
+	Name         string
+	ValidFrom    clock.BusinessDate
+	ValidTo      clock.BusinessDate
+	BudgetAmount decimal.NullDecimal
+	Description  string
+	IsActive     bool
+	CreatedAt    time.Time
+	CreatedBy    uuid.UUID
+	UpdatedAt    time.Time
+	UpdatedBy    uuid.UUID
+	Version      int32
+	DeletedAt    *time.Time
+	DeletedBy    uuid.NullUUID
+}
+
+type Channel struct {
+	ID        uuid.UUID
+	Code      string
+	Name      string
+	IsActive  bool
+	CreatedAt time.Time
+	CreatedBy uuid.UUID
+	UpdatedAt time.Time
+	UpdatedBy uuid.UUID
+	Version   int32
+	DeletedAt *time.Time
+	DeletedBy uuid.NullUUID
+}
+
+type Division struct {
+	ID        uuid.UUID
+	Code      string
+	Name      string
+	IsActive  bool
+	CreatedAt time.Time
+	CreatedBy uuid.UUID
+	UpdatedAt time.Time
+	UpdatedBy uuid.UUID
+	Version   int32
+	DeletedAt *time.Time
+	DeletedBy uuid.NullUUID
+}
+
+type DocumentSequence struct {
+	DocumentType string
+	Year         int32
+	LastNumber   int64
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+}
+
+type FiscalPeriod struct {
+	ID            uuid.UUID
+	Year          int32
+	Month         int32
+	Status        string
+	ClosedAt      *time.Time
+	ClosedBy      uuid.NullUUID
+	ReopenedCount int32
+	CreatedAt     time.Time
+	CreatedBy     uuid.UUID
+	UpdatedAt     time.Time
+	UpdatedBy     uuid.UUID
+	Version       int32
+}
+
 type IdempotencyKey struct {
 	UserID        uuid.UUID
 	Key           uuid.UUID
@@ -119,6 +208,50 @@ type IdempotencyKey struct {
 	ResponseBody  []byte
 	CreatedAt     time.Time
 	ExpiresAt     time.Time
+}
+
+type JournalEntry struct {
+	ID              uuid.UUID
+	Number          pgtype.Text
+	BusinessDate    clock.BusinessDate
+	FiscalPeriodID  uuid.NullUUID
+	EntryType       string
+	SourceType      string
+	SourceID        uuid.UUID
+	SourceLabel     string
+	PostingRuleCode pgtype.Text
+	Description     string
+	ReversalOfID    uuid.NullUUID
+	Status          string
+	TotalAmount     decimal.Decimal
+	PostedAt        *time.Time
+	PostedBy        uuid.NullUUID
+	CreatedAt       time.Time
+	CreatedBy       uuid.UUID
+	UpdatedAt       time.Time
+	UpdatedBy       uuid.UUID
+	Version         int32
+	DeletedAt       *time.Time
+	DeletedBy       uuid.NullUUID
+}
+
+type JournalLine struct {
+	ID             uuid.UUID
+	JournalEntryID uuid.UUID
+	LineNo         int32
+	AccountID      uuid.UUID
+	DebitAmount    decimal.Decimal
+	CreditAmount   decimal.Decimal
+	ChannelID      uuid.NullUUID
+	SubChannelID   uuid.NullUUID
+	DivisionID     uuid.NullUUID
+	CampaignID     uuid.NullUUID
+	PartyType      string
+	PartyID        uuid.NullUUID
+	AmountKey      string
+	Memo           string
+	CreatedAt      time.Time
+	CreatedBy      uuid.UUID
 }
 
 type LoginAttempt struct {
@@ -192,6 +325,37 @@ type Permission struct {
 	CreatedAt      time.Time
 }
 
+type PostingRule struct {
+	ID                 uuid.UUID
+	Code               string
+	Name               string
+	Description        string
+	RequiredDimensions []string
+	Release            string
+	IsActive           bool
+	CreatedAt          time.Time
+	CreatedBy          uuid.UUID
+	UpdatedAt          time.Time
+	UpdatedBy          uuid.UUID
+	Version            int32
+}
+
+type PostingRuleAccount struct {
+	ID              uuid.UUID
+	PostingRuleCode string
+	AmountKey       string
+	Side            string
+	AccountResolver string
+	AccountID       uuid.NullUUID
+	ValidFrom       clock.BusinessDate
+	ValidTo         pgtype.Date
+	CreatedAt       time.Time
+	CreatedBy       uuid.UUID
+	UpdatedAt       time.Time
+	UpdatedBy       uuid.UUID
+	Version         int32
+}
+
 type Role struct {
 	ID               uuid.UUID
 	Code             string
@@ -229,6 +393,23 @@ type Session struct {
 	UserAgent        string
 	Ip               string
 	CreatedAt        time.Time
+}
+
+type SubChannel struct {
+	ID        uuid.UUID
+	ChannelID uuid.UUID
+	Code      string
+	Name      string
+	PartyType string
+	PartyID   uuid.NullUUID
+	IsActive  bool
+	CreatedAt time.Time
+	CreatedBy uuid.UUID
+	UpdatedAt time.Time
+	UpdatedBy uuid.UUID
+	Version   int32
+	DeletedAt *time.Time
+	DeletedBy uuid.NullUUID
 }
 
 type User struct {

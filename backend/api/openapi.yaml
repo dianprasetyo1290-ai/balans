@@ -28,6 +28,10 @@ tags:
     description: Master produk, packaging, material, bundling (R1.1)
   - name: warehouse
     description: Gudang dan lokasi stok (R1.1)
+  - name: accounting
+    description: COA, dimensi, periode, posting rule, Jurnal Umum, Buku Besar (R1.1)
+  - name: document
+    description: Penomoran dokumen (R1.1)
 paths:
   /healthz:
     $ref: "./paths/system.yaml#/healthz"
@@ -123,6 +127,44 @@ paths:
     $ref: "./paths/warehouse.yaml#/warehouses"
   /api/v1/locations:
     $ref: "./paths/warehouse.yaml#/locations"
+  /api/v1/accounts:
+    $ref: "./paths/accounting.yaml#/accounts"
+  /api/v1/accounts/{id}:
+    $ref: "./paths/accounting.yaml#/account"
+  /api/v1/channels:
+    $ref: "./paths/accounting.yaml#/channels"
+  /api/v1/channels/{id}:
+    $ref: "./paths/accounting.yaml#/channel"
+  /api/v1/sub-channels:
+    $ref: "./paths/accounting.yaml#/subChannels"
+  /api/v1/sub-channels/{id}:
+    $ref: "./paths/accounting.yaml#/subChannel"
+  /api/v1/divisions:
+    $ref: "./paths/accounting.yaml#/divisions"
+  /api/v1/divisions/{id}:
+    $ref: "./paths/accounting.yaml#/division"
+  /api/v1/campaigns:
+    $ref: "./paths/accounting.yaml#/campaigns"
+  /api/v1/campaigns/{id}:
+    $ref: "./paths/accounting.yaml#/campaign"
+  /api/v1/fiscal-periods:
+    $ref: "./paths/accounting.yaml#/fiscalPeriods"
+  /api/v1/fiscal-periods/ensure:
+    $ref: "./paths/accounting.yaml#/fiscalPeriodsEnsure"
+  /api/v1/posting-rules:
+    $ref: "./paths/accounting.yaml#/postingRules"
+  /api/v1/journal-entries:
+    $ref: "./paths/accounting.yaml#/journalEntries"
+  /api/v1/journal-entries/{id}:
+    $ref: "./paths/accounting.yaml#/journalEntry"
+  /api/v1/journal-entries/{id}/post:
+    $ref: "./paths/accounting.yaml#/journalEntryPost"
+  /api/v1/journal-entries/{id}/reverse:
+    $ref: "./paths/accounting.yaml#/journalEntryReverse"
+  /api/v1/general-ledger:
+    $ref: "./paths/accounting.yaml#/generalLedger"
+  /api/v1/document-sequences:
+    $ref: "./paths/document.yaml#/documentSequences"
 components:
   securitySchemes:
     bearerAuth:

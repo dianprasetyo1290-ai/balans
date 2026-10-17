@@ -1,0 +1,63 @@
+documentSequences:
+  get:
+    operationId: listDocumentSequences
+    tags: [document]
+    summary: Pengaturan › Nomor Dokumen — nomor terakhir per kode dokumen
+    description: |
+      Format `KODE/TAHUN/BULAN/NOMOR` dengan nomor urut 5 digit yang reset setiap tahun (U-15). Nomor diberikan
+      saat dokumen diajukan atau diposting di dalam transaksi bisnis, sehingga tidak loncat. Butuh
+      `document.sequence.read`. Tanpa `year` dipakai tahun berjalan (WIB).
+    parameters:
+      - name: year
+        in: query
+        schema:
+          type: integer
+          minimum: 2000
+          maximum: 9999
+    responses:
+      "200":
+        description: Semua kode dokumen beserta nomor terakhir pada tahun tersebut
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DocumentSequenceList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+components:
+  schemas:
+    DocumentSequence:
+      type: object
+      required: [documentType, label, assignedAt, year, lastNumber, example]
+      properties:
+        documentType:
+          type: string
+          example: JV
+        label:
+          type: string
+          example: Jurnal
+        assignedAt:
+          type: string
+          description: Saat nomor diberikan, mis. `Posting` atau `Submit`.
+        year:
+          type: integer
+        lastNumber:
+          type: integer
+          format: int64
+          description: Nomor urut terakhir yang terpakai; 0 = belum ada dokumen pada tahun ini.
+        lastIssuedAt:
+          type: string
+          format: date-time
+          nullable: true
+        example:
+          type: string
+          description: Contoh nomor berikutnya, mis. `JV/2026/10/00013`.
+    DocumentSequenceList:
+      type: object
+      required: [year, items]
+      properties:
+        year:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/DocumentSequence"
