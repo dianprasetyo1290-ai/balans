@@ -128,6 +128,19 @@ export function ReceivablesPage({
           >
             <BarChart3Icon /> Laporan Piutang
           </Button>
+          {can("accounting.settlement.read") ? (
+            <Button
+              variant="outline"
+              render={
+                <Link
+                  to="/finance/marketplace-settlements"
+                  search={{ page: 1 }}
+                />
+              }
+            >
+              Settlement Marketplace
+            </Button>
+          ) : null}
           {can("accounting.payment.post") ? (
             <Button onClick={() => setPaying("new")}>
               <PlusIcon /> Catat Pembayaran

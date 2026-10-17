@@ -17,10 +17,13 @@ import { Route as MfaSetupRouteImport } from './routes/mfa-setup'
 import { Route as SetPasswordRouteImport } from './routes/set-password'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppApprovalsRouteImport } from './routes/_app/approvals'
+import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppFinanceAccountsRouteImport } from './routes/_app/finance/accounts'
+import { Route as AppFinanceFinancialStatementsRouteImport } from './routes/_app/finance/financial-statements'
 import { Route as AppFinanceFiscalPeriodsRouteImport } from './routes/_app/finance/fiscal-periods'
 import { Route as AppFinanceGeneralLedgerRouteImport } from './routes/_app/finance/general-ledger'
 import { Route as AppFinanceGoodsReceivedNotInvoicedRouteImport } from './routes/_app/finance/goods-received-not-invoiced'
+import { Route as AppFinanceMarketplaceSettlementsRouteImport } from './routes/_app/finance/marketplace-settlements'
 import { Route as AppFinanceReceivablesRouteImport } from './routes/_app/finance/receivables'
 import { Route as AppHrisEmployeesRouteImport } from './routes/_app/hris/employees'
 import { Route as AppIntegrationsDataExchangeRouteImport } from './routes/_app/integrations/data-exchange'
@@ -44,7 +47,19 @@ import { Route as AppMasterSuppliersRouteImport } from './routes/_app/master/sup
 import { Route as AppProcurementApprovalsRouteImport } from './routes/_app/procurement/approvals'
 import { Route as AppProcurementReprocessOrdersRouteImport } from './routes/_app/procurement/reprocess-orders'
 import { Route as AppProcurementTollOrdersRouteImport } from './routes/_app/procurement/toll-orders'
+import { Route as AppReportsCogsRouteImport } from './routes/_app/reports/cogs'
+import { Route as AppReportsConsignmentRouteImport } from './routes/_app/reports/consignment'
+import { Route as AppReportsExpiryRouteImport } from './routes/_app/reports/expiry'
+import { Route as AppReportsInternalUsageRouteImport } from './routes/_app/reports/internal-usage'
+import { Route as AppReportsPayablesRouteImport } from './routes/_app/reports/payables'
+import { Route as AppReportsProfitLossByDimensionRouteImport } from './routes/_app/reports/profit-loss-by-dimension'
 import { Route as AppReportsReceivableAgingRouteImport } from './routes/_app/reports/receivable-aging'
+import { Route as AppReportsReturnsRouteImport } from './routes/_app/reports/returns'
+import { Route as AppReportsSalesRouteImport } from './routes/_app/reports/sales'
+import { Route as AppReportsStockRouteImport } from './routes/_app/reports/stock'
+import { Route as AppReportsStockCountsRouteImport } from './routes/_app/reports/stock-counts'
+import { Route as AppReportsStockMovementsRouteImport } from './routes/_app/reports/stock-movements'
+import { Route as AppReportsTaxRouteImport } from './routes/_app/reports/tax'
 import { Route as AppSalesEmployeeSalesRouteImport } from './routes/_app/sales/employee-sales'
 import { Route as AppSalesMarketplaceRouteImport } from './routes/_app/sales/marketplace'
 import { Route as AppSalesModernTradeRouteImport } from './routes/_app/sales/modern-trade'
@@ -166,11 +181,22 @@ const AppApprovalsRoute = AppApprovalsRouteImport.update({
   path: '/approvals',
   getParentRoute: () => AppRoute,
 } as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppFinanceAccountsRoute = AppFinanceAccountsRouteImport.update({
   id: '/finance/accounts',
   path: '/finance/accounts',
   getParentRoute: () => AppRoute,
 } as any)
+const AppFinanceFinancialStatementsRoute =
+  AppFinanceFinancialStatementsRouteImport.update({
+    id: '/finance/financial-statements',
+    path: '/finance/financial-statements',
+    getParentRoute: () => AppRoute,
+  } as any)
 const AppFinanceFiscalPeriodsRoute = AppFinanceFiscalPeriodsRouteImport.update({
   id: '/finance/fiscal-periods',
   path: '/finance/fiscal-periods',
@@ -185,6 +211,12 @@ const AppFinanceGoodsReceivedNotInvoicedRoute =
   AppFinanceGoodsReceivedNotInvoicedRouteImport.update({
     id: '/finance/goods-received-not-invoiced',
     path: '/finance/goods-received-not-invoiced',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppFinanceMarketplaceSettlementsRoute =
+  AppFinanceMarketplaceSettlementsRouteImport.update({
+    id: '/finance/marketplace-settlements',
+    path: '/finance/marketplace-settlements',
     getParentRoute: () => AppRoute,
   } as any)
 const AppFinanceReceivablesRoute = AppFinanceReceivablesRouteImport.update({
@@ -309,12 +341,74 @@ const AppProcurementTollOrdersRoute =
     path: '/procurement/toll-orders',
     getParentRoute: () => AppRoute,
   } as any)
+const AppReportsCogsRoute = AppReportsCogsRouteImport.update({
+  id: '/reports/cogs',
+  path: '/reports/cogs',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReportsConsignmentRoute = AppReportsConsignmentRouteImport.update({
+  id: '/reports/consignment',
+  path: '/reports/consignment',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReportsExpiryRoute = AppReportsExpiryRouteImport.update({
+  id: '/reports/expiry',
+  path: '/reports/expiry',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReportsInternalUsageRoute = AppReportsInternalUsageRouteImport.update({
+  id: '/reports/internal-usage',
+  path: '/reports/internal-usage',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReportsPayablesRoute = AppReportsPayablesRouteImport.update({
+  id: '/reports/payables',
+  path: '/reports/payables',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReportsProfitLossByDimensionRoute =
+  AppReportsProfitLossByDimensionRouteImport.update({
+    id: '/reports/profit-loss-by-dimension',
+    path: '/reports/profit-loss-by-dimension',
+    getParentRoute: () => AppRoute,
+  } as any)
 const AppReportsReceivableAgingRoute =
   AppReportsReceivableAgingRouteImport.update({
     id: '/reports/receivable-aging',
     path: '/reports/receivable-aging',
     getParentRoute: () => AppRoute,
   } as any)
+const AppReportsReturnsRoute = AppReportsReturnsRouteImport.update({
+  id: '/reports/returns',
+  path: '/reports/returns',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReportsSalesRoute = AppReportsSalesRouteImport.update({
+  id: '/reports/sales',
+  path: '/reports/sales',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReportsStockRoute = AppReportsStockRouteImport.update({
+  id: '/reports/stock',
+  path: '/reports/stock',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReportsStockCountsRoute = AppReportsStockCountsRouteImport.update({
+  id: '/reports/stock-counts',
+  path: '/reports/stock-counts',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReportsStockMovementsRoute =
+  AppReportsStockMovementsRouteImport.update({
+    id: '/reports/stock-movements',
+    path: '/reports/stock-movements',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppReportsTaxRoute = AppReportsTaxRouteImport.update({
+  id: '/reports/tax',
+  path: '/reports/tax',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppSalesEmployeeSalesRoute = AppSalesEmployeeSalesRouteImport.update({
   id: '/sales/employee-sales',
   path: '/sales/employee-sales',
@@ -787,10 +881,13 @@ export interface FileRoutesByFullPath {
   '/mfa-setup': typeof MfaSetupRoute
   '/set-password': typeof SetPasswordRoute
   '/approvals': typeof AppApprovalsRoute
+  '/dashboard': typeof AppDashboardRoute
   '/finance/accounts': typeof AppFinanceAccountsRoute
+  '/finance/financial-statements': typeof AppFinanceFinancialStatementsRoute
   '/finance/fiscal-periods': typeof AppFinanceFiscalPeriodsRoute
   '/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
   '/finance/goods-received-not-invoiced': typeof AppFinanceGoodsReceivedNotInvoicedRoute
+  '/finance/marketplace-settlements': typeof AppFinanceMarketplaceSettlementsRoute
   '/finance/receivables': typeof AppFinanceReceivablesRoute
   '/hris/employees': typeof AppHrisEmployeesRoute
   '/integrations/data-exchange': typeof AppIntegrationsDataExchangeRoute
@@ -814,7 +911,19 @@ export interface FileRoutesByFullPath {
   '/procurement/approvals': typeof AppProcurementApprovalsRoute
   '/procurement/reprocess-orders': typeof AppProcurementReprocessOrdersRoute
   '/procurement/toll-orders': typeof AppProcurementTollOrdersRoute
+  '/reports/cogs': typeof AppReportsCogsRoute
+  '/reports/consignment': typeof AppReportsConsignmentRoute
+  '/reports/expiry': typeof AppReportsExpiryRoute
+  '/reports/internal-usage': typeof AppReportsInternalUsageRoute
+  '/reports/payables': typeof AppReportsPayablesRoute
+  '/reports/profit-loss-by-dimension': typeof AppReportsProfitLossByDimensionRoute
   '/reports/receivable-aging': typeof AppReportsReceivableAgingRoute
+  '/reports/returns': typeof AppReportsReturnsRoute
+  '/reports/sales': typeof AppReportsSalesRoute
+  '/reports/stock': typeof AppReportsStockRoute
+  '/reports/stock-counts': typeof AppReportsStockCountsRoute
+  '/reports/stock-movements': typeof AppReportsStockMovementsRoute
+  '/reports/tax': typeof AppReportsTaxRoute
   '/sales/employee-sales': typeof AppSalesEmployeeSalesRoute
   '/sales/marketplace': typeof AppSalesMarketplaceRoute
   '/sales/modern-trade': typeof AppSalesModernTradeRoute
@@ -904,11 +1013,14 @@ export interface FileRoutesByTo {
   '/mfa-setup': typeof MfaSetupRoute
   '/set-password': typeof SetPasswordRoute
   '/approvals': typeof AppApprovalsRoute
+  '/dashboard': typeof AppDashboardRoute
   '/': typeof AppIndexRoute
   '/finance/accounts': typeof AppFinanceAccountsRoute
+  '/finance/financial-statements': typeof AppFinanceFinancialStatementsRoute
   '/finance/fiscal-periods': typeof AppFinanceFiscalPeriodsRoute
   '/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
   '/finance/goods-received-not-invoiced': typeof AppFinanceGoodsReceivedNotInvoicedRoute
+  '/finance/marketplace-settlements': typeof AppFinanceMarketplaceSettlementsRoute
   '/finance/receivables': typeof AppFinanceReceivablesRoute
   '/hris/employees': typeof AppHrisEmployeesRoute
   '/integrations/data-exchange': typeof AppIntegrationsDataExchangeRoute
@@ -932,7 +1044,19 @@ export interface FileRoutesByTo {
   '/procurement/approvals': typeof AppProcurementApprovalsRoute
   '/procurement/reprocess-orders': typeof AppProcurementReprocessOrdersRoute
   '/procurement/toll-orders': typeof AppProcurementTollOrdersRoute
+  '/reports/cogs': typeof AppReportsCogsRoute
+  '/reports/consignment': typeof AppReportsConsignmentRoute
+  '/reports/expiry': typeof AppReportsExpiryRoute
+  '/reports/internal-usage': typeof AppReportsInternalUsageRoute
+  '/reports/payables': typeof AppReportsPayablesRoute
+  '/reports/profit-loss-by-dimension': typeof AppReportsProfitLossByDimensionRoute
   '/reports/receivable-aging': typeof AppReportsReceivableAgingRoute
+  '/reports/returns': typeof AppReportsReturnsRoute
+  '/reports/sales': typeof AppReportsSalesRoute
+  '/reports/stock': typeof AppReportsStockRoute
+  '/reports/stock-counts': typeof AppReportsStockCountsRoute
+  '/reports/stock-movements': typeof AppReportsStockMovementsRoute
+  '/reports/tax': typeof AppReportsTaxRoute
   '/sales/employee-sales': typeof AppSalesEmployeeSalesRoute
   '/sales/marketplace': typeof AppSalesMarketplaceRoute
   '/sales/modern-trade': typeof AppSalesModernTradeRoute
@@ -1024,11 +1148,14 @@ export interface FileRoutesById {
   '/mfa-setup': typeof MfaSetupRoute
   '/set-password': typeof SetPasswordRoute
   '/_app/approvals': typeof AppApprovalsRoute
+  '/_app/dashboard': typeof AppDashboardRoute
   '/_app/': typeof AppIndexRoute
   '/_app/finance/accounts': typeof AppFinanceAccountsRoute
+  '/_app/finance/financial-statements': typeof AppFinanceFinancialStatementsRoute
   '/_app/finance/fiscal-periods': typeof AppFinanceFiscalPeriodsRoute
   '/_app/finance/general-ledger': typeof AppFinanceGeneralLedgerRoute
   '/_app/finance/goods-received-not-invoiced': typeof AppFinanceGoodsReceivedNotInvoicedRoute
+  '/_app/finance/marketplace-settlements': typeof AppFinanceMarketplaceSettlementsRoute
   '/_app/finance/receivables': typeof AppFinanceReceivablesRoute
   '/_app/hris/employees': typeof AppHrisEmployeesRoute
   '/_app/integrations/data-exchange': typeof AppIntegrationsDataExchangeRoute
@@ -1052,7 +1179,19 @@ export interface FileRoutesById {
   '/_app/procurement/approvals': typeof AppProcurementApprovalsRoute
   '/_app/procurement/reprocess-orders': typeof AppProcurementReprocessOrdersRoute
   '/_app/procurement/toll-orders': typeof AppProcurementTollOrdersRoute
+  '/_app/reports/cogs': typeof AppReportsCogsRoute
+  '/_app/reports/consignment': typeof AppReportsConsignmentRoute
+  '/_app/reports/expiry': typeof AppReportsExpiryRoute
+  '/_app/reports/internal-usage': typeof AppReportsInternalUsageRoute
+  '/_app/reports/payables': typeof AppReportsPayablesRoute
+  '/_app/reports/profit-loss-by-dimension': typeof AppReportsProfitLossByDimensionRoute
   '/_app/reports/receivable-aging': typeof AppReportsReceivableAgingRoute
+  '/_app/reports/returns': typeof AppReportsReturnsRoute
+  '/_app/reports/sales': typeof AppReportsSalesRoute
+  '/_app/reports/stock': typeof AppReportsStockRoute
+  '/_app/reports/stock-counts': typeof AppReportsStockCountsRoute
+  '/_app/reports/stock-movements': typeof AppReportsStockMovementsRoute
+  '/_app/reports/tax': typeof AppReportsTaxRoute
   '/_app/sales/employee-sales': typeof AppSalesEmployeeSalesRoute
   '/_app/sales/marketplace': typeof AppSalesMarketplaceRoute
   '/_app/sales/modern-trade': typeof AppSalesModernTradeRoute
@@ -1145,10 +1284,13 @@ export interface FileRouteTypes {
     | '/mfa-setup'
     | '/set-password'
     | '/approvals'
+    | '/dashboard'
     | '/finance/accounts'
+    | '/finance/financial-statements'
     | '/finance/fiscal-periods'
     | '/finance/general-ledger'
     | '/finance/goods-received-not-invoiced'
+    | '/finance/marketplace-settlements'
     | '/finance/receivables'
     | '/hris/employees'
     | '/integrations/data-exchange'
@@ -1172,7 +1314,19 @@ export interface FileRouteTypes {
     | '/procurement/approvals'
     | '/procurement/reprocess-orders'
     | '/procurement/toll-orders'
+    | '/reports/cogs'
+    | '/reports/consignment'
+    | '/reports/expiry'
+    | '/reports/internal-usage'
+    | '/reports/payables'
+    | '/reports/profit-loss-by-dimension'
     | '/reports/receivable-aging'
+    | '/reports/returns'
+    | '/reports/sales'
+    | '/reports/stock'
+    | '/reports/stock-counts'
+    | '/reports/stock-movements'
+    | '/reports/tax'
     | '/sales/employee-sales'
     | '/sales/marketplace'
     | '/sales/modern-trade'
@@ -1262,11 +1416,14 @@ export interface FileRouteTypes {
     | '/mfa-setup'
     | '/set-password'
     | '/approvals'
+    | '/dashboard'
     | '/'
     | '/finance/accounts'
+    | '/finance/financial-statements'
     | '/finance/fiscal-periods'
     | '/finance/general-ledger'
     | '/finance/goods-received-not-invoiced'
+    | '/finance/marketplace-settlements'
     | '/finance/receivables'
     | '/hris/employees'
     | '/integrations/data-exchange'
@@ -1290,7 +1447,19 @@ export interface FileRouteTypes {
     | '/procurement/approvals'
     | '/procurement/reprocess-orders'
     | '/procurement/toll-orders'
+    | '/reports/cogs'
+    | '/reports/consignment'
+    | '/reports/expiry'
+    | '/reports/internal-usage'
+    | '/reports/payables'
+    | '/reports/profit-loss-by-dimension'
     | '/reports/receivable-aging'
+    | '/reports/returns'
+    | '/reports/sales'
+    | '/reports/stock'
+    | '/reports/stock-counts'
+    | '/reports/stock-movements'
+    | '/reports/tax'
     | '/sales/employee-sales'
     | '/sales/marketplace'
     | '/sales/modern-trade'
@@ -1381,11 +1550,14 @@ export interface FileRouteTypes {
     | '/mfa-setup'
     | '/set-password'
     | '/_app/approvals'
+    | '/_app/dashboard'
     | '/_app/'
     | '/_app/finance/accounts'
+    | '/_app/finance/financial-statements'
     | '/_app/finance/fiscal-periods'
     | '/_app/finance/general-ledger'
     | '/_app/finance/goods-received-not-invoiced'
+    | '/_app/finance/marketplace-settlements'
     | '/_app/finance/receivables'
     | '/_app/hris/employees'
     | '/_app/integrations/data-exchange'
@@ -1409,7 +1581,19 @@ export interface FileRouteTypes {
     | '/_app/procurement/approvals'
     | '/_app/procurement/reprocess-orders'
     | '/_app/procurement/toll-orders'
+    | '/_app/reports/cogs'
+    | '/_app/reports/consignment'
+    | '/_app/reports/expiry'
+    | '/_app/reports/internal-usage'
+    | '/_app/reports/payables'
+    | '/_app/reports/profit-loss-by-dimension'
     | '/_app/reports/receivable-aging'
+    | '/_app/reports/returns'
+    | '/_app/reports/sales'
+    | '/_app/reports/stock'
+    | '/_app/reports/stock-counts'
+    | '/_app/reports/stock-movements'
+    | '/_app/reports/tax'
     | '/_app/sales/employee-sales'
     | '/_app/sales/marketplace'
     | '/_app/sales/modern-trade'
@@ -1560,11 +1744,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppApprovalsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/finance/accounts': {
       id: '/_app/finance/accounts'
       path: '/finance/accounts'
       fullPath: '/finance/accounts'
       preLoaderRoute: typeof AppFinanceAccountsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/finance/financial-statements': {
+      id: '/_app/finance/financial-statements'
+      path: '/finance/financial-statements'
+      fullPath: '/finance/financial-statements'
+      preLoaderRoute: typeof AppFinanceFinancialStatementsRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/finance/fiscal-periods': {
@@ -1586,6 +1784,13 @@ declare module '@tanstack/react-router' {
       path: '/finance/goods-received-not-invoiced'
       fullPath: '/finance/goods-received-not-invoiced'
       preLoaderRoute: typeof AppFinanceGoodsReceivedNotInvoicedRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/finance/marketplace-settlements': {
+      id: '/_app/finance/marketplace-settlements'
+      path: '/finance/marketplace-settlements'
+      fullPath: '/finance/marketplace-settlements'
+      preLoaderRoute: typeof AppFinanceMarketplaceSettlementsRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/finance/receivables': {
@@ -1749,11 +1954,95 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProcurementTollOrdersRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/reports/cogs': {
+      id: '/_app/reports/cogs'
+      path: '/reports/cogs'
+      fullPath: '/reports/cogs'
+      preLoaderRoute: typeof AppReportsCogsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/reports/consignment': {
+      id: '/_app/reports/consignment'
+      path: '/reports/consignment'
+      fullPath: '/reports/consignment'
+      preLoaderRoute: typeof AppReportsConsignmentRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/reports/expiry': {
+      id: '/_app/reports/expiry'
+      path: '/reports/expiry'
+      fullPath: '/reports/expiry'
+      preLoaderRoute: typeof AppReportsExpiryRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/reports/internal-usage': {
+      id: '/_app/reports/internal-usage'
+      path: '/reports/internal-usage'
+      fullPath: '/reports/internal-usage'
+      preLoaderRoute: typeof AppReportsInternalUsageRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/reports/payables': {
+      id: '/_app/reports/payables'
+      path: '/reports/payables'
+      fullPath: '/reports/payables'
+      preLoaderRoute: typeof AppReportsPayablesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/reports/profit-loss-by-dimension': {
+      id: '/_app/reports/profit-loss-by-dimension'
+      path: '/reports/profit-loss-by-dimension'
+      fullPath: '/reports/profit-loss-by-dimension'
+      preLoaderRoute: typeof AppReportsProfitLossByDimensionRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/reports/receivable-aging': {
       id: '/_app/reports/receivable-aging'
       path: '/reports/receivable-aging'
       fullPath: '/reports/receivable-aging'
       preLoaderRoute: typeof AppReportsReceivableAgingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/reports/returns': {
+      id: '/_app/reports/returns'
+      path: '/reports/returns'
+      fullPath: '/reports/returns'
+      preLoaderRoute: typeof AppReportsReturnsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/reports/sales': {
+      id: '/_app/reports/sales'
+      path: '/reports/sales'
+      fullPath: '/reports/sales'
+      preLoaderRoute: typeof AppReportsSalesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/reports/stock': {
+      id: '/_app/reports/stock'
+      path: '/reports/stock'
+      fullPath: '/reports/stock'
+      preLoaderRoute: typeof AppReportsStockRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/reports/stock-counts': {
+      id: '/_app/reports/stock-counts'
+      path: '/reports/stock-counts'
+      fullPath: '/reports/stock-counts'
+      preLoaderRoute: typeof AppReportsStockCountsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/reports/stock-movements': {
+      id: '/_app/reports/stock-movements'
+      path: '/reports/stock-movements'
+      fullPath: '/reports/stock-movements'
+      preLoaderRoute: typeof AppReportsStockMovementsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/reports/tax': {
+      id: '/_app/reports/tax'
+      path: '/reports/tax'
+      fullPath: '/reports/tax'
+      preLoaderRoute: typeof AppReportsTaxRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/sales/employee-sales': {
@@ -2328,11 +2617,14 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppApprovalsRoute: typeof AppApprovalsRoute
+  AppDashboardRoute: typeof AppDashboardRoute
   AppIndexRoute: typeof AppIndexRoute
   AppFinanceAccountsRoute: typeof AppFinanceAccountsRoute
+  AppFinanceFinancialStatementsRoute: typeof AppFinanceFinancialStatementsRoute
   AppFinanceFiscalPeriodsRoute: typeof AppFinanceFiscalPeriodsRoute
   AppFinanceGeneralLedgerRoute: typeof AppFinanceGeneralLedgerRoute
   AppFinanceGoodsReceivedNotInvoicedRoute: typeof AppFinanceGoodsReceivedNotInvoicedRoute
+  AppFinanceMarketplaceSettlementsRoute: typeof AppFinanceMarketplaceSettlementsRoute
   AppFinanceReceivablesRoute: typeof AppFinanceReceivablesRoute
   AppHrisEmployeesRoute: typeof AppHrisEmployeesRoute
   AppIntegrationsDataExchangeRoute: typeof AppIntegrationsDataExchangeRoute
@@ -2356,7 +2648,19 @@ interface AppRouteChildren {
   AppProcurementApprovalsRoute: typeof AppProcurementApprovalsRoute
   AppProcurementReprocessOrdersRoute: typeof AppProcurementReprocessOrdersRoute
   AppProcurementTollOrdersRoute: typeof AppProcurementTollOrdersRoute
+  AppReportsCogsRoute: typeof AppReportsCogsRoute
+  AppReportsConsignmentRoute: typeof AppReportsConsignmentRoute
+  AppReportsExpiryRoute: typeof AppReportsExpiryRoute
+  AppReportsInternalUsageRoute: typeof AppReportsInternalUsageRoute
+  AppReportsPayablesRoute: typeof AppReportsPayablesRoute
+  AppReportsProfitLossByDimensionRoute: typeof AppReportsProfitLossByDimensionRoute
   AppReportsReceivableAgingRoute: typeof AppReportsReceivableAgingRoute
+  AppReportsReturnsRoute: typeof AppReportsReturnsRoute
+  AppReportsSalesRoute: typeof AppReportsSalesRoute
+  AppReportsStockRoute: typeof AppReportsStockRoute
+  AppReportsStockCountsRoute: typeof AppReportsStockCountsRoute
+  AppReportsStockMovementsRoute: typeof AppReportsStockMovementsRoute
+  AppReportsTaxRoute: typeof AppReportsTaxRoute
   AppSalesEmployeeSalesRoute: typeof AppSalesEmployeeSalesRoute
   AppSalesMarketplaceRoute: typeof AppSalesMarketplaceRoute
   AppSalesModernTradeRoute: typeof AppSalesModernTradeRoute
@@ -2442,12 +2746,15 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppApprovalsRoute: AppApprovalsRoute,
+  AppDashboardRoute: AppDashboardRoute,
   AppIndexRoute: AppIndexRoute,
   AppFinanceAccountsRoute: AppFinanceAccountsRoute,
+  AppFinanceFinancialStatementsRoute: AppFinanceFinancialStatementsRoute,
   AppFinanceFiscalPeriodsRoute: AppFinanceFiscalPeriodsRoute,
   AppFinanceGeneralLedgerRoute: AppFinanceGeneralLedgerRoute,
   AppFinanceGoodsReceivedNotInvoicedRoute:
     AppFinanceGoodsReceivedNotInvoicedRoute,
+  AppFinanceMarketplaceSettlementsRoute: AppFinanceMarketplaceSettlementsRoute,
   AppFinanceReceivablesRoute: AppFinanceReceivablesRoute,
   AppHrisEmployeesRoute: AppHrisEmployeesRoute,
   AppIntegrationsDataExchangeRoute: AppIntegrationsDataExchangeRoute,
@@ -2471,7 +2778,19 @@ const AppRouteChildren: AppRouteChildren = {
   AppProcurementApprovalsRoute: AppProcurementApprovalsRoute,
   AppProcurementReprocessOrdersRoute: AppProcurementReprocessOrdersRoute,
   AppProcurementTollOrdersRoute: AppProcurementTollOrdersRoute,
+  AppReportsCogsRoute: AppReportsCogsRoute,
+  AppReportsConsignmentRoute: AppReportsConsignmentRoute,
+  AppReportsExpiryRoute: AppReportsExpiryRoute,
+  AppReportsInternalUsageRoute: AppReportsInternalUsageRoute,
+  AppReportsPayablesRoute: AppReportsPayablesRoute,
+  AppReportsProfitLossByDimensionRoute: AppReportsProfitLossByDimensionRoute,
   AppReportsReceivableAgingRoute: AppReportsReceivableAgingRoute,
+  AppReportsReturnsRoute: AppReportsReturnsRoute,
+  AppReportsSalesRoute: AppReportsSalesRoute,
+  AppReportsStockRoute: AppReportsStockRoute,
+  AppReportsStockCountsRoute: AppReportsStockCountsRoute,
+  AppReportsStockMovementsRoute: AppReportsStockMovementsRoute,
+  AppReportsTaxRoute: AppReportsTaxRoute,
   AppSalesEmployeeSalesRoute: AppSalesEmployeeSalesRoute,
   AppSalesMarketplaceRoute: AppSalesMarketplaceRoute,
   AppSalesModernTradeRoute: AppSalesModernTradeRoute,

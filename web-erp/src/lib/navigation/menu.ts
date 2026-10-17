@@ -57,6 +57,7 @@ const DATA_EXCHANGE_PERMISSIONS = [
   "accounting.account",
   "warehouse.location",
   "sales.marketplace_order",
+  "accounting.settlement",
 ].flatMap((r) => [`${r}.import`, `${r}.export`])
 
 const items = (...labels: string[]): MenuItem[] =>
@@ -69,7 +70,12 @@ export const MENU: MenuGroup[] = [
     modules: [],
     items: [
       { label: "Ringkasan Operasional", to: "/" },
-      { label: "Dashboard Eksekutif" },
+      {
+        label: "Dashboard Eksekutif",
+        to: "/dashboard",
+        permission: "accounting.report.read",
+        module: "accounting",
+      },
       {
         label: "Persetujuan Saya",
         to: "/approvals",
@@ -574,7 +580,13 @@ export const MENU: MenuGroup[] = [
         permission: "accounting.fiscal_period.read",
         module: "accounting",
       },
-      ...items("Tutup Buku", "Saldo Awal", "Laporan Keuangan"),
+      ...items("Tutup Buku", "Saldo Awal"),
+      {
+        label: "Laporan Keuangan",
+        to: "/finance/financial-statements",
+        permission: "accounting.report.read",
+        module: "accounting",
+      },
     ],
   },
   {
@@ -590,32 +602,107 @@ export const MENU: MenuGroup[] = [
       "logistics",
     ],
     items: [
-      ...items(
-        "Laporan Stok",
-        "Laporan Mutasi Stok",
-        "Laporan Stock Count",
-        "Laporan HPP",
-        "Laporan Kedaluwarsa",
-        "Laporan Penjualan",
-        "Laporan Konsinyasi",
-        "Laporan Retur",
-        "Laporan Pemakaian Internal",
-        "Laporan Pengiriman"
-      ),
+      {
+        label: "Laporan Stok",
+        to: "/reports/stock",
+        permission: ["inventory.stock.read", "accounting.report.read"],
+        module: "inventory",
+      },
+      {
+        label: "Laporan Mutasi Stok",
+        to: "/reports/stock-movements",
+        permission: ["inventory.stock.read", "accounting.report.read"],
+        module: "inventory",
+      },
+      {
+        label: "Laporan Stock Count",
+        to: "/reports/stock-counts",
+        permission: ["warehouse.stock_count.read", "accounting.report.read"],
+        module: "warehouse",
+      },
+      {
+        label: "Laporan HPP",
+        to: "/reports/cogs",
+        permission: [
+          "procurement.goods_receipt.read",
+          "inventory.stock.read",
+          "accounting.report.read",
+        ],
+        module: "procurement",
+      },
+      {
+        label: "Laporan Kedaluwarsa",
+        to: "/reports/expiry",
+        permission: ["inventory.stock.read", "accounting.report.read"],
+        module: "inventory",
+      },
+      {
+        label: "Laporan Penjualan",
+        to: "/reports/sales",
+        permission: [
+          "sales.sales_order.read",
+          "sales.marketplace_order.read",
+          "sales.invoice.read",
+          "accounting.report.read",
+        ],
+        module: "sales",
+      },
+      {
+        label: "Laporan Konsinyasi",
+        to: "/reports/consignment",
+        permission: [
+          "sales.invoice.read",
+          "sales.consignment_reconciliation.read",
+          "accounting.report.read",
+        ],
+        module: "sales",
+      },
+      {
+        label: "Laporan Retur",
+        to: "/reports/returns",
+        permission: [
+          "inventory.stock.read",
+          "sales.sales_return.read",
+          "accounting.report.read",
+        ],
+        module: "inventory",
+      },
+      {
+        label: "Laporan Pemakaian Internal",
+        to: "/reports/internal-usage",
+        permission: ["inventory.internal_usage.read", "accounting.report.read"],
+        module: "inventory",
+      },
+      ...items("Laporan Pengiriman"),
       {
         label: "Laporan Piutang",
         to: "/reports/receivable-aging",
         permission: ["accounting.payment.read", "sales.invoice.read"],
         module: "sales",
       },
-      ...items(
-        "Laporan Utang",
-        "Laporan Laba Rugi per Dimensi",
-        "Laporan Pajak",
-        "Laporan Pipeline",
-        "Laporan HR",
-        "Laporan E-commerce"
-      ),
+      {
+        label: "Laporan Utang",
+        to: "/reports/payables",
+        permission: [
+          "procurement.supplier_bill.read",
+          "procurement.purchase_order.read",
+          "accounting.report.read",
+        ],
+        module: "procurement",
+      },
+      {
+        label: "Laporan Laba Rugi per Dimensi",
+        to: "/reports/profit-loss-by-dimension",
+        permission: "accounting.report.read",
+        module: "accounting",
+      },
+      {
+        label: "Laporan Pajak",
+        to: "/reports/tax",
+        permission: ["accounting.report.read", "accounting.withholding.read"],
+        module: "accounting",
+      },
+      ...items("Laporan Pipeline", "Laporan HR", "Laporan E-commerce"),
     ],
   },
   {
