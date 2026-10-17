@@ -134,6 +134,48 @@ func (e ErrorCode) Valid() bool {
 	}
 }
 
+// Defines values for GoodsReceiptAllowedActions.
+const (
+	GoodsReceiptAllowedActionsCancel GoodsReceiptAllowedActions = "cancel"
+	GoodsReceiptAllowedActionsEdit   GoodsReceiptAllowedActions = "edit"
+	GoodsReceiptAllowedActionsPost   GoodsReceiptAllowedActions = "post"
+)
+
+// Valid indicates whether the value is a known member of the GoodsReceiptAllowedActions enum.
+func (e GoodsReceiptAllowedActions) Valid() bool {
+	switch e {
+	case GoodsReceiptAllowedActionsCancel:
+		return true
+	case GoodsReceiptAllowedActionsEdit:
+		return true
+	case GoodsReceiptAllowedActionsPost:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for GoodsReceiptStatus.
+const (
+	GoodsReceiptStatusCancelled GoodsReceiptStatus = "cancelled"
+	GoodsReceiptStatusDraft     GoodsReceiptStatus = "draft"
+	GoodsReceiptStatusPosted    GoodsReceiptStatus = "posted"
+)
+
+// Valid indicates whether the value is a known member of the GoodsReceiptStatus enum.
+func (e GoodsReceiptStatus) Valid() bool {
+	switch e {
+	case GoodsReceiptStatusCancelled:
+		return true
+	case GoodsReceiptStatusDraft:
+		return true
+	case GoodsReceiptStatusPosted:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for PurchaseAdvanceAllowedActions.
 const (
 	PurchaseAdvanceAllowedActionsCancel PurchaseAdvanceAllowedActions = "cancel"
@@ -338,6 +380,293 @@ func (e PurchaseRequestStatus) Valid() bool {
 	}
 }
 
+// Defines values for PurchaseReturnAllowedActions.
+const (
+	PurchaseReturnAllowedActionsCancel PurchaseReturnAllowedActions = "cancel"
+	PurchaseReturnAllowedActionsEdit   PurchaseReturnAllowedActions = "edit"
+	PurchaseReturnAllowedActionsPost   PurchaseReturnAllowedActions = "post"
+	PurchaseReturnAllowedActionsRevise PurchaseReturnAllowedActions = "revise"
+	PurchaseReturnAllowedActionsSubmit PurchaseReturnAllowedActions = "submit"
+)
+
+// Valid indicates whether the value is a known member of the PurchaseReturnAllowedActions enum.
+func (e PurchaseReturnAllowedActions) Valid() bool {
+	switch e {
+	case PurchaseReturnAllowedActionsCancel:
+		return true
+	case PurchaseReturnAllowedActionsEdit:
+		return true
+	case PurchaseReturnAllowedActionsPost:
+		return true
+	case PurchaseReturnAllowedActionsRevise:
+		return true
+	case PurchaseReturnAllowedActionsSubmit:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PurchaseReturnOrigin.
+const (
+	Manual     PurchaseReturnOrigin = "manual"
+	QcInbound  PurchaseReturnOrigin = "qc_inbound"
+	QcOutbound PurchaseReturnOrigin = "qc_outbound"
+)
+
+// Valid indicates whether the value is a known member of the PurchaseReturnOrigin enum.
+func (e PurchaseReturnOrigin) Valid() bool {
+	switch e {
+	case Manual:
+		return true
+	case QcInbound:
+		return true
+	case QcOutbound:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PurchaseReturnStatus.
+const (
+	PurchaseReturnStatusApproved        PurchaseReturnStatus = "approved"
+	PurchaseReturnStatusCancelled       PurchaseReturnStatus = "cancelled"
+	PurchaseReturnStatusDraft           PurchaseReturnStatus = "draft"
+	PurchaseReturnStatusPendingApproval PurchaseReturnStatus = "pending_approval"
+	PurchaseReturnStatusPosted          PurchaseReturnStatus = "posted"
+	PurchaseReturnStatusRejected        PurchaseReturnStatus = "rejected"
+)
+
+// Valid indicates whether the value is a known member of the PurchaseReturnStatus enum.
+func (e PurchaseReturnStatus) Valid() bool {
+	switch e {
+	case PurchaseReturnStatusApproved:
+		return true
+	case PurchaseReturnStatusCancelled:
+		return true
+	case PurchaseReturnStatusDraft:
+		return true
+	case PurchaseReturnStatusPendingApproval:
+		return true
+	case PurchaseReturnStatusPosted:
+		return true
+	case PurchaseReturnStatusRejected:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PurchaseStockStatus.
+const (
+	Available  PurchaseStockStatus = "available"
+	Quarantine PurchaseStockStatus = "quarantine"
+)
+
+// Valid indicates whether the value is a known member of the PurchaseStockStatus enum.
+func (e PurchaseStockStatus) Valid() bool {
+	switch e {
+	case Available:
+		return true
+	case Quarantine:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RejectDisposition.
+const (
+	Absorbed         RejectDisposition = "absorbed"
+	ReturnToSupplier RejectDisposition = "return_to_supplier"
+)
+
+// Valid indicates whether the value is a known member of the RejectDisposition enum.
+func (e RejectDisposition) Valid() bool {
+	switch e {
+	case Absorbed:
+		return true
+	case ReturnToSupplier:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for SupplierBillAllowedActions.
+const (
+	SupplierBillAllowedActionsCancel SupplierBillAllowedActions = "cancel"
+	SupplierBillAllowedActionsEdit   SupplierBillAllowedActions = "edit"
+	SupplierBillAllowedActionsPost   SupplierBillAllowedActions = "post"
+	SupplierBillAllowedActionsRevise SupplierBillAllowedActions = "revise"
+)
+
+// Valid indicates whether the value is a known member of the SupplierBillAllowedActions enum.
+func (e SupplierBillAllowedActions) Valid() bool {
+	switch e {
+	case SupplierBillAllowedActionsCancel:
+		return true
+	case SupplierBillAllowedActionsEdit:
+		return true
+	case SupplierBillAllowedActionsPost:
+		return true
+	case SupplierBillAllowedActionsRevise:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for SupplierBillMatchStatus.
+const (
+	ApprovedException SupplierBillMatchStatus = "approved_exception"
+	ExceedsTolerance  SupplierBillMatchStatus = "exceeds_tolerance"
+	Matched           SupplierBillMatchStatus = "matched"
+)
+
+// Valid indicates whether the value is a known member of the SupplierBillMatchStatus enum.
+func (e SupplierBillMatchStatus) Valid() bool {
+	switch e {
+	case ApprovedException:
+		return true
+	case ExceedsTolerance:
+		return true
+	case Matched:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for SupplierBillStatus.
+const (
+	SupplierBillStatusAwaitingPayment SupplierBillStatus = "awaiting_payment"
+	SupplierBillStatusCancelled       SupplierBillStatus = "cancelled"
+	SupplierBillStatusDraft           SupplierBillStatus = "draft"
+	SupplierBillStatusPaid            SupplierBillStatus = "paid"
+	SupplierBillStatusPartiallyPaid   SupplierBillStatus = "partially_paid"
+	SupplierBillStatusPendingApproval SupplierBillStatus = "pending_approval"
+	SupplierBillStatusRejected        SupplierBillStatus = "rejected"
+)
+
+// Valid indicates whether the value is a known member of the SupplierBillStatus enum.
+func (e SupplierBillStatus) Valid() bool {
+	switch e {
+	case SupplierBillStatusAwaitingPayment:
+		return true
+	case SupplierBillStatusCancelled:
+		return true
+	case SupplierBillStatusDraft:
+		return true
+	case SupplierBillStatusPaid:
+		return true
+	case SupplierBillStatusPartiallyPaid:
+		return true
+	case SupplierBillStatusPendingApproval:
+		return true
+	case SupplierBillStatusRejected:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for WithholdingType.
+const (
+	None  WithholdingType = "none"
+	Pph21 WithholdingType = "pph21"
+	Pph23 WithholdingType = "pph23"
+	Pph42 WithholdingType = "pph4_2"
+)
+
+// Valid indicates whether the value is a known member of the WithholdingType enum.
+func (e WithholdingType) Valid() bool {
+	switch e {
+	case None:
+		return true
+	case Pph21:
+		return true
+	case Pph23:
+		return true
+	case Pph42:
+		return true
+	default:
+		return false
+	}
+}
+
+// BillableReceiptLine defines model for BillableReceiptLine.
+type BillableReceiptLine struct {
+	BatchNumber string `json:"batchNumber"`
+
+	// BilledQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	BilledQty PurchaseQuantity `json:"billedQty"`
+
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate       BusinessDate       `json:"businessDate"`
+	GoodsReceiptId     openapi_types.UUID `json:"goodsReceiptId"`
+	GoodsReceiptLineId openapi_types.UUID `json:"goodsReceiptLineId"`
+	GoodsReceiptNumber string             `json:"goodsReceiptNumber"`
+
+	// OpenQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	OpenQty PurchaseQuantity `json:"openQty"`
+
+	// PendingQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	PendingQty PurchaseQuantity `json:"pendingQty"`
+
+	// PoUnitPrice Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	PoUnitPrice Money              `json:"poUnitPrice"`
+	Product     PurchaseProductRef `json:"product"`
+
+	// ReceivedQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	ReceivedQty PurchaseQuantity `json:"receivedQty"`
+}
+
+// BillableReceipts defines model for BillableReceipts.
+type BillableReceipts struct {
+	// DefaultWithholdingRate Persentase desimal maks. 4 angka di belakang koma, mis. "2" untuk 2%.
+	//
+	// Example: 2.0000
+	DefaultWithholdingRate PurchasePercent `json:"defaultWithholdingRate"`
+
+	// DefaultWithholdingType Jenis PPh yang dipotong (pemasok, jenis biaya); tarif di master tarif PPh.
+	DefaultWithholdingType WithholdingType       `json:"defaultWithholdingType"`
+	Lines                  []BillableReceiptLine `json:"lines"`
+
+	// OutstandingAdvanceAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	OutstandingAdvanceAmount Money `json:"outstandingAdvanceAmount"`
+	PaymentTermDays          int   `json:"paymentTermDays"`
+
+	// PriceTolerancePercent Persentase desimal maks. 4 angka di belakang koma, mis. "2" untuk 2%.
+	//
+	// Example: 2.0000
+	PriceTolerancePercent PurchasePercent    `json:"priceTolerancePercent"`
+	PurchaseOrderId       openapi_types.UUID `json:"purchaseOrderId"`
+	PurchaseOrderNumber   string             `json:"purchaseOrderNumber"`
+
+	// QtyTolerancePercent Persentase desimal maks. 4 angka di belakang koma, mis. "2" untuk 2%.
+	//
+	// Example: 2.0000
+	QtyTolerancePercent PurchasePercent    `json:"qtyTolerancePercent"`
+	SupplierId          openapi_types.UUID `json:"supplierId"`
+	SupplierName        string             `json:"supplierName"`
+}
+
 // BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
 //
 // Example: 2026-10-19
@@ -345,6 +674,392 @@ type BusinessDate = openapi_types.Date
 
 // ErrorCode Katalog kode error (Technical Guideline Lampiran A).
 type ErrorCode string
+
+// GoodsReceipt defines model for GoodsReceipt.
+type GoodsReceipt struct {
+	AllowedActions []GoodsReceiptAllowedActions `json:"allowedActions"`
+
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate  BusinessDate       `json:"businessDate"`
+	CancelReason  string             `json:"cancelReason"`
+	CreatedAt     time.Time          `json:"createdAt"`
+	CreatedByName string             `json:"createdByName"`
+	DeliveryNote  string             `json:"deliveryNote"`
+	DivisionId    openapi_types.UUID `json:"divisionId"`
+	DivisionName  string             `json:"divisionName"`
+
+	// GrniAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	GrniAmount Money               `json:"grniAmount"`
+	Id         openapi_types.UUID  `json:"id"`
+	InboundId  *openapi_types.UUID `json:"inboundId,omitempty"`
+
+	// InventoryAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	InventoryAmount Money               `json:"inventoryAmount"`
+	JournalEntryId  *openapi_types.UUID `json:"journalEntryId,omitempty"`
+	Lines           []GoodsReceiptLine  `json:"lines"`
+	Location        PurchaseLocationRef `json:"location"`
+
+	// MaterialAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	MaterialAmount Money                  `json:"materialAmount"`
+	Materials      []GoodsReceiptMaterial `json:"materials"`
+	Note           string                 `json:"note"`
+
+	// Number Nomor GR, diisi saat diposting.
+	Number *string `json:"number,omitempty"`
+
+	// OrderType Jenis PO: `goods` barang, `packaging` packaging (RM), `toll_manufacturing` jasa maklon per batch,
+	// `reprocess` reprocess bahan GM di maklon, `other` lainnya (baris boleh berupa uraian).
+	OrderType              PurchaseOrderType    `json:"orderType"`
+	PostedAt               *time.Time           `json:"postedAt,omitempty"`
+	PurchaseOrderId        openapi_types.UUID   `json:"purchaseOrderId"`
+	PurchaseOrderNumber    string               `json:"purchaseOrderNumber"`
+	ReversalJournalEntryId *openapi_types.UUID  `json:"reversalJournalEntryId,omitempty"`
+	Status                 GoodsReceiptStatus   `json:"status"`
+	SupplierId             openapi_types.UUID   `json:"supplierId"`
+	SupplierName           string               `json:"supplierName"`
+	TollLocation           *PurchaseLocationRef `json:"tollLocation,omitempty"`
+	UpdatedAt              time.Time            `json:"updatedAt"`
+	Version                int                  `json:"version"`
+}
+
+// GoodsReceiptAllowedActions defines model for GoodsReceipt.AllowedActions.
+type GoodsReceiptAllowedActions string
+
+// GoodsReceiptFields defines model for GoodsReceiptFields.
+type GoodsReceiptFields struct {
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate                 `json:"businessDate"`
+	DeliveryNote *string                      `json:"deliveryNote,omitempty"`
+	Lines        []GoodsReceiptLineInput      `json:"lines"`
+	LocationId   openapi_types.UUID           `json:"locationId"`
+	Materials    *[]GoodsReceiptMaterialInput `json:"materials,omitempty"`
+	Note         *string                      `json:"note,omitempty"`
+}
+
+// GoodsReceiptInput defines model for GoodsReceiptInput.
+type GoodsReceiptInput struct {
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate    BusinessDate                 `json:"businessDate"`
+	DeliveryNote    *string                      `json:"deliveryNote,omitempty"`
+	Lines           []GoodsReceiptLineInput      `json:"lines"`
+	LocationId      openapi_types.UUID           `json:"locationId"`
+	Materials       *[]GoodsReceiptMaterialInput `json:"materials,omitempty"`
+	Note            *string                      `json:"note,omitempty"`
+	PurchaseOrderId openapi_types.UUID           `json:"purchaseOrderId"`
+}
+
+// GoodsReceiptLine defines model for GoodsReceiptLine.
+type GoodsReceiptLine struct {
+	BatchId     *openapi_types.UUID `json:"batchId,omitempty"`
+	BatchNumber string              `json:"batchNumber"`
+
+	// BilledQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	BilledQty  PurchaseQuantity `json:"billedQty"`
+	ExpiryDate *BusinessDate    `json:"expiryDate,omitempty"`
+
+	// GoodQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	GoodQty PurchaseQuantity `json:"goodQty"`
+
+	// GrniAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	GrniAmount Money `json:"grniAmount"`
+
+	// GrniQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	GrniQty              PurchaseQuantity   `json:"grniQty"`
+	Id                   openapi_types.UUID `json:"id"`
+	InventoryAccountCode string             `json:"inventoryAccountCode"`
+
+	// InventoryAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	InventoryAmount Money `json:"inventoryAmount"`
+	LineNo          int   `json:"lineNo"`
+
+	// MaterialCostAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	MaterialCostAmount Money  `json:"materialCostAmount"`
+	Note               string `json:"note"`
+
+	// OpenQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	OpenQty PurchaseQuantity `json:"openQty"`
+
+	// OrderedQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	OrderedQty          PurchaseQuantity   `json:"orderedQty"`
+	Product             PurchaseProductRef `json:"product"`
+	ProductionDate      *BusinessDate      `json:"productionDate,omitempty"`
+	PurchaseOrderLineId openapi_types.UUID `json:"purchaseOrderLineId"`
+
+	// RejectDisposition `absorbed` reject ditanggung Balans (ikut ditagih, nilai diserap ke HPP barang baik); `return_to_supplier`
+	// ditolak di tempat dan diganti pemasok (tidak masuk stok maupun tagihan).
+	RejectDisposition RejectDisposition `json:"rejectDisposition"`
+
+	// RejectQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	RejectQty PurchaseQuantity `json:"rejectQty"`
+
+	// ReturnedQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	ReturnedQty PurchaseQuantity `json:"returnedQty"`
+
+	// UnitCost HPP per unit, maks. 4 angka di belakang koma.
+	//
+	// Example: 12500.0000
+	UnitCost PurchaseUnitCost `json:"unitCost"`
+
+	// UnitPrice Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	UnitPrice Money `json:"unitPrice"`
+}
+
+// GoodsReceiptLineInput defines model for GoodsReceiptLineInput.
+type GoodsReceiptLineInput struct {
+	BatchNumber *string       `json:"batchNumber,omitempty"`
+	ExpiryDate  *BusinessDate `json:"expiryDate,omitempty"`
+
+	// GoodQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	GoodQty             PurchaseQuantity   `json:"goodQty"`
+	Note                *string            `json:"note,omitempty"`
+	ProductionDate      *BusinessDate      `json:"productionDate,omitempty"`
+	PurchaseOrderLineId openapi_types.UUID `json:"purchaseOrderLineId"`
+
+	// RejectDisposition `absorbed` reject ditanggung Balans (ikut ditagih, nilai diserap ke HPP barang baik); `return_to_supplier`
+	// ditolak di tempat dan diganti pemasok (tidak masuk stok maupun tagihan).
+	RejectDisposition *RejectDisposition `json:"rejectDisposition,omitempty"`
+
+	// RejectQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	RejectQty *PurchaseQuantity `json:"rejectQty,omitempty"`
+}
+
+// GoodsReceiptList defines model for GoodsReceiptList.
+type GoodsReceiptList struct {
+	Items      []GoodsReceiptSummary `json:"items"`
+	Page       int                   `json:"page"`
+	PageSize   int                   `json:"pageSize"`
+	TotalItems int64                 `json:"totalItems"`
+	TotalPages int                   `json:"totalPages"`
+}
+
+// GoodsReceiptMaterial defines model for GoodsReceiptMaterial.
+type GoodsReceiptMaterial struct {
+	AccountCode string `json:"accountCode"`
+
+	// CostAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	CostAmount Money              `json:"costAmount"`
+	Id         openapi_types.UUID `json:"id"`
+	LineNo     int                `json:"lineNo"`
+	Note       string             `json:"note"`
+	Product    PurchaseProductRef `json:"product"`
+
+	// UsedGoodQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	UsedGoodQty PurchaseQuantity `json:"usedGoodQty"`
+
+	// UsedRejectQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	UsedRejectQty PurchaseQuantity `json:"usedRejectQty"`
+}
+
+// GoodsReceiptMaterialInput defines model for GoodsReceiptMaterialInput.
+type GoodsReceiptMaterialInput struct {
+	Note      *string            `json:"note,omitempty"`
+	ProductId openapi_types.UUID `json:"productId"`
+
+	// UsedGoodQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	UsedGoodQty PurchaseQuantity `json:"usedGoodQty"`
+
+	// UsedRejectQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	UsedRejectQty PurchaseQuantity `json:"usedRejectQty"`
+}
+
+// GoodsReceiptStatus defines model for GoodsReceiptStatus.
+type GoodsReceiptStatus string
+
+// GoodsReceiptSummary defines model for GoodsReceiptSummary.
+type GoodsReceiptSummary struct {
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate `json:"businessDate"`
+	CreatedAt    time.Time    `json:"createdAt"`
+	DeliveryNote string       `json:"deliveryNote"`
+
+	// GrniAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	GrniAmount Money              `json:"grniAmount"`
+	Id         openapi_types.UUID `json:"id"`
+
+	// InventoryAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	InventoryAmount Money `json:"inventoryAmount"`
+
+	// Number Nomor GR, diisi saat diposting.
+	Number *string `json:"number,omitempty"`
+
+	// OrderType Jenis PO: `goods` barang, `packaging` packaging (RM), `toll_manufacturing` jasa maklon per batch,
+	// `reprocess` reprocess bahan GM di maklon, `other` lainnya (baris boleh berupa uraian).
+	OrderType           PurchaseOrderType  `json:"orderType"`
+	PurchaseOrderId     openapi_types.UUID `json:"purchaseOrderId"`
+	PurchaseOrderNumber string             `json:"purchaseOrderNumber"`
+	Status              GoodsReceiptStatus `json:"status"`
+	SupplierId          openapi_types.UUID `json:"supplierId"`
+	SupplierName        string             `json:"supplierName"`
+	UpdatedAt           time.Time          `json:"updatedAt"`
+	Version             int                `json:"version"`
+}
+
+// GoodsReceiptUpdate defines model for GoodsReceiptUpdate.
+type GoodsReceiptUpdate struct {
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate                 `json:"businessDate"`
+	DeliveryNote *string                      `json:"deliveryNote,omitempty"`
+	Lines        []GoodsReceiptLineInput      `json:"lines"`
+	LocationId   openapi_types.UUID           `json:"locationId"`
+	Materials    *[]GoodsReceiptMaterialInput `json:"materials,omitempty"`
+	Note         *string                      `json:"note,omitempty"`
+
+	// Version Versi terakhir yang dilihat user (optimistic locking).
+	Version int `json:"version"`
+}
+
+// GoodsReceivedNotInvoicedLine defines model for GoodsReceivedNotInvoicedLine.
+type GoodsReceivedNotInvoicedLine struct {
+	// BilledAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	BilledAmount Money `json:"billedAmount"`
+
+	// BilledQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	BilledQty PurchaseQuantity `json:"billedQty"`
+
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate       BusinessDate       `json:"businessDate"`
+	GoodsReceiptId     openapi_types.UUID `json:"goodsReceiptId"`
+	GoodsReceiptLineId openapi_types.UUID `json:"goodsReceiptLineId"`
+	GoodsReceiptNumber string             `json:"goodsReceiptNumber"`
+
+	// OpenAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	OpenAmount Money `json:"openAmount"`
+
+	// OpenQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	OpenQty PurchaseQuantity `json:"openQty"`
+
+	// OrderType Jenis PO: `goods` barang, `packaging` packaging (RM), `toll_manufacturing` jasa maklon per batch,
+	// `reprocess` reprocess bahan GM di maklon, `other` lainnya (baris boleh berupa uraian).
+	OrderType           PurchaseOrderType  `json:"orderType"`
+	Product             PurchaseProductRef `json:"product"`
+	PurchaseOrderId     openapi_types.UUID `json:"purchaseOrderId"`
+	PurchaseOrderNumber string             `json:"purchaseOrderNumber"`
+
+	// ReceivedAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	ReceivedAmount Money `json:"receivedAmount"`
+
+	// ReceivedQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	ReceivedQty PurchaseQuantity `json:"receivedQty"`
+
+	// ReturnedAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	ReturnedAmount Money `json:"returnedAmount"`
+
+	// ReturnedQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	ReturnedQty  PurchaseQuantity   `json:"returnedQty"`
+	SupplierId   openapi_types.UUID `json:"supplierId"`
+	SupplierName string             `json:"supplierName"`
+
+	// UnitPrice Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	UnitPrice Money `json:"unitPrice"`
+}
+
+// GoodsReceivedNotInvoicedReport defines model for GoodsReceivedNotInvoicedReport.
+type GoodsReceivedNotInvoicedReport struct {
+	// AccountCode Example: 2102
+	AccountCode string `json:"accountCode"`
+
+	// AsOf Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	AsOf BusinessDate `json:"asOf"`
+
+	// Difference Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Difference Money `json:"difference"`
+
+	// FilteredTotal Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	FilteredTotal Money `json:"filteredTotal"`
+
+	// LedgerBalance Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	LedgerBalance Money                          `json:"ledgerBalance"`
+	Lines         []GoodsReceivedNotInvoicedLine `json:"lines"`
+
+	// SubledgerTotal Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	SubledgerTotal Money `json:"subledgerTotal"`
+}
 
 // Money Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
 //
@@ -802,12 +1517,19 @@ type PurchaseOrderUpdate struct {
 	Version int `json:"version"`
 }
 
+// PurchasePercent Persentase desimal maks. 4 angka di belakang koma, mis. "2" untuk 2%.
+//
+// Example: 2.0000
+type PurchasePercent = string
+
 // PurchaseProductRef defines model for PurchaseProductRef.
 type PurchaseProductRef struct {
-	Id   openapi_types.UUID `json:"id"`
-	Name string             `json:"name"`
-	Sku  string             `json:"sku"`
-	Uom  string             `json:"uom"`
+	// HasBatch Produk dilacak per batch (nomor batch, tanggal produksi & kedaluwarsa wajib saat diterima).
+	HasBatch *bool              `json:"hasBatch,omitempty"`
+	Id       openapi_types.UUID `json:"id"`
+	Name     string             `json:"name"`
+	Sku      string             `json:"sku"`
+	Uom      string             `json:"uom"`
 }
 
 // PurchaseQuantity Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
@@ -995,11 +1717,583 @@ type PurchaseRequestUpdate struct {
 	Version int `json:"version"`
 }
 
+// PurchaseReturn defines model for PurchaseReturn.
+type PurchaseReturn struct {
+	AllowedActions []PurchaseReturnAllowedActions `json:"allowedActions"`
+	ApprovedAt     *time.Time                     `json:"approvedAt,omitempty"`
+
+	// BilledAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	BilledAmount Money `json:"billedAmount"`
+
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate  BusinessDate `json:"businessDate"`
+	CancelReason  string       `json:"cancelReason"`
+	CreatedAt     time.Time    `json:"createdAt"`
+	CreatedByName string       `json:"createdByName"`
+
+	// DebitNoteNumber Nomor nota debit DN (diposting).
+	DebitNoteNumber *string              `json:"debitNoteNumber,omitempty"`
+	DivisionId      openapi_types.UUID   `json:"divisionId"`
+	DivisionName    string               `json:"divisionName"`
+	Id              openapi_types.UUID   `json:"id"`
+	JournalEntryId  *openapi_types.UUID  `json:"journalEntryId,omitempty"`
+	Lines           []PurchaseReturnLine `json:"lines"`
+	Note            string               `json:"note"`
+
+	// Number Nomor RB (diajukan/diposting).
+	Number *string `json:"number,omitempty"`
+
+	// Origin `manual` butuh persetujuan Head Logistik; `qc_inbound`/`qc_outbound` dari hasil QC tanpa approval (D-24).
+	Origin              PurchaseReturnOrigin `json:"origin"`
+	PostedAt            *time.Time           `json:"postedAt,omitempty"`
+	PurchaseOrderId     openapi_types.UUID   `json:"purchaseOrderId"`
+	PurchaseOrderNumber string               `json:"purchaseOrderNumber"`
+	Reason              string               `json:"reason"`
+	SourceLabel         string               `json:"sourceLabel"`
+	SourceType          string               `json:"sourceType"`
+	Status              PurchaseReturnStatus `json:"status"`
+	SubmittedAt         *time.Time           `json:"submittedAt,omitempty"`
+	SupplierId          openapi_types.UUID   `json:"supplierId"`
+	SupplierName        string               `json:"supplierName"`
+
+	// TotalAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	TotalAmount Money `json:"totalAmount"`
+
+	// UnbilledAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	UnbilledAmount Money     `json:"unbilledAmount"`
+	UpdatedAt      time.Time `json:"updatedAt"`
+	Version        int       `json:"version"`
+}
+
+// PurchaseReturnAllowedActions defines model for PurchaseReturn.AllowedActions.
+type PurchaseReturnAllowedActions string
+
+// PurchaseReturnFields defines model for PurchaseReturnFields.
+type PurchaseReturnFields struct {
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate              `json:"businessDate"`
+	Lines        []PurchaseReturnLineInput `json:"lines"`
+	Note         *string                   `json:"note,omitempty"`
+	Reason       string                    `json:"reason"`
+}
+
+// PurchaseReturnInput defines model for PurchaseReturnInput.
+type PurchaseReturnInput struct {
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate    BusinessDate              `json:"businessDate"`
+	Lines           []PurchaseReturnLineInput `json:"lines"`
+	Note            *string                   `json:"note,omitempty"`
+	PurchaseOrderId openapi_types.UUID        `json:"purchaseOrderId"`
+	Reason          string                    `json:"reason"`
+}
+
+// PurchaseReturnLine defines model for PurchaseReturnLine.
+type PurchaseReturnLine struct {
+	// Amount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Amount      Money  `json:"amount"`
+	BatchNumber string `json:"batchNumber"`
+
+	// BilledAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	BilledAmount         Money               `json:"billedAmount"`
+	GoodsReceiptLineId   openapi_types.UUID  `json:"goodsReceiptLineId"`
+	GoodsReceiptNumber   string              `json:"goodsReceiptNumber"`
+	Id                   openapi_types.UUID  `json:"id"`
+	InventoryAccountCode string              `json:"inventoryAccountCode"`
+	LineNo               int                 `json:"lineNo"`
+	Location             PurchaseLocationRef `json:"location"`
+	Note                 string              `json:"note"`
+	Product              PurchaseProductRef  `json:"product"`
+
+	// Qty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	Qty PurchaseQuantity `json:"qty"`
+
+	// StockStatus Status stok asal retur.
+	StockStatus PurchaseStockStatus `json:"stockStatus"`
+
+	// UnbilledAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	UnbilledAmount Money `json:"unbilledAmount"`
+
+	// UnbilledQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	UnbilledQty PurchaseQuantity `json:"unbilledQty"`
+
+	// UnitCost HPP per unit, maks. 4 angka di belakang koma.
+	//
+	// Example: 12500.0000
+	UnitCost PurchaseUnitCost `json:"unitCost"`
+}
+
+// PurchaseReturnLineInput defines model for PurchaseReturnLineInput.
+type PurchaseReturnLineInput struct {
+	GoodsReceiptLineId openapi_types.UUID `json:"goodsReceiptLineId"`
+	LocationId         openapi_types.UUID `json:"locationId"`
+	Note               *string            `json:"note,omitempty"`
+
+	// Qty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	Qty PurchaseQuantity `json:"qty"`
+
+	// StockStatus Status stok asal retur.
+	StockStatus *PurchaseStockStatus `json:"stockStatus,omitempty"`
+}
+
+// PurchaseReturnList defines model for PurchaseReturnList.
+type PurchaseReturnList struct {
+	Items      []PurchaseReturnSummary `json:"items"`
+	Page       int                     `json:"page"`
+	PageSize   int                     `json:"pageSize"`
+	TotalItems int64                   `json:"totalItems"`
+	TotalPages int                     `json:"totalPages"`
+}
+
+// PurchaseReturnOrigin `manual` butuh persetujuan Head Logistik; `qc_inbound`/`qc_outbound` dari hasil QC tanpa approval (D-24).
+type PurchaseReturnOrigin string
+
+// PurchaseReturnStatus defines model for PurchaseReturnStatus.
+type PurchaseReturnStatus string
+
+// PurchaseReturnSummary defines model for PurchaseReturnSummary.
+type PurchaseReturnSummary struct {
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate `json:"businessDate"`
+	CreatedAt    time.Time    `json:"createdAt"`
+
+	// DebitNoteNumber Nomor nota debit DN (diposting).
+	DebitNoteNumber *string            `json:"debitNoteNumber,omitempty"`
+	Id              openapi_types.UUID `json:"id"`
+
+	// Number Nomor RB (diajukan/diposting).
+	Number *string `json:"number,omitempty"`
+
+	// Origin `manual` butuh persetujuan Head Logistik; `qc_inbound`/`qc_outbound` dari hasil QC tanpa approval (D-24).
+	Origin              PurchaseReturnOrigin `json:"origin"`
+	PurchaseOrderId     openapi_types.UUID   `json:"purchaseOrderId"`
+	PurchaseOrderNumber string               `json:"purchaseOrderNumber"`
+	Reason              string               `json:"reason"`
+	Status              PurchaseReturnStatus `json:"status"`
+	SupplierId          openapi_types.UUID   `json:"supplierId"`
+	SupplierName        string               `json:"supplierName"`
+
+	// TotalAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	TotalAmount Money     `json:"totalAmount"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+	Version     int       `json:"version"`
+}
+
+// PurchaseReturnUpdate defines model for PurchaseReturnUpdate.
+type PurchaseReturnUpdate struct {
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate              `json:"businessDate"`
+	Lines        []PurchaseReturnLineInput `json:"lines"`
+	Note         *string                   `json:"note,omitempty"`
+	Reason       string                    `json:"reason"`
+
+	// Version Versi terakhir yang dilihat user (optimistic locking).
+	Version int `json:"version"`
+}
+
+// PurchaseStockStatus Status stok asal retur.
+type PurchaseStockStatus string
+
+// PurchaseUnitCost HPP per unit, maks. 4 angka di belakang koma.
+//
+// Example: 12500.0000
+type PurchaseUnitCost = string
+
+// RejectDisposition `absorbed` reject ditanggung Balans (ikut ditagih, nilai diserap ke HPP barang baik); `return_to_supplier`
+// ditolak di tempat dan diganti pemasok (tidak masuk stok maupun tagihan).
+type RejectDisposition string
+
+// ReturnableReceiptLine defines model for ReturnableReceiptLine.
+type ReturnableReceiptLine struct {
+	BatchNumber string `json:"batchNumber"`
+
+	// GoodQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	GoodQty            PurchaseQuantity    `json:"goodQty"`
+	GoodsReceiptId     openapi_types.UUID  `json:"goodsReceiptId"`
+	GoodsReceiptLineId openapi_types.UUID  `json:"goodsReceiptLineId"`
+	GoodsReceiptNumber string              `json:"goodsReceiptNumber"`
+	Location           PurchaseLocationRef `json:"location"`
+
+	// OpenQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	OpenQty PurchaseQuantity `json:"openQty"`
+
+	// PendingQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	PendingQty PurchaseQuantity   `json:"pendingQty"`
+	Product    PurchaseProductRef `json:"product"`
+
+	// ReturnableQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	ReturnableQty PurchaseQuantity `json:"returnableQty"`
+
+	// ReturnedQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	ReturnedQty PurchaseQuantity `json:"returnedQty"`
+
+	// UnitCost HPP per unit, maks. 4 angka di belakang koma.
+	//
+	// Example: 12500.0000
+	UnitCost PurchaseUnitCost `json:"unitCost"`
+}
+
+// ReturnableReceipts defines model for ReturnableReceipts.
+type ReturnableReceipts struct {
+	Lines               []ReturnableReceiptLine `json:"lines"`
+	PurchaseOrderId     openapi_types.UUID      `json:"purchaseOrderId"`
+	PurchaseOrderNumber string                  `json:"purchaseOrderNumber"`
+	SupplierName        string                  `json:"supplierName"`
+}
+
+// SupplierBill defines model for SupplierBill.
+type SupplierBill struct {
+	// AdvanceAppliedAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	AdvanceAppliedAmount  Money                        `json:"advanceAppliedAmount"`
+	AdvanceJournalEntryId *openapi_types.UUID          `json:"advanceJournalEntryId,omitempty"`
+	Advances              []SupplierBillAdvance        `json:"advances"`
+	AllowedActions        []SupplierBillAllowedActions `json:"allowedActions"`
+
+	// BillDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BillDate      BusinessDate       `json:"billDate"`
+	CancelReason  string             `json:"cancelReason"`
+	CreatedAt     time.Time          `json:"createdAt"`
+	CreatedByName string             `json:"createdByName"`
+	DivisionId    openapi_types.UUID `json:"divisionId"`
+	DivisionName  string             `json:"divisionName"`
+
+	// DueDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	DueDate BusinessDate `json:"dueDate"`
+
+	// GrniAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	GrniAmount     Money                   `json:"grniAmount"`
+	Id             openapi_types.UUID      `json:"id"`
+	JournalEntryId *openapi_types.UUID     `json:"journalEntryId,omitempty"`
+	Lines          []SupplierBillLine      `json:"lines"`
+	MatchStatus    SupplierBillMatchStatus `json:"matchStatus"`
+	Note           string                  `json:"note"`
+
+	// Number Nomor tagihan dari pemasok (unik per pemasok).
+	Number string `json:"number"`
+
+	// OpenAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	OpenAmount Money `json:"openAmount"`
+
+	// PaidAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	PaidAmount Money `json:"paidAmount"`
+
+	// PaymentBlocked true selama utang belum terbentuk (draft, menunggu persetujuan selisih, ditolak).
+	PaymentBlocked bool       `json:"paymentBlocked"`
+	PostedAt       *time.Time `json:"postedAt,omitempty"`
+
+	// PriceTolerancePercent Persentase desimal maks. 4 angka di belakang koma, mis. "2" untuk 2%.
+	//
+	// Example: 2.0000
+	PriceTolerancePercent PurchasePercent `json:"priceTolerancePercent"`
+
+	// PriceVarianceAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	PriceVarianceAmount Money              `json:"priceVarianceAmount"`
+	PurchaseOrderId     openapi_types.UUID `json:"purchaseOrderId"`
+	PurchaseOrderNumber string             `json:"purchaseOrderNumber"`
+
+	// QtyTolerancePercent Persentase desimal maks. 4 angka di belakang koma, mis. "2" untuk 2%.
+	//
+	// Example: 2.0000
+	QtyTolerancePercent PurchasePercent    `json:"qtyTolerancePercent"`
+	Status              SupplierBillStatus `json:"status"`
+	SubmittedAt         *time.Time         `json:"submittedAt,omitempty"`
+
+	// SubtotalAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	SubtotalAmount Money              `json:"subtotalAmount"`
+	SupplierId     openapi_types.UUID `json:"supplierId"`
+	SupplierName   string             `json:"supplierName"`
+
+	// TotalPayableAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	TotalPayableAmount Money     `json:"totalPayableAmount"`
+	UpdatedAt          time.Time `json:"updatedAt"`
+	Version            int       `json:"version"`
+
+	// WithholdingAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	WithholdingAmount Money `json:"withholdingAmount"`
+
+	// WithholdingRate Persentase desimal maks. 4 angka di belakang koma, mis. "2" untuk 2%.
+	//
+	// Example: 2.0000
+	WithholdingRate PurchasePercent `json:"withholdingRate"`
+
+	// WithholdingType Jenis PPh yang dipotong (pemasok, jenis biaya); tarif di master tarif PPh.
+	WithholdingType WithholdingType `json:"withholdingType"`
+}
+
+// SupplierBillAllowedActions defines model for SupplierBill.AllowedActions.
+type SupplierBillAllowedActions string
+
+// SupplierBillAdvance defines model for SupplierBillAdvance.
+type SupplierBillAdvance struct {
+	AdvanceId     openapi_types.UUID `json:"advanceId"`
+	AdvanceNumber string             `json:"advanceNumber"`
+
+	// Amount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Amount Money `json:"amount"`
+}
+
+// SupplierBillFields defines model for SupplierBillFields.
+type SupplierBillFields struct {
+	// BillDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BillDate BusinessDate `json:"billDate"`
+
+	// DueDate Kosong = tanggal tagihan + termin PO.
+	DueDate *BusinessDate           `json:"dueDate,omitempty"`
+	Lines   []SupplierBillLineInput `json:"lines"`
+	Note    *string                 `json:"note,omitempty"`
+	Number  string                  `json:"number"`
+
+	// WithholdingRate Kosong = tarif awal jenis PPh.
+	WithholdingRate *PurchasePercent `json:"withholdingRate,omitempty"`
+
+	// WithholdingType Kosong = PPh default pemasok.
+	WithholdingType *WithholdingType `json:"withholdingType,omitempty"`
+}
+
+// SupplierBillInput defines model for SupplierBillInput.
+type SupplierBillInput struct {
+	// BillDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BillDate BusinessDate `json:"billDate"`
+
+	// DueDate Kosong = tanggal tagihan + termin PO.
+	DueDate         *BusinessDate           `json:"dueDate,omitempty"`
+	Lines           []SupplierBillLineInput `json:"lines"`
+	Note            *string                 `json:"note,omitempty"`
+	Number          string                  `json:"number"`
+	PurchaseOrderId openapi_types.UUID      `json:"purchaseOrderId"`
+
+	// WithholdingRate Kosong = tarif awal jenis PPh.
+	WithholdingRate *PurchasePercent `json:"withholdingRate,omitempty"`
+
+	// WithholdingType Kosong = PPh default pemasok.
+	WithholdingType *WithholdingType `json:"withholdingType,omitempty"`
+}
+
+// SupplierBillLine defines model for SupplierBillLine.
+type SupplierBillLine struct {
+	// Amount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	Amount             Money              `json:"amount"`
+	BatchNumber        string             `json:"batchNumber"`
+	ExceedsTolerance   bool               `json:"exceedsTolerance"`
+	GoodsReceiptId     openapi_types.UUID `json:"goodsReceiptId"`
+	GoodsReceiptLineId openapi_types.UUID `json:"goodsReceiptLineId"`
+	GoodsReceiptNumber string             `json:"goodsReceiptNumber"`
+
+	// GrniAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	GrniAmount Money              `json:"grniAmount"`
+	Id         openapi_types.UUID `json:"id"`
+	LineNo     int                `json:"lineNo"`
+	Note       string             `json:"note"`
+
+	// PoUnitPrice Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	PoUnitPrice   Money `json:"poUnitPrice"`
+	PriceMismatch bool  `json:"priceMismatch"`
+
+	// PriceVarianceAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	PriceVarianceAmount Money `json:"priceVarianceAmount"`
+
+	// PriceVariancePercent Persentase desimal maks. 4 angka di belakang koma, mis. "2" untuk 2%.
+	//
+	// Example: 2.0000
+	PriceVariancePercent PurchasePercent    `json:"priceVariancePercent"`
+	Product              PurchaseProductRef `json:"product"`
+
+	// Qty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	Qty         PurchaseQuantity `json:"qty"`
+	QtyMismatch bool             `json:"qtyMismatch"`
+
+	// ReceiptOpenQty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	ReceiptOpenQty PurchaseQuantity `json:"receiptOpenQty"`
+
+	// UnitPrice Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	UnitPrice Money `json:"unitPrice"`
+}
+
+// SupplierBillLineInput defines model for SupplierBillLineInput.
+type SupplierBillLineInput struct {
+	GoodsReceiptLineId openapi_types.UUID `json:"goodsReceiptLineId"`
+	Note               *string            `json:"note,omitempty"`
+
+	// Qty Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+	//
+	// Example: 10000.000
+	Qty PurchaseQuantity `json:"qty"`
+
+	// UnitPrice Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	UnitPrice Money `json:"unitPrice"`
+}
+
+// SupplierBillList defines model for SupplierBillList.
+type SupplierBillList struct {
+	Items      []SupplierBillSummary `json:"items"`
+	Page       int                   `json:"page"`
+	PageSize   int                   `json:"pageSize"`
+	TotalItems int64                 `json:"totalItems"`
+	TotalPages int                   `json:"totalPages"`
+}
+
+// SupplierBillMatchStatus defines model for SupplierBillMatchStatus.
+type SupplierBillMatchStatus string
+
+// SupplierBillStatus defines model for SupplierBillStatus.
+type SupplierBillStatus string
+
+// SupplierBillSummary defines model for SupplierBillSummary.
+type SupplierBillSummary struct {
+	// BillDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BillDate  BusinessDate `json:"billDate"`
+	CreatedAt time.Time    `json:"createdAt"`
+
+	// DueDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	DueDate     BusinessDate            `json:"dueDate"`
+	Id          openapi_types.UUID      `json:"id"`
+	MatchStatus SupplierBillMatchStatus `json:"matchStatus"`
+
+	// Number Nomor tagihan dari pemasok (unik per pemasok).
+	Number string `json:"number"`
+
+	// PaidAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	PaidAmount Money `json:"paidAmount"`
+
+	// PaymentBlocked true selama utang belum terbentuk (draft, menunggu persetujuan selisih, ditolak).
+	PaymentBlocked      bool               `json:"paymentBlocked"`
+	PurchaseOrderId     openapi_types.UUID `json:"purchaseOrderId"`
+	PurchaseOrderNumber string             `json:"purchaseOrderNumber"`
+	Status              SupplierBillStatus `json:"status"`
+
+	// SubtotalAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	SubtotalAmount Money              `json:"subtotalAmount"`
+	SupplierId     openapi_types.UUID `json:"supplierId"`
+	SupplierName   string             `json:"supplierName"`
+
+	// TotalPayableAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	TotalPayableAmount Money     `json:"totalPayableAmount"`
+	UpdatedAt          time.Time `json:"updatedAt"`
+	Version            int       `json:"version"`
+}
+
+// SupplierBillUpdate defines model for SupplierBillUpdate.
+type SupplierBillUpdate struct {
+	// BillDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BillDate BusinessDate `json:"billDate"`
+
+	// DueDate Kosong = tanggal tagihan + termin PO.
+	DueDate *BusinessDate           `json:"dueDate,omitempty"`
+	Lines   []SupplierBillLineInput `json:"lines"`
+	Note    *string                 `json:"note,omitempty"`
+	Number  string                  `json:"number"`
+
+	// Version Versi terakhir yang dilihat user (optimistic locking).
+	Version int `json:"version"`
+
+	// WithholdingRate Kosong = tarif awal jenis PPh.
+	WithholdingRate *PurchasePercent `json:"withholdingRate,omitempty"`
+
+	// WithholdingType Kosong = PPh default pemasok.
+	WithholdingType *WithholdingType `json:"withholdingType,omitempty"`
+}
+
 // VersionInput defines model for VersionInput.
 type VersionInput struct {
 	// Version Versi terakhir yang dilihat user (optimistic locking).
 	Version int `json:"version"`
 }
+
+// WithholdingType Jenis PPh yang dipotong (pemasok, jenis biaya); tarif di master tarif PPh.
+type WithholdingType string
 
 // Id defines model for Id.
 type Id = openapi_types.UUID
@@ -1018,6 +2312,60 @@ type Search = string
 
 // Sort defines model for Sort.
 type Sort = string
+
+// ListGoodsReceiptsParams defines parameters for ListGoodsReceipts.
+type ListGoodsReceiptsParams struct {
+	Page            *Page                `form:"page,omitempty" json:"page,omitempty"`
+	PageSize        *PageSize            `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+	Q               *Search              `form:"q,omitempty" json:"q,omitempty"`
+	Status          *GoodsReceiptStatus  `form:"status,omitempty" json:"status,omitempty"`
+	OrderType       *[]PurchaseOrderType `form:"orderType,omitempty" json:"orderType,omitempty"`
+	PurchaseOrderId *openapi_types.UUID  `form:"purchaseOrderId,omitempty" json:"purchaseOrderId,omitempty"`
+	SupplierId      *openapi_types.UUID  `form:"supplierId,omitempty" json:"supplierId,omitempty"`
+	DateFrom        *BusinessDate        `form:"dateFrom,omitempty" json:"dateFrom,omitempty"`
+	DateTo          *BusinessDate        `form:"dateTo,omitempty" json:"dateTo,omitempty"`
+}
+
+// CreateGoodsReceiptParams defines parameters for CreateGoodsReceipt.
+type CreateGoodsReceiptParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// UpdateGoodsReceiptParams defines parameters for UpdateGoodsReceipt.
+type UpdateGoodsReceiptParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// CancelGoodsReceiptParams defines parameters for CancelGoodsReceipt.
+type CancelGoodsReceiptParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// PostGoodsReceiptParams defines parameters for PostGoodsReceipt.
+type PostGoodsReceiptParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// ListBillableReceiptsParams defines parameters for ListBillableReceipts.
+type ListBillableReceiptsParams struct {
+	PurchaseOrderId openapi_types.UUID `form:"purchaseOrderId" json:"purchaseOrderId"`
+}
+
+// GetGoodsReceivedNotInvoicedParams defines parameters for GetGoodsReceivedNotInvoiced.
+type GetGoodsReceivedNotInvoicedParams struct {
+	Q               *Search             `form:"q,omitempty" json:"q,omitempty"`
+	SupplierId      *openapi_types.UUID `form:"supplierId,omitempty" json:"supplierId,omitempty"`
+	PurchaseOrderId *openapi_types.UUID `form:"purchaseOrderId,omitempty" json:"purchaseOrderId,omitempty"`
+}
+
+// ListReturnableReceiptsParams defines parameters for ListReturnableReceipts.
+type ListReturnableReceiptsParams struct {
+	PurchaseOrderId openapi_types.UUID `form:"purchaseOrderId" json:"purchaseOrderId"`
+}
 
 // ListPurchaseAdvancesParams defines parameters for ListPurchaseAdvances.
 type ListPurchaseAdvancesParams struct {
@@ -1162,6 +2510,110 @@ type SubmitPurchaseRequestParams struct {
 	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
 }
 
+// ListPurchaseReturnsParams defines parameters for ListPurchaseReturns.
+type ListPurchaseReturnsParams struct {
+	Page            *Page                 `form:"page,omitempty" json:"page,omitempty"`
+	PageSize        *PageSize             `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+	Q               *Search               `form:"q,omitempty" json:"q,omitempty"`
+	Status          *PurchaseReturnStatus `form:"status,omitempty" json:"status,omitempty"`
+	Origin          *PurchaseReturnOrigin `form:"origin,omitempty" json:"origin,omitempty"`
+	PurchaseOrderId *openapi_types.UUID   `form:"purchaseOrderId,omitempty" json:"purchaseOrderId,omitempty"`
+	SupplierId      *openapi_types.UUID   `form:"supplierId,omitempty" json:"supplierId,omitempty"`
+	DateFrom        *BusinessDate         `form:"dateFrom,omitempty" json:"dateFrom,omitempty"`
+	DateTo          *BusinessDate         `form:"dateTo,omitempty" json:"dateTo,omitempty"`
+}
+
+// CreatePurchaseReturnParams defines parameters for CreatePurchaseReturn.
+type CreatePurchaseReturnParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// UpdatePurchaseReturnParams defines parameters for UpdatePurchaseReturn.
+type UpdatePurchaseReturnParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// CancelPurchaseReturnParams defines parameters for CancelPurchaseReturn.
+type CancelPurchaseReturnParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// PostPurchaseReturnParams defines parameters for PostPurchaseReturn.
+type PostPurchaseReturnParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// RevisePurchaseReturnParams defines parameters for RevisePurchaseReturn.
+type RevisePurchaseReturnParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// SubmitPurchaseReturnParams defines parameters for SubmitPurchaseReturn.
+type SubmitPurchaseReturnParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// ListSupplierBillsParams defines parameters for ListSupplierBills.
+type ListSupplierBillsParams struct {
+	Page            *Page                    `form:"page,omitempty" json:"page,omitempty"`
+	PageSize        *PageSize                `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+	Q               *Search                  `form:"q,omitempty" json:"q,omitempty"`
+	Status          *SupplierBillStatus      `form:"status,omitempty" json:"status,omitempty"`
+	MatchStatus     *SupplierBillMatchStatus `form:"matchStatus,omitempty" json:"matchStatus,omitempty"`
+	PurchaseOrderId *openapi_types.UUID      `form:"purchaseOrderId,omitempty" json:"purchaseOrderId,omitempty"`
+	SupplierId      *openapi_types.UUID      `form:"supplierId,omitempty" json:"supplierId,omitempty"`
+	DateFrom        *BusinessDate            `form:"dateFrom,omitempty" json:"dateFrom,omitempty"`
+	DateTo          *BusinessDate            `form:"dateTo,omitempty" json:"dateTo,omitempty"`
+}
+
+// CreateSupplierBillParams defines parameters for CreateSupplierBill.
+type CreateSupplierBillParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// UpdateSupplierBillParams defines parameters for UpdateSupplierBill.
+type UpdateSupplierBillParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// CancelSupplierBillParams defines parameters for CancelSupplierBill.
+type CancelSupplierBillParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// PostSupplierBillParams defines parameters for PostSupplierBill.
+type PostSupplierBillParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// ReviseSupplierBillParams defines parameters for ReviseSupplierBill.
+type ReviseSupplierBillParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// CreateGoodsReceiptJSONRequestBody defines body for CreateGoodsReceipt for application/json ContentType.
+type CreateGoodsReceiptJSONRequestBody = GoodsReceiptInput
+
+// UpdateGoodsReceiptJSONRequestBody defines body for UpdateGoodsReceipt for application/json ContentType.
+type UpdateGoodsReceiptJSONRequestBody = GoodsReceiptUpdate
+
+// CancelGoodsReceiptJSONRequestBody defines body for CancelGoodsReceipt for application/json ContentType.
+type CancelGoodsReceiptJSONRequestBody = PurchaseCancelInput
+
+// PostGoodsReceiptJSONRequestBody defines body for PostGoodsReceipt for application/json ContentType.
+type PostGoodsReceiptJSONRequestBody = VersionInput
+
 // CreatePurchaseAdvanceJSONRequestBody defines body for CreatePurchaseAdvance for application/json ContentType.
 type CreatePurchaseAdvanceJSONRequestBody = PurchaseAdvanceInput
 
@@ -1210,14 +2662,77 @@ type RevisePurchaseRequestJSONRequestBody = VersionInput
 // SubmitPurchaseRequestJSONRequestBody defines body for SubmitPurchaseRequest for application/json ContentType.
 type SubmitPurchaseRequestJSONRequestBody = VersionInput
 
+// CreatePurchaseReturnJSONRequestBody defines body for CreatePurchaseReturn for application/json ContentType.
+type CreatePurchaseReturnJSONRequestBody = PurchaseReturnInput
+
+// UpdatePurchaseReturnJSONRequestBody defines body for UpdatePurchaseReturn for application/json ContentType.
+type UpdatePurchaseReturnJSONRequestBody = PurchaseReturnUpdate
+
+// CancelPurchaseReturnJSONRequestBody defines body for CancelPurchaseReturn for application/json ContentType.
+type CancelPurchaseReturnJSONRequestBody = PurchaseCancelInput
+
+// PostPurchaseReturnJSONRequestBody defines body for PostPurchaseReturn for application/json ContentType.
+type PostPurchaseReturnJSONRequestBody = VersionInput
+
+// RevisePurchaseReturnJSONRequestBody defines body for RevisePurchaseReturn for application/json ContentType.
+type RevisePurchaseReturnJSONRequestBody = VersionInput
+
+// SubmitPurchaseReturnJSONRequestBody defines body for SubmitPurchaseReturn for application/json ContentType.
+type SubmitPurchaseReturnJSONRequestBody = VersionInput
+
+// CreateSupplierBillJSONRequestBody defines body for CreateSupplierBill for application/json ContentType.
+type CreateSupplierBillJSONRequestBody = SupplierBillInput
+
+// UpdateSupplierBillJSONRequestBody defines body for UpdateSupplierBill for application/json ContentType.
+type UpdateSupplierBillJSONRequestBody = SupplierBillUpdate
+
+// CancelSupplierBillJSONRequestBody defines body for CancelSupplierBill for application/json ContentType.
+type CancelSupplierBillJSONRequestBody = PurchaseCancelInput
+
+// PostSupplierBillJSONRequestBody defines body for PostSupplierBill for application/json ContentType.
+type PostSupplierBillJSONRequestBody = VersionInput
+
+// ReviseSupplierBillJSONRequestBody defines body for ReviseSupplierBill for application/json ContentType.
+type ReviseSupplierBillJSONRequestBody = VersionInput
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// ListGoodsReceipts Daftar Penerimaan Barang (S-206, S-207)
+	// (GET /api/v1/goods-receipts)
+	ListGoodsReceipts(w http.ResponseWriter, r *http.Request, params ListGoodsReceiptsParams)
+	// CreateGoodsReceipt Menyimpan draft Penerimaan Barang untuk PO Disetujui/Diterima Sebagian
+	// (POST /api/v1/goods-receipts)
+	CreateGoodsReceipt(w http.ResponseWriter, r *http.Request, params CreateGoodsReceiptParams)
+	// GetGoodsReceipt Detail Penerimaan Barang
+	// (GET /api/v1/goods-receipts/{id})
+	GetGoodsReceipt(w http.ResponseWriter, r *http.Request, id Id)
+	// UpdateGoodsReceipt Mengubah draft Penerimaan Barang
+	// (PUT /api/v1/goods-receipts/{id})
+	UpdateGoodsReceipt(w http.ResponseWriter, r *http.Request, id Id, params UpdateGoodsReceiptParams)
+	// CancelGoodsReceipt Batalkan Penerimaan Barang
+	// (POST /api/v1/goods-receipts/{id}/cancel)
+	CancelGoodsReceipt(w http.ResponseWriter, r *http.Request, id Id, params CancelGoodsReceiptParams)
+	// PostGoodsReceipt Posting Penerimaan Barang (stok Inbound Karantina, jurnal A-01/A-03)
+	// (POST /api/v1/goods-receipts/{id}/post)
+	PostGoodsReceipt(w http.ResponseWriter, r *http.Request, id Id, params PostGoodsReceiptParams)
+	// ListBillableReceipts Baris Penerimaan Barang PO yang belum ditagih (form Tagihan Pemasok)
+	// (GET /api/v1/procurement/billable-receipts)
+	ListBillableReceipts(w http.ResponseWriter, r *http.Request, params ListBillableReceiptsParams)
 	// ListProcurementCashBankAccounts Akun Kas & Bank (11xx) untuk pembayaran uang muka pembelian
 	// (GET /api/v1/procurement/cash-bank-accounts)
 	ListProcurementCashBankAccounts(w http.ResponseWriter, r *http.Request)
 	// ListProcurementDivisionOptions Divisi aktif untuk form Purchase Request dan Purchase Order
 	// (GET /api/v1/procurement/division-options)
 	ListProcurementDivisionOptions(w http.ResponseWriter, r *http.Request)
+	// ListProcurementInboundLocations Lokasi Inbound aktif untuk form Penerimaan Barang
+	// (GET /api/v1/procurement/inbound-locations)
+	ListProcurementInboundLocations(w http.ResponseWriter, r *http.Request)
+	// GetGoodsReceivedNotInvoiced Laporan Barang Diterima Belum Ditagih per PO/GR (S-209)
+	// (GET /api/v1/procurement/reports/goods-received-not-invoiced)
+	GetGoodsReceivedNotInvoiced(w http.ResponseWriter, r *http.Request, params GetGoodsReceivedNotInvoicedParams)
+	// ListReturnableReceipts Baris Penerimaan Barang PO yang masih bisa diretur (form Retur Pembelian)
+	// (GET /api/v1/procurement/returnable-receipts)
+	ListReturnableReceipts(w http.ResponseWriter, r *http.Request, params ListReturnableReceiptsParams)
 	// ListPurchaseAdvances Daftar uang muka pembelian (S-205)
 	// (GET /api/v1/purchase-advances)
 	ListPurchaseAdvances(w http.ResponseWriter, r *http.Request, params ListPurchaseAdvancesParams)
@@ -1284,11 +2799,98 @@ type ServerInterface interface {
 	// SubmitPurchaseRequest Ajukan Purchase Request
 	// (POST /api/v1/purchase-requests/{id}/submit)
 	SubmitPurchaseRequest(w http.ResponseWriter, r *http.Request, id Id, params SubmitPurchaseRequestParams)
+	// ListPurchaseReturns Daftar Retur Pembelian & nota debit (S-210)
+	// (GET /api/v1/purchase-returns)
+	ListPurchaseReturns(w http.ResponseWriter, r *http.Request, params ListPurchaseReturnsParams)
+	// CreatePurchaseReturn Menyimpan draft retur pembelian manual
+	// (POST /api/v1/purchase-returns)
+	CreatePurchaseReturn(w http.ResponseWriter, r *http.Request, params CreatePurchaseReturnParams)
+	// GetPurchaseReturn Detail retur pembelian
+	// (GET /api/v1/purchase-returns/{id})
+	GetPurchaseReturn(w http.ResponseWriter, r *http.Request, id Id)
+	// UpdatePurchaseReturn Mengubah draft retur pembelian
+	// (PUT /api/v1/purchase-returns/{id})
+	UpdatePurchaseReturn(w http.ResponseWriter, r *http.Request, id Id, params UpdatePurchaseReturnParams)
+	// CancelPurchaseReturn Batalkan retur Draft atau Disetujui
+	// (POST /api/v1/purchase-returns/{id}/cancel)
+	CancelPurchaseReturn(w http.ResponseWriter, r *http.Request, id Id, params CancelPurchaseReturnParams)
+	// PostPurchaseReturn Posting retur pembelian (nota debit DN, jurnal A-02)
+	// (POST /api/v1/purchase-returns/{id}/post)
+	PostPurchaseReturn(w http.ResponseWriter, r *http.Request, id Id, params PostPurchaseReturnParams)
+	// RevisePurchaseReturn Kembalikan retur yang ditolak ke Draft
+	// (POST /api/v1/purchase-returns/{id}/revise)
+	RevisePurchaseReturn(w http.ResponseWriter, r *http.Request, id Id, params RevisePurchaseReturnParams)
+	// SubmitPurchaseReturn Ajukan retur pembelian ke Head Logistik (nomor RB)
+	// (POST /api/v1/purchase-returns/{id}/submit)
+	SubmitPurchaseReturn(w http.ResponseWriter, r *http.Request, id Id, params SubmitPurchaseReturnParams)
+	// ListSupplierBills Daftar Tagihan Pemasok (S-208)
+	// (GET /api/v1/supplier-bills)
+	ListSupplierBills(w http.ResponseWriter, r *http.Request, params ListSupplierBillsParams)
+	// CreateSupplierBill Menyimpan draft tagihan pemasok dan menampilkan hasil 3-way match
+	// (POST /api/v1/supplier-bills)
+	CreateSupplierBill(w http.ResponseWriter, r *http.Request, params CreateSupplierBillParams)
+	// GetSupplierBill Detail tagihan pemasok
+	// (GET /api/v1/supplier-bills/{id})
+	GetSupplierBill(w http.ResponseWriter, r *http.Request, id Id)
+	// UpdateSupplierBill Mengubah draft tagihan pemasok
+	// (PUT /api/v1/supplier-bills/{id})
+	UpdateSupplierBill(w http.ResponseWriter, r *http.Request, id Id, params UpdateSupplierBillParams)
+	// CancelSupplierBill Batalkan tagihan Draft atau Ditolak
+	// (POST /api/v1/supplier-bills/{id}/cancel)
+	CancelSupplierBill(w http.ResponseWriter, r *http.Request, id Id, params CancelSupplierBillParams)
+	// PostSupplierBill Posting tagihan pemasok (3-way match, jurnal A-18)
+	// (POST /api/v1/supplier-bills/{id}/post)
+	PostSupplierBill(w http.ResponseWriter, r *http.Request, id Id, params PostSupplierBillParams)
+	// ReviseSupplierBill Kembalikan tagihan yang ditolak ke Draft
+	// (POST /api/v1/supplier-bills/{id}/revise)
+	ReviseSupplierBill(w http.ResponseWriter, r *http.Request, id Id, params ReviseSupplierBillParams)
 }
 
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
 
 type Unimplemented struct{}
+
+// ListGoodsReceipts Daftar Penerimaan Barang (S-206, S-207)
+// (GET /api/v1/goods-receipts)
+func (_ Unimplemented) ListGoodsReceipts(w http.ResponseWriter, r *http.Request, params ListGoodsReceiptsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// CreateGoodsReceipt Menyimpan draft Penerimaan Barang untuk PO Disetujui/Diterima Sebagian
+// (POST /api/v1/goods-receipts)
+func (_ Unimplemented) CreateGoodsReceipt(w http.ResponseWriter, r *http.Request, params CreateGoodsReceiptParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetGoodsReceipt Detail Penerimaan Barang
+// (GET /api/v1/goods-receipts/{id})
+func (_ Unimplemented) GetGoodsReceipt(w http.ResponseWriter, r *http.Request, id Id) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// UpdateGoodsReceipt Mengubah draft Penerimaan Barang
+// (PUT /api/v1/goods-receipts/{id})
+func (_ Unimplemented) UpdateGoodsReceipt(w http.ResponseWriter, r *http.Request, id Id, params UpdateGoodsReceiptParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// CancelGoodsReceipt Batalkan Penerimaan Barang
+// (POST /api/v1/goods-receipts/{id}/cancel)
+func (_ Unimplemented) CancelGoodsReceipt(w http.ResponseWriter, r *http.Request, id Id, params CancelGoodsReceiptParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// PostGoodsReceipt Posting Penerimaan Barang (stok Inbound Karantina, jurnal A-01/A-03)
+// (POST /api/v1/goods-receipts/{id}/post)
+func (_ Unimplemented) PostGoodsReceipt(w http.ResponseWriter, r *http.Request, id Id, params PostGoodsReceiptParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListBillableReceipts Baris Penerimaan Barang PO yang belum ditagih (form Tagihan Pemasok)
+// (GET /api/v1/procurement/billable-receipts)
+func (_ Unimplemented) ListBillableReceipts(w http.ResponseWriter, r *http.Request, params ListBillableReceiptsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
 
 // ListProcurementCashBankAccounts Akun Kas & Bank (11xx) untuk pembayaran uang muka pembelian
 // (GET /api/v1/procurement/cash-bank-accounts)
@@ -1299,6 +2901,24 @@ func (_ Unimplemented) ListProcurementCashBankAccounts(w http.ResponseWriter, r 
 // ListProcurementDivisionOptions Divisi aktif untuk form Purchase Request dan Purchase Order
 // (GET /api/v1/procurement/division-options)
 func (_ Unimplemented) ListProcurementDivisionOptions(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListProcurementInboundLocations Lokasi Inbound aktif untuk form Penerimaan Barang
+// (GET /api/v1/procurement/inbound-locations)
+func (_ Unimplemented) ListProcurementInboundLocations(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetGoodsReceivedNotInvoiced Laporan Barang Diterima Belum Ditagih per PO/GR (S-209)
+// (GET /api/v1/procurement/reports/goods-received-not-invoiced)
+func (_ Unimplemented) GetGoodsReceivedNotInvoiced(w http.ResponseWriter, r *http.Request, params GetGoodsReceivedNotInvoicedParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListReturnableReceipts Baris Penerimaan Barang PO yang masih bisa diretur (form Retur Pembelian)
+// (GET /api/v1/procurement/returnable-receipts)
+func (_ Unimplemented) ListReturnableReceipts(w http.ResponseWriter, r *http.Request, params ListReturnableReceiptsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -1434,6 +3054,96 @@ func (_ Unimplemented) SubmitPurchaseRequest(w http.ResponseWriter, r *http.Requ
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListPurchaseReturns Daftar Retur Pembelian & nota debit (S-210)
+// (GET /api/v1/purchase-returns)
+func (_ Unimplemented) ListPurchaseReturns(w http.ResponseWriter, r *http.Request, params ListPurchaseReturnsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// CreatePurchaseReturn Menyimpan draft retur pembelian manual
+// (POST /api/v1/purchase-returns)
+func (_ Unimplemented) CreatePurchaseReturn(w http.ResponseWriter, r *http.Request, params CreatePurchaseReturnParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetPurchaseReturn Detail retur pembelian
+// (GET /api/v1/purchase-returns/{id})
+func (_ Unimplemented) GetPurchaseReturn(w http.ResponseWriter, r *http.Request, id Id) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// UpdatePurchaseReturn Mengubah draft retur pembelian
+// (PUT /api/v1/purchase-returns/{id})
+func (_ Unimplemented) UpdatePurchaseReturn(w http.ResponseWriter, r *http.Request, id Id, params UpdatePurchaseReturnParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// CancelPurchaseReturn Batalkan retur Draft atau Disetujui
+// (POST /api/v1/purchase-returns/{id}/cancel)
+func (_ Unimplemented) CancelPurchaseReturn(w http.ResponseWriter, r *http.Request, id Id, params CancelPurchaseReturnParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// PostPurchaseReturn Posting retur pembelian (nota debit DN, jurnal A-02)
+// (POST /api/v1/purchase-returns/{id}/post)
+func (_ Unimplemented) PostPurchaseReturn(w http.ResponseWriter, r *http.Request, id Id, params PostPurchaseReturnParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// RevisePurchaseReturn Kembalikan retur yang ditolak ke Draft
+// (POST /api/v1/purchase-returns/{id}/revise)
+func (_ Unimplemented) RevisePurchaseReturn(w http.ResponseWriter, r *http.Request, id Id, params RevisePurchaseReturnParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// SubmitPurchaseReturn Ajukan retur pembelian ke Head Logistik (nomor RB)
+// (POST /api/v1/purchase-returns/{id}/submit)
+func (_ Unimplemented) SubmitPurchaseReturn(w http.ResponseWriter, r *http.Request, id Id, params SubmitPurchaseReturnParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListSupplierBills Daftar Tagihan Pemasok (S-208)
+// (GET /api/v1/supplier-bills)
+func (_ Unimplemented) ListSupplierBills(w http.ResponseWriter, r *http.Request, params ListSupplierBillsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// CreateSupplierBill Menyimpan draft tagihan pemasok dan menampilkan hasil 3-way match
+// (POST /api/v1/supplier-bills)
+func (_ Unimplemented) CreateSupplierBill(w http.ResponseWriter, r *http.Request, params CreateSupplierBillParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetSupplierBill Detail tagihan pemasok
+// (GET /api/v1/supplier-bills/{id})
+func (_ Unimplemented) GetSupplierBill(w http.ResponseWriter, r *http.Request, id Id) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// UpdateSupplierBill Mengubah draft tagihan pemasok
+// (PUT /api/v1/supplier-bills/{id})
+func (_ Unimplemented) UpdateSupplierBill(w http.ResponseWriter, r *http.Request, id Id, params UpdateSupplierBillParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// CancelSupplierBill Batalkan tagihan Draft atau Ditolak
+// (POST /api/v1/supplier-bills/{id}/cancel)
+func (_ Unimplemented) CancelSupplierBill(w http.ResponseWriter, r *http.Request, id Id, params CancelSupplierBillParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// PostSupplierBill Posting tagihan pemasok (3-way match, jurnal A-18)
+// (POST /api/v1/supplier-bills/{id}/post)
+func (_ Unimplemented) PostSupplierBill(w http.ResponseWriter, r *http.Request, id Id, params PostSupplierBillParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ReviseSupplierBill Kembalikan tagihan yang ditolak ke Draft
+// (POST /api/v1/supplier-bills/{id}/revise)
+func (_ Unimplemented) ReviseSupplierBill(w http.ResponseWriter, r *http.Request, id Id, params ReviseSupplierBillParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
 // ServerInterfaceWrapper converts contexts to parameters.
 type ServerInterfaceWrapper struct {
 	Handler            ServerInterface
@@ -1442,6 +3152,409 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(http.Handler) http.Handler
+
+// ListGoodsReceipts operation middleware
+func (siw *ServerInterfaceWrapper) ListGoodsReceipts(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListGoodsReceiptsParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", r.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "page"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "pageSize", r.URL.Query(), &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "pageSize"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "q" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "q", r.URL.Query(), &params.Q, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "q"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "q", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "status" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "status", r.URL.Query(), &params.Status, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "status"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "status", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "orderType" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", false, false, "orderType", r.URL.Query(), &params.OrderType, runtime.BindQueryParameterOptions{Type: "array", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "orderType"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orderType", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "purchaseOrderId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "purchaseOrderId", r.URL.Query(), &params.PurchaseOrderId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "purchaseOrderId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "purchaseOrderId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "supplierId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "supplierId", r.URL.Query(), &params.SupplierId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "supplierId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "supplierId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "dateFrom" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "dateFrom", r.URL.Query(), &params.DateFrom, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dateFrom"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dateFrom", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "dateTo" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "dateTo", r.URL.Query(), &params.DateTo, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dateTo"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dateTo", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListGoodsReceipts(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateGoodsReceipt operation middleware
+func (siw *ServerInterfaceWrapper) CreateGoodsReceipt(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateGoodsReceiptParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateGoodsReceipt(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetGoodsReceipt operation middleware
+func (siw *ServerInterfaceWrapper) GetGoodsReceipt(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetGoodsReceipt(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateGoodsReceipt operation middleware
+func (siw *ServerInterfaceWrapper) UpdateGoodsReceipt(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params UpdateGoodsReceiptParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateGoodsReceipt(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CancelGoodsReceipt operation middleware
+func (siw *ServerInterfaceWrapper) CancelGoodsReceipt(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CancelGoodsReceiptParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CancelGoodsReceipt(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostGoodsReceipt operation middleware
+func (siw *ServerInterfaceWrapper) PostGoodsReceipt(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params PostGoodsReceiptParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostGoodsReceipt(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListBillableReceipts operation middleware
+func (siw *ServerInterfaceWrapper) ListBillableReceipts(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListBillableReceiptsParams
+
+	// ------------- Required query parameter "purchaseOrderId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "purchaseOrderId", r.URL.Query(), &params.PurchaseOrderId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "purchaseOrderId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "purchaseOrderId", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListBillableReceipts(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
 
 // ListProcurementCashBankAccounts operation middleware
 func (siw *ServerInterfaceWrapper) ListProcurementCashBankAccounts(w http.ResponseWriter, r *http.Request) {
@@ -1462,6 +3575,112 @@ func (siw *ServerInterfaceWrapper) ListProcurementDivisionOptions(w http.Respons
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.ListProcurementDivisionOptions(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListProcurementInboundLocations operation middleware
+func (siw *ServerInterfaceWrapper) ListProcurementInboundLocations(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListProcurementInboundLocations(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetGoodsReceivedNotInvoiced operation middleware
+func (siw *ServerInterfaceWrapper) GetGoodsReceivedNotInvoiced(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetGoodsReceivedNotInvoicedParams
+
+	// ------------- Optional query parameter "q" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "q", r.URL.Query(), &params.Q, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "q"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "q", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "supplierId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "supplierId", r.URL.Query(), &params.SupplierId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "supplierId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "supplierId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "purchaseOrderId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "purchaseOrderId", r.URL.Query(), &params.PurchaseOrderId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "purchaseOrderId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "purchaseOrderId", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetGoodsReceivedNotInvoiced(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListReturnableReceipts operation middleware
+func (siw *ServerInterfaceWrapper) ListReturnableReceipts(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListReturnableReceiptsParams
+
+	// ------------- Required query parameter "purchaseOrderId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "purchaseOrderId", r.URL.Query(), &params.PurchaseOrderId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "purchaseOrderId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "purchaseOrderId", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListReturnableReceipts(w, r, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -2797,6 +5016,908 @@ func (siw *ServerInterfaceWrapper) SubmitPurchaseRequest(w http.ResponseWriter, 
 	handler.ServeHTTP(w, r)
 }
 
+// ListPurchaseReturns operation middleware
+func (siw *ServerInterfaceWrapper) ListPurchaseReturns(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListPurchaseReturnsParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", r.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "page"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "pageSize", r.URL.Query(), &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "pageSize"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "q" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "q", r.URL.Query(), &params.Q, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "q"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "q", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "status" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "status", r.URL.Query(), &params.Status, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "status"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "status", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "origin" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "origin", r.URL.Query(), &params.Origin, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "origin"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "origin", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "purchaseOrderId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "purchaseOrderId", r.URL.Query(), &params.PurchaseOrderId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "purchaseOrderId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "purchaseOrderId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "supplierId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "supplierId", r.URL.Query(), &params.SupplierId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "supplierId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "supplierId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "dateFrom" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "dateFrom", r.URL.Query(), &params.DateFrom, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dateFrom"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dateFrom", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "dateTo" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "dateTo", r.URL.Query(), &params.DateTo, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dateTo"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dateTo", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListPurchaseReturns(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreatePurchaseReturn operation middleware
+func (siw *ServerInterfaceWrapper) CreatePurchaseReturn(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreatePurchaseReturnParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreatePurchaseReturn(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetPurchaseReturn operation middleware
+func (siw *ServerInterfaceWrapper) GetPurchaseReturn(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetPurchaseReturn(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdatePurchaseReturn operation middleware
+func (siw *ServerInterfaceWrapper) UpdatePurchaseReturn(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params UpdatePurchaseReturnParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdatePurchaseReturn(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CancelPurchaseReturn operation middleware
+func (siw *ServerInterfaceWrapper) CancelPurchaseReturn(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CancelPurchaseReturnParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CancelPurchaseReturn(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostPurchaseReturn operation middleware
+func (siw *ServerInterfaceWrapper) PostPurchaseReturn(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params PostPurchaseReturnParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostPurchaseReturn(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// RevisePurchaseReturn operation middleware
+func (siw *ServerInterfaceWrapper) RevisePurchaseReturn(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params RevisePurchaseReturnParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.RevisePurchaseReturn(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// SubmitPurchaseReturn operation middleware
+func (siw *ServerInterfaceWrapper) SubmitPurchaseReturn(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params SubmitPurchaseReturnParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.SubmitPurchaseReturn(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListSupplierBills operation middleware
+func (siw *ServerInterfaceWrapper) ListSupplierBills(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListSupplierBillsParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", r.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "page"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "pageSize", r.URL.Query(), &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "pageSize"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "q" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "q", r.URL.Query(), &params.Q, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "q"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "q", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "status" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "status", r.URL.Query(), &params.Status, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "status"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "status", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "matchStatus" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "matchStatus", r.URL.Query(), &params.MatchStatus, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "matchStatus"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "matchStatus", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "purchaseOrderId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "purchaseOrderId", r.URL.Query(), &params.PurchaseOrderId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "purchaseOrderId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "purchaseOrderId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "supplierId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "supplierId", r.URL.Query(), &params.SupplierId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "supplierId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "supplierId", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "dateFrom" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "dateFrom", r.URL.Query(), &params.DateFrom, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dateFrom"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dateFrom", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "dateTo" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "dateTo", r.URL.Query(), &params.DateTo, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "dateTo"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "dateTo", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListSupplierBills(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateSupplierBill operation middleware
+func (siw *ServerInterfaceWrapper) CreateSupplierBill(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateSupplierBillParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateSupplierBill(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetSupplierBill operation middleware
+func (siw *ServerInterfaceWrapper) GetSupplierBill(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetSupplierBill(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateSupplierBill operation middleware
+func (siw *ServerInterfaceWrapper) UpdateSupplierBill(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params UpdateSupplierBillParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateSupplierBill(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CancelSupplierBill operation middleware
+func (siw *ServerInterfaceWrapper) CancelSupplierBill(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CancelSupplierBillParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CancelSupplierBill(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostSupplierBill operation middleware
+func (siw *ServerInterfaceWrapper) PostSupplierBill(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params PostSupplierBillParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostSupplierBill(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ReviseSupplierBill operation middleware
+func (siw *ServerInterfaceWrapper) ReviseSupplierBill(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ReviseSupplierBillParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ReviseSupplierBill(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 type UnescapedCookieParamError struct {
 	ParamName string
 	Err       error
@@ -2982,11 +6103,366 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/api/v1/purchase-advances/{id}/cancel", wrapper.CancelPurchaseAdvance)
 	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/procurement/inbound-locations", wrapper.ListProcurementInboundLocations)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/goods-receipts", wrapper.ListGoodsReceipts)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/goods-receipts", wrapper.CreateGoodsReceipt)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/goods-receipts/{id}", wrapper.GetGoodsReceipt)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/goods-receipts/{id}", wrapper.UpdateGoodsReceipt)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/goods-receipts/{id}/post", wrapper.PostGoodsReceipt)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/goods-receipts/{id}/cancel", wrapper.CancelGoodsReceipt)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/procurement/billable-receipts", wrapper.ListBillableReceipts)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/supplier-bills", wrapper.ListSupplierBills)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/supplier-bills", wrapper.CreateSupplierBill)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/supplier-bills/{id}", wrapper.GetSupplierBill)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/supplier-bills/{id}", wrapper.UpdateSupplierBill)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/supplier-bills/{id}/post", wrapper.PostSupplierBill)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/supplier-bills/{id}/revise", wrapper.ReviseSupplierBill)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/supplier-bills/{id}/cancel", wrapper.CancelSupplierBill)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/procurement/returnable-receipts", wrapper.ListReturnableReceipts)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/purchase-returns", wrapper.ListPurchaseReturns)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/purchase-returns", wrapper.CreatePurchaseReturn)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/purchase-returns/{id}", wrapper.GetPurchaseReturn)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/purchase-returns/{id}", wrapper.UpdatePurchaseReturn)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/purchase-returns/{id}/submit", wrapper.SubmitPurchaseReturn)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/purchase-returns/{id}/post", wrapper.PostPurchaseReturn)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/purchase-returns/{id}/revise", wrapper.RevisePurchaseReturn)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/purchase-returns/{id}/cancel", wrapper.CancelPurchaseReturn)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/procurement/reports/goods-received-not-invoiced", wrapper.GetGoodsReceivedNotInvoiced)
+	})
 
 	return r
 }
 
 type ProblemApplicationProblemPlusJSONResponse Problem
+
+type ListGoodsReceiptsRequestObject struct {
+	Params ListGoodsReceiptsParams
+}
+
+type ListGoodsReceiptsResponseObject interface {
+	VisitListGoodsReceiptsResponse(w http.ResponseWriter) error
+}
+
+type ListGoodsReceipts200JSONResponse GoodsReceiptList
+
+func (response ListGoodsReceipts200JSONResponse) VisitListGoodsReceiptsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListGoodsReceiptsdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListGoodsReceiptsdefaultApplicationProblemPlusJSONResponse) VisitListGoodsReceiptsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateGoodsReceiptRequestObject struct {
+	Params CreateGoodsReceiptParams
+	Body   *CreateGoodsReceiptJSONRequestBody
+}
+
+type CreateGoodsReceiptResponseObject interface {
+	VisitCreateGoodsReceiptResponse(w http.ResponseWriter) error
+}
+
+type CreateGoodsReceipt201JSONResponse GoodsReceipt
+
+func (response CreateGoodsReceipt201JSONResponse) VisitCreateGoodsReceiptResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateGoodsReceiptdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response CreateGoodsReceiptdefaultApplicationProblemPlusJSONResponse) VisitCreateGoodsReceiptResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetGoodsReceiptRequestObject struct {
+	Id Id `json:"id"`
+}
+
+type GetGoodsReceiptResponseObject interface {
+	VisitGetGoodsReceiptResponse(w http.ResponseWriter) error
+}
+
+type GetGoodsReceipt200JSONResponse GoodsReceipt
+
+func (response GetGoodsReceipt200JSONResponse) VisitGetGoodsReceiptResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetGoodsReceiptdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetGoodsReceiptdefaultApplicationProblemPlusJSONResponse) VisitGetGoodsReceiptResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateGoodsReceiptRequestObject struct {
+	Id     Id `json:"id"`
+	Params UpdateGoodsReceiptParams
+	Body   *UpdateGoodsReceiptJSONRequestBody
+}
+
+type UpdateGoodsReceiptResponseObject interface {
+	VisitUpdateGoodsReceiptResponse(w http.ResponseWriter) error
+}
+
+type UpdateGoodsReceipt200JSONResponse GoodsReceipt
+
+func (response UpdateGoodsReceipt200JSONResponse) VisitUpdateGoodsReceiptResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateGoodsReceiptdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response UpdateGoodsReceiptdefaultApplicationProblemPlusJSONResponse) VisitUpdateGoodsReceiptResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CancelGoodsReceiptRequestObject struct {
+	Id     Id `json:"id"`
+	Params CancelGoodsReceiptParams
+	Body   *CancelGoodsReceiptJSONRequestBody
+}
+
+type CancelGoodsReceiptResponseObject interface {
+	VisitCancelGoodsReceiptResponse(w http.ResponseWriter) error
+}
+
+type CancelGoodsReceipt200JSONResponse GoodsReceipt
+
+func (response CancelGoodsReceipt200JSONResponse) VisitCancelGoodsReceiptResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CancelGoodsReceiptdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response CancelGoodsReceiptdefaultApplicationProblemPlusJSONResponse) VisitCancelGoodsReceiptResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostGoodsReceiptRequestObject struct {
+	Id     Id `json:"id"`
+	Params PostGoodsReceiptParams
+	Body   *PostGoodsReceiptJSONRequestBody
+}
+
+type PostGoodsReceiptResponseObject interface {
+	VisitPostGoodsReceiptResponse(w http.ResponseWriter) error
+}
+
+type PostGoodsReceipt200JSONResponse GoodsReceipt
+
+func (response PostGoodsReceipt200JSONResponse) VisitPostGoodsReceiptResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostGoodsReceiptdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response PostGoodsReceiptdefaultApplicationProblemPlusJSONResponse) VisitPostGoodsReceiptResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListBillableReceiptsRequestObject struct {
+	Params ListBillableReceiptsParams
+}
+
+type ListBillableReceiptsResponseObject interface {
+	VisitListBillableReceiptsResponse(w http.ResponseWriter) error
+}
+
+type ListBillableReceipts200JSONResponse BillableReceipts
+
+func (response ListBillableReceipts200JSONResponse) VisitListBillableReceiptsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListBillableReceiptsdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListBillableReceiptsdefaultApplicationProblemPlusJSONResponse) VisitListBillableReceiptsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
 
 type ListProcurementCashBankAccountsRequestObject struct {
 }
@@ -3053,6 +6529,122 @@ type ListProcurementDivisionOptionsdefaultApplicationProblemPlusJSONResponse str
 }
 
 func (response ListProcurementDivisionOptionsdefaultApplicationProblemPlusJSONResponse) VisitListProcurementDivisionOptionsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListProcurementInboundLocationsRequestObject struct {
+}
+
+type ListProcurementInboundLocationsResponseObject interface {
+	VisitListProcurementInboundLocationsResponse(w http.ResponseWriter) error
+}
+
+type ListProcurementInboundLocations200JSONResponse []PurchaseLocationRef
+
+func (response ListProcurementInboundLocations200JSONResponse) VisitListProcurementInboundLocationsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListProcurementInboundLocationsdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListProcurementInboundLocationsdefaultApplicationProblemPlusJSONResponse) VisitListProcurementInboundLocationsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetGoodsReceivedNotInvoicedRequestObject struct {
+	Params GetGoodsReceivedNotInvoicedParams
+}
+
+type GetGoodsReceivedNotInvoicedResponseObject interface {
+	VisitGetGoodsReceivedNotInvoicedResponse(w http.ResponseWriter) error
+}
+
+type GetGoodsReceivedNotInvoiced200JSONResponse GoodsReceivedNotInvoicedReport
+
+func (response GetGoodsReceivedNotInvoiced200JSONResponse) VisitGetGoodsReceivedNotInvoicedResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetGoodsReceivedNotInvoiceddefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetGoodsReceivedNotInvoiceddefaultApplicationProblemPlusJSONResponse) VisitGetGoodsReceivedNotInvoicedResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListReturnableReceiptsRequestObject struct {
+	Params ListReturnableReceiptsParams
+}
+
+type ListReturnableReceiptsResponseObject interface {
+	VisitListReturnableReceiptsResponse(w http.ResponseWriter) error
+}
+
+type ListReturnableReceipts200JSONResponse ReturnableReceipts
+
+func (response ListReturnableReceipts200JSONResponse) VisitListReturnableReceiptsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListReturnableReceiptsdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListReturnableReceiptsdefaultApplicationProblemPlusJSONResponse) VisitListReturnableReceiptsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
@@ -3951,14 +7543,649 @@ func (response SubmitPurchaseRequestdefaultApplicationProblemPlusJSONResponse) V
 	return err
 }
 
+type ListPurchaseReturnsRequestObject struct {
+	Params ListPurchaseReturnsParams
+}
+
+type ListPurchaseReturnsResponseObject interface {
+	VisitListPurchaseReturnsResponse(w http.ResponseWriter) error
+}
+
+type ListPurchaseReturns200JSONResponse PurchaseReturnList
+
+func (response ListPurchaseReturns200JSONResponse) VisitListPurchaseReturnsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListPurchaseReturnsdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListPurchaseReturnsdefaultApplicationProblemPlusJSONResponse) VisitListPurchaseReturnsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreatePurchaseReturnRequestObject struct {
+	Params CreatePurchaseReturnParams
+	Body   *CreatePurchaseReturnJSONRequestBody
+}
+
+type CreatePurchaseReturnResponseObject interface {
+	VisitCreatePurchaseReturnResponse(w http.ResponseWriter) error
+}
+
+type CreatePurchaseReturn201JSONResponse PurchaseReturn
+
+func (response CreatePurchaseReturn201JSONResponse) VisitCreatePurchaseReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreatePurchaseReturndefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response CreatePurchaseReturndefaultApplicationProblemPlusJSONResponse) VisitCreatePurchaseReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetPurchaseReturnRequestObject struct {
+	Id Id `json:"id"`
+}
+
+type GetPurchaseReturnResponseObject interface {
+	VisitGetPurchaseReturnResponse(w http.ResponseWriter) error
+}
+
+type GetPurchaseReturn200JSONResponse PurchaseReturn
+
+func (response GetPurchaseReturn200JSONResponse) VisitGetPurchaseReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetPurchaseReturndefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetPurchaseReturndefaultApplicationProblemPlusJSONResponse) VisitGetPurchaseReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdatePurchaseReturnRequestObject struct {
+	Id     Id `json:"id"`
+	Params UpdatePurchaseReturnParams
+	Body   *UpdatePurchaseReturnJSONRequestBody
+}
+
+type UpdatePurchaseReturnResponseObject interface {
+	VisitUpdatePurchaseReturnResponse(w http.ResponseWriter) error
+}
+
+type UpdatePurchaseReturn200JSONResponse PurchaseReturn
+
+func (response UpdatePurchaseReturn200JSONResponse) VisitUpdatePurchaseReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdatePurchaseReturndefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response UpdatePurchaseReturndefaultApplicationProblemPlusJSONResponse) VisitUpdatePurchaseReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CancelPurchaseReturnRequestObject struct {
+	Id     Id `json:"id"`
+	Params CancelPurchaseReturnParams
+	Body   *CancelPurchaseReturnJSONRequestBody
+}
+
+type CancelPurchaseReturnResponseObject interface {
+	VisitCancelPurchaseReturnResponse(w http.ResponseWriter) error
+}
+
+type CancelPurchaseReturn200JSONResponse PurchaseReturn
+
+func (response CancelPurchaseReturn200JSONResponse) VisitCancelPurchaseReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CancelPurchaseReturndefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response CancelPurchaseReturndefaultApplicationProblemPlusJSONResponse) VisitCancelPurchaseReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostPurchaseReturnRequestObject struct {
+	Id     Id `json:"id"`
+	Params PostPurchaseReturnParams
+	Body   *PostPurchaseReturnJSONRequestBody
+}
+
+type PostPurchaseReturnResponseObject interface {
+	VisitPostPurchaseReturnResponse(w http.ResponseWriter) error
+}
+
+type PostPurchaseReturn200JSONResponse PurchaseReturn
+
+func (response PostPurchaseReturn200JSONResponse) VisitPostPurchaseReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostPurchaseReturndefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response PostPurchaseReturndefaultApplicationProblemPlusJSONResponse) VisitPostPurchaseReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RevisePurchaseReturnRequestObject struct {
+	Id     Id `json:"id"`
+	Params RevisePurchaseReturnParams
+	Body   *RevisePurchaseReturnJSONRequestBody
+}
+
+type RevisePurchaseReturnResponseObject interface {
+	VisitRevisePurchaseReturnResponse(w http.ResponseWriter) error
+}
+
+type RevisePurchaseReturn200JSONResponse PurchaseReturn
+
+func (response RevisePurchaseReturn200JSONResponse) VisitRevisePurchaseReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RevisePurchaseReturndefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response RevisePurchaseReturndefaultApplicationProblemPlusJSONResponse) VisitRevisePurchaseReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SubmitPurchaseReturnRequestObject struct {
+	Id     Id `json:"id"`
+	Params SubmitPurchaseReturnParams
+	Body   *SubmitPurchaseReturnJSONRequestBody
+}
+
+type SubmitPurchaseReturnResponseObject interface {
+	VisitSubmitPurchaseReturnResponse(w http.ResponseWriter) error
+}
+
+type SubmitPurchaseReturn200JSONResponse PurchaseReturn
+
+func (response SubmitPurchaseReturn200JSONResponse) VisitSubmitPurchaseReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SubmitPurchaseReturndefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response SubmitPurchaseReturndefaultApplicationProblemPlusJSONResponse) VisitSubmitPurchaseReturnResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListSupplierBillsRequestObject struct {
+	Params ListSupplierBillsParams
+}
+
+type ListSupplierBillsResponseObject interface {
+	VisitListSupplierBillsResponse(w http.ResponseWriter) error
+}
+
+type ListSupplierBills200JSONResponse SupplierBillList
+
+func (response ListSupplierBills200JSONResponse) VisitListSupplierBillsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListSupplierBillsdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListSupplierBillsdefaultApplicationProblemPlusJSONResponse) VisitListSupplierBillsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateSupplierBillRequestObject struct {
+	Params CreateSupplierBillParams
+	Body   *CreateSupplierBillJSONRequestBody
+}
+
+type CreateSupplierBillResponseObject interface {
+	VisitCreateSupplierBillResponse(w http.ResponseWriter) error
+}
+
+type CreateSupplierBill201JSONResponse SupplierBill
+
+func (response CreateSupplierBill201JSONResponse) VisitCreateSupplierBillResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateSupplierBilldefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response CreateSupplierBilldefaultApplicationProblemPlusJSONResponse) VisitCreateSupplierBillResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetSupplierBillRequestObject struct {
+	Id Id `json:"id"`
+}
+
+type GetSupplierBillResponseObject interface {
+	VisitGetSupplierBillResponse(w http.ResponseWriter) error
+}
+
+type GetSupplierBill200JSONResponse SupplierBill
+
+func (response GetSupplierBill200JSONResponse) VisitGetSupplierBillResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetSupplierBilldefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetSupplierBilldefaultApplicationProblemPlusJSONResponse) VisitGetSupplierBillResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateSupplierBillRequestObject struct {
+	Id     Id `json:"id"`
+	Params UpdateSupplierBillParams
+	Body   *UpdateSupplierBillJSONRequestBody
+}
+
+type UpdateSupplierBillResponseObject interface {
+	VisitUpdateSupplierBillResponse(w http.ResponseWriter) error
+}
+
+type UpdateSupplierBill200JSONResponse SupplierBill
+
+func (response UpdateSupplierBill200JSONResponse) VisitUpdateSupplierBillResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateSupplierBilldefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response UpdateSupplierBilldefaultApplicationProblemPlusJSONResponse) VisitUpdateSupplierBillResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CancelSupplierBillRequestObject struct {
+	Id     Id `json:"id"`
+	Params CancelSupplierBillParams
+	Body   *CancelSupplierBillJSONRequestBody
+}
+
+type CancelSupplierBillResponseObject interface {
+	VisitCancelSupplierBillResponse(w http.ResponseWriter) error
+}
+
+type CancelSupplierBill200JSONResponse SupplierBill
+
+func (response CancelSupplierBill200JSONResponse) VisitCancelSupplierBillResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CancelSupplierBilldefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response CancelSupplierBilldefaultApplicationProblemPlusJSONResponse) VisitCancelSupplierBillResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostSupplierBillRequestObject struct {
+	Id     Id `json:"id"`
+	Params PostSupplierBillParams
+	Body   *PostSupplierBillJSONRequestBody
+}
+
+type PostSupplierBillResponseObject interface {
+	VisitPostSupplierBillResponse(w http.ResponseWriter) error
+}
+
+type PostSupplierBill200JSONResponse SupplierBill
+
+func (response PostSupplierBill200JSONResponse) VisitPostSupplierBillResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PostSupplierBilldefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response PostSupplierBilldefaultApplicationProblemPlusJSONResponse) VisitPostSupplierBillResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ReviseSupplierBillRequestObject struct {
+	Id     Id `json:"id"`
+	Params ReviseSupplierBillParams
+	Body   *ReviseSupplierBillJSONRequestBody
+}
+
+type ReviseSupplierBillResponseObject interface {
+	VisitReviseSupplierBillResponse(w http.ResponseWriter) error
+}
+
+type ReviseSupplierBill200JSONResponse SupplierBill
+
+func (response ReviseSupplierBill200JSONResponse) VisitReviseSupplierBillResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ReviseSupplierBilldefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ReviseSupplierBilldefaultApplicationProblemPlusJSONResponse) VisitReviseSupplierBillResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
+	// ListGoodsReceipts Daftar Penerimaan Barang (S-206, S-207)
+	// (GET /api/v1/goods-receipts)
+	ListGoodsReceipts(ctx context.Context, request ListGoodsReceiptsRequestObject) (ListGoodsReceiptsResponseObject, error)
+	// CreateGoodsReceipt Menyimpan draft Penerimaan Barang untuk PO Disetujui/Diterima Sebagian
+	// (POST /api/v1/goods-receipts)
+	CreateGoodsReceipt(ctx context.Context, request CreateGoodsReceiptRequestObject) (CreateGoodsReceiptResponseObject, error)
+	// GetGoodsReceipt Detail Penerimaan Barang
+	// (GET /api/v1/goods-receipts/{id})
+	GetGoodsReceipt(ctx context.Context, request GetGoodsReceiptRequestObject) (GetGoodsReceiptResponseObject, error)
+	// UpdateGoodsReceipt Mengubah draft Penerimaan Barang
+	// (PUT /api/v1/goods-receipts/{id})
+	UpdateGoodsReceipt(ctx context.Context, request UpdateGoodsReceiptRequestObject) (UpdateGoodsReceiptResponseObject, error)
+	// CancelGoodsReceipt Batalkan Penerimaan Barang
+	// (POST /api/v1/goods-receipts/{id}/cancel)
+	CancelGoodsReceipt(ctx context.Context, request CancelGoodsReceiptRequestObject) (CancelGoodsReceiptResponseObject, error)
+	// PostGoodsReceipt Posting Penerimaan Barang (stok Inbound Karantina, jurnal A-01/A-03)
+	// (POST /api/v1/goods-receipts/{id}/post)
+	PostGoodsReceipt(ctx context.Context, request PostGoodsReceiptRequestObject) (PostGoodsReceiptResponseObject, error)
+	// ListBillableReceipts Baris Penerimaan Barang PO yang belum ditagih (form Tagihan Pemasok)
+	// (GET /api/v1/procurement/billable-receipts)
+	ListBillableReceipts(ctx context.Context, request ListBillableReceiptsRequestObject) (ListBillableReceiptsResponseObject, error)
 	// ListProcurementCashBankAccounts Akun Kas & Bank (11xx) untuk pembayaran uang muka pembelian
 	// (GET /api/v1/procurement/cash-bank-accounts)
 	ListProcurementCashBankAccounts(ctx context.Context, request ListProcurementCashBankAccountsRequestObject) (ListProcurementCashBankAccountsResponseObject, error)
 	// ListProcurementDivisionOptions Divisi aktif untuk form Purchase Request dan Purchase Order
 	// (GET /api/v1/procurement/division-options)
 	ListProcurementDivisionOptions(ctx context.Context, request ListProcurementDivisionOptionsRequestObject) (ListProcurementDivisionOptionsResponseObject, error)
+	// ListProcurementInboundLocations Lokasi Inbound aktif untuk form Penerimaan Barang
+	// (GET /api/v1/procurement/inbound-locations)
+	ListProcurementInboundLocations(ctx context.Context, request ListProcurementInboundLocationsRequestObject) (ListProcurementInboundLocationsResponseObject, error)
+	// GetGoodsReceivedNotInvoiced Laporan Barang Diterima Belum Ditagih per PO/GR (S-209)
+	// (GET /api/v1/procurement/reports/goods-received-not-invoiced)
+	GetGoodsReceivedNotInvoiced(ctx context.Context, request GetGoodsReceivedNotInvoicedRequestObject) (GetGoodsReceivedNotInvoicedResponseObject, error)
+	// ListReturnableReceipts Baris Penerimaan Barang PO yang masih bisa diretur (form Retur Pembelian)
+	// (GET /api/v1/procurement/returnable-receipts)
+	ListReturnableReceipts(ctx context.Context, request ListReturnableReceiptsRequestObject) (ListReturnableReceiptsResponseObject, error)
 	// ListPurchaseAdvances Daftar uang muka pembelian (S-205)
 	// (GET /api/v1/purchase-advances)
 	ListPurchaseAdvances(ctx context.Context, request ListPurchaseAdvancesRequestObject) (ListPurchaseAdvancesResponseObject, error)
@@ -4025,6 +8252,51 @@ type StrictServerInterface interface {
 	// SubmitPurchaseRequest Ajukan Purchase Request
 	// (POST /api/v1/purchase-requests/{id}/submit)
 	SubmitPurchaseRequest(ctx context.Context, request SubmitPurchaseRequestRequestObject) (SubmitPurchaseRequestResponseObject, error)
+	// ListPurchaseReturns Daftar Retur Pembelian & nota debit (S-210)
+	// (GET /api/v1/purchase-returns)
+	ListPurchaseReturns(ctx context.Context, request ListPurchaseReturnsRequestObject) (ListPurchaseReturnsResponseObject, error)
+	// CreatePurchaseReturn Menyimpan draft retur pembelian manual
+	// (POST /api/v1/purchase-returns)
+	CreatePurchaseReturn(ctx context.Context, request CreatePurchaseReturnRequestObject) (CreatePurchaseReturnResponseObject, error)
+	// GetPurchaseReturn Detail retur pembelian
+	// (GET /api/v1/purchase-returns/{id})
+	GetPurchaseReturn(ctx context.Context, request GetPurchaseReturnRequestObject) (GetPurchaseReturnResponseObject, error)
+	// UpdatePurchaseReturn Mengubah draft retur pembelian
+	// (PUT /api/v1/purchase-returns/{id})
+	UpdatePurchaseReturn(ctx context.Context, request UpdatePurchaseReturnRequestObject) (UpdatePurchaseReturnResponseObject, error)
+	// CancelPurchaseReturn Batalkan retur Draft atau Disetujui
+	// (POST /api/v1/purchase-returns/{id}/cancel)
+	CancelPurchaseReturn(ctx context.Context, request CancelPurchaseReturnRequestObject) (CancelPurchaseReturnResponseObject, error)
+	// PostPurchaseReturn Posting retur pembelian (nota debit DN, jurnal A-02)
+	// (POST /api/v1/purchase-returns/{id}/post)
+	PostPurchaseReturn(ctx context.Context, request PostPurchaseReturnRequestObject) (PostPurchaseReturnResponseObject, error)
+	// RevisePurchaseReturn Kembalikan retur yang ditolak ke Draft
+	// (POST /api/v1/purchase-returns/{id}/revise)
+	RevisePurchaseReturn(ctx context.Context, request RevisePurchaseReturnRequestObject) (RevisePurchaseReturnResponseObject, error)
+	// SubmitPurchaseReturn Ajukan retur pembelian ke Head Logistik (nomor RB)
+	// (POST /api/v1/purchase-returns/{id}/submit)
+	SubmitPurchaseReturn(ctx context.Context, request SubmitPurchaseReturnRequestObject) (SubmitPurchaseReturnResponseObject, error)
+	// ListSupplierBills Daftar Tagihan Pemasok (S-208)
+	// (GET /api/v1/supplier-bills)
+	ListSupplierBills(ctx context.Context, request ListSupplierBillsRequestObject) (ListSupplierBillsResponseObject, error)
+	// CreateSupplierBill Menyimpan draft tagihan pemasok dan menampilkan hasil 3-way match
+	// (POST /api/v1/supplier-bills)
+	CreateSupplierBill(ctx context.Context, request CreateSupplierBillRequestObject) (CreateSupplierBillResponseObject, error)
+	// GetSupplierBill Detail tagihan pemasok
+	// (GET /api/v1/supplier-bills/{id})
+	GetSupplierBill(ctx context.Context, request GetSupplierBillRequestObject) (GetSupplierBillResponseObject, error)
+	// UpdateSupplierBill Mengubah draft tagihan pemasok
+	// (PUT /api/v1/supplier-bills/{id})
+	UpdateSupplierBill(ctx context.Context, request UpdateSupplierBillRequestObject) (UpdateSupplierBillResponseObject, error)
+	// CancelSupplierBill Batalkan tagihan Draft atau Ditolak
+	// (POST /api/v1/supplier-bills/{id}/cancel)
+	CancelSupplierBill(ctx context.Context, request CancelSupplierBillRequestObject) (CancelSupplierBillResponseObject, error)
+	// PostSupplierBill Posting tagihan pemasok (3-way match, jurnal A-18)
+	// (POST /api/v1/supplier-bills/{id}/post)
+	PostSupplierBill(ctx context.Context, request PostSupplierBillRequestObject) (PostSupplierBillResponseObject, error)
+	// ReviseSupplierBill Kembalikan tagihan yang ditolak ke Draft
+	// (POST /api/v1/supplier-bills/{id}/revise)
+	ReviseSupplierBill(ctx context.Context, request ReviseSupplierBillRequestObject) (ReviseSupplierBillResponseObject, error)
 }
 
 type StrictHandlerFunc func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error)
@@ -4064,6 +8336,219 @@ type strictHandler struct {
 	ssi         StrictServerInterface
 	middlewares []StrictMiddlewareFunc
 	options     StrictHTTPServerOptions
+}
+
+// ListGoodsReceipts operation middleware
+func (sh *strictHandler) ListGoodsReceipts(w http.ResponseWriter, r *http.Request, params ListGoodsReceiptsParams) {
+	var request ListGoodsReceiptsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListGoodsReceipts(ctx, request.(ListGoodsReceiptsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListGoodsReceipts")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListGoodsReceiptsResponseObject); ok {
+		if err := validResponse.VisitListGoodsReceiptsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreateGoodsReceipt operation middleware
+func (sh *strictHandler) CreateGoodsReceipt(w http.ResponseWriter, r *http.Request, params CreateGoodsReceiptParams) {
+	var request CreateGoodsReceiptRequestObject
+
+	request.Params = params
+
+	var body CreateGoodsReceiptJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CreateGoodsReceipt(ctx, request.(CreateGoodsReceiptRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateGoodsReceipt")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreateGoodsReceiptResponseObject); ok {
+		if err := validResponse.VisitCreateGoodsReceiptResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetGoodsReceipt operation middleware
+func (sh *strictHandler) GetGoodsReceipt(w http.ResponseWriter, r *http.Request, id Id) {
+	var request GetGoodsReceiptRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetGoodsReceipt(ctx, request.(GetGoodsReceiptRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetGoodsReceipt")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetGoodsReceiptResponseObject); ok {
+		if err := validResponse.VisitGetGoodsReceiptResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateGoodsReceipt operation middleware
+func (sh *strictHandler) UpdateGoodsReceipt(w http.ResponseWriter, r *http.Request, id Id, params UpdateGoodsReceiptParams) {
+	var request UpdateGoodsReceiptRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body UpdateGoodsReceiptJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateGoodsReceipt(ctx, request.(UpdateGoodsReceiptRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateGoodsReceipt")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdateGoodsReceiptResponseObject); ok {
+		if err := validResponse.VisitUpdateGoodsReceiptResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CancelGoodsReceipt operation middleware
+func (sh *strictHandler) CancelGoodsReceipt(w http.ResponseWriter, r *http.Request, id Id, params CancelGoodsReceiptParams) {
+	var request CancelGoodsReceiptRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body CancelGoodsReceiptJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CancelGoodsReceipt(ctx, request.(CancelGoodsReceiptRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CancelGoodsReceipt")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CancelGoodsReceiptResponseObject); ok {
+		if err := validResponse.VisitCancelGoodsReceiptResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostGoodsReceipt operation middleware
+func (sh *strictHandler) PostGoodsReceipt(w http.ResponseWriter, r *http.Request, id Id, params PostGoodsReceiptParams) {
+	var request PostGoodsReceiptRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body PostGoodsReceiptJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostGoodsReceipt(ctx, request.(PostGoodsReceiptRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostGoodsReceipt")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostGoodsReceiptResponseObject); ok {
+		if err := validResponse.VisitPostGoodsReceiptResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListBillableReceipts operation middleware
+func (sh *strictHandler) ListBillableReceipts(w http.ResponseWriter, r *http.Request, params ListBillableReceiptsParams) {
+	var request ListBillableReceiptsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListBillableReceipts(ctx, request.(ListBillableReceiptsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListBillableReceipts")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListBillableReceiptsResponseObject); ok {
+		if err := validResponse.VisitListBillableReceiptsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
 }
 
 // ListProcurementCashBankAccounts operation middleware
@@ -4107,6 +8592,82 @@ func (sh *strictHandler) ListProcurementDivisionOptions(w http.ResponseWriter, r
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(ListProcurementDivisionOptionsResponseObject); ok {
 		if err := validResponse.VisitListProcurementDivisionOptionsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListProcurementInboundLocations operation middleware
+func (sh *strictHandler) ListProcurementInboundLocations(w http.ResponseWriter, r *http.Request) {
+	var request ListProcurementInboundLocationsRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListProcurementInboundLocations(ctx, request.(ListProcurementInboundLocationsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListProcurementInboundLocations")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListProcurementInboundLocationsResponseObject); ok {
+		if err := validResponse.VisitListProcurementInboundLocationsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetGoodsReceivedNotInvoiced operation middleware
+func (sh *strictHandler) GetGoodsReceivedNotInvoiced(w http.ResponseWriter, r *http.Request, params GetGoodsReceivedNotInvoicedParams) {
+	var request GetGoodsReceivedNotInvoicedRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetGoodsReceivedNotInvoiced(ctx, request.(GetGoodsReceivedNotInvoicedRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetGoodsReceivedNotInvoiced")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetGoodsReceivedNotInvoicedResponseObject); ok {
+		if err := validResponse.VisitGetGoodsReceivedNotInvoicedResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListReturnableReceipts operation middleware
+func (sh *strictHandler) ListReturnableReceipts(w http.ResponseWriter, r *http.Request, params ListReturnableReceiptsParams) {
+	var request ListReturnableReceiptsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListReturnableReceipts(ctx, request.(ListReturnableReceiptsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListReturnableReceipts")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListReturnableReceiptsResponseObject); ok {
+		if err := validResponse.VisitListReturnableReceiptsResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
@@ -4804,6 +9365,482 @@ func (sh *strictHandler) SubmitPurchaseRequest(w http.ResponseWriter, r *http.Re
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(SubmitPurchaseRequestResponseObject); ok {
 		if err := validResponse.VisitSubmitPurchaseRequestResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListPurchaseReturns operation middleware
+func (sh *strictHandler) ListPurchaseReturns(w http.ResponseWriter, r *http.Request, params ListPurchaseReturnsParams) {
+	var request ListPurchaseReturnsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListPurchaseReturns(ctx, request.(ListPurchaseReturnsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListPurchaseReturns")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListPurchaseReturnsResponseObject); ok {
+		if err := validResponse.VisitListPurchaseReturnsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreatePurchaseReturn operation middleware
+func (sh *strictHandler) CreatePurchaseReturn(w http.ResponseWriter, r *http.Request, params CreatePurchaseReturnParams) {
+	var request CreatePurchaseReturnRequestObject
+
+	request.Params = params
+
+	var body CreatePurchaseReturnJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CreatePurchaseReturn(ctx, request.(CreatePurchaseReturnRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreatePurchaseReturn")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreatePurchaseReturnResponseObject); ok {
+		if err := validResponse.VisitCreatePurchaseReturnResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetPurchaseReturn operation middleware
+func (sh *strictHandler) GetPurchaseReturn(w http.ResponseWriter, r *http.Request, id Id) {
+	var request GetPurchaseReturnRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetPurchaseReturn(ctx, request.(GetPurchaseReturnRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetPurchaseReturn")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetPurchaseReturnResponseObject); ok {
+		if err := validResponse.VisitGetPurchaseReturnResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdatePurchaseReturn operation middleware
+func (sh *strictHandler) UpdatePurchaseReturn(w http.ResponseWriter, r *http.Request, id Id, params UpdatePurchaseReturnParams) {
+	var request UpdatePurchaseReturnRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body UpdatePurchaseReturnJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdatePurchaseReturn(ctx, request.(UpdatePurchaseReturnRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdatePurchaseReturn")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdatePurchaseReturnResponseObject); ok {
+		if err := validResponse.VisitUpdatePurchaseReturnResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CancelPurchaseReturn operation middleware
+func (sh *strictHandler) CancelPurchaseReturn(w http.ResponseWriter, r *http.Request, id Id, params CancelPurchaseReturnParams) {
+	var request CancelPurchaseReturnRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body CancelPurchaseReturnJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CancelPurchaseReturn(ctx, request.(CancelPurchaseReturnRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CancelPurchaseReturn")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CancelPurchaseReturnResponseObject); ok {
+		if err := validResponse.VisitCancelPurchaseReturnResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostPurchaseReturn operation middleware
+func (sh *strictHandler) PostPurchaseReturn(w http.ResponseWriter, r *http.Request, id Id, params PostPurchaseReturnParams) {
+	var request PostPurchaseReturnRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body PostPurchaseReturnJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostPurchaseReturn(ctx, request.(PostPurchaseReturnRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostPurchaseReturn")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostPurchaseReturnResponseObject); ok {
+		if err := validResponse.VisitPostPurchaseReturnResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// RevisePurchaseReturn operation middleware
+func (sh *strictHandler) RevisePurchaseReturn(w http.ResponseWriter, r *http.Request, id Id, params RevisePurchaseReturnParams) {
+	var request RevisePurchaseReturnRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body RevisePurchaseReturnJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.RevisePurchaseReturn(ctx, request.(RevisePurchaseReturnRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RevisePurchaseReturn")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(RevisePurchaseReturnResponseObject); ok {
+		if err := validResponse.VisitRevisePurchaseReturnResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// SubmitPurchaseReturn operation middleware
+func (sh *strictHandler) SubmitPurchaseReturn(w http.ResponseWriter, r *http.Request, id Id, params SubmitPurchaseReturnParams) {
+	var request SubmitPurchaseReturnRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body SubmitPurchaseReturnJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.SubmitPurchaseReturn(ctx, request.(SubmitPurchaseReturnRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "SubmitPurchaseReturn")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(SubmitPurchaseReturnResponseObject); ok {
+		if err := validResponse.VisitSubmitPurchaseReturnResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListSupplierBills operation middleware
+func (sh *strictHandler) ListSupplierBills(w http.ResponseWriter, r *http.Request, params ListSupplierBillsParams) {
+	var request ListSupplierBillsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListSupplierBills(ctx, request.(ListSupplierBillsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListSupplierBills")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListSupplierBillsResponseObject); ok {
+		if err := validResponse.VisitListSupplierBillsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreateSupplierBill operation middleware
+func (sh *strictHandler) CreateSupplierBill(w http.ResponseWriter, r *http.Request, params CreateSupplierBillParams) {
+	var request CreateSupplierBillRequestObject
+
+	request.Params = params
+
+	var body CreateSupplierBillJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CreateSupplierBill(ctx, request.(CreateSupplierBillRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateSupplierBill")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreateSupplierBillResponseObject); ok {
+		if err := validResponse.VisitCreateSupplierBillResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetSupplierBill operation middleware
+func (sh *strictHandler) GetSupplierBill(w http.ResponseWriter, r *http.Request, id Id) {
+	var request GetSupplierBillRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetSupplierBill(ctx, request.(GetSupplierBillRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetSupplierBill")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetSupplierBillResponseObject); ok {
+		if err := validResponse.VisitGetSupplierBillResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateSupplierBill operation middleware
+func (sh *strictHandler) UpdateSupplierBill(w http.ResponseWriter, r *http.Request, id Id, params UpdateSupplierBillParams) {
+	var request UpdateSupplierBillRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body UpdateSupplierBillJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateSupplierBill(ctx, request.(UpdateSupplierBillRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateSupplierBill")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdateSupplierBillResponseObject); ok {
+		if err := validResponse.VisitUpdateSupplierBillResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CancelSupplierBill operation middleware
+func (sh *strictHandler) CancelSupplierBill(w http.ResponseWriter, r *http.Request, id Id, params CancelSupplierBillParams) {
+	var request CancelSupplierBillRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body CancelSupplierBillJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CancelSupplierBill(ctx, request.(CancelSupplierBillRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CancelSupplierBill")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CancelSupplierBillResponseObject); ok {
+		if err := validResponse.VisitCancelSupplierBillResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostSupplierBill operation middleware
+func (sh *strictHandler) PostSupplierBill(w http.ResponseWriter, r *http.Request, id Id, params PostSupplierBillParams) {
+	var request PostSupplierBillRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body PostSupplierBillJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostSupplierBill(ctx, request.(PostSupplierBillRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostSupplierBill")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostSupplierBillResponseObject); ok {
+		if err := validResponse.VisitPostSupplierBillResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ReviseSupplierBill operation middleware
+func (sh *strictHandler) ReviseSupplierBill(w http.ResponseWriter, r *http.Request, id Id, params ReviseSupplierBillParams) {
+	var request ReviseSupplierBillRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body ReviseSupplierBillJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ReviseSupplierBill(ctx, request.(ReviseSupplierBillRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ReviseSupplierBill")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ReviseSupplierBillResponseObject); ok {
+		if err := validResponse.VisitReviseSupplierBillResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

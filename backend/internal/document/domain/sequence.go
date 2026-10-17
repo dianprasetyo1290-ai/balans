@@ -40,6 +40,8 @@ const (
 	TypeResellerDeposit           Type = "DEP"
 	TypeVendingRefill             Type = "RFL"
 	TypeVendingReconciliation     Type = "RKV"
+	TypeRepacking                 Type = "RPK"
+	TypeReturnDisposition         Type = "DRT"
 )
 
 // NumberDigits adalah panjang nomor urut (5 digit, contoh `JV/2027/01/00102`).
@@ -78,6 +80,8 @@ var types = []TypeInfo{
 	{TypeResellerDeposit, "Mutasi Deposit Reseller", "Posting"},
 	{TypeVendingRefill, "Refill Vending", "Posting"},
 	{TypeVendingReconciliation, "Rekonsiliasi Vending", "Mulai rekonsiliasi"},
+	{TypeRepacking, "Repacking", "Mulai repacking"},
+	{TypeReturnDisposition, "Disposisi Retur", "Submit"},
 }
 
 // Types mengembalikan seluruh kode dokumen sesuai urutan desain.

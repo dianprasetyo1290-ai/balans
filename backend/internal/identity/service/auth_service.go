@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"image/png"
 	"log/slog"
+	"runtime"
 	"time"
 
 	"github.com/google/uuid"
@@ -100,11 +101,40 @@ type Deps struct {
 type AuthService struct {
 	Deps
 	cache *authCache
+	// hashSlots membatasi hashing argon2id yang berjalan bersamaan. Satu hash memakai ±19 MiB, sehingga
+	// lonjakan login tanpa batas bisa menghabiskan batas memori container api (Runbook 8.1).
+	hashSlots chan struct{}
 }
 
 // NewAuthService membuat AuthService.
 func NewAuthService(d Deps) *AuthService {
-	return &AuthService{Deps: d, cache: newAuthCache(d.Clock)}
+	return &AuthService{Deps: d, cache: newAuthCache(d.Clock), hashSlots: make(chan struct{}, max(2, runtime.NumCPU()))}
+}
+
+// withHashSlot menjalankan fn setelah mendapat slot hashing; menunggu sampai slot kosong atau request dibatalkan.
+func (s *AuthService) withHashSlot(ctx context.Context, fn func()) error {
+	select {
+	case s.hashSlots <- struct{}{}:
+	case <-ctx.Done():
+		return fmt.Errorf("wait password hash slot: %w", ctx.Err())
+	}
+	defer func() { <-s.hashSlots }()
+	fn()
+	return nil
+}
+
+func (s *AuthService) verifyPassword(ctx context.Context, password, encoded string) (ok bool, err error) {
+	if slotErr := s.withHashSlot(ctx, func() { ok, err = domain.VerifyPassword(password, encoded) }); slotErr != nil {
+		return false, slotErr
+	}
+	return ok, err
+}
+
+func (s *AuthService) hashPassword(ctx context.Context, password string) (hash string, err error) {
+	if slotErr := s.withHashSlot(ctx, func() { hash, err = domain.HashPassword(password) }); slotErr != nil {
+		return "", slotErr
+	}
+	return hash, err
 }
 
 // SessionTokens adalah hasil login atau refresh. RefreshToken kosong berarti cookie tidak perlu diganti.
@@ -155,10 +185,10 @@ func (s *AuthService) Login(ctx context.Context, email, password, totpCode strin
 	}
 
 	if !found || !user.HasPassword() || !user.IsActive {
-		domain.BurnPasswordCheck(password)
+		_ = s.withHashSlot(ctx, func() { domain.BurnPasswordCheck(password) })
 		return fail(apperr.CodeAuthInvalidCredentials)
 	}
-	ok, err := domain.VerifyPassword(password, user.PasswordHash)
+	ok, err := s.verifyPassword(ctx, password, user.PasswordHash)
 	if err != nil {
 		return SessionTokens{}, fmt.Errorf("verify password: %w", err)
 	}
@@ -359,7 +389,7 @@ func (s *AuthService) Reauth(ctx context.Context, password, totpCode string) (Se
 			return SessionTokens{}, apperr.New(apperr.CodeAuthMFAInvalid)
 		}
 	case password != "":
-		ok, err := domain.VerifyPassword(password, user.PasswordHash)
+		ok, err := s.verifyPassword(ctx, password, user.PasswordHash)
 		if err != nil {
 			return SessionTokens{}, fmt.Errorf("verify password: %w", err)
 		}
@@ -570,7 +600,7 @@ func (s *AuthService) SetupPassword(ctx context.Context, token, password string)
 		if err := domain.ValidatePassword(password, t.Email); err != nil {
 			return err
 		}
-		hash, err := domain.HashPassword(password)
+		hash, err := s.hashPassword(ctx, password)
 		if err != nil {
 			return err
 		}
@@ -605,7 +635,7 @@ func (s *AuthService) ChangePassword(ctx context.Context, current, next string) 
 		if err != nil {
 			return err
 		}
-		ok, err := domain.VerifyPassword(current, user.PasswordHash)
+		ok, err := s.verifyPassword(ctx, current, user.PasswordHash)
 		if err != nil {
 			return fmt.Errorf("verify password: %w", err)
 		}
@@ -615,7 +645,7 @@ func (s *AuthService) ChangePassword(ctx context.Context, current, next string) 
 		if err := domain.ValidatePassword(next, user.Email); err != nil {
 			return err
 		}
-		hash, err := domain.HashPassword(next)
+		hash, err := s.hashPassword(ctx, next)
 		if err != nil {
 			return err
 		}

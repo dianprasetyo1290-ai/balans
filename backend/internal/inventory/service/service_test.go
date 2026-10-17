@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"os"
+	"slices"
 	"sync"
 	"testing"
 	"time"
@@ -62,6 +63,22 @@ func (f *fakeLocations) Locations(_ context.Context, ids []uuid.UUID) (map[uuid.
 		if l, ok := f.m[id]; ok {
 			out[id] = l
 		}
+	}
+	return out, nil
+}
+
+func (f *fakeLocations) FindLocations(_ context.Context, q warehouse.LocationQuery) ([]warehouse.Location, error) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	var out []warehouse.Location
+	for _, l := range f.m {
+		if q.WarehouseID != nil && (l.WarehouseID == nil || *l.WarehouseID != *q.WarehouseID) {
+			continue
+		}
+		if len(q.Types) > 0 && !slices.Contains(q.Types, l.Type) {
+			continue
+		}
+		out = append(out, l)
 	}
 	return out, nil
 }

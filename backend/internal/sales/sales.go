@@ -1,18 +1,29 @@
 // Package sales adalah API publik modul penjualan. Modul lain dan adapter hanya memakai package ini.
+//
+// R1.3: Sales Order satu model untuk Modern Trade beli putus, B2B, WhatsApp/Instagram, marketplace, dan karyawan
+// (harga otomatis dari pricing, alokasi stok FEFO lewat inventory, approval diskon), Proforma Invoice berlaku
+// 14 hari, invoice NON-PKP, piutang & pembayaran pelanggan dengan alokasi ke banyak invoice, dan pengakuan
+// penjualan/HPP per channel (A-05, A-06, A-10, A-PB). Logistik (DO, Outbound, kurir) memanggil ShippableOrder,
+// MarkShipped/MarkHandedOver, dan MarkDelivered di transaksi dokumennya; rekonsiliasi bank memakai
+// IncomingPayments/Payment.
 package sales
 
 import (
 	"context"
 	"log/slog"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/riverqueue/river"
 
+	"balans/internal/approval"
 	"balans/internal/audit"
+	"balans/internal/platform/clock"
 	"balans/internal/platform/db"
 	"balans/internal/platform/httpx"
+	"balans/internal/platform/tabular"
 	"balans/internal/platform/webhook"
 	"balans/internal/sales/domain"
 	saleshttp "balans/internal/sales/http"
@@ -42,6 +53,55 @@ type (
 	Disposition = domain.Disposition
 )
 
+// Dokumen penjualan dan dependensi modul lain (diisi adapter di internal/app).
+type (
+	// Order adalah Sales Order beserta baris dan alokasi stok (Allocations: komponen, lokasi, batch FEFO, qty sisa).
+	Order = domain.Order
+	// OrderLine adalah baris Sales Order.
+	OrderLine = domain.Line
+	// OrderType adalah jenis pesanan (channel).
+	OrderType = domain.OrderType
+	// Allocation adalah stok yang dialokasikan untuk satu komponen baris.
+	Allocation = domain.Allocation
+	// AllocationBatch adalah batch hasil alokasi FEFO.
+	AllocationBatch = domain.AllocationBatch
+	// Shipment adalah barang Sales Order yang keluar lewat satu dokumen logistik beserta HPP-nya.
+	Shipment = domain.Shipment
+	// ShipmentInput adalah input MarkShipped/MarkHandedOver.
+	ShipmentInput = service.ShipmentInput
+	// ShipmentQty adalah qty kirim per alokasi.
+	ShipmentQty = domain.ShipmentQty
+	// Status adalah status dokumen penjualan.
+	Status = domain.Status
+	// CustomerPayment adalah pembayaran pelanggan beserta alokasi invoice.
+	CustomerPayment = domain.CustomerPayment
+	// PaymentAllocation adalah bagian pembayaran untuk satu invoice.
+	PaymentAllocation = domain.PaymentAllocation
+	// PaymentQuery adalah kriteria pembayaran masuk untuk rekonsiliasi bank.
+	PaymentQuery = service.PaymentQuery
+	// Invoice adalah invoice NON-PKP / piutang per invoice.
+	Invoice = domain.Invoice
+
+	Catalog   = service.Catalog
+	Parties   = service.Parties
+	Locations = service.Locations
+	Pricing   = service.Pricing
+	Stock     = service.Stock
+	Ledger    = service.Ledger
+	Approvals = service.Approvals
+	Numberer  = service.Numberer
+	Files     = service.Files
+	Users     = service.Users
+
+	ProductRef   = service.ProductRef
+	ComponentQty = domain.ComponentQty
+	PartyInfo    = domain.PartyInfo
+	LocationRef  = service.LocationRef
+	ChannelRef   = service.ChannelRef
+	Option       = service.Option
+	DocumentType = service.DocumentType
+)
+
 // Cakupan alasan retur dan disposisi barang retur.
 const (
 	ScopeSalesReturn    = domain.ScopeSalesReturn
@@ -63,10 +123,49 @@ const (
 	PaymentStatusExpired = domain.PaymentStatusExpired
 )
 
+// Jenis pesanan, status, jenis nomor dokumen, jenis pihak, permission, dan sumber dokumen.
+const (
+	OrderModernTrade    = domain.OrderModernTrade
+	OrderB2B            = domain.OrderB2B
+	OrderSocialCommerce = domain.OrderSocialCommerce
+	OrderMarketplace    = domain.OrderMarketplace
+	OrderEmployee       = domain.OrderEmployee
+
+	StatusInProgress = domain.StatusInProgress
+	StatusInTransit  = domain.StatusInTransit
+	StatusCompleted  = domain.StatusCompleted
+
+	DocSalesOrder = service.DocSalesOrder
+	DocProforma   = service.DocProforma
+	DocInvoice    = service.DocInvoice
+	DocPayment    = service.DocPayment
+
+	PartyCustomer = domain.PartyCustomer
+	PartyPartner  = domain.PartyPartner
+
+	PermOrderRead       = service.PermOrderRead
+	PermMarketplaceRead = service.PermMarketplaceRead
+	PermProformaRead    = service.PermProformaRead
+	PermInvoiceRead     = service.PermInvoiceRead
+	PermPaymentRead     = service.PermPaymentRead
+	PermPaymentPost     = service.PermPaymentPost
+
+	// SourceSalesOrder adalah source_type reservasi/mutasi stok Sales Order di inventory.
+	SourceSalesOrder = service.SourceSalesOrder
+	// SourceCustomerPayment adalah source_type jurnal A-PB pembayaran pelanggan (rekonsiliasi bank).
+	SourceCustomerPayment = service.SourcePayment
+	// FileOwnerPaymentProof dan FileOwnerCustomerPaymentProof adalah jenis pemilik file bukti bayar di filestore.
+	FileOwnerPaymentProof         = service.FileOwnerPaymentProof
+	FileOwnerCustomerPaymentProof = service.FileOwnerCustomerPaymentProof
+	// MarketplaceImportKind adalah jenis data impor penjualan marketplace (dataexchange).
+	MarketplaceImportKind = service.MarketplaceImportKind
+)
+
 // ErrInvalidSignature dikembalikan adapter jika signature webhook tidak valid.
 var ErrInvalidSignature = domain.ErrInvalidSignature
 
-// Deps adalah dependensi modul.
+// Deps adalah dependensi modul. Dependensi dokumen penjualan (Catalog … Users) wajib diisi agar route dokumen
+// penjualan berfungsi.
 type Deps struct {
 	Pool      *pgxpool.Pool
 	Tx        *db.TxManager
@@ -75,39 +174,97 @@ type Deps struct {
 	Inbox     *webhook.Inbox
 	Responder *httpx.Responder
 	Log       *slog.Logger
+	Clock     clock.Clock
+	Catalog   Catalog
+	Parties   Parties
+	Locations Locations
+	Pricing   Pricing
+	Stock     Stock
+	Ledger    Ledger
+	Approvals Approvals
+	Numberer  Numberer
+	Files     Files
+	Users     Users
+	// ProformaValidDays: masa berlaku Proforma Invoice (0 = 14 hari).
+	ProformaValidDays int
+	// BaseURL adalah URL ERP untuk tautan invoice di teks WhatsApp.
+	BaseURL string
 }
 
 // Module adalah modul sales.
 type Module struct {
 	webhooks *service.PaymentWebhookService
 	reasons  *service.ReturnReasonService
+	docs     *service.DocumentService
 	rs       *httpx.Responder
 }
 
 // New menyusun modul.
 func New(d Deps) *Module {
+	store := postgres.NewStore(d.Pool)
+	if d.Clock == nil {
+		d.Clock = clock.System{}
+	}
 	return &Module{
 		webhooks: service.NewPaymentWebhookService(d.Gateway, d.Inbox, d.Log),
-		reasons:  service.NewReturnReasonService(postgres.NewStore(d.Pool), d.Tx, d.Audit),
-		rs:       d.Responder,
+		reasons:  service.NewReturnReasonService(store, d.Tx, d.Audit),
+		docs: service.NewDocumentService(service.Deps{
+			Store: store, Tx: d.Tx, Audit: d.Audit, Clock: d.Clock, Log: d.Log, Catalog: d.Catalog, Parties: d.Parties,
+			Locations: d.Locations, Pricing: d.Pricing, Stock: d.Stock, Ledger: d.Ledger, Approvals: d.Approvals,
+			Numberer: d.Numberer, Files: d.Files, Users: d.Users, ProformaValidDays: d.ProformaValidDays, BaseURL: d.BaseURL,
+		}),
+		rs: d.Responder,
 	}
 }
 
 // Name mengembalikan nama modul.
 func (m *Module) Name() string { return Name }
 
-// RegisterRoutes mendaftarkan route webhook Midtrans dan master alasan retur.
+// RegisterRoutes mendaftarkan route webhook Midtrans, master alasan retur, dokumen penjualan, dan piutang.
 func (m *Module) RegisterRoutes(r chi.Router) {
-	saleshttp.Register(r, saleshttp.NewHandler(m.reasons), saleshttp.NewWebhookHandler(m.webhooks, m.rs), m.rs)
+	saleshttp.Register(r, saleshttp.NewHandler(m.reasons, m.docs), saleshttp.NewWebhookHandler(m.webhooks, m.rs), m.rs)
 }
 
 // RegisterWorkers mendaftarkan worker job modul.
 func (m *Module) RegisterWorkers(w *river.Workers) {
 	river.AddWorker(w, service.NewPaymentWebhookWorker(m.webhooks))
+	river.AddWorker(w, service.NewExpireProformasWorker(m.docs))
 }
 
-// PeriodicJobs mengembalikan jadwal berkala modul.
-func (m *Module) PeriodicJobs() []*river.PeriodicJob { return nil }
+// PeriodicJobs menjadwalkan sales.expire_proformas tiap jam: Proforma lewat masa berlaku → Kedaluwarsa dan alokasi
+// stok dilepas (BRD 5.4).
+func (m *Module) PeriodicJobs() []*river.PeriodicJob {
+	return []*river.PeriodicJob{
+		river.NewPeriodicJob(river.PeriodicInterval(time.Hour),
+			func() (river.JobArgs, *river.InsertOpts) { return service.ExpireProformasArgs{}, nil },
+			&river.PeriodicJobOpts{ID: service.ExpireProformasArgs{}.Kind(), RunOnStart: true}),
+	}
+}
+
+// AuditEntities memetakan jenis entitas audit trail ke permission baca untuk tab Riwayat.
+func AuditEntities() map[string]string {
+	return map[string]string{
+		"return_reason":                "sales.return_reason.read",
+		service.EntitySalesOrder:       service.PermOrderRead,
+		service.EntityMarketplaceOrder: service.PermMarketplaceRead,
+		service.EntityProforma:         service.PermProformaRead,
+		service.EntityInvoice:          service.PermInvoiceRead,
+		service.EntityCustomerPayment:  service.PermPaymentRead,
+	}
+}
+
+// ApprovalRegistrar adalah bagian modul approval yang dipakai saat wiring.
+type ApprovalRegistrar interface {
+	RegisterHandler(t approval.SubjectType, readPermission string, h approval.Handler)
+}
+
+// RegisterApprovalHandlers mendaftarkan handler approval `sales_order_discount` (diskon di atas batas role).
+// Dipanggil SETELAH handler dev agar menggantikannya.
+func (m *Module) RegisterApprovalHandlers(r ApprovalRegistrar) {
+	r.RegisterHandler(approval.SubjectSalesOrderDiscount, service.PermOrderRead, approval.Handler{
+		OnApproved: m.docs.OnDiscountApproved, OnRejected: m.docs.OnDiscountRejected,
+	})
+}
 
 // ReturnReason membaca alasan retur (belum dihapus) untuk dokumen retur penjualan/pembelian; NOT_FOUND bila
 // tidak ada. Tidak memeriksa permission. Pakai ReturnReason.UsableError(scope) sebelum dipakai dokumen baru.
@@ -118,4 +275,63 @@ func (m *Module) ReturnReason(ctx context.Context, id uuid.UUID) (ReturnReason, 
 // ReturnReasonByCode membaca alasan retur berdasarkan kode (impor data).
 func (m *Module) ReturnReasonByCode(ctx context.Context, code string) (ReturnReason, error) {
 	return m.reasons.GetByCode(ctx, code)
+}
+
+// --- API untuk logistics (DO, Outbound, serah kurir) ----------------------------------------
+
+// ShippableOrder mengembalikan Sales Order berstatus Diproses beserta baris dan alokasi stok (komponen bundel,
+// lokasi, batch FEFO, qty belum dikirim = Allocation.OutstandingQty) untuk disusun menjadi DO. Ditolak
+// INVALID_STATE_TRANSITION bila pesanan belum dibayar/dikonfirmasi atau sudah dikirim. Tanpa cek permission.
+func (m *Module) ShippableOrder(ctx context.Context, orderID uuid.UUID) (Order, error) {
+	return m.docs.ShippableOrder(ctx, orderID)
+}
+
+// MarkShipped mencatat barang Sales Order keluar lewat dokumen logistik (DO ship) di transaksi pemanggil: stok
+// reserved di-issue (HPP FIFO) dan jurnal HPP A-06 (MT/B2B/WA-IG/karyawan) atau penjualan marketplace A-10 dibuat
+// dengan dimensi channel/sub-channel pesanan. Lines kosong = seluruh sisa alokasi. Idempotent per
+// (pesanan, SourceType, SourceID). Semua terkirim → Dalam Pengiriman. Logistik TIDAK memposting stok/jurnal sendiri.
+func (m *Module) MarkShipped(ctx context.Context, in ShipmentInput) (Shipment, error) {
+	return m.docs.MarkShipped(ctx, in)
+}
+
+// MarkHandedOver mencatat serah ke kurir pesanan marketplace (titik pengakuan penjualan, U-25): seluruh pesanan
+// keluar dari E-commerce Stock dan jurnal A-10 (Piutang Marketplace 121x sesuai marketplace, voucher penjual,
+// Penjualan, HPP) diposting.
+func (m *Module) MarkHandedOver(ctx context.Context, in ShipmentInput) (Shipment, error) {
+	return m.docs.MarkHandedOver(ctx, in)
+}
+
+// MarkDelivered menandai pesanan Dalam Pengiriman sudah diterima (Selesai).
+func (m *Module) MarkDelivered(ctx context.Context, orderID uuid.UUID) (Order, error) {
+	return m.docs.MarkDelivered(ctx, orderID)
+}
+
+// --- API untuk rekonsiliasi bank (R1.4) ------------------------------------------------------
+
+// IncomingPayments mengembalikan pembayaran pelanggan Diposting (BYR) per akun Kas & Bank dan rentang tanggal
+// untuk dicocokkan dengan mutasi bank (referensi → nominal + tanggal). CustomerPayment.JournalEntryID adalah jurnal
+// A-PB-nya. Tanpa cek permission.
+func (m *Module) IncomingPayments(ctx context.Context, q PaymentQuery) ([]CustomerPayment, error) {
+	return m.docs.IncomingPayments(ctx, q)
+}
+
+// Payment membaca satu pembayaran pelanggan beserta alokasi invoice. Tanpa cek permission.
+func (m *Module) Payment(ctx context.Context, id uuid.UUID) (CustomerPayment, error) {
+	return m.docs.Payment(ctx, id)
+}
+
+// --- Job & impor ------------------------------------------------------------------------------
+
+// ExpireProformas menjalankan pelepasan Proforma kedaluwarsa satu kali (worker dan test).
+func (m *Module) ExpireProformas(ctx context.Context) (int, error) {
+	return m.docs.ExpireProformas(ctx)
+}
+
+// MarketplaceColumns adalah kolom template impor penjualan marketplace.
+func MarketplaceColumns() []tabular.Column { return service.MarketplaceColumns }
+
+// ImportMarketplaceRow mencatat satu order marketplace dari baris Excel di transaksi aktif; rowKey
+// (dataexchange.RowKey) membuat penyimpanan idempotent per baris. Butuh sales.marketplace_order.import + write.
+func (m *Module) ImportMarketplaceRow(ctx context.Context, row tabular.Row, rowKey string) error {
+	return m.docs.ImportMarketplaceRow(ctx, row, rowKey)
 }

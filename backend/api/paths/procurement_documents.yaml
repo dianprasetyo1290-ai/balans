@@ -1,0 +1,1702 @@
+procurementInboundLocations:
+  get:
+    operationId: listProcurementInboundLocations
+    tags: [procurement]
+    summary: Lokasi Inbound aktif untuk form Penerimaan Barang
+    responses:
+      "200":
+        description: Lokasi Inbound aktif
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "./procurement.yaml#/components/schemas/PurchaseLocationRef"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+goodsReceipts:
+  get:
+    operationId: listGoodsReceipts
+    tags: [procurement]
+    summary: Daftar Penerimaan Barang (S-206, S-207)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - $ref: "../components/common.yaml#/parameters/Search"
+      - name: status
+        in: query
+        schema:
+          $ref: "#/components/schemas/GoodsReceiptStatus"
+      - name: orderType
+        in: query
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            $ref: "../components/common.yaml#/PurchaseOrderType"
+      - name: purchaseOrderId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: supplierId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: dateFrom
+        in: query
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+      - name: dateTo
+        in: query
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+    responses:
+      "200":
+        description: Penerimaan terbaru lebih dulu
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GoodsReceiptList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createGoodsReceipt
+    tags: [procurement]
+    summary: Menyimpan draft Penerimaan Barang untuk PO Disetujui/Diterima Sebagian
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/GoodsReceiptInput"
+    responses:
+      "201":
+        description: Draft dibuat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GoodsReceipt"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+goodsReceipt:
+  get:
+    operationId: getGoodsReceipt
+    tags: [procurement]
+    summary: Detail Penerimaan Barang
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+    responses:
+      "200":
+        description: Penerimaan Barang
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GoodsReceipt"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  put:
+    operationId: updateGoodsReceipt
+    tags: [procurement]
+    summary: Mengubah draft Penerimaan Barang
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/GoodsReceiptUpdate"
+    responses:
+      "200":
+        description: Draft diperbarui
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GoodsReceipt"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+goodsReceiptPost:
+  post:
+    operationId: postGoodsReceipt
+    tags: [procurement]
+    summary: Posting Penerimaan Barang (stok Inbound Karantina, jurnal A-01/A-03)
+    description: |
+      Nomor `GR/TAHUN/BULAN/NOMOR`; PO maklon/reprocess mengeluarkan packaging/bahan terpakai (baik + reject) dari
+      lokasi maklon dengan HPP FIFO; HPP per unit = nilai batch ÷ qty baik; stok baik masuk lokasi Inbound berstatus
+      Karantina; jurnal A-01 atau A-03; qty diterima PO dan dokumen Inbound/QC, semuanya di satu transaksi.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../components/common.yaml#/VersionInput"
+    responses:
+      "200":
+        description: Diposting
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GoodsReceipt"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+goodsReceiptCancel:
+  post:
+    operationId: cancelGoodsReceipt
+    tags: [procurement]
+    summary: Batalkan Penerimaan Barang
+    description: |
+      Draft (hak tulis) atau Diposting yang belum ditagih/diretur dan belum di-QC (hak batal, alasan wajib): stok dan
+      jurnal dibalik di transaksi yang sama.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "./procurement.yaml#/components/schemas/PurchaseCancelInput"
+    responses:
+      "200":
+        description: Dibatalkan
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GoodsReceipt"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+billableReceipts:
+  get:
+    operationId: listBillableReceipts
+    tags: [procurement]
+    summary: Baris Penerimaan Barang PO yang belum ditagih (form Tagihan Pemasok)
+    parameters:
+      - name: purchaseOrderId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Baris GR yang masih bisa ditagih beserta default PPh, termin, sisa uang muka, dan toleransi
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BillableReceipts"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+supplierBills:
+  get:
+    operationId: listSupplierBills
+    tags: [procurement]
+    summary: Daftar Tagihan Pemasok (S-208)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - $ref: "../components/common.yaml#/parameters/Search"
+      - name: status
+        in: query
+        schema:
+          $ref: "#/components/schemas/SupplierBillStatus"
+      - name: matchStatus
+        in: query
+        schema:
+          $ref: "#/components/schemas/SupplierBillMatchStatus"
+      - name: purchaseOrderId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: supplierId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: dateFrom
+        in: query
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+      - name: dateTo
+        in: query
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+    responses:
+      "200":
+        description: Tagihan terbaru lebih dulu
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SupplierBillList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createSupplierBill
+    tags: [procurement]
+    summary: Menyimpan draft tagihan pemasok dan menampilkan hasil 3-way match
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/SupplierBillInput"
+    responses:
+      "201":
+        description: Draft dibuat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SupplierBill"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+supplierBill:
+  get:
+    operationId: getSupplierBill
+    tags: [procurement]
+    summary: Detail tagihan pemasok
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+    responses:
+      "200":
+        description: Tagihan pemasok
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SupplierBill"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  put:
+    operationId: updateSupplierBill
+    tags: [procurement]
+    summary: Mengubah draft tagihan pemasok
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/SupplierBillUpdate"
+    responses:
+      "200":
+        description: Draft diperbarui
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SupplierBill"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+supplierBillPost:
+  post:
+    operationId: postSupplierBill
+    tags: [procurement]
+    summary: Posting tagihan pemasok (3-way match, jurnal A-18)
+    description: |
+      Dalam toleransi (qty 0%, harga 1%): jurnal A-18 (Dr 2102 + selisih harga 5103, Cr 2101 dan utang PPh sesuai
+      PPh default pemasok), uang muka PO dipotong otomatis (A-19 `advance_applied`), qty ditagih PO/GR, dan utang
+      terbentuk. Di luar toleransi: Menunggu Persetujuan `supplier_bill_exception` (Head F&A), pembayaran diblokir.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../components/common.yaml#/VersionInput"
+    responses:
+      "200":
+        description: Diposting atau menunggu persetujuan selisih
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SupplierBill"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+supplierBillRevise:
+  post:
+    operationId: reviseSupplierBill
+    tags: [procurement]
+    summary: Kembalikan tagihan yang ditolak ke Draft
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../components/common.yaml#/VersionInput"
+    responses:
+      "200":
+        description: Kembali Draft
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SupplierBill"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+supplierBillCancel:
+  post:
+    operationId: cancelSupplierBill
+    tags: [procurement]
+    summary: Batalkan tagihan Draft atau Ditolak
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "./procurement.yaml#/components/schemas/PurchaseCancelInput"
+    responses:
+      "200":
+        description: Dibatalkan
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SupplierBill"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+returnableReceipts:
+  get:
+    operationId: listReturnableReceipts
+    tags: [procurement]
+    summary: Baris Penerimaan Barang PO yang masih bisa diretur (form Retur Pembelian)
+    parameters:
+      - name: purchaseOrderId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Baris GR yang masih bisa diretur
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReturnableReceipts"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+purchaseReturns:
+  get:
+    operationId: listPurchaseReturns
+    tags: [procurement]
+    summary: Daftar Retur Pembelian & nota debit (S-210)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - $ref: "../components/common.yaml#/parameters/Search"
+      - name: status
+        in: query
+        schema:
+          $ref: "#/components/schemas/PurchaseReturnStatus"
+      - name: origin
+        in: query
+        schema:
+          $ref: "#/components/schemas/PurchaseReturnOrigin"
+      - name: purchaseOrderId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: supplierId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: dateFrom
+        in: query
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+      - name: dateTo
+        in: query
+        schema:
+          $ref: "../components/common.yaml#/BusinessDate"
+    responses:
+      "200":
+        description: Retur terbaru lebih dulu
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseReturnList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  post:
+    operationId: createPurchaseReturn
+    tags: [procurement]
+    summary: Menyimpan draft retur pembelian manual
+    description: Retur manual butuh persetujuan Head Logistik sebelum diposting; retur asal QC dibuat modul gudang.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PurchaseReturnInput"
+    responses:
+      "201":
+        description: Draft dibuat
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseReturn"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+purchaseReturn:
+  get:
+    operationId: getPurchaseReturn
+    tags: [procurement]
+    summary: Detail retur pembelian
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+    responses:
+      "200":
+        description: Retur pembelian
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseReturn"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+  put:
+    operationId: updatePurchaseReturn
+    tags: [procurement]
+    summary: Mengubah draft retur pembelian
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PurchaseReturnUpdate"
+    responses:
+      "200":
+        description: Draft diperbarui
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseReturn"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+purchaseReturnSubmit:
+  post:
+    operationId: submitPurchaseReturn
+    tags: [procurement]
+    summary: Ajukan retur pembelian ke Head Logistik (nomor RB)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../components/common.yaml#/VersionInput"
+    responses:
+      "200":
+        description: Menunggu persetujuan
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseReturn"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+purchaseReturnPost:
+  post:
+    operationId: postPurchaseReturn
+    tags: [procurement]
+    summary: Posting retur pembelian (nota debit DN, jurnal A-02)
+    description: |
+      Barang keluar dari lokasi/status asal dengan HPP FIFO; bagian yang belum ditagih mengurangi 2102 (qty diterima PO
+      ikut berkurang), bagian yang sudah ditagih mengurangi utang 2101 lewat nota debit.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../components/common.yaml#/VersionInput"
+    responses:
+      "200":
+        description: Diposting
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseReturn"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+purchaseReturnRevise:
+  post:
+    operationId: revisePurchaseReturn
+    tags: [procurement]
+    summary: Kembalikan retur yang ditolak ke Draft
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../components/common.yaml#/VersionInput"
+    responses:
+      "200":
+        description: Kembali Draft
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseReturn"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+purchaseReturnCancel:
+  post:
+    operationId: cancelPurchaseReturn
+    tags: [procurement]
+    summary: Batalkan retur Draft atau Disetujui
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "./procurement.yaml#/components/schemas/PurchaseCancelInput"
+    responses:
+      "200":
+        description: Dibatalkan
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseReturn"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+goodsReceivedNotInvoiced:
+  get:
+    operationId: getGoodsReceivedNotInvoiced
+    tags: [procurement]
+    summary: Laporan Barang Diterima Belum Ditagih per PO/GR (S-209)
+    description: Saldo per baris GR dan rekonsiliasi ke saldo akun 2102 (total sub-ledger, saldo buku besar, selisih).
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Search"
+      - name: supplierId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: purchaseOrderId
+        in: query
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Laporan per hari ini
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GoodsReceivedNotInvoicedReport"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+components:
+  schemas:
+    PurchaseUnitCost:
+      type: string
+      description: HPP per unit, maks. 4 angka di belakang koma.
+      example: "12500.0000"
+    PurchasePercent:
+      type: string
+      description: Persentase desimal maks. 4 angka di belakang koma, mis. "2" untuk 2%.
+      pattern: "^-?[0-9]{1,5}(\\.[0-9]{1,4})?$"
+      example: "2.0000"
+    PurchaseStockStatus:
+      type: string
+      description: Status stok asal retur.
+      enum: [quarantine, available]
+    GoodsReceiptStatus:
+      type: string
+      enum: [draft, posted, cancelled]
+    RejectDisposition:
+      type: string
+      description: |
+        `absorbed` reject ditanggung Balans (ikut ditagih, nilai diserap ke HPP barang baik); `return_to_supplier`
+        ditolak di tempat dan diganti pemasok (tidak masuk stok maupun tagihan).
+      enum: [absorbed, return_to_supplier]
+    GoodsReceiptSummary:
+      type: object
+      required:
+        - id
+        - purchaseOrderId
+        - purchaseOrderNumber
+        - orderType
+        - supplierId
+        - supplierName
+        - businessDate
+        - deliveryNote
+        - inventoryAmount
+        - grniAmount
+        - status
+        - createdAt
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+          nullable: true
+          description: Nomor GR, diisi saat diposting.
+        purchaseOrderId:
+          type: string
+          format: uuid
+        purchaseOrderNumber:
+          type: string
+        orderType:
+          $ref: "../components/common.yaml#/PurchaseOrderType"
+        supplierId:
+          type: string
+          format: uuid
+        supplierName:
+          type: string
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        deliveryNote:
+          type: string
+        inventoryAmount:
+          $ref: "../components/common.yaml#/Money"
+        grniAmount:
+          $ref: "../components/common.yaml#/Money"
+        status:
+          $ref: "#/components/schemas/GoodsReceiptStatus"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    GoodsReceiptLine:
+      type: object
+      required:
+        - id
+        - lineNo
+        - purchaseOrderLineId
+        - product
+        - orderedQty
+        - goodQty
+        - rejectQty
+        - rejectDisposition
+        - batchNumber
+        - unitPrice
+        - grniQty
+        - grniAmount
+        - materialCostAmount
+        - inventoryAmount
+        - unitCost
+        - inventoryAccountCode
+        - billedQty
+        - returnedQty
+        - openQty
+        - note
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        purchaseOrderLineId:
+          type: string
+          format: uuid
+        product:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseProductRef"
+        orderedQty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        goodQty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        rejectQty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        rejectDisposition:
+          $ref: "#/components/schemas/RejectDisposition"
+        batchNumber:
+          type: string
+        productionDate:
+          allOf:
+            - $ref: "../components/common.yaml#/BusinessDate"
+          nullable: true
+        expiryDate:
+          allOf:
+            - $ref: "../components/common.yaml#/BusinessDate"
+          nullable: true
+        batchId:
+          type: string
+          format: uuid
+          nullable: true
+        unitPrice:
+          $ref: "../components/common.yaml#/Money"
+        grniQty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        grniAmount:
+          $ref: "../components/common.yaml#/Money"
+        materialCostAmount:
+          $ref: "../components/common.yaml#/Money"
+        inventoryAmount:
+          $ref: "../components/common.yaml#/Money"
+        unitCost:
+          $ref: "#/components/schemas/PurchaseUnitCost"
+        inventoryAccountCode:
+          type: string
+        billedQty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        returnedQty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        openQty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        note:
+          type: string
+    GoodsReceiptMaterial:
+      type: object
+      required: [id, lineNo, product, usedGoodQty, usedRejectQty, costAmount, accountCode, note]
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        product:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseProductRef"
+        usedGoodQty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        usedRejectQty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        costAmount:
+          $ref: "../components/common.yaml#/Money"
+        accountCode:
+          type: string
+        note:
+          type: string
+    GoodsReceipt:
+      allOf:
+        - $ref: "#/components/schemas/GoodsReceiptSummary"
+        - type: object
+          required:
+            - divisionId
+            - divisionName
+            - location
+            - note
+            - materialAmount
+            - cancelReason
+            - createdByName
+            - lines
+            - materials
+            - allowedActions
+          properties:
+            divisionId:
+              type: string
+              format: uuid
+            divisionName:
+              type: string
+            location:
+              $ref: "./procurement.yaml#/components/schemas/PurchaseLocationRef"
+            tollLocation:
+              allOf:
+                - $ref: "./procurement.yaml#/components/schemas/PurchaseLocationRef"
+              nullable: true
+            note:
+              type: string
+            materialAmount:
+              $ref: "../components/common.yaml#/Money"
+            inboundId:
+              type: string
+              format: uuid
+              nullable: true
+            journalEntryId:
+              type: string
+              format: uuid
+              nullable: true
+            reversalJournalEntryId:
+              type: string
+              format: uuid
+              nullable: true
+            cancelReason:
+              type: string
+            postedAt:
+              type: string
+              format: date-time
+              nullable: true
+            createdByName:
+              type: string
+            lines:
+              type: array
+              items:
+                $ref: "#/components/schemas/GoodsReceiptLine"
+            materials:
+              type: array
+              items:
+                $ref: "#/components/schemas/GoodsReceiptMaterial"
+            allowedActions:
+              type: array
+              items:
+                type: string
+                enum: [edit, post, cancel]
+    GoodsReceiptList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/GoodsReceiptSummary"
+    GoodsReceiptLineInput:
+      type: object
+      required: [purchaseOrderLineId, goodQty]
+      properties:
+        purchaseOrderLineId:
+          type: string
+          format: uuid
+        goodQty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        rejectQty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        rejectDisposition:
+          $ref: "#/components/schemas/RejectDisposition"
+        batchNumber:
+          type: string
+          maxLength: 40
+        productionDate:
+          allOf:
+            - $ref: "../components/common.yaml#/BusinessDate"
+          nullable: true
+        expiryDate:
+          allOf:
+            - $ref: "../components/common.yaml#/BusinessDate"
+          nullable: true
+        note:
+          type: string
+          maxLength: 500
+    GoodsReceiptMaterialInput:
+      type: object
+      required: [productId, usedGoodQty, usedRejectQty]
+      properties:
+        productId:
+          type: string
+          format: uuid
+        usedGoodQty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        usedRejectQty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        note:
+          type: string
+          maxLength: 500
+    GoodsReceiptFields:
+      type: object
+      required: [businessDate, locationId, lines]
+      properties:
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        locationId:
+          type: string
+          format: uuid
+        deliveryNote:
+          type: string
+          maxLength: 100
+        note:
+          type: string
+          maxLength: 1000
+        lines:
+          type: array
+          maxItems: 200
+          items:
+            $ref: "#/components/schemas/GoodsReceiptLineInput"
+        materials:
+          type: array
+          maxItems: 200
+          items:
+            $ref: "#/components/schemas/GoodsReceiptMaterialInput"
+    GoodsReceiptInput:
+      allOf:
+        - $ref: "#/components/schemas/GoodsReceiptFields"
+        - type: object
+          required: [purchaseOrderId]
+          properties:
+            purchaseOrderId:
+              type: string
+              format: uuid
+    GoodsReceiptUpdate:
+      allOf:
+        - $ref: "#/components/schemas/GoodsReceiptFields"
+        - $ref: "../components/common.yaml#/VersionInput"
+    SupplierBillStatus:
+      type: string
+      enum: [draft, pending_approval, rejected, awaiting_payment, partially_paid, paid, cancelled]
+    SupplierBillMatchStatus:
+      type: string
+      enum: [matched, exceeds_tolerance, approved_exception]
+    SupplierBillSummary:
+      type: object
+      required:
+        - id
+        - number
+        - purchaseOrderId
+        - purchaseOrderNumber
+        - supplierId
+        - supplierName
+        - billDate
+        - dueDate
+        - subtotalAmount
+        - totalPayableAmount
+        - paidAmount
+        - matchStatus
+        - status
+        - paymentBlocked
+        - createdAt
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+          description: Nomor tagihan dari pemasok (unik per pemasok).
+        purchaseOrderId:
+          type: string
+          format: uuid
+        purchaseOrderNumber:
+          type: string
+        supplierId:
+          type: string
+          format: uuid
+        supplierName:
+          type: string
+        billDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        dueDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        subtotalAmount:
+          $ref: "../components/common.yaml#/Money"
+        totalPayableAmount:
+          $ref: "../components/common.yaml#/Money"
+        paidAmount:
+          $ref: "../components/common.yaml#/Money"
+        matchStatus:
+          $ref: "#/components/schemas/SupplierBillMatchStatus"
+        status:
+          $ref: "#/components/schemas/SupplierBillStatus"
+        paymentBlocked:
+          type: boolean
+          description: true selama utang belum terbentuk (draft, menunggu persetujuan selisih, ditolak).
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    SupplierBillLine:
+      type: object
+      required:
+        - id
+        - lineNo
+        - goodsReceiptLineId
+        - goodsReceiptId
+        - goodsReceiptNumber
+        - product
+        - batchNumber
+        - qty
+        - receiptOpenQty
+        - unitPrice
+        - poUnitPrice
+        - amount
+        - grniAmount
+        - priceVarianceAmount
+        - priceVariancePercent
+        - qtyMismatch
+        - priceMismatch
+        - exceedsTolerance
+        - note
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        goodsReceiptLineId:
+          type: string
+          format: uuid
+        goodsReceiptId:
+          type: string
+          format: uuid
+        goodsReceiptNumber:
+          type: string
+        product:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseProductRef"
+        batchNumber:
+          type: string
+        qty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        receiptOpenQty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        unitPrice:
+          $ref: "../components/common.yaml#/Money"
+        poUnitPrice:
+          $ref: "../components/common.yaml#/Money"
+        amount:
+          $ref: "../components/common.yaml#/Money"
+        grniAmount:
+          $ref: "../components/common.yaml#/Money"
+        priceVarianceAmount:
+          $ref: "../components/common.yaml#/Money"
+        priceVariancePercent:
+          $ref: "#/components/schemas/PurchasePercent"
+        qtyMismatch:
+          type: boolean
+        priceMismatch:
+          type: boolean
+        exceedsTolerance:
+          type: boolean
+        note:
+          type: string
+    SupplierBillAdvance:
+      type: object
+      required: [advanceId, advanceNumber, amount]
+      properties:
+        advanceId:
+          type: string
+          format: uuid
+        advanceNumber:
+          type: string
+        amount:
+          $ref: "../components/common.yaml#/Money"
+    SupplierBill:
+      allOf:
+        - $ref: "#/components/schemas/SupplierBillSummary"
+        - type: object
+          required:
+            - divisionId
+            - divisionName
+            - note
+            - grniAmount
+            - priceVarianceAmount
+            - withholdingType
+            - withholdingRate
+            - withholdingAmount
+            - advanceAppliedAmount
+            - openAmount
+            - cancelReason
+            - createdByName
+            - qtyTolerancePercent
+            - priceTolerancePercent
+            - lines
+            - advances
+            - allowedActions
+          properties:
+            divisionId:
+              type: string
+              format: uuid
+            divisionName:
+              type: string
+            note:
+              type: string
+            grniAmount:
+              $ref: "../components/common.yaml#/Money"
+            priceVarianceAmount:
+              $ref: "../components/common.yaml#/Money"
+            withholdingType:
+              $ref: "../components/common.yaml#/WithholdingType"
+            withholdingRate:
+              $ref: "#/components/schemas/PurchasePercent"
+            withholdingAmount:
+              $ref: "../components/common.yaml#/Money"
+            advanceAppliedAmount:
+              $ref: "../components/common.yaml#/Money"
+            openAmount:
+              $ref: "../components/common.yaml#/Money"
+            journalEntryId:
+              type: string
+              format: uuid
+              nullable: true
+            advanceJournalEntryId:
+              type: string
+              format: uuid
+              nullable: true
+            cancelReason:
+              type: string
+            submittedAt:
+              type: string
+              format: date-time
+              nullable: true
+            postedAt:
+              type: string
+              format: date-time
+              nullable: true
+            createdByName:
+              type: string
+            qtyTolerancePercent:
+              $ref: "#/components/schemas/PurchasePercent"
+            priceTolerancePercent:
+              $ref: "#/components/schemas/PurchasePercent"
+            lines:
+              type: array
+              items:
+                $ref: "#/components/schemas/SupplierBillLine"
+            advances:
+              type: array
+              items:
+                $ref: "#/components/schemas/SupplierBillAdvance"
+            allowedActions:
+              type: array
+              items:
+                type: string
+                enum: [edit, post, cancel, revise]
+    SupplierBillList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/SupplierBillSummary"
+    SupplierBillLineInput:
+      type: object
+      required: [goodsReceiptLineId, qty, unitPrice]
+      properties:
+        goodsReceiptLineId:
+          type: string
+          format: uuid
+        qty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        unitPrice:
+          $ref: "../components/common.yaml#/Money"
+        note:
+          type: string
+          maxLength: 500
+    SupplierBillFields:
+      type: object
+      required: [number, billDate, lines]
+      properties:
+        number:
+          type: string
+          maxLength: 60
+        billDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        dueDate:
+          allOf:
+            - $ref: "../components/common.yaml#/BusinessDate"
+          nullable: true
+          description: Kosong = tanggal tagihan + termin PO.
+        withholdingType:
+          allOf:
+            - $ref: "../components/common.yaml#/WithholdingType"
+          nullable: true
+          description: Kosong = PPh default pemasok.
+        withholdingRate:
+          allOf:
+            - $ref: "#/components/schemas/PurchasePercent"
+          nullable: true
+          description: Kosong = tarif awal jenis PPh.
+        note:
+          type: string
+          maxLength: 1000
+        lines:
+          type: array
+          maxItems: 200
+          items:
+            $ref: "#/components/schemas/SupplierBillLineInput"
+    SupplierBillInput:
+      allOf:
+        - $ref: "#/components/schemas/SupplierBillFields"
+        - type: object
+          required: [purchaseOrderId]
+          properties:
+            purchaseOrderId:
+              type: string
+              format: uuid
+    SupplierBillUpdate:
+      allOf:
+        - $ref: "#/components/schemas/SupplierBillFields"
+        - $ref: "../components/common.yaml#/VersionInput"
+    BillableReceiptLine:
+      type: object
+      required:
+        - goodsReceiptLineId
+        - goodsReceiptId
+        - goodsReceiptNumber
+        - businessDate
+        - product
+        - batchNumber
+        - poUnitPrice
+        - receivedQty
+        - billedQty
+        - openQty
+        - pendingQty
+      properties:
+        goodsReceiptLineId:
+          type: string
+          format: uuid
+        goodsReceiptId:
+          type: string
+          format: uuid
+        goodsReceiptNumber:
+          type: string
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        product:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseProductRef"
+        batchNumber:
+          type: string
+        poUnitPrice:
+          $ref: "../components/common.yaml#/Money"
+        receivedQty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        billedQty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        openQty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        pendingQty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+    BillableReceipts:
+      type: object
+      required:
+        - purchaseOrderId
+        - purchaseOrderNumber
+        - supplierId
+        - supplierName
+        - paymentTermDays
+        - defaultWithholdingType
+        - defaultWithholdingRate
+        - outstandingAdvanceAmount
+        - qtyTolerancePercent
+        - priceTolerancePercent
+        - lines
+      properties:
+        purchaseOrderId:
+          type: string
+          format: uuid
+        purchaseOrderNumber:
+          type: string
+        supplierId:
+          type: string
+          format: uuid
+        supplierName:
+          type: string
+        paymentTermDays:
+          type: integer
+        defaultWithholdingType:
+          $ref: "../components/common.yaml#/WithholdingType"
+        defaultWithholdingRate:
+          $ref: "#/components/schemas/PurchasePercent"
+        outstandingAdvanceAmount:
+          $ref: "../components/common.yaml#/Money"
+        qtyTolerancePercent:
+          $ref: "#/components/schemas/PurchasePercent"
+        priceTolerancePercent:
+          $ref: "#/components/schemas/PurchasePercent"
+        lines:
+          type: array
+          items:
+            $ref: "#/components/schemas/BillableReceiptLine"
+    PurchaseReturnStatus:
+      type: string
+      enum: [draft, pending_approval, approved, rejected, posted, cancelled]
+    PurchaseReturnOrigin:
+      type: string
+      description: "`manual` butuh persetujuan Head Logistik; `qc_inbound`/`qc_outbound` dari hasil QC tanpa approval (D-24)."
+      enum: [manual, qc_inbound, qc_outbound]
+    PurchaseReturnSummary:
+      type: object
+      required:
+        - id
+        - purchaseOrderId
+        - purchaseOrderNumber
+        - supplierId
+        - supplierName
+        - origin
+        - businessDate
+        - reason
+        - totalAmount
+        - status
+        - createdAt
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+          nullable: true
+          description: Nomor RB (diajukan/diposting).
+        debitNoteNumber:
+          type: string
+          nullable: true
+          description: Nomor nota debit DN (diposting).
+        purchaseOrderId:
+          type: string
+          format: uuid
+        purchaseOrderNumber:
+          type: string
+        supplierId:
+          type: string
+          format: uuid
+        supplierName:
+          type: string
+        origin:
+          $ref: "#/components/schemas/PurchaseReturnOrigin"
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        reason:
+          type: string
+        totalAmount:
+          $ref: "../components/common.yaml#/Money"
+        status:
+          $ref: "#/components/schemas/PurchaseReturnStatus"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    PurchaseReturnLine:
+      type: object
+      required:
+        - id
+        - lineNo
+        - goodsReceiptLineId
+        - goodsReceiptNumber
+        - product
+        - batchNumber
+        - location
+        - stockStatus
+        - qty
+        - unitCost
+        - amount
+        - unbilledQty
+        - unbilledAmount
+        - billedAmount
+        - inventoryAccountCode
+        - note
+      properties:
+        id:
+          type: string
+          format: uuid
+        lineNo:
+          type: integer
+        goodsReceiptLineId:
+          type: string
+          format: uuid
+        goodsReceiptNumber:
+          type: string
+        product:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseProductRef"
+        batchNumber:
+          type: string
+        location:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseLocationRef"
+        stockStatus:
+          $ref: "#/components/schemas/PurchaseStockStatus"
+        qty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        unitCost:
+          $ref: "#/components/schemas/PurchaseUnitCost"
+        amount:
+          $ref: "../components/common.yaml#/Money"
+        unbilledQty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        unbilledAmount:
+          $ref: "../components/common.yaml#/Money"
+        billedAmount:
+          $ref: "../components/common.yaml#/Money"
+        inventoryAccountCode:
+          type: string
+        note:
+          type: string
+    PurchaseReturn:
+      allOf:
+        - $ref: "#/components/schemas/PurchaseReturnSummary"
+        - type: object
+          required:
+            - divisionId
+            - divisionName
+            - sourceType
+            - sourceLabel
+            - note
+            - unbilledAmount
+            - billedAmount
+            - cancelReason
+            - createdByName
+            - lines
+            - allowedActions
+          properties:
+            divisionId:
+              type: string
+              format: uuid
+            divisionName:
+              type: string
+            sourceType:
+              type: string
+            sourceLabel:
+              type: string
+            note:
+              type: string
+            unbilledAmount:
+              $ref: "../components/common.yaml#/Money"
+            billedAmount:
+              $ref: "../components/common.yaml#/Money"
+            journalEntryId:
+              type: string
+              format: uuid
+              nullable: true
+            cancelReason:
+              type: string
+            submittedAt:
+              type: string
+              format: date-time
+              nullable: true
+            approvedAt:
+              type: string
+              format: date-time
+              nullable: true
+            postedAt:
+              type: string
+              format: date-time
+              nullable: true
+            createdByName:
+              type: string
+            lines:
+              type: array
+              items:
+                $ref: "#/components/schemas/PurchaseReturnLine"
+            allowedActions:
+              type: array
+              items:
+                type: string
+                enum: [edit, submit, post, cancel, revise]
+    PurchaseReturnList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/PurchaseReturnSummary"
+    PurchaseReturnLineInput:
+      type: object
+      required: [goodsReceiptLineId, locationId, qty]
+      properties:
+        goodsReceiptLineId:
+          type: string
+          format: uuid
+        locationId:
+          type: string
+          format: uuid
+        stockStatus:
+          $ref: "#/components/schemas/PurchaseStockStatus"
+        qty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        note:
+          type: string
+          maxLength: 500
+    PurchaseReturnFields:
+      type: object
+      required: [businessDate, reason, lines]
+      properties:
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        reason:
+          type: string
+          maxLength: 400
+        note:
+          type: string
+          maxLength: 1000
+        lines:
+          type: array
+          maxItems: 200
+          items:
+            $ref: "#/components/schemas/PurchaseReturnLineInput"
+    PurchaseReturnInput:
+      allOf:
+        - $ref: "#/components/schemas/PurchaseReturnFields"
+        - type: object
+          required: [purchaseOrderId]
+          properties:
+            purchaseOrderId:
+              type: string
+              format: uuid
+    PurchaseReturnUpdate:
+      allOf:
+        - $ref: "#/components/schemas/PurchaseReturnFields"
+        - $ref: "../components/common.yaml#/VersionInput"
+    ReturnableReceiptLine:
+      type: object
+      required:
+        - goodsReceiptLineId
+        - goodsReceiptId
+        - goodsReceiptNumber
+        - product
+        - batchNumber
+        - location
+        - goodQty
+        - returnedQty
+        - pendingQty
+        - returnableQty
+        - unitCost
+        - openQty
+      properties:
+        goodsReceiptLineId:
+          type: string
+          format: uuid
+        goodsReceiptId:
+          type: string
+          format: uuid
+        goodsReceiptNumber:
+          type: string
+        product:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseProductRef"
+        batchNumber:
+          type: string
+        location:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseLocationRef"
+        goodQty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        returnedQty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        pendingQty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        returnableQty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        openQty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        unitCost:
+          $ref: "#/components/schemas/PurchaseUnitCost"
+    ReturnableReceipts:
+      type: object
+      required: [purchaseOrderId, purchaseOrderNumber, supplierName, lines]
+      properties:
+        purchaseOrderId:
+          type: string
+          format: uuid
+        purchaseOrderNumber:
+          type: string
+        supplierName:
+          type: string
+        lines:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReturnableReceiptLine"
+    GoodsReceivedNotInvoicedLine:
+      type: object
+      required:
+        - goodsReceiptLineId
+        - goodsReceiptId
+        - goodsReceiptNumber
+        - businessDate
+        - purchaseOrderId
+        - purchaseOrderNumber
+        - orderType
+        - supplierId
+        - supplierName
+        - product
+        - unitPrice
+        - receivedQty
+        - receivedAmount
+        - billedQty
+        - billedAmount
+        - returnedQty
+        - returnedAmount
+        - openQty
+        - openAmount
+      properties:
+        goodsReceiptLineId:
+          type: string
+          format: uuid
+        goodsReceiptId:
+          type: string
+          format: uuid
+        goodsReceiptNumber:
+          type: string
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        purchaseOrderId:
+          type: string
+          format: uuid
+        purchaseOrderNumber:
+          type: string
+        orderType:
+          $ref: "../components/common.yaml#/PurchaseOrderType"
+        supplierId:
+          type: string
+          format: uuid
+        supplierName:
+          type: string
+        product:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseProductRef"
+        unitPrice:
+          $ref: "../components/common.yaml#/Money"
+        receivedQty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        receivedAmount:
+          $ref: "../components/common.yaml#/Money"
+        billedQty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        billedAmount:
+          $ref: "../components/common.yaml#/Money"
+        returnedQty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        returnedAmount:
+          $ref: "../components/common.yaml#/Money"
+        openQty:
+          $ref: "./procurement.yaml#/components/schemas/PurchaseQuantity"
+        openAmount:
+          $ref: "../components/common.yaml#/Money"
+    GoodsReceivedNotInvoicedReport:
+      type: object
+      required: [asOf, accountCode, lines, filteredTotal, subledgerTotal, ledgerBalance, difference]
+      properties:
+        asOf:
+          $ref: "../components/common.yaml#/BusinessDate"
+        accountCode:
+          type: string
+          example: "2102"
+        lines:
+          type: array
+          items:
+            $ref: "#/components/schemas/GoodsReceivedNotInvoicedLine"
+        filteredTotal:
+          $ref: "../components/common.yaml#/Money"
+        subledgerTotal:
+          $ref: "../components/common.yaml#/Money"
+        ledgerBalance:
+          $ref: "../components/common.yaml#/Money"
+        difference:
+          $ref: "../components/common.yaml#/Money"

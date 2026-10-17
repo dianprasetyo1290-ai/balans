@@ -1,7 +1,18 @@
 import { describe, expect, it } from "vitest"
 
-import { formatDate, formatDateTime, parseBusinessDate, todayBusinessDate, toBusinessDate } from "./date"
-import { formatMoneyInput, formatRupiah, formatUnitCost, parseMoneyInput } from "./money"
+import {
+  formatDate,
+  formatDateTime,
+  parseBusinessDate,
+  todayBusinessDate,
+  toBusinessDate,
+} from "./date"
+import {
+  formatMoneyInput,
+  formatRupiah,
+  formatUnitCost,
+  parseMoneyInput,
+} from "./money"
 import { formatPercent, formatQuantity, parseQuantityInput } from "./number"
 import { statusLabel, STATUS_LABELS } from "./status-labels"
 
@@ -76,8 +87,12 @@ describe("tanggal WIB", () => {
   })
 
   it("menghitung tanggal bisnis hari ini menurut WIB", () => {
-    expect(todayBusinessDate(new Date("2026-10-14T16:59:00Z"))).toBe("2026-10-14")
-    expect(todayBusinessDate(new Date("2026-10-14T17:00:00Z"))).toBe("2026-10-15")
+    expect(todayBusinessDate(new Date("2026-10-14T16:59:00Z"))).toBe(
+      "2026-10-14"
+    )
+    expect(todayBusinessDate(new Date("2026-10-14T17:00:00Z"))).toBe(
+      "2026-10-15"
+    )
     expect(toBusinessDate(new Date("2026-12-31T18:00:00Z"))).toBe("2027-01-01")
   })
 })
@@ -87,11 +102,17 @@ describe("label status", () => {
     expect(statusLabel("pending_approval").label).toBe("Menunggu Persetujuan")
     expect(statusLabel("qc_rejected").label).toBe("Ditolak QC")
     expect(statusLabel("posted").label).toBe("Diposting")
+    expect(statusLabel("awaiting_settlement").label).toBe(
+      "Menunggu Penyelesaian"
+    )
     expect(statusLabel("submitted").label).toBe("Diajukan")
-    expect(Object.keys(STATUS_LABELS)).toHaveLength(20)
+    expect(Object.keys(STATUS_LABELS)).toHaveLength(21)
   })
 
   it("menampilkan kode yang belum terdaftar apa adanya", () => {
-    expect(statusLabel("unknown_status")).toEqual({ label: "unknown_status", tone: "neutral" })
+    expect(statusLabel("unknown_status")).toEqual({
+      label: "unknown_status",
+      tone: "neutral",
+    })
   })
 })

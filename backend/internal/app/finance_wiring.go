@@ -17,6 +17,8 @@ import (
 	"balans/internal/platform/actor"
 	"balans/internal/platform/apperr"
 	"balans/internal/platform/clock"
+	"balans/internal/procurement"
+	"balans/internal/sales"
 )
 
 // Batas teknis file keuangan R1.4 (bukan nilai bisnis).
@@ -84,6 +86,12 @@ func (a *App) connectFinance(mailer *notification.Module) {
 		c.Suppliers = financeSuppliers{party: a.party}
 	}
 	a.accounting.ConnectFinance(c)
+	if a.sales != nil {
+		a.accounting.RegisterBookedPayments(salesBookedPayments{sales: a.sales})
+	}
+	if a.procurement != nil {
+		a.accounting.RegisterPaymentCandidates(supplierPayableCandidates{procurement: a.procurement, party: a.party})
+	}
 	registerAuditEntities(a.audit, accounting.AuditEntities())
 }
 
@@ -179,4 +187,91 @@ func (s financeSuppliers) SupplierName(ctx context.Context, id uuid.UUID) (strin
 		return "", false, err
 	}
 	return sup.Name, true, nil
+}
+
+// salesBookedPayments memperkaya kandidat rekonsiliasi dengan nomor & referensi pembayaran pelanggan sales (BYR
+// yang sudah dijurnal A-PB oleh modul sales).
+type salesBookedPayments struct{ sales *sales.Module }
+
+func (s salesBookedPayments) BookedPayments(ctx context.Context, accountCode string, from, to clock.BusinessDate) ([]accounting.BookedPayment, error) {
+	list, err := s.sales.IncomingPayments(ctx, sales.PaymentQuery{AccountCode: accountCode, DateFrom: from, DateTo: to})
+	if err != nil {
+		return nil, err
+	}
+	out := make([]accounting.BookedPayment, 0, len(list))
+	for _, p := range list {
+		if p.JournalEntryID == nil {
+			continue
+		}
+		out = append(out, accounting.BookedPayment{
+			JournalEntryID: *p.JournalEntryID, Number: p.Number, Reference: p.Reference, PartyName: p.PartyName,
+		})
+	}
+	return out, nil
+}
+
+// SourceSupplierPayables adalah nama penyedia kandidat utang pemasok untuk rekonsiliasi bank.
+const SourceSupplierPayables = "procurement.supplier_payable"
+
+// supplierPayableCandidates menyediakan tagihan pemasok terbuka sebagai kandidat mutasi keluar. Konfirmasi
+// membuat pembayaran BYR (Dr 2101 / Cr bank) lalu SettlePayable mengurangi sisa utang.
+type supplierPayableCandidates struct {
+	procurement *procurement.Module
+	party       *party.Module
+}
+
+func (p supplierPayableCandidates) Source() string { return SourceSupplierPayables }
+
+func (p supplierPayableCandidates) list(ctx context.Context) ([]accounting.PaymentCandidate, error) {
+	payables, err := p.procurement.OpenPayables(ctx, uuid.Nil)
+	if err != nil {
+		return nil, err
+	}
+	names := map[uuid.UUID]string{}
+	out := make([]accounting.PaymentCandidate, 0, len(payables))
+	for _, py := range payables {
+		if !py.OpenAmount.IsPositive() {
+			continue // nota debit dikompensasi lewat tagihan, bukan mutasi bank
+		}
+		name, ok := names[py.SupplierID]
+		if !ok && p.party != nil {
+			if sup, err := p.party.SupplierByID(ctx, py.SupplierID); err == nil {
+				name = sup.Name
+			}
+			names[py.SupplierID] = name
+		}
+		supplier := py.SupplierID
+		out = append(out, accounting.PaymentCandidate{
+			Source: SourceSupplierPayables, DocumentID: py.ID, DocumentLabel: py.DocumentNumber,
+			Direction: accounting.PaymentOutgoing, PartyType: "supplier", PartyID: &supplier, PartyName: name,
+			OpenAmount: py.OpenAmount, DocumentDate: py.DueDate, References: []string{py.DocumentNumber},
+			CounterAccountCode: accounting.TradePayableAccount,
+		})
+	}
+	return out, nil
+}
+
+func (p supplierPayableCandidates) PaymentCandidates(ctx context.Context, q accounting.CandidateQuery) ([]accounting.PaymentCandidate, error) {
+	if q.Direction != accounting.PaymentOutgoing {
+		return nil, nil
+	}
+	return p.list(ctx)
+}
+
+func (p supplierPayableCandidates) PaymentCandidate(ctx context.Context, id uuid.UUID) (accounting.PaymentCandidate, bool, error) {
+	list, err := p.list(ctx)
+	if err != nil {
+		return accounting.PaymentCandidate{}, false, err
+	}
+	for _, c := range list {
+		if c.DocumentID == id {
+			return c, true, nil
+		}
+	}
+	return accounting.PaymentCandidate{}, false, nil
+}
+
+func (p supplierPayableCandidates) SettlePayment(ctx context.Context, c accounting.PaymentCandidate, pay accounting.Payment) error {
+	_, err := p.procurement.SettlePayable(ctx, c.DocumentID, pay.Amount)
+	return err
 }

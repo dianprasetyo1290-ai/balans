@@ -24,6 +24,11 @@ func (s *Service) Order(ctx context.Context, id uuid.UUID) (domain.PurchaseOrder
 	return s.Store.GetOrder(ctx, id, false)
 }
 
+// Receipt membaca Penerimaan Barang tanpa memeriksa permission (modul Inbound/QC).
+func (s *Service) Receipt(ctx context.Context, id uuid.UUID) (domain.GoodsReceipt, error) {
+	return s.Store.GetReceipt(ctx, id, false)
+}
+
 // ReceivableOrder mengembalikan PO yang bisa diterima (Disetujui atau Diterima Sebagian) beserta baris, sisa qty,
 // bahan maklon, dan lokasi maklon. INVALID_STATE_TRANSITION bila PO belum disetujui atau sudah selesai.
 func (s *Service) ReceivableOrder(ctx context.Context, id uuid.UUID) (domain.PurchaseOrder, error) {

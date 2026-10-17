@@ -179,9 +179,28 @@ func (s *Service) AutoMatch(ctx context.Context, statementID uuid.UUID) (Stateme
 
 // candidates mengumpulkan baris jurnal rekening yang belum direkonsiliasi dan dokumen terbuka dari penyedia.
 func (s *Service) candidates(ctx context.Context, b domain.BankAccount, from, to clock.BusinessDate, dirs ...domain.PaymentDirection) ([]domain.MatchCandidate, error) {
-	out, err := s.Finance.UnreconciledBankLines(ctx, b.AccountID, from.AddDays(-candidateWindowDays), to.AddDays(candidateWindowDays))
+	winFrom, winTo := from.AddDays(-candidateWindowDays), to.AddDays(candidateWindowDays)
+	out, err := s.Finance.UnreconciledBankLines(ctx, b.AccountID, winFrom, winTo)
 	if err != nil {
 		return nil, err
+	}
+	for _, src := range s.bookedSources() {
+		booked, err := src.BookedPayments(ctx, b.AccountCode, winFrom, winTo)
+		if err != nil {
+			return nil, fmt.Errorf("pembayaran tercatat: %w", err)
+		}
+		byEntry := make(map[uuid.UUID]BookedPayment, len(booked))
+		for _, bp := range booked {
+			byEntry[bp.JournalEntryID] = bp
+		}
+		for i := range out {
+			if bp, ok := byEntry[out[i].JournalEntryID]; ok {
+				out[i].References = append(out[i].References, bp.Number, bp.Reference)
+				if bp.PartyName != "" {
+					out[i].Label += " · " + bp.PartyName
+				}
+			}
+		}
 	}
 	for _, p := range s.allProviders() {
 		for _, dir := range dirs {

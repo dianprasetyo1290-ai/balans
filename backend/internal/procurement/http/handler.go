@@ -118,7 +118,8 @@ func productRef(id *uuid.UUID, products map[uuid.UUID]service.ProductRef) *Purch
 	if !ok {
 		return &PurchaseProductRef{Id: *id, Sku: "", Name: "(produk tidak ditemukan)", Uom: ""}
 	}
-	return &PurchaseProductRef{Id: p.ID, Sku: p.SKU, Name: p.Name, Uom: p.UOM}
+	hasBatch := p.HasBatch
+	return &PurchaseProductRef{Id: p.ID, Sku: p.SKU, Name: p.Name, Uom: p.UOM, HasBatch: &hasBatch}
 }
 
 func optOption(id *uuid.UUID, locs map[uuid.UUID]service.LocationRef) *PurchaseLocationRef {

@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest"
 
 import { orderKindOf } from "../api/procurement-api"
-import { documentTotal, lineAmount, terbilang } from "./procurement-lib"
+import {
+  documentTotal,
+  lineAmount,
+  priceVariancePercent,
+  terbilang,
+} from "./procurement-lib"
 
 describe("lineAmount & documentTotal", () => {
   it("membulatkan half-up ke 2 desimal seperti backend", () => {
@@ -49,5 +54,15 @@ describe("orderKindOf", () => {
     expect(orderKindOf("toll_manufacturing")).toBe("toll")
     expect(orderKindOf("reprocess")).toBe("reprocess")
     expect(orderKindOf("packaging")).toBe("regular")
+  })
+})
+
+describe("priceVariancePercent", () => {
+  it("menghitung selisih harga tagihan terhadap PO untuk toleransi 1%", () => {
+    expect(priceVariancePercent("20500", "20000").toFixed(2)).toBe("2.50")
+    expect(priceVariancePercent("1262.5", "1250").toFixed(2)).toBe("1.00")
+    expect(priceVariancePercent("990", "1000").toFixed(2)).toBe("-1.00")
+    expect(priceVariancePercent("1", "0").toFixed(0)).toBe("100")
+    expect(priceVariancePercent("", "0").toFixed(0)).toBe("0")
   })
 })

@@ -1,0 +1,12 @@
+# Jadwal uji restore: tanggal 2 setiap bulan pukul 03.00 WIB, sehari setelah backup bulanan permanen
+# (tanggal 1, 01.00 WIB). Persistent=true menjalankan uji yang terlewat saat VPS mati.
+[Unit]
+Description=Balans - jadwal uji restore bulanan
+
+[Timer]
+OnCalendar=*-*-02 03:00:00 Asia/Jakarta
+Persistent=true
+RandomizedDelaySec=15min
+
+[Install]
+WantedBy=timers.target

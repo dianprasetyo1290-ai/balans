@@ -21,7 +21,6 @@ import (
 	"balans/internal/hris"
 	"balans/internal/identity"
 	"balans/internal/integration/mockconsole"
-	"balans/internal/integration/mockpayment"
 	"balans/internal/integration/mockshipment"
 	"balans/internal/integration/smtpmail"
 	"balans/internal/inventory"
@@ -37,6 +36,7 @@ import (
 	"balans/internal/platform/pii"
 	"balans/internal/platform/webhook"
 	"balans/internal/pricing"
+	"balans/internal/procurement"
 	"balans/internal/sales"
 	"balans/internal/system"
 	"balans/internal/warehouse"
@@ -69,6 +69,8 @@ type App struct {
 	pricing      *pricing.Module
 	notification *notification.Module
 	dataexchange *dataexchange.Module
+	sales        *sales.Module
+	procurement  *procurement.Module
 	cipher       *pii.Cipher
 	modules      []module
 	console      *mockconsole.Console
@@ -220,19 +222,12 @@ func (a *App) buildModules() error {
 	if err := a.buildMasterData(); err != nil {
 		return err
 	}
+	reasons := &returnReasonAdapter{}
 	if cfg.IsEnabled(inventory.Name) {
 		if a.catalog == nil || a.warehouse == nil {
 			return errors.New("modul inventory membutuhkan modul catalog dan warehouse")
 		}
-		d := inventory.Deps{
-			Pool: a.Pool, Tx: a.Tx, Clock: a.Clock, Log: a.Log, Responder: a.Responder,
-			Products: a.catalog, Locations: a.warehouse,
-		}
-		if a.accounting != nil {
-			d.Periods = a.accounting
-		}
-		a.inventory = inventory.New(d)
-		a.modules = append(a.modules, a.inventory)
+		a.buildInventory(mailer, reasons)
 	}
 	a.connectMasterData()
 	a.connectWarehouseDocuments()
@@ -245,22 +240,14 @@ func (a *App) buildModules() error {
 	if err := a.buildProcurement(mailer); err != nil {
 		return err
 	}
-	a.connectFinance(mailer)
-	if cfg.IsEnabled(sales.Name) {
-		if cfg.PaymentGateway != config.ProviderMock {
-			return providerNotAvailable("PAYMENT_GATEWAY", cfg.PaymentGateway)
-		}
-		gateway := mockpayment.New(a.Pool, mockpayment.Config{
-			ServerKey:     cfg.MidtransServerKey,
-			PublicBaseURL: cfg.PublicBaseURL,
-			WebhookURL:    cfg.InternalAPIURL + "/api/v1/webhooks/midtrans",
-		})
-		a.modules = append(a.modules, sales.New(sales.Deps{
-			Pool: a.Pool, Tx: a.Tx, Audit: a.audit, Gateway: gateway, Inbox: inbox, Responder: a.Responder, Log: a.Log,
-		}))
-		console.Payments = gateway
-		a.audit.RegisterEntity("return_reason", "sales.return_reason.read")
+	gateway, err := a.buildSales(inbox, reasons)
+	if err != nil {
+		return err
 	}
+	if gateway != nil {
+		console.Payments = gateway
+	}
+	a.connectFinance(mailer)
 	if cfg.IsEnabled(logistics.Name) {
 		if cfg.ShipmentProvider != config.ProviderMock {
 			return providerNotAvailable("SHIPMENT_PROVIDER", cfg.ShipmentProvider)

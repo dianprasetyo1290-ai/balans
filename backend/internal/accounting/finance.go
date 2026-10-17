@@ -28,6 +28,10 @@ type (
 	// PaymentCandidateProvider adalah titik sambung piutang/utang ke rekonsiliasi bank (S-402).
 	PaymentCandidateProvider = service.PaymentCandidateProvider
 
+	// BookedPayment dan BookedPaymentSource memperkaya kandidat rekonsiliasi dengan pembayaran modul lain.
+	BookedPayment       = service.BookedPayment
+	BookedPaymentSource = service.BookedPaymentSource
+
 	// WithholdingRequest adalah permintaan pemotongan PPh satu dokumen sumber.
 	WithholdingRequest = service.WithholdingRequest
 	// WithholdingResult adalah data bukti potong dan akun utang PPh hasil pemotongan.
@@ -103,6 +107,10 @@ func (m *Module) ConnectFinance(c FinanceConnections) {
 func (m *Module) RegisterPaymentCandidates(p PaymentCandidateProvider) {
 	m.svc.RegisterPaymentCandidates(p)
 }
+
+// RegisterBookedPayments mendaftarkan sumber pembayaran tercatat modul lain (mis. pembayaran pelanggan sales) agar
+// nomor/referensinya ikut dicocokkan dengan mutasi bank.
+func (m *Module) RegisterBookedPayments(src BookedPaymentSource) { m.svc.RegisterBookedPayments(src) }
 
 // RecordPayment membuat dan memposting pembayaran dokumen modul lain (nomor BYR, jurnal A-PB) di transaksi aktif.
 // Pembayaran keluar butuh re-autentikasi `accounting.payment.post` (★).

@@ -123,6 +123,350 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/v1/sales/orders": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Daftar Sales Order semua channel (Sales Order, Modern Trade, Penjualan Marketplace, WA/IG, Karyawan)
+     * @description Hanya jenis pesanan yang boleh dilihat user: marketplace butuh `sales.marketplace_order.read`, jenis lain
+     *     `sales.sales_order.read`.
+     */
+    get: operations["listSalesOrders"]
+    put?: never
+    /**
+     * Menyimpan draft Sales Order, atau mencatat penjualan marketplace (S-301, S-306, S-307, S-308)
+     * @description Harga satuan diambil resolver harga (harga khusus → promo → bertingkat → daftar harga channel/mitra/karyawan
+     *     → Harga Dasar) pada tanggal pesanan; aturan & versi disimpan per baris. Diskon manual per baris/dokumen
+     *     (persen atau nominal). NON-PKP: tanpa PPN. Marketplace (`orderType=marketplace`) langsung tercatat Diproses
+     *     dengan E-commerce Stock dialokasikan; nomor order marketplace unik per marketplace; harga baris boleh diisi
+     *     dari marketplace (`unitPrice`).
+     */
+    post: operations["createSalesOrder"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/orders/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail Sales Order beserta alokasi batch, Proforma, invoice, dan pengiriman */
+    get: operations["getSalesOrder"]
+    /** Mengubah draft Sales Order (jenis pesanan tetap; harga dihitung ulang) */
+    put: operations["updateSalesOrder"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/orders/{id}/confirm": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Konfirmasi Sales Order
+     * @description Harga dihitung ulang, nomor `SO/TAHUN/BULAN/NOMOR` diberikan, stok dialokasikan FEFO dari lokasi asal
+     *     (bundel dipecah ke komponen). Diskon di atas batas role → Menunggu Persetujuan (`sales_order_discount`, Head
+     *     Sales). Selain itu: prepaid → Proforma Invoice terbit (Menunggu Pembayaran); tempo → invoice terbit dan
+     *     jurnal A-05 (Diproses).
+     */
+    post: operations["confirmSalesOrder"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/orders/{id}/cancel": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Batalkan Sales Order yang belum dikirim
+     * @description Alasan wajib selain draft. Approval diskon dibatalkan, alokasi stok dilepas, Proforma dibatalkan, invoice
+     *     tempo tanpa pembayaran dibatalkan dengan jurnal balik A-05.
+     */
+    post: operations["cancelSalesOrder"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/orders/{id}/payment-proof": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Unggah bukti bayar pelanggan (pesanan Menunggu Pembayaran)
+     * @description File diunggah dulu lewat `/api/v1/files` dengan `ownerType=sales.payment_proof` (JPG/PNG/WebP/PDF), lalu
+     *     ditautkan ke pesanan. F&A mengonfirmasi pembayaran di Proforma Invoice.
+     */
+    post: operations["uploadSalesOrderPaymentProof"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/channel-options": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Channel & sub-channel aktif untuk form pesanan */
+    get: operations["listSalesChannelOptions"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/location-options": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Lokasi asal stok yang boleh dipakai jenis pesanan */
+    get: operations["listSalesLocationOptions"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/cash-bank-accounts": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Akun Kas & Bank (11xx) untuk konfirmasi pembayaran */
+    get: operations["listSalesCashBankAccounts"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/proforma-invoices": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Daftar Proforma Invoice */
+    get: operations["listProformaInvoices"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/proforma-invoices/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail Proforma Invoice beserta Sales Order (cetak PI) */
+    get: operations["getProformaInvoice"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/proforma-invoices/{id}/confirm-payment": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Konfirmasi pembayaran Proforma Invoice (F&A)
+     * @description Invoice final `INV/…` terbit Lunas dengan jurnal A-05, pembayaran `BYR/…` tercatat dan dialokasikan ke
+     *     invoice (A-PB: Dr Kas/Bank, Cr Piutang Usaha), Sales Order menjadi Diproses (siap dikirim). PI yang lewat
+     *     masa berlaku ditolak.
+     */
+    post: operations["confirmProformaPayment"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/invoices": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Daftar invoice (Penjualan › Invoice, Keuangan & Akuntansi › Piutang Usaha) */
+    get: operations["listSalesInvoices"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/invoices/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail invoice beserta riwayat pembayaran (cetak invoice NON-PKP) */
+    get: operations["getSalesInvoice"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/invoices/{id}/share-text": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Teks invoice siap tempel ke WhatsApp */
+    get: operations["getSalesInvoiceShareText"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/customer-payments": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Daftar pembayaran pelanggan (Piutang Usaha) */
+    get: operations["listCustomerPayments"]
+    put?: never
+    /**
+     * Catat pembayaran pelanggan (alokasi ke satu atau banyak invoice) ★
+     * @description Pembayaran sebagian diperbolehkan; jumlah alokasi harus sama dengan nominal pembayaran. Nomor `BYR/…` dan
+     *     jurnal A-PB (Dr akun Kas & Bank, Cr Piutang Usaha 1201, pihak = pelanggan/mitra). Butuh
+     *     `accounting.payment.post` dan re-autentikasi 5 menit.
+     */
+    post: operations["createCustomerPayment"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/customer-payments/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail pembayaran pelanggan */
+    get: operations["getCustomerPayment"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/customer-payments/{id}/cancel": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Batalkan pembayaran pelanggan ★ (jurnal A-PB dibalik, piutang invoice dikembalikan) */
+    post: operations["cancelCustomerPayment"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/receivable-aging": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Laporan Piutang — umur piutang per pelanggan/mitra */
+    get: operations["getReceivableAging"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/v1/webhooks/biteship": {
     parameters: {
       query?: never
@@ -2771,6 +3115,329 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/v1/internal-usages": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Pemakaian Internal — daftar (INV-05, HR-02)
+     * @description Permission `inventory.internal_usage.read`.
+     */
+    get: operations["listInternalUsages"]
+    put?: never
+    /**
+     * Membuat draft Pemakaian Internal (S-221, S-227)
+     * @description Tujuan marketing/sampling sales/event wajib kode kampanye (A-11); sampel karyawan tanpa kampanye (A-12). Event
+     *     wajib lokasi Event dan tanggal selesai; batas pencatatan sisa = H+1. Permission `inventory.internal_usage.write`.
+     */
+    post: operations["createInternalUsage"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/internal-usages/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail Pemakaian Internal beserta batch yang keluar dan aksi yang diizinkan */
+    get: operations["getInternalUsage"]
+    /** Mengubah draft Pemakaian Internal */
+    put: operations["updateInternalUsage"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/internal-usages/{id}/actions/{action}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Aksi Pemakaian Internal (submit, revise, release, handover, post, cancel)
+     * @description `submit` (S) memberi nomor PU dan mengajukan approval `internal_usage` sebesar taksiran HPP FEFO; `release` (P,
+     *     Logistik Leader) mengalokasikan stok asal FEFO; `handover` (W, divisi peminta) mengonfirmasi serah terima —
+     *     non-event: stok keluar + jurnal A-11/A-12, event: stok pindah ke lokasi Event tanpa jurnal; `post` (P) event
+     *     setelah sisa dicatat: qty terpakai keluar dari lokasi Event + jurnal A-11; `revise`, `cancel` (W).
+     */
+    post: operations["runInternalUsageAction"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/internal-usages/{id}/settle": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Mencatat sisa barang event (maks. H+1); sisa kembali ke Inbound berstatus Karantina */
+    post: operations["settleInternalUsage"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/internal-usage-options/{kind}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Divisi atau kampanye aktif untuk form Pemakaian Internal */
+    get: operations["listInternalUsageDimensionOptions"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/repackings": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Repacking — daftar (INV-06) */
+    get: operations["listRepackings"]
+    put?: never
+    /**
+     * Membuat draft Repacking (S-222)
+     * @description Bahan: barang retur (Produk Jadi dari lokasi Retur) dan packaging baru (dari lokasi RM); tepat satu baris hasil FG
+     *     dengan batch baru di lokasi FG Non-Ecommerce. Permission `inventory.repacking.write`.
+     */
+    post: operations["createRepacking"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/repackings/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail Repacking */
+    get: operations["getRepacking"]
+    /** Mengubah draft Repacking */
+    put: operations["updateRepacking"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/repackings/{id}/actions/{action}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Aksi Repacking (start, post, cancel)
+     * @description `start` (P) memberi nomor RPK dan mengalokasikan bahan; `post` (P) mengeluarkan bahan (HPP FIFO), menerima FG batch
+     *     baru bernilai HPP retur + packaging, dan menjurnal A-26 (Dr 1311; Cr 1314, Cr 1301); `cancel` (W) melepas alokasi.
+     */
+    post: operations["runRepackingAction"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/disposals": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Pemusnahan — daftar (INV-12) */
+    get: operations["listDisposals"]
+    put?: never
+    /**
+     * Membuat draft Pemusnahan (S-223)
+     * @description Alasan `return` hanya dari lokasi Retur (A-26 Dr 6403, Cr 1314); `expired`/`damaged` dari lokasi FG, E-commerce,
+     *     Petty Stock, Inbound, atau Event (A-27 Dr 6402, Cr 1311). Foto berita acara diunggah lebih dulu ke filestore
+     *     (`ownerType=disposal`). Permission `inventory.disposal.write`.
+     */
+    post: operations["createDisposal"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/disposals/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail Pemusnahan (juga isi Berita Acara cetak) */
+    get: operations["getDisposal"]
+    /** Mengubah draft Pemusnahan */
+    put: operations["updateDisposal"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/disposals/{id}/report": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Mengisi Berita Acara Pemusnahan (tanggal, metode, saksi, foto) sebelum posting */
+    put: operations["updateDisposalReport"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/disposals/{id}/actions/{action}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Aksi Pemusnahan (submit, revise, post, cancel)
+     * @description `submit` (S) memberi nomor MUS dan mengajukan approval `disposal` (Head Logistik → Head F&A → Direksi bila > Rp10 jt)
+     *     sebesar taksiran HPP; `post` (P) wajib berita acara lengkap (metode, ≥ 1 saksi, ≥ 1 foto), mengeluarkan stok, dan
+     *     menjurnal A-26/A-27.
+     */
+    post: operations["runDisposalAction"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/return-dispositions": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Disposisi Retur — daftar (WMS-07)
+     * @description Permission `warehouse.return_disposition.read`.
+     */
+    get: operations["listReturnDispositions"]
+    put?: never
+    /**
+     * Membuat draft Disposisi Retur dari barang di Gudang Retur (S-220)
+     * @description Per baris: hasil QC dan disposisi; disposisi kosong diisi usulan alasan retur. Permission
+     *     `warehouse.return_disposition.write`.
+     */
+    post: operations["createReturnDisposition"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/return-dispositions/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail Disposisi Retur */
+    get: operations["getReturnDisposition"]
+    /** Mengubah draft Disposisi Retur */
+    put: operations["updateReturnDisposition"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/return-dispositions/{id}/actions/{action}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Aksi Disposisi Retur (submit, revise, post, cancel)
+     * @description `submit` (S) memberi nomor DRT dan mengajukan approval `return_disposition` (flag `has_disposal`, nominal = nilai
+     *     pemusnahan); `post` (W) mengeksekusi per baris: restock → FG, reprocess → GM (jurnal A-26), repack → draft
+     *     Repacking, sampel → Pemakaian Internal disetujui, musnah → Pemusnahan disetujui.
+     */
+    post: operations["runReturnDispositionAction"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/recost-runs": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Riwayat recost HPP akibat penerimaan bertanggal mundur (S-224) */
+    get: operations["listRecostRuns"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/v1/customers": {
     parameters: {
       query?: never
@@ -4216,6 +4883,359 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/v1/procurement/inbound-locations": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Lokasi Inbound aktif untuk form Penerimaan Barang */
+    get: operations["listProcurementInboundLocations"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/goods-receipts": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Daftar Penerimaan Barang (S-206, S-207) */
+    get: operations["listGoodsReceipts"]
+    put?: never
+    /** Menyimpan draft Penerimaan Barang untuk PO Disetujui/Diterima Sebagian */
+    post: operations["createGoodsReceipt"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/goods-receipts/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail Penerimaan Barang */
+    get: operations["getGoodsReceipt"]
+    /** Mengubah draft Penerimaan Barang */
+    put: operations["updateGoodsReceipt"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/goods-receipts/{id}/post": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Posting Penerimaan Barang (stok Inbound Karantina, jurnal A-01/A-03)
+     * @description Nomor `GR/TAHUN/BULAN/NOMOR`; PO maklon/reprocess mengeluarkan packaging/bahan terpakai (baik + reject) dari
+     *     lokasi maklon dengan HPP FIFO; HPP per unit = nilai batch ÷ qty baik; stok baik masuk lokasi Inbound berstatus
+     *     Karantina; jurnal A-01 atau A-03; qty diterima PO dan dokumen Inbound/QC, semuanya di satu transaksi.
+     */
+    post: operations["postGoodsReceipt"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/goods-receipts/{id}/cancel": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Batalkan Penerimaan Barang
+     * @description Draft (hak tulis) atau Diposting yang belum ditagih/diretur dan belum di-QC (hak batal, alasan wajib): stok dan
+     *     jurnal dibalik di transaksi yang sama.
+     */
+    post: operations["cancelGoodsReceipt"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/procurement/billable-receipts": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Baris Penerimaan Barang PO yang belum ditagih (form Tagihan Pemasok) */
+    get: operations["listBillableReceipts"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/supplier-bills": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Daftar Tagihan Pemasok (S-208) */
+    get: operations["listSupplierBills"]
+    put?: never
+    /** Menyimpan draft tagihan pemasok dan menampilkan hasil 3-way match */
+    post: operations["createSupplierBill"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/supplier-bills/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail tagihan pemasok */
+    get: operations["getSupplierBill"]
+    /** Mengubah draft tagihan pemasok */
+    put: operations["updateSupplierBill"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/supplier-bills/{id}/post": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Posting tagihan pemasok (3-way match, jurnal A-18)
+     * @description Dalam toleransi (qty 0%, harga 1%): jurnal A-18 (Dr 2102 + selisih harga 5103, Cr 2101 dan utang PPh sesuai
+     *     PPh default pemasok), uang muka PO dipotong otomatis (A-19 `advance_applied`), qty ditagih PO/GR, dan utang
+     *     terbentuk. Di luar toleransi: Menunggu Persetujuan `supplier_bill_exception` (Head F&A), pembayaran diblokir.
+     */
+    post: operations["postSupplierBill"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/supplier-bills/{id}/revise": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Kembalikan tagihan yang ditolak ke Draft */
+    post: operations["reviseSupplierBill"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/supplier-bills/{id}/cancel": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Batalkan tagihan Draft atau Ditolak */
+    post: operations["cancelSupplierBill"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/procurement/returnable-receipts": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Baris Penerimaan Barang PO yang masih bisa diretur (form Retur Pembelian) */
+    get: operations["listReturnableReceipts"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/purchase-returns": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Daftar Retur Pembelian & nota debit (S-210) */
+    get: operations["listPurchaseReturns"]
+    put?: never
+    /**
+     * Menyimpan draft retur pembelian manual
+     * @description Retur manual butuh persetujuan Head Logistik sebelum diposting; retur asal QC dibuat modul gudang.
+     */
+    post: operations["createPurchaseReturn"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/purchase-returns/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail retur pembelian */
+    get: operations["getPurchaseReturn"]
+    /** Mengubah draft retur pembelian */
+    put: operations["updatePurchaseReturn"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/purchase-returns/{id}/submit": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Ajukan retur pembelian ke Head Logistik (nomor RB) */
+    post: operations["submitPurchaseReturn"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/purchase-returns/{id}/post": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Posting retur pembelian (nota debit DN, jurnal A-02)
+     * @description Barang keluar dari lokasi/status asal dengan HPP FIFO; bagian yang belum ditagih mengurangi 2102 (qty diterima PO
+     *     ikut berkurang), bagian yang sudah ditagih mengurangi utang 2101 lewat nota debit.
+     */
+    post: operations["postPurchaseReturn"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/purchase-returns/{id}/revise": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Kembalikan retur yang ditolak ke Draft */
+    post: operations["revisePurchaseReturn"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/purchase-returns/{id}/cancel": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Batalkan retur Draft atau Disetujui */
+    post: operations["cancelPurchaseReturn"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/procurement/reports/goods-received-not-invoiced": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Laporan Barang Diterima Belum Ditagih per PO/GR (S-209)
+     * @description Saldo per baris GR dan rekonsiliasi ke saldo akun 2102 (total sub-ledger, saldo buku besar, selisih).
+     */
+    get: operations["getGoodsReceivedNotInvoiced"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -4332,7 +5352,7 @@ export interface components {
      */
     ReturnReasonAppliesTo: "sales_return" | "purchase_return" | "both"
     /**
-     * @description Disposisi barang retur (Disposisi Retur, WMS-07).
+     * @description Disposisi barang retur (Disposisi Retur, WMS-07); dipakai master Alasan Retur dan dokumen Disposisi Retur.
      * @enum {string}
      */
     ReturnDisposition:
@@ -4369,6 +5389,458 @@ export interface components {
     }
     ReturnReasonUpdate: components["schemas"]["ReturnReasonFields"] &
       components["schemas"]["VersionInput"]
+    /**
+     * @description Status Sales Order, Proforma Invoice, Invoice, dan pembayaran pelanggan (Desain Status Dokumen 1).
+     * @enum {string}
+     */
+    SalesDocumentStatus:
+      | "draft"
+      | "pending_approval"
+      | "awaiting_payment"
+      | "partially_paid"
+      | "paid"
+      | "in_progress"
+      | "in_transit"
+      | "completed"
+      | "cancelled"
+      | "expired"
+      | "posted"
+    /**
+     * @description Jenis pesanan (satu model Sales Order untuk semua channel): `modern_trade` MT beli putus, `b2b` B2B/corporate,
+     *     `social_commerce` WhatsApp/Instagram, `marketplace` penjualan marketplace, `employee` penjualan karyawan.
+     * @enum {string}
+     */
+    SalesOrderType:
+      "modern_trade" | "b2b" | "social_commerce" | "marketplace" | "employee"
+    /**
+     * Format: date
+     * @description Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+     * @example 2026-10-19
+     */
+    BusinessDate: string
+    /** @description Metadata pagination standar (Technical Guideline 8.2). */
+    Pagination: {
+      page: number
+      pageSize: number
+      /** Format: int64 */
+      totalItems: number
+      totalPages: number
+    }
+    /**
+     * @description `prepaid` = Proforma Invoice lalu invoice lunas; `credit` = tempo (MT/B2B), invoice terbit saat konfirmasi.
+     * @enum {string}
+     */
+    SalesPaymentMode: "prepaid" | "credit"
+    /**
+     * @description Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+     * @example 1250000.00
+     */
+    Money: string
+    SalesOrderSummary: {
+      /** Format: uuid */
+      id: string
+      number?: string | null
+      orderType: components["schemas"]["SalesOrderType"]
+      /** Format: uuid */
+      channelId: string
+      channelName: string
+      /** Format: uuid */
+      subChannelId: string
+      subChannelName: string
+      /** Format: uuid */
+      customerId?: string | null
+      /** Format: uuid */
+      partnerId?: string | null
+      partyName: string
+      partyCode: string
+      partyPhone: string
+      externalOrderId: string
+      clientPoNumber: string
+      businessDate: components["schemas"]["BusinessDate"]
+      paymentMode: components["schemas"]["SalesPaymentMode"]
+      totalAmount: components["schemas"]["Money"]
+      status: components["schemas"]["SalesDocumentStatus"]
+      /** Format: date-time */
+      createdAt: string
+      version: number
+    }
+    SalesOrderList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["SalesOrderSummary"][]
+    }
+    /**
+     * @description Bentuk diskon manual (MD-05) — persen dari dasar atau nominal rupiah.
+     * @enum {string}
+     */
+    DiscountKind: "percent" | "amount"
+    SalesDiscount: {
+      kind: components["schemas"]["DiscountKind"]
+      /**
+       * @description Persen (maks. 4 desimal) atau nominal rupiah.
+       * @example 5
+       */
+      value: string
+    }
+    /**
+     * @description Kuantitas desimal maks. 3 angka di belakang koma sebagai string.
+     * @example 12.000
+     */
+    SalesQuantity: string
+    SalesOrderLineInput: {
+      /** Format: uuid */
+      productId: string
+      qty: components["schemas"]["SalesQuantity"]
+      discount?: components["schemas"]["SalesDiscount"]
+      /** @description Hanya marketplace (harga di marketplace); jenis lain memakai resolver harga. */
+      unitPrice?: components["schemas"]["Money"] | null
+      note?: string
+    }
+    SalesOrderFields: {
+      /** Format: uuid */
+      channelId: string
+      /** Format: uuid */
+      subChannelId: string
+      /** Format: uuid */
+      customerId?: string | null
+      /** Format: uuid */
+      partnerId?: string | null
+      /** @description Nama pembeli marketplace. */
+      buyerName?: string
+      /** @description Nomor order marketplace (unik per marketplace). */
+      externalOrderId?: string
+      /** @description Nomor PO klien MT/B2B. */
+      clientPoNumber?: string
+      businessDate: components["schemas"]["BusinessDate"]
+      /**
+       * Format: uuid
+       * @description Lokasi asal stok; kosong untuk marketplace = E-commerce Stock satu-satunya.
+       */
+      sourceLocationId?: string | null
+      paymentMode?: components["schemas"]["SalesPaymentMode"]
+      paymentTermDays?: number
+      shipToName?: string
+      shipToPhone?: string
+      shipToAddress?: string
+      documentDiscount?: components["schemas"]["SalesDiscount"]
+      shippingAmount?: components["schemas"]["Money"]
+      note?: string
+      lines: components["schemas"]["SalesOrderLineInput"][]
+    }
+    SalesOrderInput: components["schemas"]["SalesOrderFields"] & {
+      orderType: components["schemas"]["SalesOrderType"]
+    }
+    SalesLocationRef: {
+      /** Format: uuid */
+      id: string
+      code: string
+      name: string
+      locationType: string
+    }
+    SalesProductRef: {
+      /** Format: uuid */
+      id: string
+      sku: string
+      name: string
+      uom: string
+    }
+    SalesOrderLine: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      product: components["schemas"]["SalesProductRef"]
+      isBundle: boolean
+      qty: components["schemas"]["SalesQuantity"]
+      unitPrice: components["schemas"]["Money"]
+      /** @description Aturan harga (PriceRule) atau `marketplace_input`. */
+      priceRule: string
+      /** Format: uuid */
+      priceSourceId?: string | null
+      /** Format: uuid */
+      priceListId?: string | null
+      /** Format: uuid */
+      priceListVersionId?: string | null
+      priceDescription: string
+      discount: components["schemas"]["SalesDiscount"]
+      grossAmount: components["schemas"]["Money"]
+      discountAmount: components["schemas"]["Money"]
+      lineTotalAmount: components["schemas"]["Money"]
+      shippedQty: components["schemas"]["SalesQuantity"]
+      note: string
+    }
+    SalesAllocationBatch: {
+      /** Format: uuid */
+      batchId?: string | null
+      batchNumber?: string | null
+      expiryDate?: components["schemas"]["BusinessDate"] | null
+      qty: components["schemas"]["SalesQuantity"]
+    }
+    SalesOrderAllocation: {
+      /** Format: uuid */
+      id: string
+      /** Format: uuid */
+      lineId: string
+      product: components["schemas"]["SalesProductRef"]
+      location: components["schemas"]["SalesLocationRef"]
+      qty: components["schemas"]["SalesQuantity"]
+      shippedQty: components["schemas"]["SalesQuantity"]
+      released: boolean
+      batches: components["schemas"]["SalesAllocationBatch"][]
+    }
+    SalesDocumentRef: {
+      /** Format: uuid */
+      id: string
+      number: string
+      status: components["schemas"]["SalesDocumentStatus"]
+      amount: components["schemas"]["Money"]
+      validUntil?: components["schemas"]["BusinessDate"] | null
+      paidAmount?: components["schemas"]["Money"] | null
+    }
+    SalesShipment: {
+      /** Format: uuid */
+      id: string
+      sourceType: string
+      /** Format: uuid */
+      sourceId: string
+      sourceLabel: string
+      businessDate: components["schemas"]["BusinessDate"]
+      costAmount: components["schemas"]["Money"]
+      /** Format: date-time */
+      createdAt: string
+    }
+    SalesOrder: components["schemas"]["SalesOrderSummary"] & {
+      sourceLocation: components["schemas"]["SalesLocationRef"]
+      paymentTermDays: number
+      shipToName: string
+      shipToPhone: string
+      shipToAddress: string
+      grossAmount: components["schemas"]["Money"]
+      lineDiscountAmount: components["schemas"]["Money"]
+      documentDiscount: components["schemas"]["SalesDiscount"]
+      documentDiscountAmount: components["schemas"]["Money"]
+      shippingAmount: components["schemas"]["Money"]
+      discountApprovalRequired: boolean
+      /** Format: date-time */
+      discountApprovedAt?: string | null
+      note: string
+      cancelReason: string
+      /** Format: date-time */
+      confirmedAt?: string | null
+      /** Format: date-time */
+      shippedAt?: string | null
+      /** Format: date-time */
+      deliveredAt?: string | null
+      /** Format: uuid */
+      paymentProofFileId?: string | null
+      paymentProofFileName?: string | null
+      createdByName: string
+      lines: components["schemas"]["SalesOrderLine"][]
+      allocations: components["schemas"]["SalesOrderAllocation"][]
+      proformas: components["schemas"]["SalesDocumentRef"][]
+      invoices: components["schemas"]["SalesDocumentRef"][]
+      shipments: components["schemas"]["SalesShipment"][]
+      allowedActions: ("edit" | "confirm" | "cancel" | "upload_payment_proof")[]
+    }
+    SalesOrderUpdate: components["schemas"]["SalesOrderFields"] &
+      components["schemas"]["VersionInput"]
+    SalesCancelInput: {
+      version: number
+      reason?: string
+    }
+    SalesPaymentProofInput: {
+      version: number
+      /** Format: uuid */
+      fileId: string
+    }
+    SalesChannelOption: {
+      /** Format: uuid */
+      id: string
+      /** @enum {string} */
+      kind: "channel" | "sub_channel"
+      code: string
+      name: string
+      /** Format: uuid */
+      channelId?: string | null
+      partyType?: string
+      /** Format: uuid */
+      partyId?: string | null
+    }
+    SalesAccountOption: {
+      /** Format: uuid */
+      id: string
+      code: string
+      name: string
+    }
+    ProformaInvoice: {
+      /** Format: uuid */
+      id: string
+      number: string
+      /** Format: uuid */
+      salesOrderId: string
+      salesOrderNumber: string
+      partyName: string
+      orderType: components["schemas"]["SalesOrderType"]
+      amount: components["schemas"]["Money"]
+      issueDate: components["schemas"]["BusinessDate"]
+      validUntil: components["schemas"]["BusinessDate"]
+      status: components["schemas"]["SalesDocumentStatus"]
+      /** Format: date-time */
+      paidAt?: string | null
+      /** Format: uuid */
+      invoiceId?: string | null
+      cancelReason: string
+      allowedActions: ("confirm_payment" | "print")[]
+      version: number
+    }
+    ProformaInvoiceList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["ProformaInvoice"][]
+    }
+    ProformaInvoiceDetail: components["schemas"]["ProformaInvoice"] & {
+      salesOrder: components["schemas"]["SalesOrder"]
+    }
+    /** @enum {string} */
+    CustomerPaymentMethod: "bank_transfer" | "cash"
+    ProformaPaymentInput: {
+      version: number
+      paymentDate?: components["schemas"]["BusinessDate"]
+      method: components["schemas"]["CustomerPaymentMethod"]
+      /** @description Kode akun Kas & Bank penerima (11xx). */
+      accountCode: string
+      reference?: string
+      /** Format: uuid */
+      proofFileId?: string | null
+    }
+    /**
+     * @description Jenis pihak invoice/pembayaran.
+     * @enum {string}
+     */
+    SalesPartyType: "customer" | "partner"
+    SalesInvoiceSummary: {
+      /** Format: uuid */
+      id: string
+      number: string
+      invoiceType: string
+      /** Format: uuid */
+      salesOrderId?: string | null
+      salesOrderNumber: string
+      partyType: components["schemas"]["SalesPartyType"]
+      /** Format: uuid */
+      partyId: string
+      partyCode: string
+      partyName: string
+      invoiceDate: components["schemas"]["BusinessDate"]
+      dueDate: components["schemas"]["BusinessDate"]
+      totalAmount: components["schemas"]["Money"]
+      paidAmount: components["schemas"]["Money"]
+      outstandingAmount: components["schemas"]["Money"]
+      daysOverdue: number
+      status: components["schemas"]["SalesDocumentStatus"]
+      version: number
+    }
+    SalesInvoiceList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["SalesInvoiceSummary"][]
+    }
+    SalesInvoiceLine: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      /** Format: uuid */
+      productId?: string | null
+      description: string
+      qty: components["schemas"]["SalesQuantity"]
+      unitPrice: components["schemas"]["Money"]
+      discountAmount: components["schemas"]["Money"]
+      lineTotalAmount: components["schemas"]["Money"]
+    }
+    SalesInvoicePayment: {
+      /** Format: uuid */
+      paymentId: string
+      paymentNumber: string
+      paymentDate: components["schemas"]["BusinessDate"]
+      status: components["schemas"]["SalesDocumentStatus"]
+      amount: components["schemas"]["Money"]
+    }
+    SalesInvoice: components["schemas"]["SalesInvoiceSummary"] & {
+      channelName: string
+      subChannelName: string
+      orderType?: components["schemas"]["SalesOrderType"] | null
+      grossAmount: components["schemas"]["Money"]
+      discountAmount: components["schemas"]["Money"]
+      shippingAmount: components["schemas"]["Money"]
+      cancelReason: string
+      shipToAddress: string
+      lines: components["schemas"]["SalesInvoiceLine"][]
+      payments: components["schemas"]["SalesInvoicePayment"][]
+      allowedActions: ("print" | "share_whatsapp" | "record_payment")[]
+    }
+    SalesShareText: {
+      text: string
+    }
+    CustomerPaymentAllocation: {
+      /** Format: uuid */
+      invoiceId: string
+      invoiceNumber?: string
+      amount: components["schemas"]["Money"]
+    }
+    CustomerPayment: {
+      /** Format: uuid */
+      id: string
+      number: string
+      partyType: components["schemas"]["SalesPartyType"]
+      /** Format: uuid */
+      partyId: string
+      partyName: string
+      paymentDate: components["schemas"]["BusinessDate"]
+      amount: components["schemas"]["Money"]
+      method: components["schemas"]["CustomerPaymentMethod"]
+      accountCode: string
+      reference: string
+      /** Format: uuid */
+      proofFileId?: string | null
+      note: string
+      status: components["schemas"]["SalesDocumentStatus"]
+      cancelReason: string
+      /** Format: uuid */
+      journalEntryId?: string | null
+      allocations: components["schemas"]["CustomerPaymentAllocation"][]
+      allowedActions: "cancel"[]
+      /** Format: date-time */
+      createdAt: string
+      version: number
+    }
+    CustomerPaymentList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["CustomerPayment"][]
+    }
+    CustomerPaymentInput: {
+      partyType: components["schemas"]["SalesPartyType"]
+      /** Format: uuid */
+      partyId: string
+      paymentDate: components["schemas"]["BusinessDate"]
+      amount: components["schemas"]["Money"]
+      method: components["schemas"]["CustomerPaymentMethod"]
+      accountCode: string
+      reference?: string
+      /** Format: uuid */
+      proofFileId?: string | null
+      note?: string
+      allocations: components["schemas"]["CustomerPaymentAllocation"][]
+    }
+    ReceivableAgingRow: {
+      partyType: components["schemas"]["SalesPartyType"]
+      /** Format: uuid */
+      partyId: string
+      partyName: string
+      invoices: number
+      current: components["schemas"]["Money"]
+      days1To30: components["schemas"]["Money"]
+      days31To60: components["schemas"]["Money"]
+      days61To90: components["schemas"]["Money"]
+      over90: components["schemas"]["Money"]
+      total: components["schemas"]["Money"]
+    }
+    ReceivableAgingReport: {
+      asOf: components["schemas"]["BusinessDate"]
+      rows: components["schemas"]["ReceivableAgingRow"][]
+      totals: components["schemas"]["ReceivableAgingRow"]
+    }
     /** @description Payload webhook status order Biteship (nama field milik Biteship). */
     BiteshipNotification: {
       /** @example order.status */
@@ -4435,14 +5907,6 @@ export interface components {
       isMfaEnabled: boolean
       /** @description Role user mewajibkan MFA tetapi MFA belum aktif; semua menu lain terkunci sampai MFA aktif. */
       mfaEnrollmentRequired: boolean
-    }
-    /** @description Metadata pagination standar (Technical Guideline 8.2). */
-    Pagination: {
-      page: number
-      pageSize: number
-      /** Format: int64 */
-      totalItems: number
-      totalPages: number
     }
     UserRoleAssignment: {
       code: string
@@ -4558,11 +6022,6 @@ export interface components {
     AuditLogList: components["schemas"]["Pagination"] & {
       items: components["schemas"]["AuditLog"][]
     }
-    /**
-     * @description Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
-     * @example 1250000.00
-     */
-    Money: string
     /** @enum {string} */
     ApprovalStatus: "pending_approval" | "approved" | "rejected" | "cancelled"
     /**
@@ -4713,12 +6172,6 @@ export interface components {
     ApprovalPolicyUpdate: components["schemas"]["ApprovalPolicyFields"] & {
       version: number
     }
-    /**
-     * Format: date
-     * @description Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
-     * @example 2026-10-19
-     */
-    BusinessDate: string
     /** @enum {string} */
     ApprovalDelegationStatus: "scheduled" | "active" | "ended" | "cancelled"
     ApprovalDelegation: {
@@ -6703,6 +8156,422 @@ export interface components {
     BundleAvailabilityList: {
       items: components["schemas"]["BundleAvailability"][]
     }
+    /**
+     * @description Status dokumen persediaan (Desain Status Dokumen bagian 1).
+     * @enum {string}
+     */
+    InventoryDocStatus:
+      | "draft"
+      | "pending_approval"
+      | "approved"
+      | "rejected"
+      | "in_progress"
+      | "awaiting_settlement"
+      | "posted"
+      | "cancelled"
+    /**
+     * @description `marketing` Marketing, `event` Event, `employee_sample` Sampel Karyawan, `sales_sampling` Sampling Sales.
+     * @enum {string}
+     */
+    InternalUsagePurpose:
+      "marketing" | "event" | "employee_sample" | "sales_sampling"
+    InventoryDimensionRef: {
+      /** Format: uuid */
+      id: string
+      code: string
+      name: string
+    }
+    InventoryActorRef: {
+      /** Format: uuid */
+      userId: string
+      name: string
+    }
+    InventoryDocStep: {
+      /** Format: uuid */
+      userId: string
+      name: string
+      /** Format: date-time */
+      at: string
+    }
+    InternalUsageLine: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      product: components["schemas"]["StockProductRef"]
+      qty: components["schemas"]["StockQuantity"]
+      returnedQty: components["schemas"]["StockQuantity"]
+      consumedQty: components["schemas"]["StockQuantity"]
+      costAmount: components["schemas"]["Money"]
+      note: string
+    }
+    InventoryBatchRef: {
+      /** Format: uuid */
+      id: string
+      number: string
+      expiryDate?: components["schemas"]["BusinessDate"]
+    }
+    /** @description Mutasi stok dokumen (batch yang dialokasikan, dikirim, atau keluar). */
+    InventoryDocMovement: {
+      /** Format: uuid */
+      id: string
+      /** Format: uuid */
+      sourceLineId?: string
+      movementType: components["schemas"]["StockMovementType"]
+      movementTypeLabel: string
+      product: components["schemas"]["StockProductRef"]
+      location: components["schemas"]["StockLocationRef"]
+      batch?: components["schemas"]["InventoryBatchRef"]
+      status: components["schemas"]["StockStatus"]
+      statusLabel: string
+      qty: components["schemas"]["StockQuantity"]
+      costAmount: components["schemas"]["Money"]
+    }
+    /**
+     * @description Aksi yang boleh dilakukan user pada dokumen (allowedActions).
+     * @enum {string}
+     */
+    InventoryDocAction:
+      | "edit"
+      | "submit"
+      | "revise"
+      | "release"
+      | "handover"
+      | "settle"
+      | "start"
+      | "report"
+      | "post"
+      | "cancel"
+    InternalUsage: {
+      /** Format: uuid */
+      id: string
+      number?: string
+      purpose: components["schemas"]["InternalUsagePurpose"]
+      purposeLabel: string
+      division: components["schemas"]["InventoryDimensionRef"]
+      campaign?: components["schemas"]["InventoryDimensionRef"]
+      sourceLocation: components["schemas"]["StockLocationRef"]
+      eventLocation?: components["schemas"]["StockLocationRef"]
+      eventEndDate?: components["schemas"]["BusinessDate"]
+      settleDueDate?: components["schemas"]["BusinessDate"]
+      businessDate: components["schemas"]["BusinessDate"]
+      note: string
+      status: components["schemas"]["InventoryDocStatus"]
+      statusLabel: string
+      estimatedCost: components["schemas"]["Money"]
+      costAmount: components["schemas"]["Money"]
+      /** Format: uuid */
+      journalId?: string
+      /** Format: uuid */
+      returnDispositionId?: string
+      requestedBy: components["schemas"]["InventoryActorRef"]
+      released?: components["schemas"]["InventoryDocStep"]
+      handedOver?: components["schemas"]["InventoryDocStep"]
+      settled?: components["schemas"]["InventoryDocStep"]
+      posted?: components["schemas"]["InventoryDocStep"]
+      lines: components["schemas"]["InternalUsageLine"][]
+      movements: components["schemas"]["InventoryDocMovement"][]
+      allowedActions: components["schemas"]["InventoryDocAction"][]
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    InternalUsageList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["InternalUsage"][]
+    }
+    InternalUsageInput: {
+      purpose: components["schemas"]["InternalUsagePurpose"]
+      /** Format: uuid */
+      divisionId: string
+      /** Format: uuid */
+      campaignId?: string
+      /** Format: uuid */
+      sourceLocationId: string
+      /** Format: uuid */
+      eventLocationId?: string
+      eventEndDate?: components["schemas"]["BusinessDate"]
+      businessDate: components["schemas"]["BusinessDate"]
+      note?: string
+      lines: {
+        /** Format: uuid */
+        productId: string
+        qty: components["schemas"]["StockQuantity"]
+        note?: string
+      }[]
+    }
+    InternalUsageUpdate: components["schemas"]["InternalUsageInput"] &
+      components["schemas"]["VersionInput"]
+    /** @enum {string} */
+    InternalUsageAction:
+      "submit" | "revise" | "release" | "handover" | "post" | "cancel"
+    InternalUsageSettleInput: {
+      version: number
+      /** @description Qty sisa per baris; baris yang tidak dikirim berarti tanpa sisa. */
+      lines: {
+        /** Format: uuid */
+        lineId: string
+        returnedQty: components["schemas"]["StockQuantity"]
+      }[]
+    }
+    InventoryDimensionOption: components["schemas"]["InventoryDimensionRef"] & {
+      validFrom?: components["schemas"]["BusinessDate"]
+      validTo?: components["schemas"]["BusinessDate"]
+    }
+    InventoryDimensionOptionList: {
+      items: components["schemas"]["InventoryDimensionOption"][]
+    }
+    /** @enum {string} */
+    RepackDirection: "input" | "output"
+    /**
+     * @description Status stok baris dokumen (Tersedia atau Karantina).
+     * @enum {string}
+     */
+    InventoryDocStockStatus: "available" | "quarantine"
+    RepackingLine: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      direction: components["schemas"]["RepackDirection"]
+      product: components["schemas"]["StockProductRef"]
+      location: components["schemas"]["StockLocationRef"]
+      stockStatus: components["schemas"]["InventoryDocStockStatus"]
+      batch?: components["schemas"]["InventoryBatchRef"]
+      /** @description Nomor batch baru baris hasil. */
+      batchNumber: string
+      productionDate?: components["schemas"]["BusinessDate"]
+      expiryDate?: components["schemas"]["BusinessDate"]
+      qty: components["schemas"]["StockQuantity"]
+      costAmount: components["schemas"]["Money"]
+      note: string
+    }
+    Repacking: {
+      /** Format: uuid */
+      id: string
+      number?: string
+      businessDate: components["schemas"]["BusinessDate"]
+      note: string
+      status: components["schemas"]["InventoryDocStatus"]
+      statusLabel: string
+      costAmount: components["schemas"]["Money"]
+      /** Format: uuid */
+      journalId?: string
+      /** Format: uuid */
+      returnDispositionId?: string
+      createdBy: components["schemas"]["InventoryActorRef"]
+      started?: components["schemas"]["InventoryDocStep"]
+      posted?: components["schemas"]["InventoryDocStep"]
+      lines: components["schemas"]["RepackingLine"][]
+      movements: components["schemas"]["InventoryDocMovement"][]
+      allowedActions: components["schemas"]["InventoryDocAction"][]
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    RepackingList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["Repacking"][]
+    }
+    RepackingInput: {
+      businessDate: components["schemas"]["BusinessDate"]
+      note?: string
+      lines: {
+        direction: components["schemas"]["RepackDirection"]
+        /** Format: uuid */
+        productId: string
+        /** Format: uuid */
+        locationId: string
+        stockStatus?: components["schemas"]["InventoryDocStockStatus"]
+        /** Format: uuid */
+        batchId?: string
+        batchNumber?: string
+        productionDate?: components["schemas"]["BusinessDate"]
+        expiryDate?: components["schemas"]["BusinessDate"]
+        qty: components["schemas"]["StockQuantity"]
+        note?: string
+      }[]
+    }
+    RepackingUpdate: components["schemas"]["RepackingInput"] &
+      components["schemas"]["VersionInput"]
+    /** @enum {string} */
+    RepackingAction: "start" | "post" | "cancel"
+    /**
+     * @description `expired` Kedaluwarsa, `damaged` Rusak, `return` Barang Retur.
+     * @enum {string}
+     */
+    DisposalReason: "expired" | "damaged" | "return"
+    DisposalPhoto: {
+      /** Format: uuid */
+      id: string
+      name: string
+    }
+    DisposalLine: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      product: components["schemas"]["StockProductRef"]
+      batch?: components["schemas"]["InventoryBatchRef"]
+      location: components["schemas"]["StockLocationRef"]
+      stockStatus: components["schemas"]["InventoryDocStockStatus"]
+      qty: components["schemas"]["StockQuantity"]
+      costAmount: components["schemas"]["Money"]
+      note: string
+    }
+    Disposal: {
+      /** Format: uuid */
+      id: string
+      number?: string
+      reason: components["schemas"]["DisposalReason"]
+      reasonLabel: string
+      disposalDate: components["schemas"]["BusinessDate"]
+      method: string
+      witnesses: string[]
+      photos: components["schemas"]["DisposalPhoto"][]
+      note: string
+      status: components["schemas"]["InventoryDocStatus"]
+      statusLabel: string
+      estimatedCost: components["schemas"]["Money"]
+      costAmount: components["schemas"]["Money"]
+      postingRuleCode: string
+      /** Format: uuid */
+      journalId?: string
+      /** Format: uuid */
+      returnDispositionId?: string
+      createdBy: components["schemas"]["InventoryActorRef"]
+      submitted?: components["schemas"]["InventoryDocStep"]
+      posted?: components["schemas"]["InventoryDocStep"]
+      lines: components["schemas"]["DisposalLine"][]
+      movements: components["schemas"]["InventoryDocMovement"][]
+      allowedActions: components["schemas"]["InventoryDocAction"][]
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    DisposalList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["Disposal"][]
+    }
+    DisposalReportFields: {
+      disposalDate: components["schemas"]["BusinessDate"]
+      method?: string
+      witnesses?: string[]
+      photoFileIds?: string[]
+    }
+    DisposalInput: components["schemas"]["DisposalReportFields"] & {
+      reason: components["schemas"]["DisposalReason"]
+      note?: string
+      lines: {
+        /** Format: uuid */
+        productId: string
+        /** Format: uuid */
+        batchId?: string
+        /** Format: uuid */
+        locationId: string
+        stockStatus?: components["schemas"]["InventoryDocStockStatus"]
+        qty: components["schemas"]["StockQuantity"]
+        note?: string
+      }[]
+    }
+    DisposalUpdate: components["schemas"]["DisposalInput"] &
+      components["schemas"]["VersionInput"]
+    DisposalReportInput: components["schemas"]["DisposalReportFields"] &
+      components["schemas"]["VersionInput"]
+    /** @enum {string} */
+    DisposalAction: "submit" | "revise" | "post" | "cancel"
+    ReturnDispositionDocumentLine: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      product: components["schemas"]["StockProductRef"]
+      batch?: components["schemas"]["InventoryBatchRef"]
+      stockStatus: components["schemas"]["InventoryDocStockStatus"]
+      qty: components["schemas"]["StockQuantity"]
+      reason?: components["schemas"]["InventoryDimensionRef"]
+      disposition: components["schemas"]["ReturnDisposition"]
+      dispositionLabel: string
+      qcNote: string
+      estimatedCost: components["schemas"]["Money"]
+      costAmount: components["schemas"]["Money"]
+      /** @description Dokumen lanjutan hasil eksekusi (`repacking`, `disposal`, `internal_usage`). */
+      targetType?: string
+      /** Format: uuid */
+      targetId?: string
+    }
+    ReturnDispositionDocument: {
+      /** Format: uuid */
+      id: string
+      number?: string
+      location: components["schemas"]["StockLocationRef"]
+      businessDate: components["schemas"]["BusinessDate"]
+      note: string
+      status: components["schemas"]["InventoryDocStatus"]
+      statusLabel: string
+      disposalValue: components["schemas"]["Money"]
+      costAmount: components["schemas"]["Money"]
+      /** Format: uuid */
+      journalId?: string
+      createdBy: components["schemas"]["InventoryActorRef"]
+      submitted?: components["schemas"]["InventoryDocStep"]
+      posted?: components["schemas"]["InventoryDocStep"]
+      lines: components["schemas"]["ReturnDispositionDocumentLine"][]
+      movements: components["schemas"]["InventoryDocMovement"][]
+      allowedActions: components["schemas"]["InventoryDocAction"][]
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    ReturnDispositionDocumentList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["ReturnDispositionDocument"][]
+    }
+    ReturnDispositionDocumentInput: {
+      /** Format: uuid */
+      locationId: string
+      businessDate: components["schemas"]["BusinessDate"]
+      note?: string
+      lines: {
+        /** Format: uuid */
+        productId: string
+        /** Format: uuid */
+        batchId?: string
+        stockStatus?: components["schemas"]["InventoryDocStockStatus"]
+        qty: components["schemas"]["StockQuantity"]
+        /** Format: uuid */
+        reasonId?: string
+        disposition?: components["schemas"]["ReturnDisposition"]
+        qcNote?: string
+      }[]
+    }
+    ReturnDispositionDocumentUpdate: components["schemas"]["ReturnDispositionDocumentInput"] &
+      components["schemas"]["VersionInput"]
+    /** @enum {string} */
+    ReturnDispositionAction: "submit" | "revise" | "post" | "cancel"
+    RecostRun: {
+      /** Format: uuid */
+      id: string
+      product: components["schemas"]["StockProductRef"]
+      /** Format: uuid */
+      batchId?: string
+      fromBusinessDate: components["schemas"]["BusinessDate"]
+      triggerSourceType: string
+      triggerSourceLabel: string
+      /** @enum {string} */
+      status: "pending" | "completed" | "failed"
+      adjustmentAmount: components["schemas"]["Money"]
+      /** Format: uuid */
+      journalId?: string
+      error: string
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      completedAt?: string
+    }
+    RecostRunList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["RecostRun"][]
+    }
     /** @enum {string} */
     CustomerType: "retail" | "b2b" | "reseller" | "employee"
     CustomerAddress: {
@@ -7485,11 +9354,6 @@ export interface components {
       maxRetailPrice?: components["schemas"]["Money"] | null
       description: string
     }
-    /**
-     * @description Bentuk diskon manual (MD-05) — persen dari dasar atau nominal rupiah.
-     * @enum {string}
-     */
-    DiscountKind: "percent" | "amount"
     DiscountValue: {
       kind: components["schemas"]["DiscountKind"]
       /** @description Persen (maks. 4 desimal) atau nominal rupiah (maks. 2 desimal) sebagai string desimal. */
@@ -7709,6 +9573,8 @@ export interface components {
       sku: string
       name: string
       uom: string
+      /** @description Produk dilacak per batch (nomor batch, tanggal produksi & kedaluwarsa wajib saat diterima). */
+      hasBatch?: boolean
     }
     PurchaseRequestLine: {
       /** Format: uuid */
@@ -7960,6 +9826,464 @@ export interface components {
     }
     PurchaseAdvanceUpdate: components["schemas"]["PurchaseAdvanceFields"] &
       components["schemas"]["VersionInput"]
+    /** @enum {string} */
+    GoodsReceiptStatus: "draft" | "posted" | "cancelled"
+    GoodsReceiptSummary: {
+      /** Format: uuid */
+      id: string
+      /** @description Nomor GR, diisi saat diposting. */
+      number?: string | null
+      /** Format: uuid */
+      purchaseOrderId: string
+      purchaseOrderNumber: string
+      orderType: components["schemas"]["PurchaseOrderType"]
+      /** Format: uuid */
+      supplierId: string
+      supplierName: string
+      businessDate: components["schemas"]["BusinessDate"]
+      deliveryNote: string
+      inventoryAmount: components["schemas"]["Money"]
+      grniAmount: components["schemas"]["Money"]
+      status: components["schemas"]["GoodsReceiptStatus"]
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    GoodsReceiptList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["GoodsReceiptSummary"][]
+    }
+    /**
+     * @description `absorbed` reject ditanggung Balans (ikut ditagih, nilai diserap ke HPP barang baik); `return_to_supplier`
+     *     ditolak di tempat dan diganti pemasok (tidak masuk stok maupun tagihan).
+     * @enum {string}
+     */
+    RejectDisposition: "absorbed" | "return_to_supplier"
+    GoodsReceiptLineInput: {
+      /** Format: uuid */
+      purchaseOrderLineId: string
+      goodQty: components["schemas"]["PurchaseQuantity"]
+      rejectQty?: components["schemas"]["PurchaseQuantity"]
+      rejectDisposition?: components["schemas"]["RejectDisposition"]
+      batchNumber?: string
+      productionDate?: components["schemas"]["BusinessDate"] | null
+      expiryDate?: components["schemas"]["BusinessDate"] | null
+      note?: string
+    }
+    GoodsReceiptMaterialInput: {
+      /** Format: uuid */
+      productId: string
+      usedGoodQty: components["schemas"]["PurchaseQuantity"]
+      usedRejectQty: components["schemas"]["PurchaseQuantity"]
+      note?: string
+    }
+    GoodsReceiptFields: {
+      businessDate: components["schemas"]["BusinessDate"]
+      /** Format: uuid */
+      locationId: string
+      deliveryNote?: string
+      note?: string
+      lines: components["schemas"]["GoodsReceiptLineInput"][]
+      materials?: components["schemas"]["GoodsReceiptMaterialInput"][]
+    }
+    GoodsReceiptInput: components["schemas"]["GoodsReceiptFields"] & {
+      /** Format: uuid */
+      purchaseOrderId: string
+    }
+    /**
+     * @description HPP per unit, maks. 4 angka di belakang koma.
+     * @example 12500.0000
+     */
+    PurchaseUnitCost: string
+    GoodsReceiptLine: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      /** Format: uuid */
+      purchaseOrderLineId: string
+      product: components["schemas"]["PurchaseProductRef"]
+      orderedQty: components["schemas"]["PurchaseQuantity"]
+      goodQty: components["schemas"]["PurchaseQuantity"]
+      rejectQty: components["schemas"]["PurchaseQuantity"]
+      rejectDisposition: components["schemas"]["RejectDisposition"]
+      batchNumber: string
+      productionDate?: components["schemas"]["BusinessDate"] | null
+      expiryDate?: components["schemas"]["BusinessDate"] | null
+      /** Format: uuid */
+      batchId?: string | null
+      unitPrice: components["schemas"]["Money"]
+      grniQty: components["schemas"]["PurchaseQuantity"]
+      grniAmount: components["schemas"]["Money"]
+      materialCostAmount: components["schemas"]["Money"]
+      inventoryAmount: components["schemas"]["Money"]
+      unitCost: components["schemas"]["PurchaseUnitCost"]
+      inventoryAccountCode: string
+      billedQty: components["schemas"]["PurchaseQuantity"]
+      returnedQty: components["schemas"]["PurchaseQuantity"]
+      openQty: components["schemas"]["PurchaseQuantity"]
+      note: string
+    }
+    GoodsReceiptMaterial: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      product: components["schemas"]["PurchaseProductRef"]
+      usedGoodQty: components["schemas"]["PurchaseQuantity"]
+      usedRejectQty: components["schemas"]["PurchaseQuantity"]
+      costAmount: components["schemas"]["Money"]
+      accountCode: string
+      note: string
+    }
+    GoodsReceipt: components["schemas"]["GoodsReceiptSummary"] & {
+      /** Format: uuid */
+      divisionId: string
+      divisionName: string
+      location: components["schemas"]["PurchaseLocationRef"]
+      tollLocation?: components["schemas"]["PurchaseLocationRef"] | null
+      note: string
+      materialAmount: components["schemas"]["Money"]
+      /** Format: uuid */
+      inboundId?: string | null
+      /** Format: uuid */
+      journalEntryId?: string | null
+      /** Format: uuid */
+      reversalJournalEntryId?: string | null
+      cancelReason: string
+      /** Format: date-time */
+      postedAt?: string | null
+      createdByName: string
+      lines: components["schemas"]["GoodsReceiptLine"][]
+      materials: components["schemas"]["GoodsReceiptMaterial"][]
+      allowedActions: ("edit" | "post" | "cancel")[]
+    }
+    GoodsReceiptUpdate: components["schemas"]["GoodsReceiptFields"] &
+      components["schemas"]["VersionInput"]
+    /**
+     * @description Persentase desimal maks. 4 angka di belakang koma, mis. "2" untuk 2%.
+     * @example 2.0000
+     */
+    PurchasePercent: string
+    BillableReceiptLine: {
+      /** Format: uuid */
+      goodsReceiptLineId: string
+      /** Format: uuid */
+      goodsReceiptId: string
+      goodsReceiptNumber: string
+      businessDate: components["schemas"]["BusinessDate"]
+      product: components["schemas"]["PurchaseProductRef"]
+      batchNumber: string
+      poUnitPrice: components["schemas"]["Money"]
+      receivedQty: components["schemas"]["PurchaseQuantity"]
+      billedQty: components["schemas"]["PurchaseQuantity"]
+      openQty: components["schemas"]["PurchaseQuantity"]
+      pendingQty: components["schemas"]["PurchaseQuantity"]
+    }
+    BillableReceipts: {
+      /** Format: uuid */
+      purchaseOrderId: string
+      purchaseOrderNumber: string
+      /** Format: uuid */
+      supplierId: string
+      supplierName: string
+      paymentTermDays: number
+      defaultWithholdingType: components["schemas"]["WithholdingType"]
+      defaultWithholdingRate: components["schemas"]["PurchasePercent"]
+      outstandingAdvanceAmount: components["schemas"]["Money"]
+      qtyTolerancePercent: components["schemas"]["PurchasePercent"]
+      priceTolerancePercent: components["schemas"]["PurchasePercent"]
+      lines: components["schemas"]["BillableReceiptLine"][]
+    }
+    /** @enum {string} */
+    SupplierBillStatus:
+      | "draft"
+      | "pending_approval"
+      | "rejected"
+      | "awaiting_payment"
+      | "partially_paid"
+      | "paid"
+      | "cancelled"
+    /** @enum {string} */
+    SupplierBillMatchStatus:
+      "matched" | "exceeds_tolerance" | "approved_exception"
+    SupplierBillSummary: {
+      /** Format: uuid */
+      id: string
+      /** @description Nomor tagihan dari pemasok (unik per pemasok). */
+      number: string
+      /** Format: uuid */
+      purchaseOrderId: string
+      purchaseOrderNumber: string
+      /** Format: uuid */
+      supplierId: string
+      supplierName: string
+      billDate: components["schemas"]["BusinessDate"]
+      dueDate: components["schemas"]["BusinessDate"]
+      subtotalAmount: components["schemas"]["Money"]
+      totalPayableAmount: components["schemas"]["Money"]
+      paidAmount: components["schemas"]["Money"]
+      matchStatus: components["schemas"]["SupplierBillMatchStatus"]
+      status: components["schemas"]["SupplierBillStatus"]
+      /** @description true selama utang belum terbentuk (draft, menunggu persetujuan selisih, ditolak). */
+      paymentBlocked: boolean
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    SupplierBillList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["SupplierBillSummary"][]
+    }
+    SupplierBillLineInput: {
+      /** Format: uuid */
+      goodsReceiptLineId: string
+      qty: components["schemas"]["PurchaseQuantity"]
+      unitPrice: components["schemas"]["Money"]
+      note?: string
+    }
+    SupplierBillFields: {
+      number: string
+      billDate: components["schemas"]["BusinessDate"]
+      /** @description Kosong = tanggal tagihan + termin PO. */
+      dueDate?: components["schemas"]["BusinessDate"] | null
+      /** @description Kosong = PPh default pemasok. */
+      withholdingType?: components["schemas"]["WithholdingType"] | null
+      /** @description Kosong = tarif awal jenis PPh. */
+      withholdingRate?: components["schemas"]["PurchasePercent"] | null
+      note?: string
+      lines: components["schemas"]["SupplierBillLineInput"][]
+    }
+    SupplierBillInput: components["schemas"]["SupplierBillFields"] & {
+      /** Format: uuid */
+      purchaseOrderId: string
+    }
+    SupplierBillLine: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      /** Format: uuid */
+      goodsReceiptLineId: string
+      /** Format: uuid */
+      goodsReceiptId: string
+      goodsReceiptNumber: string
+      product: components["schemas"]["PurchaseProductRef"]
+      batchNumber: string
+      qty: components["schemas"]["PurchaseQuantity"]
+      receiptOpenQty: components["schemas"]["PurchaseQuantity"]
+      unitPrice: components["schemas"]["Money"]
+      poUnitPrice: components["schemas"]["Money"]
+      amount: components["schemas"]["Money"]
+      grniAmount: components["schemas"]["Money"]
+      priceVarianceAmount: components["schemas"]["Money"]
+      priceVariancePercent: components["schemas"]["PurchasePercent"]
+      qtyMismatch: boolean
+      priceMismatch: boolean
+      exceedsTolerance: boolean
+      note: string
+    }
+    SupplierBillAdvance: {
+      /** Format: uuid */
+      advanceId: string
+      advanceNumber: string
+      amount: components["schemas"]["Money"]
+    }
+    SupplierBill: components["schemas"]["SupplierBillSummary"] & {
+      /** Format: uuid */
+      divisionId: string
+      divisionName: string
+      note: string
+      grniAmount: components["schemas"]["Money"]
+      priceVarianceAmount: components["schemas"]["Money"]
+      withholdingType: components["schemas"]["WithholdingType"]
+      withholdingRate: components["schemas"]["PurchasePercent"]
+      withholdingAmount: components["schemas"]["Money"]
+      advanceAppliedAmount: components["schemas"]["Money"]
+      openAmount: components["schemas"]["Money"]
+      /** Format: uuid */
+      journalEntryId?: string | null
+      /** Format: uuid */
+      advanceJournalEntryId?: string | null
+      cancelReason: string
+      /** Format: date-time */
+      submittedAt?: string | null
+      /** Format: date-time */
+      postedAt?: string | null
+      createdByName: string
+      qtyTolerancePercent: components["schemas"]["PurchasePercent"]
+      priceTolerancePercent: components["schemas"]["PurchasePercent"]
+      lines: components["schemas"]["SupplierBillLine"][]
+      advances: components["schemas"]["SupplierBillAdvance"][]
+      allowedActions: ("edit" | "post" | "cancel" | "revise")[]
+    }
+    SupplierBillUpdate: components["schemas"]["SupplierBillFields"] &
+      components["schemas"]["VersionInput"]
+    ReturnableReceiptLine: {
+      /** Format: uuid */
+      goodsReceiptLineId: string
+      /** Format: uuid */
+      goodsReceiptId: string
+      goodsReceiptNumber: string
+      product: components["schemas"]["PurchaseProductRef"]
+      batchNumber: string
+      location: components["schemas"]["PurchaseLocationRef"]
+      goodQty: components["schemas"]["PurchaseQuantity"]
+      returnedQty: components["schemas"]["PurchaseQuantity"]
+      pendingQty: components["schemas"]["PurchaseQuantity"]
+      returnableQty: components["schemas"]["PurchaseQuantity"]
+      openQty: components["schemas"]["PurchaseQuantity"]
+      unitCost: components["schemas"]["PurchaseUnitCost"]
+    }
+    ReturnableReceipts: {
+      /** Format: uuid */
+      purchaseOrderId: string
+      purchaseOrderNumber: string
+      supplierName: string
+      lines: components["schemas"]["ReturnableReceiptLine"][]
+    }
+    /** @enum {string} */
+    PurchaseReturnStatus:
+      | "draft"
+      | "pending_approval"
+      | "approved"
+      | "rejected"
+      | "posted"
+      | "cancelled"
+    /**
+     * @description `manual` butuh persetujuan Head Logistik; `qc_inbound`/`qc_outbound` dari hasil QC tanpa approval (D-24).
+     * @enum {string}
+     */
+    PurchaseReturnOrigin: "manual" | "qc_inbound" | "qc_outbound"
+    PurchaseReturnSummary: {
+      /** Format: uuid */
+      id: string
+      /** @description Nomor RB (diajukan/diposting). */
+      number?: string | null
+      /** @description Nomor nota debit DN (diposting). */
+      debitNoteNumber?: string | null
+      /** Format: uuid */
+      purchaseOrderId: string
+      purchaseOrderNumber: string
+      /** Format: uuid */
+      supplierId: string
+      supplierName: string
+      origin: components["schemas"]["PurchaseReturnOrigin"]
+      businessDate: components["schemas"]["BusinessDate"]
+      reason: string
+      totalAmount: components["schemas"]["Money"]
+      status: components["schemas"]["PurchaseReturnStatus"]
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    PurchaseReturnList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["PurchaseReturnSummary"][]
+    }
+    /**
+     * @description Status stok asal retur.
+     * @enum {string}
+     */
+    PurchaseStockStatus: "quarantine" | "available"
+    PurchaseReturnLineInput: {
+      /** Format: uuid */
+      goodsReceiptLineId: string
+      /** Format: uuid */
+      locationId: string
+      stockStatus?: components["schemas"]["PurchaseStockStatus"]
+      qty: components["schemas"]["PurchaseQuantity"]
+      note?: string
+    }
+    PurchaseReturnFields: {
+      businessDate: components["schemas"]["BusinessDate"]
+      reason: string
+      note?: string
+      lines: components["schemas"]["PurchaseReturnLineInput"][]
+    }
+    PurchaseReturnInput: components["schemas"]["PurchaseReturnFields"] & {
+      /** Format: uuid */
+      purchaseOrderId: string
+    }
+    PurchaseReturnLine: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      /** Format: uuid */
+      goodsReceiptLineId: string
+      goodsReceiptNumber: string
+      product: components["schemas"]["PurchaseProductRef"]
+      batchNumber: string
+      location: components["schemas"]["PurchaseLocationRef"]
+      stockStatus: components["schemas"]["PurchaseStockStatus"]
+      qty: components["schemas"]["PurchaseQuantity"]
+      unitCost: components["schemas"]["PurchaseUnitCost"]
+      amount: components["schemas"]["Money"]
+      unbilledQty: components["schemas"]["PurchaseQuantity"]
+      unbilledAmount: components["schemas"]["Money"]
+      billedAmount: components["schemas"]["Money"]
+      inventoryAccountCode: string
+      note: string
+    }
+    PurchaseReturn: components["schemas"]["PurchaseReturnSummary"] & {
+      /** Format: uuid */
+      divisionId: string
+      divisionName: string
+      sourceType: string
+      sourceLabel: string
+      note: string
+      unbilledAmount: components["schemas"]["Money"]
+      billedAmount: components["schemas"]["Money"]
+      /** Format: uuid */
+      journalEntryId?: string | null
+      cancelReason: string
+      /** Format: date-time */
+      submittedAt?: string | null
+      /** Format: date-time */
+      approvedAt?: string | null
+      /** Format: date-time */
+      postedAt?: string | null
+      createdByName: string
+      lines: components["schemas"]["PurchaseReturnLine"][]
+      allowedActions: ("edit" | "submit" | "post" | "cancel" | "revise")[]
+    }
+    PurchaseReturnUpdate: components["schemas"]["PurchaseReturnFields"] &
+      components["schemas"]["VersionInput"]
+    GoodsReceivedNotInvoicedLine: {
+      /** Format: uuid */
+      goodsReceiptLineId: string
+      /** Format: uuid */
+      goodsReceiptId: string
+      goodsReceiptNumber: string
+      businessDate: components["schemas"]["BusinessDate"]
+      /** Format: uuid */
+      purchaseOrderId: string
+      purchaseOrderNumber: string
+      orderType: components["schemas"]["PurchaseOrderType"]
+      /** Format: uuid */
+      supplierId: string
+      supplierName: string
+      product: components["schemas"]["PurchaseProductRef"]
+      unitPrice: components["schemas"]["Money"]
+      receivedQty: components["schemas"]["PurchaseQuantity"]
+      receivedAmount: components["schemas"]["Money"]
+      billedQty: components["schemas"]["PurchaseQuantity"]
+      billedAmount: components["schemas"]["Money"]
+      returnedQty: components["schemas"]["PurchaseQuantity"]
+      returnedAmount: components["schemas"]["Money"]
+      openQty: components["schemas"]["PurchaseQuantity"]
+      openAmount: components["schemas"]["Money"]
+    }
+    GoodsReceivedNotInvoicedReport: {
+      asOf: components["schemas"]["BusinessDate"]
+      /** @example 2102 */
+      accountCode: string
+      lines: components["schemas"]["GoodsReceivedNotInvoicedLine"][]
+      filteredTotal: components["schemas"]["Money"]
+      subledgerTotal: components["schemas"]["Money"]
+      ledgerBalance: components["schemas"]["Money"]
+      difference: components["schemas"]["Money"]
+    }
   }
   responses: {
     /** @description Error standar (problem+json) */
@@ -7977,11 +10301,11 @@ export interface components {
     /** @description UUID per percobaan submit (Technical Guideline 7.1). */
     IdempotencyKey: string
     Id: string
-    RefreshCookie: string
     Page: number
     PageSize: number
     /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
     Sort: string
+    RefreshCookie: string
     /** @description Versi terakhir yang dilihat user (optimistic locking). */
     Version: number
     IncludeInactive: boolean
@@ -8230,6 +10554,570 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listSalesOrders: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
+        sort?: components["parameters"]["Sort"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["SalesDocumentStatus"]
+        orderType?: components["schemas"]["SalesOrderType"][]
+        channelId?: string
+        subChannelId?: string
+        dateFrom?: components["schemas"]["BusinessDate"]
+        dateTo?: components["schemas"]["BusinessDate"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Pesanan terbaru lebih dulu */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SalesOrderList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createSalesOrder: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SalesOrderInput"]
+      }
+    }
+    responses: {
+      /** @description Pesanan dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SalesOrder"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getSalesOrder: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Sales Order */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SalesOrder"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateSalesOrder: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SalesOrderUpdate"]
+      }
+    }
+    responses: {
+      /** @description Draft diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SalesOrder"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  confirmSalesOrder: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Pesanan dikonfirmasi */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SalesOrder"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  cancelSalesOrder: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SalesCancelInput"]
+      }
+    }
+    responses: {
+      /** @description Pesanan dibatalkan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SalesOrder"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  uploadSalesOrderPaymentProof: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SalesPaymentProofInput"]
+      }
+    }
+    responses: {
+      /** @description Bukti bayar tercatat */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SalesOrder"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listSalesChannelOptions: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Channel dan sub-channel */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SalesChannelOption"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listSalesLocationOptions: {
+    parameters: {
+      query: {
+        orderType: components["schemas"]["SalesOrderType"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Lokasi aktif */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SalesLocationRef"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listSalesCashBankAccounts: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Akun Kas & Bank aktif */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SalesAccountOption"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listProformaInvoices: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["SalesDocumentStatus"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description PI terbaru lebih dulu */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ProformaInvoiceList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getProformaInvoice: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Proforma Invoice */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ProformaInvoiceDetail"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  confirmProformaPayment: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ProformaPaymentInput"]
+      }
+    }
+    responses: {
+      /** @description PI Lunas */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ProformaInvoiceDetail"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listSalesInvoices: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        /** @description Daftar field dipisah koma; awalan minus untuk descending, mis. `-createdAt,sku`. */
+        sort?: components["parameters"]["Sort"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["SalesDocumentStatus"][]
+        partyType?: components["schemas"]["SalesPartyType"]
+        partyId?: string
+        dateFrom?: components["schemas"]["BusinessDate"]
+        dateTo?: components["schemas"]["BusinessDate"]
+        /** @description Hanya invoice terbuka yang lewat jatuh tempo hari ini. */
+        overdue?: boolean
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Invoice terbaru lebih dulu */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SalesInvoiceList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getSalesInvoice: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Invoice */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SalesInvoice"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getSalesInvoiceShareText: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Teks invoice */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SalesShareText"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listCustomerPayments: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["SalesDocumentStatus"]
+        partyType?: components["schemas"]["SalesPartyType"]
+        partyId?: string
+        dateFrom?: components["schemas"]["BusinessDate"]
+        dateTo?: components["schemas"]["BusinessDate"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Pembayaran terbaru lebih dulu */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CustomerPaymentList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createCustomerPayment: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CustomerPaymentInput"]
+      }
+    }
+    responses: {
+      /** @description Pembayaran diposting */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CustomerPayment"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getCustomerPayment: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Pembayaran */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CustomerPayment"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  cancelCustomerPayment: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SalesCancelInput"]
+      }
+    }
+    responses: {
+      /** @description Pembayaran dibatalkan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CustomerPayment"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getReceivableAging: {
+    parameters: {
+      query?: {
+        /** @description Tanggal posisi (default hari ini). */
+        asOf?: components["schemas"]["BusinessDate"]
+        partyType?: components["schemas"]["SalesPartyType"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Umur piutang */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ReceivableAgingReport"]
+        }
       }
       default: components["responses"]["Problem"]
     }
@@ -13192,6 +16080,668 @@ export interface operations {
       default: components["responses"]["Problem"]
     }
   }
+  listInternalUsages: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["InventoryDocStatus"]
+        purpose?: components["schemas"]["InternalUsagePurpose"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar Pemakaian Internal */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["InternalUsageList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createInternalUsage: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["InternalUsageInput"]
+      }
+    }
+    responses: {
+      /** @description Draft dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["InternalUsage"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getInternalUsage: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Pemakaian Internal */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["InternalUsage"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateInternalUsage: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["InternalUsageUpdate"]
+      }
+    }
+    responses: {
+      /** @description Draft diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["InternalUsage"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  runInternalUsageAction: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+        action: components["schemas"]["InternalUsageAction"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Aksi dijalankan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["InternalUsage"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  settleInternalUsage: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["InternalUsageSettleInput"]
+      }
+    }
+    responses: {
+      /** @description Sisa dicatat */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["InternalUsage"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listInternalUsageDimensionOptions: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        kind: "division" | "campaign"
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Pilihan dimensi */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["InventoryDimensionOptionList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listRepackings: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["InventoryDocStatus"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar Repacking */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["RepackingList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createRepacking: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RepackingInput"]
+      }
+    }
+    responses: {
+      /** @description Draft dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Repacking"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getRepacking: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Repacking */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Repacking"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateRepacking: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RepackingUpdate"]
+      }
+    }
+    responses: {
+      /** @description Draft diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Repacking"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  runRepackingAction: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+        action: components["schemas"]["RepackingAction"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Aksi dijalankan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Repacking"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listDisposals: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["InventoryDocStatus"]
+        reason?: components["schemas"]["DisposalReason"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar Pemusnahan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["DisposalList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createDisposal: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DisposalInput"]
+      }
+    }
+    responses: {
+      /** @description Draft dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Disposal"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getDisposal: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Pemusnahan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Disposal"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateDisposal: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DisposalUpdate"]
+      }
+    }
+    responses: {
+      /** @description Draft diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Disposal"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateDisposalReport: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DisposalReportInput"]
+      }
+    }
+    responses: {
+      /** @description Berita acara diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Disposal"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  runDisposalAction: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+        action: components["schemas"]["DisposalAction"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Aksi dijalankan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["Disposal"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listReturnDispositions: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["InventoryDocStatus"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar Disposisi Retur */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ReturnDispositionDocumentList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createReturnDisposition: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ReturnDispositionDocumentInput"]
+      }
+    }
+    responses: {
+      /** @description Draft dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ReturnDispositionDocument"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getReturnDisposition: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Disposisi Retur */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ReturnDispositionDocument"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateReturnDisposition: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ReturnDispositionDocumentUpdate"]
+      }
+    }
+    responses: {
+      /** @description Draft diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ReturnDispositionDocument"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  runReturnDispositionAction: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+        action: components["schemas"]["ReturnDispositionAction"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Aksi dijalankan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ReturnDispositionDocument"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listRecostRuns: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        productId?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Riwayat recost */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["RecostRunList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
   listCustomers: {
     parameters: {
       query?: {
@@ -16043,6 +19593,704 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["PurchaseAdvance"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listProcurementInboundLocations: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Lokasi Inbound aktif */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PurchaseLocationRef"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listGoodsReceipts: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["GoodsReceiptStatus"]
+        orderType?: components["schemas"]["PurchaseOrderType"][]
+        purchaseOrderId?: string
+        supplierId?: string
+        dateFrom?: components["schemas"]["BusinessDate"]
+        dateTo?: components["schemas"]["BusinessDate"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Penerimaan terbaru lebih dulu */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["GoodsReceiptList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createGoodsReceipt: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["GoodsReceiptInput"]
+      }
+    }
+    responses: {
+      /** @description Draft dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["GoodsReceipt"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getGoodsReceipt: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Penerimaan Barang */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["GoodsReceipt"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateGoodsReceipt: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["GoodsReceiptUpdate"]
+      }
+    }
+    responses: {
+      /** @description Draft diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["GoodsReceipt"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  postGoodsReceipt: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Diposting */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["GoodsReceipt"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  cancelGoodsReceipt: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PurchaseCancelInput"]
+      }
+    }
+    responses: {
+      /** @description Dibatalkan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["GoodsReceipt"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listBillableReceipts: {
+    parameters: {
+      query: {
+        purchaseOrderId: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Baris GR yang masih bisa ditagih beserta default PPh, termin, sisa uang muka, dan toleransi */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["BillableReceipts"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listSupplierBills: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["SupplierBillStatus"]
+        matchStatus?: components["schemas"]["SupplierBillMatchStatus"]
+        purchaseOrderId?: string
+        supplierId?: string
+        dateFrom?: components["schemas"]["BusinessDate"]
+        dateTo?: components["schemas"]["BusinessDate"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Tagihan terbaru lebih dulu */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SupplierBillList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createSupplierBill: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SupplierBillInput"]
+      }
+    }
+    responses: {
+      /** @description Draft dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SupplierBill"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getSupplierBill: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Tagihan pemasok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SupplierBill"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateSupplierBill: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SupplierBillUpdate"]
+      }
+    }
+    responses: {
+      /** @description Draft diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SupplierBill"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  postSupplierBill: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Diposting atau menunggu persetujuan selisih */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SupplierBill"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  reviseSupplierBill: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Kembali Draft */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SupplierBill"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  cancelSupplierBill: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PurchaseCancelInput"]
+      }
+    }
+    responses: {
+      /** @description Dibatalkan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["SupplierBill"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listReturnableReceipts: {
+    parameters: {
+      query: {
+        purchaseOrderId: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Baris GR yang masih bisa diretur */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ReturnableReceipts"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listPurchaseReturns: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["PurchaseReturnStatus"]
+        origin?: components["schemas"]["PurchaseReturnOrigin"]
+        purchaseOrderId?: string
+        supplierId?: string
+        dateFrom?: components["schemas"]["BusinessDate"]
+        dateTo?: components["schemas"]["BusinessDate"]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Retur terbaru lebih dulu */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PurchaseReturnList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createPurchaseReturn: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PurchaseReturnInput"]
+      }
+    }
+    responses: {
+      /** @description Draft dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PurchaseReturn"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getPurchaseReturn: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Retur pembelian */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PurchaseReturn"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updatePurchaseReturn: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PurchaseReturnUpdate"]
+      }
+    }
+    responses: {
+      /** @description Draft diperbarui */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PurchaseReturn"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  submitPurchaseReturn: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Menunggu persetujuan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PurchaseReturn"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  postPurchaseReturn: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Diposting */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PurchaseReturn"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  revisePurchaseReturn: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Kembali Draft */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PurchaseReturn"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  cancelPurchaseReturn: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PurchaseCancelInput"]
+      }
+    }
+    responses: {
+      /** @description Dibatalkan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["PurchaseReturn"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getGoodsReceivedNotInvoiced: {
+    parameters: {
+      query?: {
+        q?: components["parameters"]["Search"]
+        supplierId?: string
+        purchaseOrderId?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Laporan per hari ini */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["GoodsReceivedNotInvoicedReport"]
         }
       }
       default: components["responses"]["Problem"]

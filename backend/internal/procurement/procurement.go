@@ -1,7 +1,8 @@
 // Package procurement adalah API publik modul pengadaan R1.2: Purchase Request, Purchase Order (barang/packaging,
-// jasa maklon per batch, reprocess) dengan approval berjenjang, notifikasi ETA H-1, dan uang muka pembelian A-19
-// (BRD 5.2, 5.3; PRD F1-201 – F1-203). Fungsi untuk Penerimaan Barang dan Tagihan Pemasok berjalan di transaksi
-// pemanggil dan tidak memeriksa permission (pemanggil memeriksa aksi user-nya).
+// jasa maklon per batch, reprocess) dengan approval berjenjang, notifikasi ETA H-1, uang muka pembelian A-19,
+// Penerimaan Barang (A-01/A-03, stok Inbound Karantina), Tagihan Pemasok dengan 3-way match (A-18), laporan Barang
+// Diterima Belum Ditagih, dan Retur Pembelian + nota debit (A-02) (BRD 5.2, 5.3; PRD F1-201 – F1-207). Fungsi
+// untuk modul lain (Inbound/QC, pembayaran) berjalan di transaksi pemanggil dan tidak memeriksa permission.
 package procurement
 
 import (
@@ -56,6 +57,27 @@ type (
 	Numberer  = service.Numberer
 	Users     = service.Users
 	Notifier  = service.Notifier
+	// Stock memutasi stok (diisi *inventory.Module).
+	Stock = service.Stock
+	// Inbounds adalah titik integrasi modul warehouse (Inbound/QC); lihat SetInbounds.
+	Inbounds = service.Inbounds
+	// InboundRequest dan InboundLine adalah isi permintaan pembuatan Inbound dari GR.
+	InboundRequest = service.InboundRequest
+	InboundLine    = service.InboundLine
+	// GoodsReceipt adalah Penerimaan Barang; ReceiptLine barisnya.
+	GoodsReceipt = domain.GoodsReceipt
+	ReceiptLine  = domain.ReceiptLine
+	// Payable adalah item utang pemasok (tagihan positif, nota debit negatif).
+	Payable = domain.Payable
+	// PayableDocument adalah jenis dokumen utang.
+	PayableDocument = domain.PayableDocument
+	// QCReturnInput dan QCReturnLine adalah permintaan retur dari hasil QC (D-24).
+	QCReturnInput = service.QCReturnInput
+	QCReturnLine  = service.QCReturnLine
+	// PurchaseReturn adalah retur pembelian beserta nota debit.
+	PurchaseReturn = domain.PurchaseReturn
+	// ReturnOrigin adalah asal retur.
+	ReturnOrigin = domain.ReturnOrigin
 	// ProductRef, SupplierRef, LocationRef, UserRef, Option adalah data rujukan dari modul lain.
 	ProductRef   = service.ProductRef
 	SupplierRef  = service.SupplierRef
@@ -89,6 +111,24 @@ const (
 
 	// SourcePurchaseAdvance adalah source_type jurnal A-19 uang muka.
 	SourcePurchaseAdvance = service.SourcePurchaseAdvance
+	// SourceGoodsReceipt, SourceSupplierBill, SourcePurchaseReturn adalah source_type jurnal & mutasi stok.
+	SourceGoodsReceipt   = service.SourceGoodsReceipt
+	SourceSupplierBill   = service.SourceSupplierBill
+	SourcePurchaseReturn = service.SourcePurchaseReturn
+
+	DocGoodsReceipt   = service.DocGoodsReceipt
+	DocPurchaseReturn = service.DocPurchaseReturn
+	DocDebitNote      = service.DocDebitNote
+
+	PermReceiptRead = service.PermReceiptRead
+	PermBillRead    = service.PermBillRead
+	PermReturnRead  = service.PermReturnRead
+
+	ReturnQCInbound  = domain.ReturnQCInbound
+	ReturnQCOutbound = domain.ReturnQCOutbound
+
+	PayableSupplierBill = domain.PayableSupplierBill
+	PayableDebitNote    = domain.PayableDebitNote
 )
 
 // Deps adalah dependensi modul.
@@ -107,7 +147,10 @@ type Deps struct {
 	Numberer  Numberer
 	Users     Users
 	Notifier  Notifier
-	BaseURL   string
+	Stock     Stock
+	// Inbounds opsional; bisa juga diisi belakangan lewat Module.SetInbounds.
+	Inbounds Inbounds
+	BaseURL  string
 }
 
 // Module adalah modul procurement.
@@ -122,7 +165,7 @@ func New(d Deps) *Module {
 	svc := service.New(service.Deps{
 		Store: postgres.NewStore(d.Pool), Tx: d.Tx, Audit: d.Audit, Clock: d.Clock, Log: d.Log, Catalog: d.Catalog,
 		Suppliers: d.Suppliers, Locations: d.Locations, Ledger: d.Ledger, Approvals: d.Approvals, Numberer: d.Numberer,
-		Users: d.Users, Notifier: d.Notifier, BaseURL: d.BaseURL,
+		Users: d.Users, Notifier: d.Notifier, Stock: d.Stock, Inbounds: d.Inbounds, BaseURL: d.BaseURL,
 	})
 	return &Module{svc: svc, rs: d.Responder, h: procurementhttp.NewHandler(svc)}
 }
@@ -154,6 +197,9 @@ func AuditEntities() map[string]string {
 		service.EntityPurchaseRequest: service.PermRequestRead,
 		service.EntityPurchaseOrder:   service.PermOrderRead,
 		service.EntityPurchaseAdvance: service.PermAdvanceRead,
+		service.EntityGoodsReceipt:    service.PermReceiptRead,
+		service.EntitySupplierBill:    service.PermBillRead,
+		service.EntityPurchaseReturn:  service.PermReturnRead,
 	}
 }
 
@@ -162,7 +208,8 @@ type ApprovalRegistrar interface {
 	RegisterHandler(t approval.SubjectType, readPermission string, h approval.Handler)
 }
 
-// RegisterApprovalHandlers mendaftarkan handler keputusan approval `purchase_request` dan `purchase_order`.
+// RegisterApprovalHandlers mendaftarkan handler keputusan approval `purchase_request`, `purchase_order`,
+// `supplier_bill_exception` (selisih 3-way match, Head F&A), dan `purchase_return` (retur manual, Head Logistik).
 // Dipanggil SETELAH handler dev agar menggantikannya.
 func (m *Module) RegisterApprovalHandlers(r ApprovalRegistrar) {
 	r.RegisterHandler(approval.SubjectPurchaseRequest, service.PermRequestRead, approval.Handler{
@@ -171,7 +218,17 @@ func (m *Module) RegisterApprovalHandlers(r ApprovalRegistrar) {
 	r.RegisterHandler(approval.SubjectPurchaseOrder, service.PermOrderRead, approval.Handler{
 		OnApproved: m.svc.OnOrderApproved, OnRejected: m.svc.OnOrderRejected,
 	})
+	r.RegisterHandler(approval.SubjectSupplierBillException, service.PermBillRead, approval.Handler{
+		OnApproved: m.svc.OnBillExceptionApproved, OnRejected: m.svc.OnBillExceptionRejected,
+	})
+	r.RegisterHandler(approval.SubjectPurchaseReturn, service.PermReturnRead, approval.Handler{
+		OnApproved: m.svc.OnReturnApproved, OnRejected: m.svc.OnReturnRejected,
+	})
 }
+
+// SetInbounds memasang integrasi Inbound/QC modul warehouse (TITIK INTEGRASI S-217). Selama belum dipasang, GR
+// yang diposting memasukkan stok ke lokasi Inbound berstatus Karantina tanpa dokumen Inbound.
+func (m *Module) SetInbounds(i Inbounds) { m.svc.Inbounds = i }
 
 // NotifyETA menjalankan notifikasi ETA H-1 satu kali (dipakai worker dan test).
 func (m *Module) NotifyETA(ctx context.Context) (int, error) { return m.svc.NotifyETA(ctx) }
@@ -234,4 +291,32 @@ func (m *Module) ApplyAdvances(ctx context.Context, orderID uuid.UUID, amount mo
 // ReleaseAdvances mengembalikan potongan uang muka saat tagihan pemasok dibatalkan.
 func (m *Module) ReleaseAdvances(ctx context.Context, applications []AdvanceApplication) error {
 	return m.svc.ReleaseAdvances(ctx, applications)
+}
+
+// --- API untuk Inbound/QC, Outbound QC, dan pembayaran (R1.4) ---------------------------------
+
+// CreateReturnFromQC membuat dan langsung memposting retur pembelian + nota debit (A-02) dari barang gagal QC
+// Inbound/Outbound tanpa approval (D-24), di transaksi pemanggil. Baris merujuk baris Penerimaan Barang asal, atau
+// cukup batch (GR diposting terakhir untuk batch itu). Tidak memeriksa permission.
+func (m *Module) CreateReturnFromQC(ctx context.Context, in QCReturnInput) (PurchaseReturn, error) {
+	v, err := m.svc.CreateReturnFromQC(ctx, in)
+	return v.PurchaseReturn, err
+}
+
+// Receipt membaca Penerimaan Barang beserta baris (batch, HPP) tanpa memeriksa permission.
+func (m *Module) Receipt(ctx context.Context, id uuid.UUID) (GoodsReceipt, error) {
+	return m.svc.Receipt(ctx, id)
+}
+
+// OpenPayables mengembalikan utang pemasok yang masih terbuka (tagihan positif, nota debit negatif) urut jatuh
+// tempo, untuk alokasi pembayaran R1.4. supplierID uuid.Nil = semua pemasok (maks. 500, kandidat rekonsiliasi
+// bank). Tidak memeriksa permission.
+func (m *Module) OpenPayables(ctx context.Context, supplierID uuid.UUID) ([]Payable, error) {
+	return m.svc.OpenPayables(ctx, supplierID)
+}
+
+// SettlePayable mengurangi sisa satu item utang di transaksi aktif (pembayaran/kompensasi nota debit R1.4);
+// tagihan pemasok ikut menjadi Dibayar Sebagian/Lunas. amount bertanda sama dengan sisa utang.
+func (m *Module) SettlePayable(ctx context.Context, payableID uuid.UUID, amount money.Amount) (Payable, error) {
+	return m.svc.SettlePayable(ctx, payableID, amount)
 }

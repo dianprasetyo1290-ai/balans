@@ -21,6 +21,7 @@ import (
 	"balans/internal/platform/db"
 	"balans/internal/platform/httpx"
 	"balans/internal/platform/jobqueue"
+	"balans/internal/platform/money"
 	"balans/internal/platform/pii"
 	"balans/internal/platform/tabular"
 )
@@ -51,8 +52,18 @@ type (
 	ExpenseType = domain.ExpenseType
 	// WithholdingType adalah jenis PPh yang dipotong pada biaya.
 	WithholdingType = domain.WithholdingType
+	// DimensionKind adalah jenis dimensi.
+	DimensionKind = domain.DimensionKind
 	// Account adalah akun Chart of Accounts.
 	Account = domain.Account
+)
+
+// Jenis dimensi untuk DimensionValues.
+const (
+	KindChannel    = domain.KindChannel
+	KindSubChannel = domain.KindSubChannel
+	KindDivision   = domain.KindDivision
+	KindCampaign   = domain.KindCampaign
 )
 
 // Jenis PPh jenis biaya dan jenis dokumen approval yang dipakai jenis biaya.
@@ -173,6 +184,13 @@ func (m *Module) ExpenseType(ctx context.Context, id uuid.UUID) (ExpenseType, er
 	return m.svc.ExpenseType(ctx, id)
 }
 
+// DimensionValues membaca master dimensi satu jenis yang belum dihapus untuk dropdown dan tampilan dokumen modul
+// lain (mis. divisi & kampanye Pemakaian Internal). Tidak memeriksa permission; includeInactive juga
+// mengembalikan nilai nonaktif agar dokumen lama tetap bisa menampilkan namanya.
+func (m *Module) DimensionValues(ctx context.Context, kind DimensionKind, includeInactive bool) ([]DimensionValue, error) {
+	return m.svc.Store.ListDimensions(ctx, kind, postgres.DimensionFilter{IncludeInactive: includeInactive})
+}
+
 // DivisionOptions mengembalikan divisi aktif untuk pemilih divisi dokumen modul lain (PR, PO). Tidak memeriksa
 // permission.
 func (m *Module) DivisionOptions(ctx context.Context) ([]DimensionValue, error) {
@@ -200,8 +218,26 @@ func (m *Module) ExpenseTypeByCode(ctx context.Context, code string) (ExpenseTyp
 	return m.svc.ExpenseTypeByCode(ctx, code)
 }
 
+// AccountBalance menghitung saldo akun (sesuai saldo normal) dari jurnal diposting sampai asOf. Tidak memeriksa
+// permission; dipakai laporan rekonsiliasi modul lain (mis. Barang Diterima Belum Ditagih vs 2102).
+func (m *Module) AccountBalance(ctx context.Context, code string, asOf clock.BusinessDate) (money.Amount, error) {
+	return m.svc.AccountBalance(ctx, code, asOf)
+}
+
 // DimensionValue adalah satu nilai master dimensi (channel, sub-channel, divisi, kampanye).
 type DimensionValue = domain.DimensionValue
+
+// SalesChannels mengembalikan channel dan sub-channel aktif (DimensionValue.Kind membedakan; sub-channel membawa
+// ChannelID dan pihak pemiliknya) untuk dokumen penjualan. Tidak memeriksa permission.
+func (m *Module) SalesChannels(ctx context.Context) ([]DimensionValue, error) {
+	return m.svc.SalesChannels(ctx)
+}
+
+// DimensionLabels mengembalikan jenis, kode, dan nama dimensi (termasuk nonaktif/terhapus) untuk tampilan dan
+// pemetaan dokumen modul lain.
+func (m *Module) DimensionLabels(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID]DimensionValue, error) {
+	return m.svc.DimensionLabels(ctx, ids)
+}
 
 // AccountColumns adalah kolom template impor/ekspor Chart of Accounts (S-125).
 func AccountColumns() []tabular.Column { return service.AccountColumns }

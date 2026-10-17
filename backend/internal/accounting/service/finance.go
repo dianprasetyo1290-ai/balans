@@ -256,9 +256,37 @@ type PaymentCandidateProvider interface {
 	SettlePayment(ctx context.Context, c PaymentCandidate, p domain.Payment) error
 }
 
+// BookedPayment adalah pembayaran yang sudah dijurnal modul lain (mis. pembayaran pelanggan sales) di akun
+// rekening. Dipakai memperkaya kandidat baris jurnal dengan nomor/referensi agar aturan referensi bisa cocok.
+type BookedPayment struct {
+	JournalEntryID uuid.UUID
+	Number         string
+	Reference      string
+	PartyName      string
+}
+
+// BookedPaymentSource mengembalikan pembayaran Diposting modul lain per kode akun Kas & Bank dan rentang tanggal.
+type BookedPaymentSource interface {
+	BookedPayments(ctx context.Context, accountCode string, from, to clock.BusinessDate) ([]BookedPayment, error)
+}
+
 type providerRegistry struct {
-	mu   sync.RWMutex
-	byID map[string]PaymentCandidateProvider
+	mu     sync.RWMutex
+	byID   map[string]PaymentCandidateProvider
+	booked []BookedPaymentSource
+}
+
+// RegisterBookedPayments mendaftarkan sumber pembayaran tercatat modul lain (saat wiring).
+func (s *Service) RegisterBookedPayments(src BookedPaymentSource) {
+	s.providers.mu.Lock()
+	defer s.providers.mu.Unlock()
+	s.providers.booked = append(s.providers.booked, src)
+}
+
+func (s *Service) bookedSources() []BookedPaymentSource {
+	s.providers.mu.RLock()
+	defer s.providers.mu.RUnlock()
+	return slices.Clone(s.providers.booked)
 }
 
 func newProviderRegistry() *providerRegistry {

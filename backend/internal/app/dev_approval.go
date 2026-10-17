@@ -5,12 +5,9 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/google/uuid"
-
 	"balans/internal/approval"
 	"balans/internal/platform/actor"
 	"balans/internal/platform/apperr"
-	"balans/internal/platform/money"
 )
 
 // registerDevApprovalHandlers dipakai hanya di APP_ENV=local selama modul dokumen (PO, PR, dll.) belum
@@ -31,20 +28,10 @@ type devApprovalSample struct {
 	subject       approval.Subject
 }
 
-// devApprovalSamples adalah dokumen contoh yang menunggu persetujuan untuk demo lokal.
-func devApprovalSamples() []devApprovalSample {
-	sample := func(t approval.SubjectType, label, summary string, amount int64, flags ...string) approval.Subject {
-		return approval.Subject{
-			Type: t, ID: uuid.NewSHA1(uuid.NameSpaceURL, []byte("balans-dev/"+label)), Label: label,
-			Summary: summary, Amount: money.FromInt(amount), Flags: flags,
-		}
-	}
-	// PR/PO dan pengajuan biaya tidak lagi disemai: modul procurement dan accounting mendaftarkan handler-nya
-	// sendiri dan menolak dokumen yang tidak ada di tabelnya.
-	return []devApprovalSample{
-		{"warehouse_staff", sample(approval.SubjectReturnDisposition, "RJ/2026/10/90001", "Retur MT · 3 baris pemusnahan", 1_750_000, approval.ConditionHasDisposal)},
-	}
-}
+// devApprovalSamples adalah dokumen contoh yang menunggu persetujuan untuk demo lokal. Kosong: modul dokumen
+// (procurement, warehouse, accounting) mendaftarkan handler-nya sendiri dan menolak dokumen yang tidak ada di
+// tabelnya, sehingga dokumen contoh dibuat lewat seed modul masing-masing.
+func devApprovalSamples() []devApprovalSample { return nil }
 
 // seedDevApprovals mengajukan dokumen contoh. Dokumen yang masih menunggu dilewati, sehingga aman diulang.
 func (a *App) seedDevApprovals(ctx context.Context) (int, error) {

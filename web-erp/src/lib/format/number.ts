@@ -2,7 +2,9 @@ import Big from "big.js"
 
 const QUANTITY_DECIMALS = 3
 
-const quantityFormat = new Intl.NumberFormat("id-ID", { maximumFractionDigits: QUANTITY_DECIMALS })
+const quantityFormat = new Intl.NumberFormat("id-ID", {
+  maximumFractionDigits: QUANTITY_DECIMALS,
+})
 
 /** Format kuantitas (string desimal API, 3 desimal) dengan format Indonesia: `1250.5` → `1.250,5`. */
 export function formatQuantity(value: string | null | undefined): string {
@@ -10,7 +12,9 @@ export function formatQuantity(value: string | null | undefined): string {
     return "-"
   }
   try {
-    return quantityFormat.format(Number(new Big(value).toFixed(QUANTITY_DECIMALS)))
+    return quantityFormat.format(
+      Number(new Big(value).toFixed(QUANTITY_DECIMALS))
+    )
   } catch {
     return "-"
   }
@@ -18,7 +22,10 @@ export function formatQuantity(value: string | null | undefined): string {
 
 /** Membaca input kuantitas Indonesia (`1.250,5`) menjadi string desimal API (`"1250.500"`). */
 export function parseQuantityInput(input: string): string | null {
-  const normalized = input.replace(/\./g, "").replace(",", ".").replace(/[^\d.-]/g, "")
+  const normalized = input
+    .replace(/\./g, "")
+    .replace(",", ".")
+    .replace(/[^\d.-]/g, "")
   if (normalized === "" || normalized === "-" || normalized === ".") {
     return null
   }
