@@ -23,6 +23,25 @@ export function formatRupiah(value: string | null | undefined): string {
   }
 }
 
+const unitCostFormat = new Intl.NumberFormat("id-ID", {
+  style: "currency",
+  currency: "IDR",
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 4,
+})
+
+/** Format HPP per unit (4 desimal, Technical Guideline 5.8.6): `12500.3333` → `Rp12.500,3333`. */
+export function formatUnitCost(value: string | null | undefined): string {
+  if (value === null || value === undefined || value.trim() === "") {
+    return "-"
+  }
+  try {
+    return unitCostFormat.format(Number(new Big(value).toFixed(4))).replace(/\u00a0/g, "")
+  } catch {
+    return "-"
+  }
+}
+
 /** Format angka bulat rupiah dengan pemisah ribuan untuk input: `1250000.00` → `1.250.000`. */
 export function formatMoneyInput(value: string): string {
   if (value === "") {

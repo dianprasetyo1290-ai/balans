@@ -21,6 +21,7 @@ import (
 	"balans/internal/platform/db"
 	"balans/internal/platform/httpx"
 	"balans/internal/platform/jobqueue"
+	"balans/internal/platform/tabular"
 )
 
 // Name adalah nama modul di ENABLED_MODULES.
@@ -168,4 +169,25 @@ func (m *Module) ExpenseType(ctx context.Context, id uuid.UUID) (ExpenseType, er
 // ExpenseTypeByCode membaca jenis biaya berdasarkan kode (impor data, seed).
 func (m *Module) ExpenseTypeByCode(ctx context.Context, code string) (ExpenseType, error) {
 	return m.svc.ExpenseTypeByCode(ctx, code)
+}
+
+// DimensionValue adalah satu nilai master dimensi (channel, sub-channel, divisi, kampanye).
+type DimensionValue = domain.DimensionValue
+
+// AccountColumns adalah kolom template impor/ekspor Chart of Accounts (S-125).
+func AccountColumns() []tabular.Column { return service.AccountColumns }
+
+// ImportAccountRow membuat atau memperbarui akun COA (kunci kode akun) dari satu baris Excel.
+func (m *Module) ImportAccountRow(ctx context.Context, row tabular.Row) error {
+	return m.svc.ImportAccountRow(ctx, row)
+}
+
+// ExportAccounts mengalirkan Chart of Accounts sebagai baris Excel.
+func (m *Module) ExportAccounts(ctx context.Context, emit func(tabular.Row) error) error {
+	return m.svc.ExportAccounts(ctx, emit)
+}
+
+// Divisions mengembalikan seluruh divisi (termasuk nonaktif) tanpa cek permission (impor karyawan).
+func (m *Module) Divisions(ctx context.Context) ([]DimensionValue, error) {
+	return m.svc.Divisions(ctx)
 }

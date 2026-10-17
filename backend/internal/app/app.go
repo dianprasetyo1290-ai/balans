@@ -15,6 +15,7 @@ import (
 	"balans/internal/approval"
 	"balans/internal/audit"
 	"balans/internal/catalog"
+	"balans/internal/dataexchange"
 	"balans/internal/document"
 	"balans/internal/filestore"
 	"balans/internal/hris"
@@ -23,6 +24,7 @@ import (
 	"balans/internal/integration/mockpayment"
 	"balans/internal/integration/mockshipment"
 	"balans/internal/integration/smtpmail"
+	"balans/internal/inventory"
 	"balans/internal/logistics"
 	"balans/internal/notification"
 	"balans/internal/party"
@@ -51,22 +53,25 @@ type App struct {
 	Responder *httpx.Responder
 	Migrator  *db.Migrator
 
-	idempotency *idempotency.Store
-	system      *system.Module
-	audit       *audit.Module
-	identity    *identity.Module
-	approval    *approval.Module
-	document    *document.Module
-	accounting  *accounting.Module
-	catalog     *catalog.Module
-	warehouse   *warehouse.Module
-	filestore   *filestore.Module
-	party       *party.Module
-	hris        *hris.Module
-	pricing     *pricing.Module
-	cipher      *pii.Cipher
-	modules     []module
-	console     *mockconsole.Console
+	idempotency  *idempotency.Store
+	system       *system.Module
+	audit        *audit.Module
+	identity     *identity.Module
+	approval     *approval.Module
+	document     *document.Module
+	accounting   *accounting.Module
+	catalog      *catalog.Module
+	warehouse    *warehouse.Module
+	inventory    *inventory.Module
+	filestore    *filestore.Module
+	party        *party.Module
+	hris         *hris.Module
+	pricing      *pricing.Module
+	notification *notification.Module
+	dataexchange *dataexchange.Module
+	cipher       *pii.Cipher
+	modules      []module
+	console      *mockconsole.Console
 }
 
 // New membuka koneksi database dan menyusun modul sesuai ENABLED_MODULES.
@@ -148,6 +153,7 @@ func (a *App) buildModules() error {
 			Responder: a.Responder,
 		})
 		a.modules = append(a.modules, mailer)
+		a.notification = mailer
 		console.Email = mailer
 	}
 	if cfg.IsEnabled(identity.Name) {
@@ -210,7 +216,25 @@ func (a *App) buildModules() error {
 	if err := a.buildMasterData(); err != nil {
 		return err
 	}
+	if cfg.IsEnabled(inventory.Name) {
+		if a.catalog == nil || a.warehouse == nil {
+			return errors.New("modul inventory membutuhkan modul catalog dan warehouse")
+		}
+		d := inventory.Deps{
+			Pool: a.Pool, Tx: a.Tx, Clock: a.Clock, Log: a.Log, Responder: a.Responder,
+			Products: a.catalog, Locations: a.warehouse,
+		}
+		if a.accounting != nil {
+			d.Periods = a.accounting
+		}
+		a.inventory = inventory.New(d)
+		a.modules = append(a.modules, a.inventory)
+	}
+	a.connectMasterData()
 	if err := a.buildPricing(); err != nil {
+		return err
+	}
+	if err := a.buildDataExchange(); err != nil {
 		return err
 	}
 	if cfg.IsEnabled(sales.Name) {
@@ -292,7 +316,12 @@ func (a *App) seedDevMasters(ctx context.Context) error {
 		}
 	}
 	if a.catalog != nil {
-		return a.catalog.SeedDev(ctx)
+		if err := a.catalog.SeedDev(ctx); err != nil {
+			return err
+		}
+	}
+	if a.inventory != nil && a.catalog != nil && a.warehouse != nil {
+		return a.seedDevStock(ctx)
 	}
 	return nil
 }

@@ -1,0 +1,620 @@
+stockBalances:
+  get:
+    operationId: listStockBalances
+    tags: [inventory]
+    summary: Stok per Lokasi — saldo per produk × lokasi × batch × status (INV-01, WMS-01)
+    description: |
+      Hanya saldo > 0. `unitCost` adalah HPP rata-rata sisa cost layer batch (FIFO di dalam batch), `value` =
+      qty × unitCost. Permission `inventory.stock.read`.
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - name: productId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: locationId
+        in: query
+        description: Bisa lebih dari satu.
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: batchId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        description: Bisa lebih dari satu.
+        schema:
+          type: array
+          items:
+            $ref: "#/components/schemas/StockStatus"
+    responses:
+      "200":
+        description: Saldo stok
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StockBalanceList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+stockCard:
+  get:
+    operationId: getStockCard
+    tags: [inventory]
+    summary: Kartu Stok per SKU (opsional lokasi, batch, status) dengan saldo qty & nilai berjalan (INV-01)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - name: productId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: locationId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: batchId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        schema:
+          $ref: "#/components/schemas/StockStatus"
+      - name: dateFrom
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: dateTo
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+    responses:
+      "200":
+        description: Kartu stok
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StockCard"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+batches:
+  get:
+    operationId: listBatches
+    tags: [inventory]
+    summary: Batch & Kedaluwarsa — batch berurutan FEFO dengan qty per status (INV-04, INV-09)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - $ref: "../components/common.yaml#/parameters/Search"
+      - name: productId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: expiryState
+        in: query
+        schema:
+          $ref: "#/components/schemas/ExpiryState"
+      - name: nearExpiryDays
+        in: query
+        description: Batas hari "Segera kedaluwarsa" (default 90).
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 730
+      - name: withStock
+        in: query
+        description: Default `true` — hanya batch yang masih punya stok.
+        schema:
+          type: boolean
+    responses:
+      "200":
+        description: Daftar batch
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BatchList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+batchSuggestions:
+  get:
+    operationId: suggestBatches
+    tags: [inventory]
+    summary: Alokasi Batch (FEFO) — saran batch untuk mengambil qty dari satu lokasi (S-215)
+    description: |
+      Batch stok Tersedia diurutkan kedaluwarsa terdekat; batch kedaluwarsa dan stok Karantina tidak diusulkan.
+      Pemilihan batch manual yang bukan saran FEFO wajib alasan saat diposting.
+    parameters:
+      - name: productId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: locationId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: qty
+        in: query
+        required: true
+        schema:
+          $ref: "#/components/schemas/StockQuantity"
+    responses:
+      "200":
+        description: Saran batch
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BatchSuggestion"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+costLayers:
+  get:
+    operationId: listCostLayers
+    tags: [inventory]
+    summary: HPP per Batch — cost layer FIFO per penerimaan (INV-03)
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - name: productId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: batchId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: openOnly
+        in: query
+        description: Hanya layer yang masih bersisa.
+        schema:
+          type: boolean
+    responses:
+      "200":
+        description: Cost layer
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CostLayerList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+costLayerConsumptions:
+  parameters:
+    - $ref: "../components/common.yaml#/parameters/Id"
+  get:
+    operationId: listCostLayerConsumptions
+    tags: [inventory]
+    summary: Jejak konsumsi HPP satu cost layer (RPT-04)
+    responses:
+      "200":
+        description: Jejak konsumsi
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CostLayerConsumptionList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+bundleAvailability:
+  get:
+    operationId: listBundleAvailability
+    tags: [inventory]
+    summary: Stok tersedia bundel virtual = min(floor(stok komponen ÷ qty)) (S-115, MD-03)
+    description: |
+      Stok komponen = stok Tersedia di lokasi `locationId`, atau di semua lokasi yang bisa dijual bila kosong.
+    parameters:
+      - name: bundleId
+        in: query
+        required: true
+        description: Maks. 200.
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: locationId
+        in: query
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: Stok tersedia per bundel
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BundleAvailabilityList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+components:
+  schemas:
+    StockStatus:
+      type: string
+      description: "`available` Tersedia, `quarantine` Karantina, `in_transit` Dalam Pengiriman, `reserved` Dialokasikan."
+      enum: [available, quarantine, in_transit, reserved]
+    ExpiryState:
+      type: string
+      description: "`expired` Kedaluwarsa, `near_expiry` Segera kedaluwarsa, `ok` Aman, `no_expiry` Tanpa kedaluwarsa."
+      enum: [expired, near_expiry, ok, no_expiry]
+    StockMovementType:
+      type: string
+      enum: [receive, issue, move_out, move_in]
+    StockQuantity:
+      type: string
+      description: Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string; bisa negatif di kartu stok.
+      pattern: "^-?[0-9]{1,15}(\\.[0-9]{1,3})?$"
+      example: "12.000"
+    UnitCost:
+      type: string
+      description: HPP per unit 4 desimal sebagai string.
+      example: "12500.0000"
+    StockProductRef:
+      type: object
+      required: [id, sku, name, uom]
+      properties:
+        id:
+          type: string
+          format: uuid
+        sku:
+          type: string
+        name:
+          type: string
+        uom:
+          type: string
+    StockLocationRef:
+      type: object
+      required: [id, code, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        warehouseName:
+          type: string
+    StockBalance:
+      type: object
+      required: [product, location, status, statusLabel, qty, unitCost, value, updatedAt]
+      properties:
+        product:
+          $ref: "#/components/schemas/StockProductRef"
+        location:
+          $ref: "#/components/schemas/StockLocationRef"
+        batchId:
+          type: string
+          format: uuid
+        batchNumber:
+          type: string
+        productionDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        expiryDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        expiryState:
+          $ref: "#/components/schemas/ExpiryState"
+        status:
+          $ref: "#/components/schemas/StockStatus"
+        statusLabel:
+          type: string
+        qty:
+          $ref: "#/components/schemas/StockQuantity"
+        unitCost:
+          $ref: "#/components/schemas/UnitCost"
+        value:
+          $ref: "../components/common.yaml#/Money"
+        updatedAt:
+          type: string
+          format: date-time
+    StockBalanceList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items, totalQty]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/StockBalance"
+            totalQty:
+              $ref: "#/components/schemas/StockQuantity"
+    StockCardLine:
+      type: object
+      required: [movementId, businessDate, createdAt, sourceType, sourceId, sourceLabel, movementType, movementTypeLabel,
+        location, status, statusLabel, qtyIn, qtyOut, unitCost, costAmount, runningQty, runningValue, note]
+      properties:
+        movementId:
+          type: string
+          format: uuid
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        createdAt:
+          type: string
+          format: date-time
+        sourceType:
+          type: string
+        sourceId:
+          type: string
+          format: uuid
+        sourceLabel:
+          type: string
+        movementType:
+          $ref: "#/components/schemas/StockMovementType"
+        movementTypeLabel:
+          type: string
+        location:
+          $ref: "#/components/schemas/StockLocationRef"
+        batchId:
+          type: string
+          format: uuid
+        batchNumber:
+          type: string
+        status:
+          $ref: "#/components/schemas/StockStatus"
+        statusLabel:
+          type: string
+        qtyIn:
+          $ref: "#/components/schemas/StockQuantity"
+        qtyOut:
+          $ref: "#/components/schemas/StockQuantity"
+        unitCost:
+          $ref: "#/components/schemas/UnitCost"
+        costAmount:
+          $ref: "../components/common.yaml#/Money"
+        runningQty:
+          $ref: "#/components/schemas/StockQuantity"
+        runningValue:
+          $ref: "../components/common.yaml#/Money"
+        batchReason:
+          type: string
+        note:
+          type: string
+    StockCard:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [product, openingQty, openingValue, qtyIn, qtyOut, closingQty, closingValue, items]
+          properties:
+            product:
+              $ref: "#/components/schemas/StockProductRef"
+            openingQty:
+              $ref: "#/components/schemas/StockQuantity"
+            openingValue:
+              $ref: "../components/common.yaml#/Money"
+            qtyIn:
+              $ref: "#/components/schemas/StockQuantity"
+            qtyOut:
+              $ref: "#/components/schemas/StockQuantity"
+            closingQty:
+              $ref: "#/components/schemas/StockQuantity"
+            closingValue:
+              $ref: "../components/common.yaml#/Money"
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/StockCardLine"
+    BatchSummary:
+      type: object
+      required: [id, product, batchNumber, expiryState, qtyAvailable, qtyQuarantine, qtyInTransit, qtyReserved, qtyTotal, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        product:
+          $ref: "#/components/schemas/StockProductRef"
+        batchNumber:
+          type: string
+        productionDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        expiryDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        daysToExpiry:
+          type: integer
+          description: Sisa hari sampai kedaluwarsa (negatif = sudah lewat).
+        expiryState:
+          $ref: "#/components/schemas/ExpiryState"
+        qtyAvailable:
+          $ref: "#/components/schemas/StockQuantity"
+        qtyQuarantine:
+          $ref: "#/components/schemas/StockQuantity"
+        qtyInTransit:
+          $ref: "#/components/schemas/StockQuantity"
+        qtyReserved:
+          $ref: "#/components/schemas/StockQuantity"
+        qtyTotal:
+          $ref: "#/components/schemas/StockQuantity"
+        createdAt:
+          type: string
+          format: date-time
+    BatchList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items, nearExpiryDays]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/BatchSummary"
+            nearExpiryDays:
+              type: integer
+    SuggestedBatch:
+      type: object
+      required: [batchNumber, availableQty, suggestedQty]
+      properties:
+        batchId:
+          type: string
+          format: uuid
+        batchNumber:
+          type: string
+        productionDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        expiryDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        availableQty:
+          $ref: "#/components/schemas/StockQuantity"
+        suggestedQty:
+          $ref: "#/components/schemas/StockQuantity"
+    BatchSuggestion:
+      type: object
+      required: [product, location, requestedQty, allocatedQty, shortfallQty, quarantineQty, items, expired]
+      properties:
+        product:
+          $ref: "#/components/schemas/StockProductRef"
+        location:
+          $ref: "#/components/schemas/StockLocationRef"
+        requestedQty:
+          $ref: "#/components/schemas/StockQuantity"
+        allocatedQty:
+          $ref: "#/components/schemas/StockQuantity"
+        shortfallQty:
+          $ref: "#/components/schemas/StockQuantity"
+        quarantineQty:
+          $ref: "#/components/schemas/StockQuantity"
+        items:
+          type: array
+          description: Batch Tersedia yang belum kedaluwarsa dalam urutan FEFO; suggestedQty 0 = tidak perlu diambil.
+          items:
+            $ref: "#/components/schemas/SuggestedBatch"
+        expired:
+          type: array
+          description: Batch Tersedia yang sudah kedaluwarsa (tidak diusulkan).
+          items:
+            $ref: "#/components/schemas/SuggestedBatch"
+    CostLayer:
+      type: object
+      required: [id, product, sourceType, sourceId, sourceLabel, businessDate, receivedQty, remainingQty, consumedQty,
+        unitCost, remainingValue, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        product:
+          $ref: "#/components/schemas/StockProductRef"
+        batchId:
+          type: string
+          format: uuid
+        batchNumber:
+          type: string
+        expiryDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        sourceType:
+          type: string
+        sourceId:
+          type: string
+          format: uuid
+        sourceLabel:
+          type: string
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        receivedQty:
+          $ref: "#/components/schemas/StockQuantity"
+        remainingQty:
+          $ref: "#/components/schemas/StockQuantity"
+        consumedQty:
+          $ref: "#/components/schemas/StockQuantity"
+        unitCost:
+          $ref: "#/components/schemas/UnitCost"
+        remainingValue:
+          $ref: "../components/common.yaml#/Money"
+        createdAt:
+          type: string
+          format: date-time
+    CostLayerList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/CostLayer"
+    CostLayerConsumption:
+      type: object
+      required: [id, movementId, businessDate, sourceType, sourceId, sourceLabel, location, qty, unitCost, amount]
+      properties:
+        id:
+          type: string
+          format: uuid
+        movementId:
+          type: string
+          format: uuid
+        businessDate:
+          $ref: "../components/common.yaml#/BusinessDate"
+        sourceType:
+          type: string
+        sourceId:
+          type: string
+          format: uuid
+        sourceLabel:
+          type: string
+        location:
+          $ref: "#/components/schemas/StockLocationRef"
+        qty:
+          $ref: "#/components/schemas/StockQuantity"
+        unitCost:
+          $ref: "#/components/schemas/UnitCost"
+        amount:
+          $ref: "../components/common.yaml#/Money"
+    CostLayerConsumptionList:
+      type: object
+      required: [layer, items]
+      properties:
+        layer:
+          $ref: "#/components/schemas/CostLayer"
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/CostLayerConsumption"
+    BundleComponentAvailability:
+      type: object
+      required: [productId, qtyPerBundle, availableQty]
+      properties:
+        productId:
+          type: string
+          format: uuid
+        qtyPerBundle:
+          $ref: "#/components/schemas/StockQuantity"
+        availableQty:
+          $ref: "#/components/schemas/StockQuantity"
+    BundleAvailability:
+      type: object
+      required: [bundleId, availableQty, components]
+      properties:
+        bundleId:
+          type: string
+          format: uuid
+        availableQty:
+          $ref: "#/components/schemas/StockQuantity"
+        components:
+          type: array
+          items:
+            $ref: "#/components/schemas/BundleComponentAvailability"
+    BundleAvailabilityList:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/BundleAvailability"

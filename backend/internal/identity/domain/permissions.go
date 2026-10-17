@@ -63,7 +63,9 @@ var matrix = []matrixRow{
 	{[]string{"party.supplier"}, "RWI RW - R RW R - - - - - - - R"},
 	{[]string{"warehouse.warehouse", "warehouse.location"}, "RWI R R RW R R R R - R - - - R"},
 	{[]string{"hris.employee"}, "R - - - R R - - - - - RWI - R"},
-	{[]string{"accounting.account", "accounting.posting_rule"}, "R - - - RW RWA - - - - - - - R"},
+	// Impor/ekspor COA (S-125) oleh Finance & Head F&A.
+	{[]string{"accounting.account"}, "R - - - RWI RWAI - - - - - - - R"},
+	{[]string{"accounting.posting_rule"}, "R - - - RW RWA - - - - - - - R"},
 	{[]string{"accounting.dimension"}, "RW - - - RW RW R R - R RW - - R"},
 	{[]string{"accounting.expense_type", "sales.return_reason"}, "RW - - R RW RW - - R - R - - R"},
 	{[]string{"identity.user", "identity.user_role", "identity.role"}, "RW - - - - - - - - - - - - R"},

@@ -241,6 +241,84 @@ func (s *Service) DownloadURL(ctx context.Context, id uuid.UUID) (Ticket, error)
 	return Ticket{URL: domain.ContentURL(s.Sign, domain.PurposeDownload, f.ID, exp), ExpiresAt: exp}, nil
 }
 
+// Info membaca metadata file tanpa cek permission; modul pemanggil memeriksa hak aksesnya sendiri.
+func (s *Service) Info(ctx context.Context, id uuid.UUID) (domain.File, error) {
+	return s.Store.Get(ctx, id, false)
+}
+
+// OpenContent membuka isi file yang sudah diunggah tanpa cek permission (dipakai job modul pemilik).
+func (s *Service) OpenContent(ctx context.Context, id uuid.UUID) (io.ReadSeekCloser, error) {
+	f, err := s.Store.Get(ctx, id, false)
+	if err != nil {
+		return nil, err
+	}
+	if f.Status != domain.StatusUploaded {
+		return nil, apperr.WithMessage(apperr.CodeInvalidStateTransition, "File belum selesai diunggah.")
+	}
+	r, err := s.Storage.Open(ctx, f.ObjectKey)
+	if err != nil {
+		return nil, fmt.Errorf("open file %s: %w", id, err)
+	}
+	return r, nil
+}
+
+// Save menyimpan file buatan server (mis. hasil ekspor Excel) dan langsung menautkannya ke pemilik. Pengunggah
+// tercatat sebagai actor di context (Sistem untuk proses tanpa user).
+func (s *Service) Save(ctx context.Context, ownerType string, ownerID uuid.UUID, name, contentType string, data []byte) (domain.File, error) {
+	if len(data) == 0 {
+		return domain.File{}, apperr.Validation(map[string]string{"sizeBytes": "File kosong"})
+	}
+	actorID := actor.UserID(ctx)
+	f, err := s.Store.Insert(ctx, domain.File{
+		OriginalName: name, ContentType: domain.NormalizeContentType(contentType), SizeBytes: int64(len(data)),
+		OwnerType: ownerType, Status: domain.StatusPending,
+	}, actorID)
+	if err != nil {
+		return domain.File{}, err
+	}
+	written, sum, err := s.Storage.Put(ctx, f.ObjectKey, bytes.NewReader(data))
+	if err != nil {
+		return domain.File{}, err
+	}
+	err = s.Tx.WithTx(ctx, func(ctx context.Context) error {
+		cur, err := s.Store.Get(ctx, f.ID, true)
+		if err != nil {
+			return err
+		}
+		if err := cur.MarkUploaded(written, sum, http.DetectContentType(data), s.Clock.Now()); err != nil {
+			return err
+		}
+		if err := s.Store.MarkUploaded(ctx, cur); err != nil {
+			return err
+		}
+		cur.Version++
+		if _, err := cur.AttachTo(ownerType, ownerID, actorID); err != nil {
+			return err
+		}
+		if err := s.Store.Attach(ctx, cur, actorID); err != nil {
+			return err
+		}
+		cur.Version++
+		f = cur
+		return nil
+	})
+	return f, err
+}
+
+// SignedDownloadURL membuat URL unduhan berumur 5 menit tanpa cek permission; modul pemilik sudah memeriksa
+// hak akses datanya (mis. dataexchange untuk file ekspor).
+func (s *Service) SignedDownloadURL(ctx context.Context, id uuid.UUID) (Ticket, error) {
+	f, err := s.Store.Get(ctx, id, false)
+	if err != nil {
+		return Ticket{}, err
+	}
+	if f.Status != domain.StatusUploaded {
+		return Ticket{}, apperr.WithMessage(apperr.CodeInvalidStateTransition, "File belum selesai diunggah.")
+	}
+	exp := s.Clock.Now().Add(domain.DownloadURLTTL)
+	return Ticket{URL: domain.ContentURL(s.Sign, domain.PurposeDownload, f.ID, exp), ExpiresAt: exp}, nil
+}
+
 // Open membuka isi file dari URL unduhan bertanda tangan.
 func (s *Service) Open(ctx context.Context, id uuid.UUID, expires int64, sig string) (domain.File, io.ReadSeekCloser, error) {
 	if err := domain.Verify(s.Sign, domain.PurposeDownload, id, expires, sig, s.Clock.Now()); err != nil {

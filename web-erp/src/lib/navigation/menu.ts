@@ -47,6 +47,17 @@ export type MenuGroup = {
   items: MenuItem[]
 }
 
+/** Permission impor/ekspor master (S-125); salah satu cukup untuk membuka Import/Export Excel. */
+const DATA_EXCHANGE_PERMISSIONS = [
+  "catalog.product",
+  "party.customer",
+  "party.supplier",
+  "party.partner_product_code",
+  "hris.employee",
+  "accounting.account",
+  "warehouse.location",
+].flatMap((r) => [`${r}.import`, `${r}.export`])
+
 const items = (...labels: string[]): MenuItem[] =>
   labels.map((label) => ({ label }))
 
@@ -208,18 +219,26 @@ export const MENU: MenuGroup[] = [
     label: "Persediaan",
     icon: BoxesIcon,
     modules: ["inventory"],
-    items: items(
-      "Stok per Lokasi",
-      "Kartu Stok",
-      "Batch & Kedaluwarsa",
-      "Alokasi Batch (FEFO)",
-      "HPP per Batch",
-      "Pemakaian Internal",
-      "Repacking",
-      "Pemusnahan",
-      "Peringatan Stok Minimum",
-      "Peringatan Kedaluwarsa"
-    ),
+    items: [
+      ...[
+        { label: "Stok per Lokasi", to: "/inventory/stock" },
+        { label: "Kartu Stok", to: "/inventory/stock-card" },
+        { label: "Batch & Kedaluwarsa", to: "/inventory/batches" },
+        { label: "Alokasi Batch (FEFO)", to: "/inventory/batch-allocation" },
+        { label: "HPP per Batch", to: "/inventory/cost-layers" },
+      ].map((i) => ({
+        ...i,
+        permission: "inventory.stock.read",
+        module: "inventory",
+      })),
+      ...items(
+        "Pemakaian Internal",
+        "Repacking",
+        "Pemusnahan",
+        "Peringatan Stok Minimum",
+        "Peringatan Kedaluwarsa"
+      ),
+    ],
   },
   {
     label: "Logistik",
@@ -457,14 +476,21 @@ export const MENU: MenuGroup[] = [
     label: "Integrasi",
     icon: PlugIcon,
     modules: ["sales", "logistics", "vending", "notification", "dataexchange"],
-    items: items(
-      "Midtrans",
-      "Biteship",
-      "Marketplace",
-      "Mesin Vending",
-      "WhatsApp Business",
-      "Import/Export Excel"
-    ),
+    items: [
+      ...items(
+        "Midtrans",
+        "Biteship",
+        "Marketplace",
+        "Mesin Vending",
+        "WhatsApp Business"
+      ),
+      {
+        label: "Import/Export Excel",
+        to: "/integrations/data-exchange",
+        module: "dataexchange",
+        permission: DATA_EXCHANGE_PERMISSIONS,
+      },
+    ],
   },
   {
     label: "Pengaturan",

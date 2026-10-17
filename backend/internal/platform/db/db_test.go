@@ -90,6 +90,32 @@ func TestWithTxRetriesSerializationFailure(t *testing.T) {
 	assert.Equal(t, 1, countProbe(t, ctx, pool))
 }
 
+func TestSavepointRollsBackOnlyFailedPart(t *testing.T) {
+	tm := setupTable(t)
+	pool := dbtest.Pool(t)
+	ctx := context.Background()
+
+	err := tm.WithTx(ctx, func(ctx context.Context) error {
+		require.NoError(t, db.Savepoint(ctx, func(ctx context.Context) error {
+			_, err := db.Conn(ctx, pool).Exec(ctx, `INSERT INTO tx_probe VALUES ('a')`)
+			return err
+		}))
+		// Pelanggaran unique membatalkan savepoint saja; transaksi luar tetap bisa dipakai.
+		err := db.Savepoint(ctx, func(ctx context.Context) error {
+			_, err := db.Conn(ctx, pool).Exec(ctx, `INSERT INTO tx_probe VALUES ('a')`)
+			return err
+		})
+		require.Error(t, err)
+		// Progress di luar transaksi tetap terlihat koneksi lain.
+		assert.Equal(t, 0, countProbe(t, ctx, db.Conn(db.WithoutTx(ctx), pool)))
+		assert.Equal(t, 1, countProbe(t, ctx, db.Conn(ctx, pool)))
+		return nil
+	})
+	require.NoError(t, err)
+	assert.Equal(t, 1, countProbe(t, ctx, pool))
+	assert.ErrorIs(t, db.Savepoint(ctx, func(context.Context) error { return nil }), db.ErrNoTransaction)
+}
+
 func TestConnWithoutTxUsesPool(t *testing.T) {
 	pool := dbtest.Pool(t)
 	ctx := context.Background()

@@ -195,6 +195,17 @@ func (q *Queries) GetPartnerForUpdate(ctx context.Context, id uuid.UUID) (Partne
 	return i, err
 }
 
+const getPartnerIDByCode = `-- name: GetPartnerIDByCode :one
+SELECT id FROM partners WHERE code = $1 AND deleted_at IS NULL
+`
+
+func (q *Queries) GetPartnerIDByCode(ctx context.Context, code string) (uuid.UUID, error) {
+	row := q.db.QueryRow(ctx, getPartnerIDByCode, code)
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
+}
+
 const getPartnerProductCodeByProduct = `-- name: GetPartnerProductCodeByProduct :one
 SELECT id, partner_id, product_id, article_code, barcode, description, created_at, created_by, updated_at, updated_by, version, deleted_at, deleted_by FROM partner_product_codes WHERE partner_id = $1 AND product_id = $2 AND deleted_at IS NULL
 `

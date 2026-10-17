@@ -132,6 +132,10 @@ type store interface {
 	ListSuppliers(ctx context.Context, f postgres.SupplierFilter, page paging.Page) (paging.Result[domain.Supplier], error)
 	UpdateSupplier(ctx context.Context, before, after domain.Supplier, actorID uuid.UUID) (domain.Supplier, error)
 	DeleteSupplier(ctx context.Context, id uuid.UUID, version int, actorID uuid.UUID) error
+
+	CustomerIDByCode(ctx context.Context, code string) (uuid.UUID, bool, error)
+	PartnerIDByCode(ctx context.Context, code string) (uuid.UUID, bool, error)
+	SupplierIDByCode(ctx context.Context, code string) (uuid.UUID, bool, error)
 }
 
 // Deps adalah dependensi Service.

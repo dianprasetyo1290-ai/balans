@@ -147,6 +147,17 @@ func (q *Queries) GetLocationForUpdate(ctx context.Context, id uuid.UUID) (Locat
 	return i, err
 }
 
+const getLocationIDByCode = `-- name: GetLocationIDByCode :one
+SELECT id FROM locations WHERE code = $1
+`
+
+func (q *Queries) GetLocationIDByCode(ctx context.Context, code string) (uuid.UUID, error) {
+	row := q.db.QueryRow(ctx, getLocationIDByCode, code)
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
+}
+
 const insertLocation = `-- name: InsertLocation :one
 INSERT INTO locations (
     code, name, warehouse_id, location_type, external_party_type, external_party_id, is_sellable, is_standard,

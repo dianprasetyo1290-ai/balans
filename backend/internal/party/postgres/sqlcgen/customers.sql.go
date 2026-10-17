@@ -144,6 +144,17 @@ func (q *Queries) GetCustomerForUpdate(ctx context.Context, id uuid.UUID) (Custo
 	return i, err
 }
 
+const getCustomerIDByCode = `-- name: GetCustomerIDByCode :one
+SELECT id FROM customers WHERE code = $1 AND deleted_at IS NULL
+`
+
+func (q *Queries) GetCustomerIDByCode(ctx context.Context, code string) (uuid.UUID, error) {
+	row := q.db.QueryRow(ctx, getCustomerIDByCode, code)
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
+}
+
 const insertCustomer = `-- name: InsertCustomer :one
 INSERT INTO customers (
     full_name, phone, phone_normalized, email, customer_type, employee_id, marketing_consent_at,
