@@ -17,11 +17,18 @@ import { Route as MfaSetupRouteImport } from './routes/mfa-setup'
 import { Route as SetPasswordRouteImport } from './routes/set-password'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppApprovalsRouteImport } from './routes/_app/approvals'
+import { Route as AppLogisticsProductLabelsRouteImport } from './routes/_app/logistics/product-labels'
+import { Route as AppMasterDataBundlesRouteImport } from './routes/_app/master-data/bundles'
+import { Route as AppMasterDataPackagingMaterialsRouteImport } from './routes/_app/master-data/packaging-materials'
 import { Route as AppSettingsApprovalPoliciesRouteImport } from './routes/_app/settings/approval-policies'
 import { Route as AppSettingsAuditLogsRouteImport } from './routes/_app/settings/audit-logs'
 import { Route as AppSettingsRolesRouteImport } from './routes/_app/settings/roles'
 import { Route as AppSettingsUsersRouteImport } from './routes/_app/settings/users'
 import { Route as AppSystemAboutRouteImport } from './routes/_app/system/about'
+import { Route as AppMasterDataProductsIndexRouteImport } from './routes/_app/master-data/products/index'
+import { Route as AppMasterDataProductsIdRouteImport } from './routes/_app/master-data/products/$id'
+import { Route as AppMasterDataWarehousesIndexRouteImport } from './routes/_app/master-data/warehouses/index'
+import { Route as AppMasterDataWarehousesIdRouteImport } from './routes/_app/master-data/warehouses/$id'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
@@ -62,6 +69,23 @@ const AppApprovalsRoute = AppApprovalsRouteImport.update({
   path: '/approvals',
   getParentRoute: () => AppRoute,
 } as any)
+const AppLogisticsProductLabelsRoute =
+  AppLogisticsProductLabelsRouteImport.update({
+    id: '/logistics/product-labels',
+    path: '/logistics/product-labels',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppMasterDataBundlesRoute = AppMasterDataBundlesRouteImport.update({
+  id: '/master-data/bundles',
+  path: '/master-data/bundles',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMasterDataPackagingMaterialsRoute =
+  AppMasterDataPackagingMaterialsRouteImport.update({
+    id: '/master-data/packaging-materials',
+    path: '/master-data/packaging-materials',
+    getParentRoute: () => AppRoute,
+  } as any)
 const AppSettingsApprovalPoliciesRoute =
   AppSettingsApprovalPoliciesRouteImport.update({
     id: '/settings/approval-policies',
@@ -88,6 +112,29 @@ const AppSystemAboutRoute = AppSystemAboutRouteImport.update({
   path: '/system/about',
   getParentRoute: () => AppRoute,
 } as any)
+const AppMasterDataProductsIndexRoute =
+  AppMasterDataProductsIndexRouteImport.update({
+    id: '/master-data/products/',
+    path: '/master-data/products/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppMasterDataProductsIdRoute = AppMasterDataProductsIdRouteImport.update({
+  id: '/master-data/products/$id',
+  path: '/master-data/products/$id',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMasterDataWarehousesIndexRoute =
+  AppMasterDataWarehousesIndexRouteImport.update({
+    id: '/master-data/warehouses/',
+    path: '/master-data/warehouses/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppMasterDataWarehousesIdRoute =
+  AppMasterDataWarehousesIdRouteImport.update({
+    id: '/master-data/warehouses/$id',
+    path: '/master-data/warehouses/$id',
+    getParentRoute: () => AppRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
@@ -97,11 +144,18 @@ export interface FileRoutesByFullPath {
   '/mfa-setup': typeof MfaSetupRoute
   '/set-password': typeof SetPasswordRoute
   '/approvals': typeof AppApprovalsRoute
+  '/logistics/product-labels': typeof AppLogisticsProductLabelsRoute
+  '/master-data/bundles': typeof AppMasterDataBundlesRoute
+  '/master-data/packaging-materials': typeof AppMasterDataPackagingMaterialsRoute
   '/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/settings/audit-logs': typeof AppSettingsAuditLogsRoute
   '/settings/roles': typeof AppSettingsRolesRoute
   '/settings/users': typeof AppSettingsUsersRoute
   '/system/about': typeof AppSystemAboutRoute
+  '/master-data/products/$id': typeof AppMasterDataProductsIdRoute
+  '/master-data/warehouses/$id': typeof AppMasterDataWarehousesIdRoute
+  '/master-data/products/': typeof AppMasterDataProductsIndexRoute
+  '/master-data/warehouses/': typeof AppMasterDataWarehousesIndexRoute
 }
 export interface FileRoutesByTo {
   '/forbidden': typeof ForbiddenRoute
@@ -111,11 +165,18 @@ export interface FileRoutesByTo {
   '/set-password': typeof SetPasswordRoute
   '/approvals': typeof AppApprovalsRoute
   '/': typeof AppIndexRoute
+  '/logistics/product-labels': typeof AppLogisticsProductLabelsRoute
+  '/master-data/bundles': typeof AppMasterDataBundlesRoute
+  '/master-data/packaging-materials': typeof AppMasterDataPackagingMaterialsRoute
   '/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/settings/audit-logs': typeof AppSettingsAuditLogsRoute
   '/settings/roles': typeof AppSettingsRolesRoute
   '/settings/users': typeof AppSettingsUsersRoute
   '/system/about': typeof AppSystemAboutRoute
+  '/master-data/products/$id': typeof AppMasterDataProductsIdRoute
+  '/master-data/warehouses/$id': typeof AppMasterDataWarehousesIdRoute
+  '/master-data/products': typeof AppMasterDataProductsIndexRoute
+  '/master-data/warehouses': typeof AppMasterDataWarehousesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -127,11 +188,18 @@ export interface FileRoutesById {
   '/set-password': typeof SetPasswordRoute
   '/_app/approvals': typeof AppApprovalsRoute
   '/_app/': typeof AppIndexRoute
+  '/_app/logistics/product-labels': typeof AppLogisticsProductLabelsRoute
+  '/_app/master-data/bundles': typeof AppMasterDataBundlesRoute
+  '/_app/master-data/packaging-materials': typeof AppMasterDataPackagingMaterialsRoute
   '/_app/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/_app/settings/audit-logs': typeof AppSettingsAuditLogsRoute
   '/_app/settings/roles': typeof AppSettingsRolesRoute
   '/_app/settings/users': typeof AppSettingsUsersRoute
   '/_app/system/about': typeof AppSystemAboutRoute
+  '/_app/master-data/products/$id': typeof AppMasterDataProductsIdRoute
+  '/_app/master-data/warehouses/$id': typeof AppMasterDataWarehousesIdRoute
+  '/_app/master-data/products/': typeof AppMasterDataProductsIndexRoute
+  '/_app/master-data/warehouses/': typeof AppMasterDataWarehousesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -143,11 +211,18 @@ export interface FileRouteTypes {
     | '/mfa-setup'
     | '/set-password'
     | '/approvals'
+    | '/logistics/product-labels'
+    | '/master-data/bundles'
+    | '/master-data/packaging-materials'
     | '/settings/approval-policies'
     | '/settings/audit-logs'
     | '/settings/roles'
     | '/settings/users'
     | '/system/about'
+    | '/master-data/products/$id'
+    | '/master-data/warehouses/$id'
+    | '/master-data/products/'
+    | '/master-data/warehouses/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/forbidden'
@@ -157,11 +232,18 @@ export interface FileRouteTypes {
     | '/set-password'
     | '/approvals'
     | '/'
+    | '/logistics/product-labels'
+    | '/master-data/bundles'
+    | '/master-data/packaging-materials'
     | '/settings/approval-policies'
     | '/settings/audit-logs'
     | '/settings/roles'
     | '/settings/users'
     | '/system/about'
+    | '/master-data/products/$id'
+    | '/master-data/warehouses/$id'
+    | '/master-data/products'
+    | '/master-data/warehouses'
   id:
     | '__root__'
     | '/_app'
@@ -172,11 +254,18 @@ export interface FileRouteTypes {
     | '/set-password'
     | '/_app/approvals'
     | '/_app/'
+    | '/_app/logistics/product-labels'
+    | '/_app/master-data/bundles'
+    | '/_app/master-data/packaging-materials'
     | '/_app/settings/approval-policies'
     | '/_app/settings/audit-logs'
     | '/_app/settings/roles'
     | '/_app/settings/users'
     | '/_app/system/about'
+    | '/_app/master-data/products/$id'
+    | '/_app/master-data/warehouses/$id'
+    | '/_app/master-data/products/'
+    | '/_app/master-data/warehouses/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -246,6 +335,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppApprovalsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/logistics/product-labels': {
+      id: '/_app/logistics/product-labels'
+      path: '/logistics/product-labels'
+      fullPath: '/logistics/product-labels'
+      preLoaderRoute: typeof AppLogisticsProductLabelsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/master-data/bundles': {
+      id: '/_app/master-data/bundles'
+      path: '/master-data/bundles'
+      fullPath: '/master-data/bundles'
+      preLoaderRoute: typeof AppMasterDataBundlesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/master-data/packaging-materials': {
+      id: '/_app/master-data/packaging-materials'
+      path: '/master-data/packaging-materials'
+      fullPath: '/master-data/packaging-materials'
+      preLoaderRoute: typeof AppMasterDataPackagingMaterialsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/settings/approval-policies': {
       id: '/_app/settings/approval-policies'
       path: '/settings/approval-policies'
@@ -281,27 +391,69 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSystemAboutRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/master-data/products/': {
+      id: '/_app/master-data/products/'
+      path: '/master-data/products'
+      fullPath: '/master-data/products/'
+      preLoaderRoute: typeof AppMasterDataProductsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/master-data/products/$id': {
+      id: '/_app/master-data/products/$id'
+      path: '/master-data/products/$id'
+      fullPath: '/master-data/products/$id'
+      preLoaderRoute: typeof AppMasterDataProductsIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/master-data/warehouses/': {
+      id: '/_app/master-data/warehouses/'
+      path: '/master-data/warehouses'
+      fullPath: '/master-data/warehouses/'
+      preLoaderRoute: typeof AppMasterDataWarehousesIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/master-data/warehouses/$id': {
+      id: '/_app/master-data/warehouses/$id'
+      path: '/master-data/warehouses/$id'
+      fullPath: '/master-data/warehouses/$id'
+      preLoaderRoute: typeof AppMasterDataWarehousesIdRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
   AppApprovalsRoute: typeof AppApprovalsRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppLogisticsProductLabelsRoute: typeof AppLogisticsProductLabelsRoute
+  AppMasterDataBundlesRoute: typeof AppMasterDataBundlesRoute
+  AppMasterDataPackagingMaterialsRoute: typeof AppMasterDataPackagingMaterialsRoute
   AppSettingsApprovalPoliciesRoute: typeof AppSettingsApprovalPoliciesRoute
   AppSettingsAuditLogsRoute: typeof AppSettingsAuditLogsRoute
   AppSettingsRolesRoute: typeof AppSettingsRolesRoute
   AppSettingsUsersRoute: typeof AppSettingsUsersRoute
   AppSystemAboutRoute: typeof AppSystemAboutRoute
+  AppMasterDataProductsIdRoute: typeof AppMasterDataProductsIdRoute
+  AppMasterDataWarehousesIdRoute: typeof AppMasterDataWarehousesIdRoute
+  AppMasterDataProductsIndexRoute: typeof AppMasterDataProductsIndexRoute
+  AppMasterDataWarehousesIndexRoute: typeof AppMasterDataWarehousesIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppApprovalsRoute: AppApprovalsRoute,
   AppIndexRoute: AppIndexRoute,
+  AppLogisticsProductLabelsRoute: AppLogisticsProductLabelsRoute,
+  AppMasterDataBundlesRoute: AppMasterDataBundlesRoute,
+  AppMasterDataPackagingMaterialsRoute: AppMasterDataPackagingMaterialsRoute,
   AppSettingsApprovalPoliciesRoute: AppSettingsApprovalPoliciesRoute,
   AppSettingsAuditLogsRoute: AppSettingsAuditLogsRoute,
   AppSettingsRolesRoute: AppSettingsRolesRoute,
   AppSettingsUsersRoute: AppSettingsUsersRoute,
   AppSystemAboutRoute: AppSystemAboutRoute,
+  AppMasterDataProductsIdRoute: AppMasterDataProductsIdRoute,
+  AppMasterDataWarehousesIdRoute: AppMasterDataWarehousesIdRoute,
+  AppMasterDataProductsIndexRoute: AppMasterDataProductsIndexRoute,
+  AppMasterDataWarehousesIndexRoute: AppMasterDataWarehousesIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

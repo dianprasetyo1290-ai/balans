@@ -31,8 +31,8 @@ export type MenuItem = {
   to?: string
   /** Kode usulan opsional (BRD 12.2 dan anggaran di U-13); item disembunyikan sampai usulan diambil. */
   optional?: string
-  /** Permission minimal untuk melihat halaman; kosong = semua user login. */
-  permission?: string
+  /** Permission minimal untuk melihat halaman (daftar = salah satu cukup); kosong = semua user login. */
+  permission?: string | string[]
   /** Modul pemilik halaman; item disembunyikan jika modul tidak aktif. Kosong = ikut grup. */
   module?: string
   /** Badge jumlah di menu, mis. dokumen yang menunggu persetujuan (NFR-11). */
@@ -71,22 +71,39 @@ export const MENU: MenuGroup[] = [
     icon: DatabaseIcon,
     modules: ["catalog", "pricing", "party", "warehouse", "hris"],
     items: [
+      {
+        label: "Produk",
+        to: "/master-data/products",
+        permission: "catalog.product.read",
+        module: "catalog",
+      },
+      {
+        label: "Packaging & Material",
+        to: "/master-data/packaging-materials",
+        permission: "catalog.product.read",
+        module: "catalog",
+      },
+      {
+        label: "Bundling",
+        to: "/master-data/bundles",
+        permission: "catalog.product.read",
+        module: "catalog",
+      },
       ...items(
-        "Produk",
-        "Packaging & Material",
-        "Bundling",
         "Daftar Harga",
         "Aturan Harga",
         "Pelanggan",
         "Mitra Konsinyasi",
         "Reseller",
-        "Pemasok & Maklon",
-        "Gudang & Lokasi",
-        "Karyawan",
-        "Alasan Retur",
-        "Jenis Biaya",
-        "Kampanye"
+        "Pemasok & Maklon"
       ),
+      {
+        label: "Gudang & Lokasi",
+        to: "/master-data/warehouses",
+        permission: "warehouse.warehouse.read",
+        module: "warehouse",
+      },
+      ...items("Karyawan", "Alasan Retur", "Jenis Biaya", "Kampanye"),
     ],
   },
   {
@@ -141,14 +158,17 @@ export const MENU: MenuGroup[] = [
   {
     label: "Logistik",
     icon: TruckIcon,
-    modules: ["logistics"],
-    items: items(
-      "Delivery Order",
-      "Pengiriman",
-      "Kurir & Resi",
-      "Label Pengiriman",
-      "Pelacakan Pengiriman"
-    ),
+    modules: ["logistics", "catalog"],
+    items: [
+      ...items("Delivery Order", "Pengiriman", "Kurir & Resi"),
+      {
+        label: "Label Produk",
+        to: "/logistics/product-labels",
+        permission: ["logistics.label.post", "logistics.label.read"],
+        module: "catalog",
+      },
+      ...items("Label Pengiriman", "Pelacakan Pengiriman"),
+    ],
   },
   {
     label: "Penjualan",
@@ -401,7 +421,7 @@ export function visibleMenu(
         (!item.optional || takenOptions.includes(item.optional)) &&
         (!item.permission ||
           !permissions ||
-          permissions.includes(item.permission))
+          [item.permission].flat().some((p) => permissions.includes(p)))
     ),
   })).filter(
     (group) =>
