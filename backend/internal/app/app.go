@@ -216,19 +216,12 @@ func (a *App) buildModules() error {
 	if err := a.buildMasterData(); err != nil {
 		return err
 	}
+	reasons := &returnReasonAdapter{}
 	if cfg.IsEnabled(inventory.Name) {
 		if a.catalog == nil || a.warehouse == nil {
 			return errors.New("modul inventory membutuhkan modul catalog dan warehouse")
 		}
-		d := inventory.Deps{
-			Pool: a.Pool, Tx: a.Tx, Clock: a.Clock, Log: a.Log, Responder: a.Responder,
-			Products: a.catalog, Locations: a.warehouse,
-		}
-		if a.accounting != nil {
-			d.Periods = a.accounting
-		}
-		a.inventory = inventory.New(d)
-		a.modules = append(a.modules, a.inventory)
+		a.buildInventory(mailer, reasons)
 	}
 	a.connectMasterData()
 	a.connectWarehouseDocuments()
@@ -250,9 +243,11 @@ func (a *App) buildModules() error {
 			PublicBaseURL: cfg.PublicBaseURL,
 			WebhookURL:    cfg.InternalAPIURL + "/api/v1/webhooks/midtrans",
 		})
-		a.modules = append(a.modules, sales.New(sales.Deps{
+		salesModule := sales.New(sales.Deps{
 			Pool: a.Pool, Tx: a.Tx, Audit: a.audit, Gateway: gateway, Inbox: inbox, Responder: a.Responder, Log: a.Log,
-		}))
+		})
+		a.modules = append(a.modules, salesModule)
+		reasons.sales = salesModule
 		console.Payments = gateway
 		a.audit.RegisterEntity("return_reason", "sales.return_reason.read")
 	}

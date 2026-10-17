@@ -51,8 +51,18 @@ type (
 	ExpenseType = domain.ExpenseType
 	// WithholdingType adalah jenis PPh yang dipotong pada biaya.
 	WithholdingType = domain.WithholdingType
+	// DimensionKind adalah jenis dimensi.
+	DimensionKind = domain.DimensionKind
 	// Account adalah akun Chart of Accounts.
 	Account = domain.Account
+)
+
+// Jenis dimensi untuk DimensionValues.
+const (
+	KindChannel    = domain.KindChannel
+	KindSubChannel = domain.KindSubChannel
+	KindDivision   = domain.KindDivision
+	KindCampaign   = domain.KindCampaign
 )
 
 // Jenis PPh jenis biaya dan jenis dokumen approval yang dipakai jenis biaya.
@@ -167,6 +177,13 @@ func (m *Module) EnsureUpcomingPeriods(ctx context.Context) (int, error) {
 // dipakai dokumen baru; akun beban dikirim ke Post lewat ResolverExpenseType.
 func (m *Module) ExpenseType(ctx context.Context, id uuid.UUID) (ExpenseType, error) {
 	return m.svc.ExpenseType(ctx, id)
+}
+
+// DimensionValues membaca master dimensi satu jenis yang belum dihapus untuk dropdown dan tampilan dokumen modul
+// lain (mis. divisi & kampanye Pemakaian Internal). Tidak memeriksa permission; includeInactive juga
+// mengembalikan nilai nonaktif agar dokumen lama tetap bisa menampilkan namanya.
+func (m *Module) DimensionValues(ctx context.Context, kind DimensionKind, includeInactive bool) ([]DimensionValue, error) {
+	return m.svc.Store.ListDimensions(ctx, kind, postgres.DimensionFilter{IncludeInactive: includeInactive})
 }
 
 // DivisionOptions mengembalikan divisi aktif untuk pemilih divisi dokumen modul lain (PR, PO). Tidak memeriksa

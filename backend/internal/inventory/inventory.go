@@ -28,6 +28,7 @@ import (
 	"github.com/riverqueue/river"
 	"github.com/shopspring/decimal"
 
+	"balans/internal/audit"
 	"balans/internal/inventory/domain"
 	inventoryhttp "balans/internal/inventory/http"
 	"balans/internal/inventory/postgres"
@@ -35,6 +36,7 @@ import (
 	"balans/internal/platform/clock"
 	"balans/internal/platform/db"
 	"balans/internal/platform/httpx"
+	"balans/internal/platform/jobqueue"
 )
 
 // Name adalah nama modul di ENABLED_MODULES.
@@ -85,6 +87,37 @@ type (
 	ProductDirectory  = service.ProductDirectory
 	LocationDirectory = service.LocationDirectory
 	PeriodGuard       = service.PeriodGuard
+	// Dependensi dokumen persediaan (diisi saat wiring; adapter di internal/app).
+	Approvals             = service.Approvals
+	Poster                = service.Poster
+	Numberer              = service.Numberer
+	DimensionDirectory    = service.DimensionDirectory
+	DimensionOption       = service.DimensionOption
+	ReturnReasonDirectory = service.ReturnReasonDirectory
+	ReturnReason          = service.ReturnReason
+	FileAttacher          = service.FileAttacher
+	Notifier              = service.Notifier
+	RoleMembers           = service.RoleMembers
+	JobEnqueuer           = service.JobEnqueuer
+	// ApprovalRegistration adalah handler approval satu jenis dokumen persediaan.
+	ApprovalRegistration = service.ApprovalRegistration
+	// Disposition adalah kode disposisi barang retur.
+	Disposition = domain.Disposition
+)
+
+// Jenis dimensi DimensionDirectory, jenis dokumen sumber, dan pemilik file.
+const (
+	DimensionDivision = service.DimensionDivision
+	DimensionCampaign = service.DimensionCampaign
+
+	SourceInternalUsage     = service.SourceInternalUsage
+	SourceRepacking         = service.SourceRepacking
+	SourceDisposal          = service.SourceDisposal
+	SourceReturnDisposition = service.SourceReturnDisposition
+	FileOwnerDisposal       = service.FileOwnerDisposal
+
+	PermDisposalRead  = domain.PermDisposalRead
+	PermDisposalWrite = domain.PermDisposalWrite
 )
 
 // Jenis baris, status stok, dan jenis movement.
@@ -125,6 +158,18 @@ type Deps struct {
 	Locations LocationDirectory
 	// Periods opsional (accounting): tanggal bisnis di periode tertutup ditolak PERIOD_LOCKED.
 	Periods PeriodGuard
+
+	// Dokumen persediaan (opsional; aksi yang butuh dependensi yang tidak aktif ditolak PROVIDER_UNAVAILABLE).
+	Audit         audit.Recorder
+	Approvals     Approvals
+	Poster        Poster
+	Numberer      Numberer
+	Dimensions    DimensionDirectory
+	ReturnReasons ReturnReasonDirectory
+	Files         FileAttacher
+	Notifier      Notifier
+	Members       RoleMembers
+	Jobs          JobEnqueuer
 }
 
 // Module adalah modul inventory.
@@ -139,6 +184,8 @@ func New(d Deps) *Module {
 	svc := service.New(service.Deps{
 		Store: postgres.NewStore(d.Pool), Tx: d.Tx, Clock: d.Clock, Log: d.Log,
 		Products: d.Products, Locations: d.Locations, Periods: d.Periods,
+		Audit: d.Audit, Approvals: d.Approvals, Poster: d.Poster, Numberer: d.Numberer, Dimensions: d.Dimensions,
+		ReturnReasons: d.ReturnReasons, Files: d.Files, Notifier: d.Notifier, Members: d.Members, Jobs: d.Jobs,
 	})
 	return &Module{svc: svc, rs: d.Responder, h: inventoryhttp.NewHandler(svc)}
 }
@@ -149,18 +196,46 @@ func (m *Module) Name() string { return Name }
 // RegisterRoutes mendaftarkan route halaman Persediaan.
 func (m *Module) RegisterRoutes(r chi.Router) { inventoryhttp.Register(r, m.h, m.rs) }
 
-// RegisterWorkers mendaftarkan worker pelepasan reservasi kedaluwarsa.
+// RegisterWorkers mendaftarkan worker pelepasan reservasi kedaluwarsa, recost, dan pengingat sisa event.
 func (m *Module) RegisterWorkers(w *river.Workers) {
 	river.AddWorker(w, service.NewExpireReservationsWorker(m.svc))
+	river.AddWorker(w, service.NewRecostWorker(m.svc))
+	river.AddWorker(w, service.NewSettleReminderWorker(m.svc))
 }
 
-// PeriodicJobs menjadwalkan stock_reservation.expire tiap 1 menit (Lampiran B).
+// PeriodicJobs menjadwalkan stock_reservation.expire tiap 1 menit dan internal_usage.settle_reminder harian
+// 08.00 WIB (Lampiran B).
 func (m *Module) PeriodicJobs() []*river.PeriodicJob {
 	return []*river.PeriodicJob{
 		river.NewPeriodicJob(river.PeriodicInterval(time.Minute),
 			func() (river.JobArgs, *river.InsertOpts) { return service.ExpireReservationsArgs{}, nil },
 			&river.PeriodicJobOpts{ID: service.ExpireReservationsArgs{}.Kind()}),
+		river.NewPeriodicJob(jobqueue.DailyAt{Hour: 8},
+			func() (river.JobArgs, *river.InsertOpts) { return service.SettleReminderArgs{}, nil },
+			&river.PeriodicJobOpts{ID: service.SettleReminderArgs{}.Kind()}),
 	}
+}
+
+// ApprovalRegistrations mengembalikan handler approval `internal_usage`, `disposal`, `return_disposition` untuk
+// didaftarkan ke modul approval saat wiring.
+func (m *Module) ApprovalRegistrations() []ApprovalRegistration { return m.svc.ApprovalRegistrations() }
+
+// AuditEntities mengembalikan permission baca entitas dokumen persediaan untuk tab Riwayat.
+func AuditEntities() map[string]string {
+	return map[string]string{
+		SourceInternalUsage:     domain.PermUsageRead,
+		SourceRepacking:         domain.PermRepackRead,
+		SourceDisposal:          domain.PermDisposalRead,
+		SourceReturnDisposition: domain.PermDispositionRead,
+	}
+}
+
+// Recost menjalankan recost satu run (dipakai worker dan test).
+func (m *Module) Recost(ctx context.Context, runID uuid.UUID) error { return m.svc.Recost(ctx, runID) }
+
+// RemindSettlements mengirim pengingat sisa event yang lewat batas (dipakai worker dan test).
+func (m *Module) RemindSettlements(ctx context.Context) (int, error) {
+	return m.svc.RemindSettlements(ctx)
 }
 
 // Post memutasi stok di transaksi aktif (atau transaksi baru): validasi, alokasi FEFO untuk baris tanpa

@@ -245,6 +245,38 @@ paths:
     $ref: "./paths/inventory.yaml#/costLayerConsumptions"
   /api/v1/bundle-availability:
     $ref: "./paths/inventory.yaml#/bundleAvailability"
+  /api/v1/internal-usages:
+    $ref: "./paths/inventory.yaml#/internalUsages"
+  /api/v1/internal-usages/{id}:
+    $ref: "./paths/inventory.yaml#/internalUsage"
+  /api/v1/internal-usages/{id}/actions/{action}:
+    $ref: "./paths/inventory.yaml#/internalUsageAction"
+  /api/v1/internal-usages/{id}/settle:
+    $ref: "./paths/inventory.yaml#/internalUsageSettle"
+  /api/v1/internal-usage-options/{kind}:
+    $ref: "./paths/inventory.yaml#/internalUsageOptions"
+  /api/v1/repackings:
+    $ref: "./paths/inventory.yaml#/repackings"
+  /api/v1/repackings/{id}:
+    $ref: "./paths/inventory.yaml#/repacking"
+  /api/v1/repackings/{id}/actions/{action}:
+    $ref: "./paths/inventory.yaml#/repackingAction"
+  /api/v1/disposals:
+    $ref: "./paths/inventory.yaml#/disposals"
+  /api/v1/disposals/{id}:
+    $ref: "./paths/inventory.yaml#/disposal"
+  /api/v1/disposals/{id}/report:
+    $ref: "./paths/inventory.yaml#/disposalReport"
+  /api/v1/disposals/{id}/actions/{action}:
+    $ref: "./paths/inventory.yaml#/disposalAction"
+  /api/v1/return-dispositions:
+    $ref: "./paths/inventory.yaml#/returnDispositions"
+  /api/v1/return-dispositions/{id}:
+    $ref: "./paths/inventory.yaml#/returnDisposition"
+  /api/v1/return-dispositions/{id}/actions/{action}:
+    $ref: "./paths/inventory.yaml#/returnDispositionAction"
+  /api/v1/recost-runs:
+    $ref: "./paths/inventory.yaml#/recostRuns"
   /api/v1/customers:
     $ref: "./paths/party.yaml#/customers"
   /api/v1/customers/{id}:

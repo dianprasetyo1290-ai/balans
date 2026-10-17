@@ -42,6 +42,10 @@ WithholdingType:
   type: string
   description: Jenis PPh yang dipotong (pemasok, jenis biaya); tarif di master tarif PPh.
   enum: [none, pph21, pph23, pph4_2]
+ReturnDisposition:
+  type: string
+  description: Disposisi barang retur (Disposisi Retur, WMS-07); dipakai master Alasan Retur dan dokumen Disposisi Retur.
+  enum: [restock, repack, reprocess, marketing_sample, dispose]
 PurchaseOrderType:
   type: string
   description: |

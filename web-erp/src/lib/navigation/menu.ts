@@ -279,7 +279,19 @@ export const MENU: MenuGroup[] = [
         to: "/warehouse/stock-counts",
         permission: "warehouse.stock_count.read",
       },
-      ...items("Gudang Retur", "Disposisi Retur", "Riwayat Mutasi Stok"),
+      {
+        label: "Gudang Retur",
+        to: "/warehouse/returns",
+        permission: "warehouse.return_disposition.read",
+        module: "inventory",
+      },
+      {
+        label: "Disposisi Retur",
+        to: "/warehouse/return-dispositions",
+        permission: "warehouse.return_disposition.read",
+        module: "inventory",
+      },
+      ...items("Riwayat Mutasi Stok"),
     ],
   },
   {
@@ -298,13 +310,25 @@ export const MENU: MenuGroup[] = [
         permission: "inventory.stock.read",
         module: "inventory",
       })),
-      ...items(
-        "Pemakaian Internal",
-        "Repacking",
-        "Pemusnahan",
-        "Peringatan Stok Minimum",
-        "Peringatan Kedaluwarsa"
-      ),
+      {
+        label: "Pemakaian Internal",
+        to: "/inventory/internal-usages",
+        permission: "inventory.internal_usage.read",
+        module: "inventory",
+      },
+      {
+        label: "Repacking",
+        to: "/inventory/repackings",
+        permission: "inventory.repacking.read",
+        module: "inventory",
+      },
+      {
+        label: "Pemusnahan",
+        to: "/inventory/disposals",
+        permission: "inventory.disposal.read",
+        module: "inventory",
+      },
+      ...items("Peringatan Stok Minimum", "Peringatan Kedaluwarsa"),
     ],
   },
   {

@@ -42,3 +42,33 @@ func (w *ExpireReservationsWorker) Work(ctx context.Context, _ *river.Job[Expire
 	}
 	return nil
 }
+
+// SettleReminderArgs adalah argumen job harian internal_usage.settle_reminder (pengingat sisa event H+1).
+type SettleReminderArgs struct{}
+
+// Kind adalah nama job.
+func (SettleReminderArgs) Kind() string { return "internal_usage.settle_reminder" }
+
+// InsertOpts: queue default, maks. 5 percobaan.
+func (SettleReminderArgs) InsertOpts() river.InsertOpts {
+	return river.InsertOpts{Queue: jobqueue.QueueDefault, MaxAttempts: 5}
+}
+
+// SettleReminderWorker mengirim pengingat pencatatan sisa barang event yang lewat batas.
+type SettleReminderWorker struct {
+	river.WorkerDefaults[SettleReminderArgs]
+	service *Service
+}
+
+// NewSettleReminderWorker membuat worker.
+func NewSettleReminderWorker(s *Service) *SettleReminderWorker {
+	return &SettleReminderWorker{service: s}
+}
+
+// Work mengirim pengingat. Idempotent: satu pengingat per dokumen per hari (reminded_on).
+func (w *SettleReminderWorker) Work(ctx context.Context, _ *river.Job[SettleReminderArgs]) error {
+	if _, err := w.service.RemindSettlements(ctx); err != nil {
+		return fmt.Errorf("remind settlements: %w", err)
+	}
+	return nil
+}

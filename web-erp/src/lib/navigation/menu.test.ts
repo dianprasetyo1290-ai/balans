@@ -45,6 +45,8 @@ describe("menu", () => {
       "/warehouse/petty-stock-requests",
       "/warehouse/in-transit",
       "/warehouse/stock-counts",
+      "/warehouse/returns",
+      "/warehouse/return-dispositions",
     ])
   })
 

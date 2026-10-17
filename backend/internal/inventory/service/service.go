@@ -10,6 +10,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 
+	"balans/internal/audit"
 	"balans/internal/catalog"
 	"balans/internal/inventory/domain"
 	"balans/internal/inventory/postgres"
@@ -29,6 +30,8 @@ type ProductDirectory interface {
 // LocationDirectory membaca master lokasi (dipenuhi *warehouse.Module).
 type LocationDirectory interface {
 	Locations(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID]warehouse.Location, error)
+	// FindLocations mencari lokasi aktif, mis. Inbound/FG/GM satu gudang untuk eksekusi dokumen.
+	FindLocations(ctx context.Context, q warehouse.LocationQuery) ([]warehouse.Location, error)
 }
 
 // PeriodGuard menolak tanggal bisnis di periode tertutup (dipenuhi *accounting.Module). Opsional.
@@ -71,6 +74,8 @@ type store interface {
 	InsertReservation(ctx context.Context, r postgres.NewReservation, actorID uuid.UUID) (uuid.UUID, error)
 	AddReservationUsage(ctx context.Context, id uuid.UUID, consumed, released decimal.Decimal, actorID uuid.UUID) error
 	ExpiredReservationSources(ctx context.Context, now time.Time, limit int32) ([]postgres.ReservationSource, error)
+
+	documentStore
 }
 
 var _ store = (*postgres.Store)(nil)
@@ -87,6 +92,20 @@ type Deps struct {
 	Periods PeriodGuard
 	// Allocator strategi alokasi batch; nil = FEFO.
 	Allocator domain.BatchAllocator
+
+	// Dependensi dokumen persediaan (Pemakaian Internal, Repacking, Pemusnahan, Disposisi Retur, recost).
+	// Semua opsional agar ledger tetap bisa dipakai tanpa modul lain; dokumen yang butuh dependensi yang
+	// tidak ada ditolak saat aksi dijalankan.
+	Audit         audit.Recorder
+	Approvals     Approvals
+	Poster        Poster
+	Numberer      Numberer
+	Dimensions    DimensionDirectory
+	ReturnReasons ReturnReasonDirectory
+	Files         FileAttacher
+	Notifier      Notifier
+	Members       RoleMembers
+	Jobs          JobEnqueuer
 }
 
 // Service adalah use case modul inventory.
