@@ -222,7 +222,24 @@ export const MENU: MenuGroup[] = [
         ],
         module: "procurement",
       },
-      ...items("Penerimaan Barang", "Reject & Waste", "Tagihan Pemasok"),
+      {
+        label: "Penerimaan Barang",
+        to: "/procurement/goods-receipts",
+        permission: "procurement.goods_receipt.read",
+        module: "procurement",
+      },
+      {
+        label: "Reject & Waste",
+        to: "/procurement/purchase-returns",
+        permission: "procurement.purchase_return.read",
+        module: "procurement",
+      },
+      {
+        label: "Tagihan Pemasok",
+        to: "/procurement/supplier-bills",
+        permission: "procurement.supplier_bill.read",
+        module: "procurement",
+      },
       {
         label: "Uang Muka Pembelian",
         to: "/procurement/purchase-advances",
@@ -235,17 +252,48 @@ export const MENU: MenuGroup[] = [
     label: "Gudang",
     icon: WarehouseIcon,
     modules: ["warehouse"],
-    items: items(
-      "Inbound",
-      "Put-away",
-      "Transfer Stok",
-      "Stok dalam Pengiriman",
-      "Outbound",
-      "Stock Count",
-      "Gudang Retur",
-      "Disposisi Retur",
-      "Riwayat Mutasi Stok"
-    ),
+    items: [
+      {
+        label: "Inbound",
+        to: "/warehouse/inbounds",
+        permission: "warehouse.inbound.read",
+      },
+      { label: "Put-away" },
+      {
+        label: "Transfer Stok",
+        to: "/warehouse/stock-transfers",
+        permission: "warehouse.stock_transfer.read",
+      },
+      {
+        label: "Permintaan Petty Stock",
+        to: "/warehouse/petty-stock-requests",
+        permission: "warehouse.stock_transfer.read",
+      },
+      {
+        label: "Stok dalam Pengiriman",
+        to: "/warehouse/in-transit",
+        permission: "warehouse.stock_transfer.read",
+      },
+      { label: "Outbound" },
+      {
+        label: "Stock Count",
+        to: "/warehouse/stock-counts",
+        permission: "warehouse.stock_count.read",
+      },
+      {
+        label: "Gudang Retur",
+        to: "/warehouse/returns",
+        permission: "warehouse.return_disposition.read",
+        module: "inventory",
+      },
+      {
+        label: "Disposisi Retur",
+        to: "/warehouse/return-dispositions",
+        permission: "warehouse.return_disposition.read",
+        module: "inventory",
+      },
+      ...items("Riwayat Mutasi Stok"),
+    ],
   },
   {
     label: "Persediaan",
@@ -263,13 +311,25 @@ export const MENU: MenuGroup[] = [
         permission: "inventory.stock.read",
         module: "inventory",
       })),
-      ...items(
-        "Pemakaian Internal",
-        "Repacking",
-        "Pemusnahan",
-        "Peringatan Stok Minimum",
-        "Peringatan Kedaluwarsa"
-      ),
+      {
+        label: "Pemakaian Internal",
+        to: "/inventory/internal-usages",
+        permission: "inventory.internal_usage.read",
+        module: "inventory",
+      },
+      {
+        label: "Repacking",
+        to: "/inventory/repackings",
+        permission: "inventory.repacking.read",
+        module: "inventory",
+      },
+      {
+        label: "Pemusnahan",
+        to: "/inventory/disposals",
+        permission: "inventory.disposal.read",
+        module: "inventory",
+      },
+      ...items("Peringatan Stok Minimum", "Peringatan Kedaluwarsa"),
     ],
   },
   {
@@ -490,8 +550,17 @@ export const MENU: MenuGroup[] = [
         permission: ["accounting.payment.read", "sales.invoice.read"],
         module: "sales",
       },
+      ...items("Utang Usaha"),
+      {
+        label: "Barang Diterima Belum Ditagih",
+        to: "/finance/goods-received-not-invoiced",
+        permission: [
+          "procurement.supplier_bill.read",
+          "accounting.report.read",
+        ],
+        module: "procurement",
+      },
       ...items(
-        "Utang Usaha",
         "Kas & Bank",
         "Rekonsiliasi Bank",
         "Kas Kecil",

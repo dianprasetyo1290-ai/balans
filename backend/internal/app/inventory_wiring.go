@@ -8,11 +8,113 @@ import (
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 
+	"balans/internal/accounting"
+	"balans/internal/filestore"
 	"balans/internal/inventory"
+	"balans/internal/notification"
 	"balans/internal/platform/actor"
+	"balans/internal/platform/apperr"
 	"balans/internal/platform/clock"
+	"balans/internal/sales"
 	"balans/internal/warehouse"
 )
+
+// maxDisposalPhotoBytes adalah batas ukuran satu foto berita acara pemusnahan. Batas teknis upload.
+const maxDisposalPhotoBytes = 10 << 20
+
+// buildInventory menyusun modul inventory beserta dependensi dokumen persediaan (Pemakaian Internal, Repacking,
+// Pemusnahan, Disposisi Retur, recost) dan mendaftarkan handler approval-nya (menimpa handler pengembangan).
+func (a *App) buildInventory(mailer *notification.Module, reasons *returnReasonAdapter) {
+	d := inventory.Deps{
+		Pool: a.Pool, Tx: a.Tx, Clock: a.Clock, Log: a.Log, Responder: a.Responder,
+		Products: a.catalog, Locations: a.warehouse, Audit: a.audit, Jobs: a.Jobs, ReturnReasons: reasons,
+	}
+	if a.accounting != nil {
+		d.Periods, d.Poster, d.Dimensions = a.accounting, a.accounting, dimensionAdapter{acc: a.accounting}
+	}
+	if a.document != nil {
+		d.Numberer = a.document
+	}
+	if a.approval != nil {
+		d.Approvals = a.approval
+	}
+	if a.filestore != nil {
+		d.Files = a.filestore
+		a.filestore.RegisterOwner(filestore.OwnerPolicy{
+			OwnerType: inventory.FileOwnerDisposal, WritePermission: inventory.PermDisposalWrite,
+			ReadPermission: inventory.PermDisposalRead, ContentTypes: []string{filestore.TypeJPEG, filestore.TypePNG, filestore.TypeWebP},
+			MaxBytes: maxDisposalPhotoBytes,
+		})
+	}
+	if mailer != nil {
+		d.Notifier = mailer
+	}
+	if a.identity != nil {
+		d.Members = roleMembersAdapter{a: a}
+	}
+	a.inventory = inventory.New(d)
+	a.modules = append(a.modules, a.inventory)
+	registerAuditEntities(a.audit, inventory.AuditEntities())
+	if a.approval != nil {
+		for _, r := range a.inventory.ApprovalRegistrations() {
+			a.approval.RegisterHandler(r.Type, r.ReadPermission, r.Handler)
+		}
+	}
+}
+
+// dimensionAdapter mengisi inventory.DimensionDirectory dari master dimensi accounting.
+type dimensionAdapter struct{ acc *accounting.Module }
+
+func (d dimensionAdapter) DimensionOptions(ctx context.Context, kind string, includeInactive bool) ([]inventory.DimensionOption, error) {
+	vals, err := d.acc.DimensionValues(ctx, accounting.DimensionKind(kind), includeInactive)
+	if err != nil {
+		return nil, err
+	}
+	out := make([]inventory.DimensionOption, len(vals))
+	for i, v := range vals {
+		o := inventory.DimensionOption{ID: v.ID, Code: v.Code, Name: v.Name, IsActive: v.IsActive}
+		if kind == inventory.DimensionCampaign {
+			from, to := v.ValidFrom, v.ValidTo
+			o.ValidFrom, o.ValidTo = &from, &to
+		}
+		out[i] = o
+	}
+	return out, nil
+}
+
+// returnReasonAdapter mengisi inventory.ReturnReasonDirectory dari master Alasan Retur modul sales. Modul sales
+// disusun setelah inventory, sehingga field sales diisi belakangan.
+type returnReasonAdapter struct{ sales *sales.Module }
+
+func (r *returnReasonAdapter) ReturnReason(ctx context.Context, id uuid.UUID) (inventory.ReturnReason, error) {
+	if r.sales == nil {
+		return inventory.ReturnReason{}, apperr.WithMessage(apperr.CodeProviderUnavailable, "Modul sales (Alasan Retur) tidak aktif")
+	}
+	rr, err := r.sales.ReturnReason(ctx, id)
+	if err != nil {
+		return inventory.ReturnReason{}, err
+	}
+	out := inventory.ReturnReason{ID: rr.ID, Code: rr.Code, Name: rr.Name, DefaultDisposition: inventory.Disposition(rr.DefaultDisposition)}
+	if msg := rr.UsableError(sales.ScopeSalesReturn); msg != "" && rr.UsableError(sales.ScopePurchaseReturn) != "" {
+		out.Usable = errors.New(msg)
+	}
+	return out, nil
+}
+
+// roleMembersAdapter mengisi inventory.RoleMembers dari modul identity.
+type roleMembersAdapter struct{ a *App }
+
+func (m roleMembersAdapter) UserIDsWithRole(ctx context.Context, role string) ([]uuid.UUID, error) {
+	users, err := m.a.identity.UsersWithRole(ctx, role, nil)
+	if err != nil {
+		return nil, err
+	}
+	out := make([]uuid.UUID, len(users))
+	for i, u := range users {
+		out[i] = u.ID
+	}
+	return out, nil
+}
 
 // devStockNamespace membuat ID dokumen seed yang tetap sehingga seed aman diulang (ErrAlreadyPosted).
 var devStockNamespace = uuid.MustParse("6f1f2a8e-6d2b-4d55-9c7e-2a1c0b6a9e11")
@@ -97,6 +199,19 @@ func (a *App) seedDevStock(ctx context.Context) error {
 		if _, err := a.inventory.Post(ctx, p); err != nil && !errors.Is(err, inventory.ErrAlreadyPosted) {
 			return fmt.Errorf("seed stok %s: %w", p.Source.Type, err)
 		}
+	}
+	// Antrian Inbound contoh untuk batch Vanila yang masih Karantina (Gudang › Inbound).
+	inb := location["UTAMA-INB"]
+	_, err = a.warehouse.InboundBySource(ctx, opening.Source.Type, opening.Source.ID)
+	if apperr.HasCode(err, apperr.CodeNotFound) {
+		_, err = a.warehouse.CreateInbound(ctx, warehouse.InboundRequest{
+			SourceType: opening.Source.Type, SourceID: opening.Source.ID, SourceLabel: opening.Source.Label, LocationID: &inb,
+			BusinessDate: opening.Source.BusinessDate,
+			Lines:        []warehouse.InboundLineInput{{ProductID: vanila, Qty: decimal.NewFromInt(60)}},
+		})
+	}
+	if err != nil && !apperr.HasCode(err, apperr.CodeProviderUnavailable) {
+		return fmt.Errorf("seed inbound: %w", err)
 	}
 	return nil
 }

@@ -1727,6 +1727,7 @@ Kode baru ditambahkan lewat PR yang mengubah lampiran ini, `apperr`, OpenAPI, da
 | `payroll.run` | bulk | Diminta HRGA | 3 |
 | `hris.alert_contract_expiry` | default | Harian 07.00 | 3 |
 | `consignment.remind_stock_count` | default | Bulanan, sesuai jadwal rekonsiliasi | 3 |
+| `warehouse.stock_count_schedule` | default | Harian 00.15 dan saat worker mulai: buat stock count dari jadwal yang jatuh tempo + pengingat petugas | 3 |
 | `maintenance.cleanup_idempotency_keys` | bulk | Harian 02.00 | 3 |
 
 Setiap job: idempotent, argumen hanya ID, log dengan `job_kind`/`job_id`/`attempt`, dan masuk dead-letter + alert setelah percobaan habis.

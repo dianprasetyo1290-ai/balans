@@ -686,10 +686,6 @@ components:
     ReturnReasonScope:
       type: string
       enum: [sales_return, purchase_return]
-    ReturnDisposition:
-      type: string
-      description: Disposisi barang retur (Disposisi Retur, WMS-07).
-      enum: [restock, repack, reprocess, marketing_sample, dispose]
     ReturnReason:
       type: object
       required: [id, code, name, appliesTo, description, isActive, updatedAt, version]
@@ -706,7 +702,7 @@ components:
           $ref: "#/components/schemas/ReturnReasonAppliesTo"
         defaultDisposition:
           allOf:
-            - $ref: "#/components/schemas/ReturnDisposition"
+            - $ref: "../components/common.yaml#/ReturnDisposition"
           nullable: true
           description: Usulan awal disposisi; staf gudang tetap memilih saat QC.
         description:
@@ -729,7 +725,7 @@ components:
           $ref: "#/components/schemas/ReturnReasonAppliesTo"
         defaultDisposition:
           allOf:
-            - $ref: "#/components/schemas/ReturnDisposition"
+            - $ref: "../components/common.yaml#/ReturnDisposition"
           nullable: true
         description:
           type: string

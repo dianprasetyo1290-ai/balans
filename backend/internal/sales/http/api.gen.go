@@ -743,7 +743,7 @@ type ReceivableAgingRow struct {
 	Total Money `json:"total"`
 }
 
-// ReturnDisposition Disposisi barang retur (Disposisi Retur, WMS-07).
+// ReturnDisposition Disposisi barang retur (Disposisi Retur, WMS-07); dipakai master Alasan Retur dan dokumen Disposisi Retur.
 type ReturnDisposition string
 
 // ReturnReason defines model for ReturnReason.

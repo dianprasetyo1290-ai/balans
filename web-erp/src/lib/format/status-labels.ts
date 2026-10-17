@@ -24,6 +24,8 @@ export const STATUS_LABELS = {
   received: { label: "Diterima", tone: "success" },
   quarantine: { label: "Karantina", tone: "warning" },
   qc_rejected: { label: "Ditolak QC", tone: "danger" },
+  awaiting_settlement: { label: "Menunggu Penyelesaian", tone: "warning" },
+  submitted: { label: "Diajukan", tone: "info" },
 } as const satisfies Record<string, StatusSpec>
 
 export type StatusCode = keyof typeof STATUS_LABELS

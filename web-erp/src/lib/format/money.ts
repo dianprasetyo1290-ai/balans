@@ -36,7 +36,9 @@ export function formatUnitCost(value: string | null | undefined): string {
     return "-"
   }
   try {
-    return unitCostFormat.format(Number(new Big(value).toFixed(4))).replace(/\u00a0/g, "")
+    return unitCostFormat
+      .format(Number(new Big(value).toFixed(4)))
+      .replace(/\u00a0/g, "")
   } catch {
     return "-"
   }
@@ -48,7 +50,9 @@ export function formatMoneyInput(value: string): string {
     return ""
   }
   try {
-    return grouping.format(Number(new Big(value).round(0, Big.roundHalfUp).toFixed(0)))
+    return grouping.format(
+      Number(new Big(value).round(0, Big.roundHalfUp).toFixed(0))
+    )
   } catch {
     return ""
   }

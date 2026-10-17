@@ -17,6 +17,51 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
+// Defines values for DisposalAction.
+const (
+	DisposalActionCancel DisposalAction = "cancel"
+	DisposalActionPost   DisposalAction = "post"
+	DisposalActionRevise DisposalAction = "revise"
+	DisposalActionSubmit DisposalAction = "submit"
+)
+
+// Valid indicates whether the value is a known member of the DisposalAction enum.
+func (e DisposalAction) Valid() bool {
+	switch e {
+	case DisposalActionCancel:
+		return true
+	case DisposalActionPost:
+		return true
+	case DisposalActionRevise:
+		return true
+	case DisposalActionSubmit:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for DisposalReason.
+const (
+	DisposalReasonDamaged DisposalReason = "damaged"
+	DisposalReasonExpired DisposalReason = "expired"
+	DisposalReasonReturn  DisposalReason = "return"
+)
+
+// Valid indicates whether the value is a known member of the DisposalReason enum.
+func (e DisposalReason) Valid() bool {
+	switch e {
+	case DisposalReasonDamaged:
+		return true
+	case DisposalReasonExpired:
+		return true
+	case DisposalReasonReturn:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for ErrorCode.
 const (
 	APPROVALPOLICYMISSING     ErrorCode = "APPROVAL_POLICY_MISSING"
@@ -136,22 +181,283 @@ func (e ErrorCode) Valid() bool {
 
 // Defines values for ExpiryState.
 const (
-	Expired    ExpiryState = "expired"
-	NearExpiry ExpiryState = "near_expiry"
-	NoExpiry   ExpiryState = "no_expiry"
-	Ok         ExpiryState = "ok"
+	ExpiryStateExpired    ExpiryState = "expired"
+	ExpiryStateNearExpiry ExpiryState = "near_expiry"
+	ExpiryStateNoExpiry   ExpiryState = "no_expiry"
+	ExpiryStateOk         ExpiryState = "ok"
 )
 
 // Valid indicates whether the value is a known member of the ExpiryState enum.
 func (e ExpiryState) Valid() bool {
 	switch e {
-	case Expired:
+	case ExpiryStateExpired:
 		return true
-	case NearExpiry:
+	case ExpiryStateNearExpiry:
 		return true
-	case NoExpiry:
+	case ExpiryStateNoExpiry:
 		return true
-	case Ok:
+	case ExpiryStateOk:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for InternalUsageAction.
+const (
+	InternalUsageActionCancel   InternalUsageAction = "cancel"
+	InternalUsageActionHandover InternalUsageAction = "handover"
+	InternalUsageActionPost     InternalUsageAction = "post"
+	InternalUsageActionRelease  InternalUsageAction = "release"
+	InternalUsageActionRevise   InternalUsageAction = "revise"
+	InternalUsageActionSubmit   InternalUsageAction = "submit"
+)
+
+// Valid indicates whether the value is a known member of the InternalUsageAction enum.
+func (e InternalUsageAction) Valid() bool {
+	switch e {
+	case InternalUsageActionCancel:
+		return true
+	case InternalUsageActionHandover:
+		return true
+	case InternalUsageActionPost:
+		return true
+	case InternalUsageActionRelease:
+		return true
+	case InternalUsageActionRevise:
+		return true
+	case InternalUsageActionSubmit:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for InternalUsagePurpose.
+const (
+	EmployeeSample InternalUsagePurpose = "employee_sample"
+	Event          InternalUsagePurpose = "event"
+	Marketing      InternalUsagePurpose = "marketing"
+	SalesSampling  InternalUsagePurpose = "sales_sampling"
+)
+
+// Valid indicates whether the value is a known member of the InternalUsagePurpose enum.
+func (e InternalUsagePurpose) Valid() bool {
+	switch e {
+	case EmployeeSample:
+		return true
+	case Event:
+		return true
+	case Marketing:
+		return true
+	case SalesSampling:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for InventoryDocAction.
+const (
+	InventoryDocActionCancel   InventoryDocAction = "cancel"
+	InventoryDocActionEdit     InventoryDocAction = "edit"
+	InventoryDocActionHandover InventoryDocAction = "handover"
+	InventoryDocActionPost     InventoryDocAction = "post"
+	InventoryDocActionRelease  InventoryDocAction = "release"
+	InventoryDocActionReport   InventoryDocAction = "report"
+	InventoryDocActionRevise   InventoryDocAction = "revise"
+	InventoryDocActionSettle   InventoryDocAction = "settle"
+	InventoryDocActionStart    InventoryDocAction = "start"
+	InventoryDocActionSubmit   InventoryDocAction = "submit"
+)
+
+// Valid indicates whether the value is a known member of the InventoryDocAction enum.
+func (e InventoryDocAction) Valid() bool {
+	switch e {
+	case InventoryDocActionCancel:
+		return true
+	case InventoryDocActionEdit:
+		return true
+	case InventoryDocActionHandover:
+		return true
+	case InventoryDocActionPost:
+		return true
+	case InventoryDocActionRelease:
+		return true
+	case InventoryDocActionReport:
+		return true
+	case InventoryDocActionRevise:
+		return true
+	case InventoryDocActionSettle:
+		return true
+	case InventoryDocActionStart:
+		return true
+	case InventoryDocActionSubmit:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for InventoryDocStatus.
+const (
+	Approved           InventoryDocStatus = "approved"
+	AwaitingSettlement InventoryDocStatus = "awaiting_settlement"
+	Cancelled          InventoryDocStatus = "cancelled"
+	Draft              InventoryDocStatus = "draft"
+	InProgress         InventoryDocStatus = "in_progress"
+	PendingApproval    InventoryDocStatus = "pending_approval"
+	Posted             InventoryDocStatus = "posted"
+	Rejected           InventoryDocStatus = "rejected"
+)
+
+// Valid indicates whether the value is a known member of the InventoryDocStatus enum.
+func (e InventoryDocStatus) Valid() bool {
+	switch e {
+	case Approved:
+		return true
+	case AwaitingSettlement:
+		return true
+	case Cancelled:
+		return true
+	case Draft:
+		return true
+	case InProgress:
+		return true
+	case PendingApproval:
+		return true
+	case Posted:
+		return true
+	case Rejected:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for InventoryDocStockStatus.
+const (
+	InventoryDocStockStatusAvailable  InventoryDocStockStatus = "available"
+	InventoryDocStockStatusQuarantine InventoryDocStockStatus = "quarantine"
+)
+
+// Valid indicates whether the value is a known member of the InventoryDocStockStatus enum.
+func (e InventoryDocStockStatus) Valid() bool {
+	switch e {
+	case InventoryDocStockStatusAvailable:
+		return true
+	case InventoryDocStockStatusQuarantine:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RecostRunStatus.
+const (
+	Completed RecostRunStatus = "completed"
+	Failed    RecostRunStatus = "failed"
+	Pending   RecostRunStatus = "pending"
+)
+
+// Valid indicates whether the value is a known member of the RecostRunStatus enum.
+func (e RecostRunStatus) Valid() bool {
+	switch e {
+	case Completed:
+		return true
+	case Failed:
+		return true
+	case Pending:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RepackDirection.
+const (
+	Input  RepackDirection = "input"
+	Output RepackDirection = "output"
+)
+
+// Valid indicates whether the value is a known member of the RepackDirection enum.
+func (e RepackDirection) Valid() bool {
+	switch e {
+	case Input:
+		return true
+	case Output:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RepackingAction.
+const (
+	RepackingActionCancel RepackingAction = "cancel"
+	RepackingActionPost   RepackingAction = "post"
+	RepackingActionStart  RepackingAction = "start"
+)
+
+// Valid indicates whether the value is a known member of the RepackingAction enum.
+func (e RepackingAction) Valid() bool {
+	switch e {
+	case RepackingActionCancel:
+		return true
+	case RepackingActionPost:
+		return true
+	case RepackingActionStart:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ReturnDisposition.
+const (
+	Dispose         ReturnDisposition = "dispose"
+	MarketingSample ReturnDisposition = "marketing_sample"
+	Repack          ReturnDisposition = "repack"
+	Reprocess       ReturnDisposition = "reprocess"
+	Restock         ReturnDisposition = "restock"
+)
+
+// Valid indicates whether the value is a known member of the ReturnDisposition enum.
+func (e ReturnDisposition) Valid() bool {
+	switch e {
+	case Dispose:
+		return true
+	case MarketingSample:
+		return true
+	case Repack:
+		return true
+	case Reprocess:
+		return true
+	case Restock:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ReturnDispositionAction.
+const (
+	ReturnDispositionActionCancel ReturnDispositionAction = "cancel"
+	ReturnDispositionActionPost   ReturnDispositionAction = "post"
+	ReturnDispositionActionRevise ReturnDispositionAction = "revise"
+	ReturnDispositionActionSubmit ReturnDispositionAction = "submit"
+)
+
+// Valid indicates whether the value is a known member of the ReturnDispositionAction enum.
+func (e ReturnDispositionAction) Valid() bool {
+	switch e {
+	case ReturnDispositionActionCancel:
+		return true
+	case ReturnDispositionActionPost:
+		return true
+	case ReturnDispositionActionRevise:
+		return true
+	case ReturnDispositionActionSubmit:
 		return true
 	default:
 		return false
@@ -184,22 +490,40 @@ func (e StockMovementType) Valid() bool {
 
 // Defines values for StockStatus.
 const (
-	Available  StockStatus = "available"
-	InTransit  StockStatus = "in_transit"
-	Quarantine StockStatus = "quarantine"
-	Reserved   StockStatus = "reserved"
+	StockStatusAvailable  StockStatus = "available"
+	StockStatusInTransit  StockStatus = "in_transit"
+	StockStatusQuarantine StockStatus = "quarantine"
+	StockStatusReserved   StockStatus = "reserved"
 )
 
 // Valid indicates whether the value is a known member of the StockStatus enum.
 func (e StockStatus) Valid() bool {
 	switch e {
-	case Available:
+	case StockStatusAvailable:
 		return true
-	case InTransit:
+	case StockStatusInTransit:
 		return true
-	case Quarantine:
+	case StockStatusQuarantine:
 		return true
-	case Reserved:
+	case StockStatusReserved:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ListInternalUsageDimensionOptionsParamsKind.
+const (
+	Campaign ListInternalUsageDimensionOptionsParamsKind = "campaign"
+	Division ListInternalUsageDimensionOptionsParamsKind = "division"
+)
+
+// Valid indicates whether the value is a known member of the ListInternalUsageDimensionOptionsParamsKind enum.
+func (e ListInternalUsageDimensionOptionsParamsKind) Valid() bool {
+	switch e {
+	case Campaign:
+		return true
+	case Division:
 		return true
 	default:
 		return false
@@ -421,11 +745,448 @@ type CostLayerList struct {
 	TotalPages int         `json:"totalPages"`
 }
 
+// Disposal defines model for Disposal.
+type Disposal struct {
+	AllowedActions []InventoryDocAction `json:"allowedActions"`
+
+	// CostAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	CostAmount Money             `json:"costAmount"`
+	CreatedAt  time.Time         `json:"createdAt"`
+	CreatedBy  InventoryActorRef `json:"createdBy"`
+
+	// DisposalDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	DisposalDate BusinessDate `json:"disposalDate"`
+
+	// EstimatedCost Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	EstimatedCost   Money                  `json:"estimatedCost"`
+	Id              openapi_types.UUID     `json:"id"`
+	JournalId       *openapi_types.UUID    `json:"journalId,omitempty"`
+	Lines           []DisposalLine         `json:"lines"`
+	Method          string                 `json:"method"`
+	Movements       []InventoryDocMovement `json:"movements"`
+	Note            string                 `json:"note"`
+	Number          *string                `json:"number,omitempty"`
+	Photos          []DisposalPhoto        `json:"photos"`
+	Posted          *InventoryDocStep      `json:"posted,omitempty"`
+	PostingRuleCode string                 `json:"postingRuleCode"`
+
+	// Reason `expired` Kedaluwarsa, `damaged` Rusak, `return` Barang Retur.
+	Reason              DisposalReason      `json:"reason"`
+	ReasonLabel         string              `json:"reasonLabel"`
+	ReturnDispositionId *openapi_types.UUID `json:"returnDispositionId,omitempty"`
+
+	// Status Status dokumen persediaan (Desain Status Dokumen bagian 1).
+	Status      InventoryDocStatus `json:"status"`
+	StatusLabel string             `json:"statusLabel"`
+	Submitted   *InventoryDocStep  `json:"submitted,omitempty"`
+	UpdatedAt   time.Time          `json:"updatedAt"`
+	Version     int                `json:"version"`
+	Witnesses   []string           `json:"witnesses"`
+}
+
+// DisposalAction defines model for DisposalAction.
+type DisposalAction string
+
+// DisposalInput defines model for DisposalInput.
+type DisposalInput struct {
+	// DisposalDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	DisposalDate BusinessDate `json:"disposalDate"`
+	Lines        []struct {
+		BatchId    *openapi_types.UUID `json:"batchId,omitempty"`
+		LocationId openapi_types.UUID  `json:"locationId"`
+		Note       *string             `json:"note,omitempty"`
+		ProductId  openapi_types.UUID  `json:"productId"`
+
+		// Qty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string; bisa negatif di kartu stok.
+		//
+		// Example: 12.000
+		Qty StockQuantity `json:"qty"`
+
+		// StockStatus Status stok baris dokumen (Tersedia atau Karantina).
+		StockStatus *InventoryDocStockStatus `json:"stockStatus,omitempty"`
+	} `json:"lines"`
+	Method       *string               `json:"method,omitempty"`
+	Note         *string               `json:"note,omitempty"`
+	PhotoFileIds *[]openapi_types.UUID `json:"photoFileIds,omitempty"`
+
+	// Reason `expired` Kedaluwarsa, `damaged` Rusak, `return` Barang Retur.
+	Reason    DisposalReason `json:"reason"`
+	Witnesses *[]string      `json:"witnesses,omitempty"`
+}
+
+// DisposalLine defines model for DisposalLine.
+type DisposalLine struct {
+	Batch *InventoryBatchRef `json:"batch,omitempty"`
+
+	// CostAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	CostAmount Money              `json:"costAmount"`
+	Id         openapi_types.UUID `json:"id"`
+	LineNo     int                `json:"lineNo"`
+	Location   StockLocationRef   `json:"location"`
+	Note       string             `json:"note"`
+	Product    StockProductRef    `json:"product"`
+
+	// Qty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string; bisa negatif di kartu stok.
+	//
+	// Example: 12.000
+	Qty StockQuantity `json:"qty"`
+
+	// StockStatus Status stok baris dokumen (Tersedia atau Karantina).
+	StockStatus InventoryDocStockStatus `json:"stockStatus"`
+}
+
+// DisposalList defines model for DisposalList.
+type DisposalList struct {
+	Items      []Disposal `json:"items"`
+	Page       int        `json:"page"`
+	PageSize   int        `json:"pageSize"`
+	TotalItems int64      `json:"totalItems"`
+	TotalPages int        `json:"totalPages"`
+}
+
+// DisposalPhoto defines model for DisposalPhoto.
+type DisposalPhoto struct {
+	Id   openapi_types.UUID `json:"id"`
+	Name string             `json:"name"`
+}
+
+// DisposalReason `expired` Kedaluwarsa, `damaged` Rusak, `return` Barang Retur.
+type DisposalReason string
+
+// DisposalReportFields defines model for DisposalReportFields.
+type DisposalReportFields struct {
+	// DisposalDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	DisposalDate BusinessDate          `json:"disposalDate"`
+	Method       *string               `json:"method,omitempty"`
+	PhotoFileIds *[]openapi_types.UUID `json:"photoFileIds,omitempty"`
+	Witnesses    *[]string             `json:"witnesses,omitempty"`
+}
+
+// DisposalReportInput defines model for DisposalReportInput.
+type DisposalReportInput struct {
+	// DisposalDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	DisposalDate BusinessDate          `json:"disposalDate"`
+	Method       *string               `json:"method,omitempty"`
+	PhotoFileIds *[]openapi_types.UUID `json:"photoFileIds,omitempty"`
+
+	// Version Versi terakhir yang dilihat user (optimistic locking).
+	Version   int       `json:"version"`
+	Witnesses *[]string `json:"witnesses,omitempty"`
+}
+
+// DisposalUpdate defines model for DisposalUpdate.
+type DisposalUpdate struct {
+	// DisposalDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	DisposalDate BusinessDate `json:"disposalDate"`
+	Lines        []struct {
+		BatchId    *openapi_types.UUID `json:"batchId,omitempty"`
+		LocationId openapi_types.UUID  `json:"locationId"`
+		Note       *string             `json:"note,omitempty"`
+		ProductId  openapi_types.UUID  `json:"productId"`
+
+		// Qty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string; bisa negatif di kartu stok.
+		//
+		// Example: 12.000
+		Qty StockQuantity `json:"qty"`
+
+		// StockStatus Status stok baris dokumen (Tersedia atau Karantina).
+		StockStatus *InventoryDocStockStatus `json:"stockStatus,omitempty"`
+	} `json:"lines"`
+	Method       *string               `json:"method,omitempty"`
+	Note         *string               `json:"note,omitempty"`
+	PhotoFileIds *[]openapi_types.UUID `json:"photoFileIds,omitempty"`
+
+	// Reason `expired` Kedaluwarsa, `damaged` Rusak, `return` Barang Retur.
+	Reason DisposalReason `json:"reason"`
+
+	// Version Versi terakhir yang dilihat user (optimistic locking).
+	Version   int       `json:"version"`
+	Witnesses *[]string `json:"witnesses,omitempty"`
+}
+
 // ErrorCode Katalog kode error (Technical Guideline Lampiran A).
 type ErrorCode string
 
 // ExpiryState `expired` Kedaluwarsa, `near_expiry` Segera kedaluwarsa, `ok` Aman, `no_expiry` Tanpa kedaluwarsa.
 type ExpiryState string
+
+// InternalUsage defines model for InternalUsage.
+type InternalUsage struct {
+	AllowedActions []InventoryDocAction `json:"allowedActions"`
+
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate           `json:"businessDate"`
+	Campaign     *InventoryDimensionRef `json:"campaign,omitempty"`
+
+	// CostAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	CostAmount Money                 `json:"costAmount"`
+	CreatedAt  time.Time             `json:"createdAt"`
+	Division   InventoryDimensionRef `json:"division"`
+
+	// EstimatedCost Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	EstimatedCost Money `json:"estimatedCost"`
+
+	// EventEndDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	EventEndDate  *BusinessDate          `json:"eventEndDate,omitempty"`
+	EventLocation *StockLocationRef      `json:"eventLocation,omitempty"`
+	HandedOver    *InventoryDocStep      `json:"handedOver,omitempty"`
+	Id            openapi_types.UUID     `json:"id"`
+	JournalId     *openapi_types.UUID    `json:"journalId,omitempty"`
+	Lines         []InternalUsageLine    `json:"lines"`
+	Movements     []InventoryDocMovement `json:"movements"`
+	Note          string                 `json:"note"`
+	Number        *string                `json:"number,omitempty"`
+	Posted        *InventoryDocStep      `json:"posted,omitempty"`
+
+	// Purpose `marketing` Marketing, `event` Event, `employee_sample` Sampel Karyawan, `sales_sampling` Sampling Sales.
+	Purpose             InternalUsagePurpose `json:"purpose"`
+	PurposeLabel        string               `json:"purposeLabel"`
+	Released            *InventoryDocStep    `json:"released,omitempty"`
+	RequestedBy         InventoryActorRef    `json:"requestedBy"`
+	ReturnDispositionId *openapi_types.UUID  `json:"returnDispositionId,omitempty"`
+
+	// SettleDueDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	SettleDueDate  *BusinessDate     `json:"settleDueDate,omitempty"`
+	Settled        *InventoryDocStep `json:"settled,omitempty"`
+	SourceLocation StockLocationRef  `json:"sourceLocation"`
+
+	// Status Status dokumen persediaan (Desain Status Dokumen bagian 1).
+	Status      InventoryDocStatus `json:"status"`
+	StatusLabel string             `json:"statusLabel"`
+	UpdatedAt   time.Time          `json:"updatedAt"`
+	Version     int                `json:"version"`
+}
+
+// InternalUsageAction defines model for InternalUsageAction.
+type InternalUsageAction string
+
+// InternalUsageInput defines model for InternalUsageInput.
+type InternalUsageInput struct {
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate        `json:"businessDate"`
+	CampaignId   *openapi_types.UUID `json:"campaignId,omitempty"`
+	DivisionId   openapi_types.UUID  `json:"divisionId"`
+
+	// EventEndDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	EventEndDate    *BusinessDate       `json:"eventEndDate,omitempty"`
+	EventLocationId *openapi_types.UUID `json:"eventLocationId,omitempty"`
+	Lines           []struct {
+		Note      *string            `json:"note,omitempty"`
+		ProductId openapi_types.UUID `json:"productId"`
+
+		// Qty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string; bisa negatif di kartu stok.
+		//
+		// Example: 12.000
+		Qty StockQuantity `json:"qty"`
+	} `json:"lines"`
+	Note *string `json:"note,omitempty"`
+
+	// Purpose `marketing` Marketing, `event` Event, `employee_sample` Sampel Karyawan, `sales_sampling` Sampling Sales.
+	Purpose          InternalUsagePurpose `json:"purpose"`
+	SourceLocationId openapi_types.UUID   `json:"sourceLocationId"`
+}
+
+// InternalUsageLine defines model for InternalUsageLine.
+type InternalUsageLine struct {
+	// ConsumedQty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string; bisa negatif di kartu stok.
+	//
+	// Example: 12.000
+	ConsumedQty StockQuantity `json:"consumedQty"`
+
+	// CostAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	CostAmount Money              `json:"costAmount"`
+	Id         openapi_types.UUID `json:"id"`
+	LineNo     int                `json:"lineNo"`
+	Note       string             `json:"note"`
+	Product    StockProductRef    `json:"product"`
+
+	// Qty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string; bisa negatif di kartu stok.
+	//
+	// Example: 12.000
+	Qty StockQuantity `json:"qty"`
+
+	// ReturnedQty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string; bisa negatif di kartu stok.
+	//
+	// Example: 12.000
+	ReturnedQty StockQuantity `json:"returnedQty"`
+}
+
+// InternalUsageList defines model for InternalUsageList.
+type InternalUsageList struct {
+	Items      []InternalUsage `json:"items"`
+	Page       int             `json:"page"`
+	PageSize   int             `json:"pageSize"`
+	TotalItems int64           `json:"totalItems"`
+	TotalPages int             `json:"totalPages"`
+}
+
+// InternalUsagePurpose `marketing` Marketing, `event` Event, `employee_sample` Sampel Karyawan, `sales_sampling` Sampling Sales.
+type InternalUsagePurpose string
+
+// InternalUsageSettleInput defines model for InternalUsageSettleInput.
+type InternalUsageSettleInput struct {
+	// Lines Qty sisa per baris; baris yang tidak dikirim berarti tanpa sisa.
+	Lines []struct {
+		LineId openapi_types.UUID `json:"lineId"`
+
+		// ReturnedQty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string; bisa negatif di kartu stok.
+		//
+		// Example: 12.000
+		ReturnedQty StockQuantity `json:"returnedQty"`
+	} `json:"lines"`
+	Version int `json:"version"`
+}
+
+// InternalUsageUpdate defines model for InternalUsageUpdate.
+type InternalUsageUpdate struct {
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate        `json:"businessDate"`
+	CampaignId   *openapi_types.UUID `json:"campaignId,omitempty"`
+	DivisionId   openapi_types.UUID  `json:"divisionId"`
+
+	// EventEndDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	EventEndDate    *BusinessDate       `json:"eventEndDate,omitempty"`
+	EventLocationId *openapi_types.UUID `json:"eventLocationId,omitempty"`
+	Lines           []struct {
+		Note      *string            `json:"note,omitempty"`
+		ProductId openapi_types.UUID `json:"productId"`
+
+		// Qty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string; bisa negatif di kartu stok.
+		//
+		// Example: 12.000
+		Qty StockQuantity `json:"qty"`
+	} `json:"lines"`
+	Note *string `json:"note,omitempty"`
+
+	// Purpose `marketing` Marketing, `event` Event, `employee_sample` Sampel Karyawan, `sales_sampling` Sampling Sales.
+	Purpose          InternalUsagePurpose `json:"purpose"`
+	SourceLocationId openapi_types.UUID   `json:"sourceLocationId"`
+
+	// Version Versi terakhir yang dilihat user (optimistic locking).
+	Version int `json:"version"`
+}
+
+// InventoryActorRef defines model for InventoryActorRef.
+type InventoryActorRef struct {
+	Name   string             `json:"name"`
+	UserId openapi_types.UUID `json:"userId"`
+}
+
+// InventoryBatchRef defines model for InventoryBatchRef.
+type InventoryBatchRef struct {
+	// ExpiryDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	ExpiryDate *BusinessDate      `json:"expiryDate,omitempty"`
+	Id         openapi_types.UUID `json:"id"`
+	Number     string             `json:"number"`
+}
+
+// InventoryDimensionOption defines model for InventoryDimensionOption.
+type InventoryDimensionOption struct {
+	Code string             `json:"code"`
+	Id   openapi_types.UUID `json:"id"`
+	Name string             `json:"name"`
+
+	// ValidFrom Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	ValidFrom *BusinessDate `json:"validFrom,omitempty"`
+
+	// ValidTo Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	ValidTo *BusinessDate `json:"validTo,omitempty"`
+}
+
+// InventoryDimensionOptionList defines model for InventoryDimensionOptionList.
+type InventoryDimensionOptionList struct {
+	Items []InventoryDimensionOption `json:"items"`
+}
+
+// InventoryDimensionRef defines model for InventoryDimensionRef.
+type InventoryDimensionRef struct {
+	Code string             `json:"code"`
+	Id   openapi_types.UUID `json:"id"`
+	Name string             `json:"name"`
+}
+
+// InventoryDocAction Aksi yang boleh dilakukan user pada dokumen (allowedActions).
+type InventoryDocAction string
+
+// InventoryDocMovement Mutasi stok dokumen (batch yang dialokasikan, dikirim, atau keluar).
+type InventoryDocMovement struct {
+	Batch *InventoryBatchRef `json:"batch,omitempty"`
+
+	// CostAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	CostAmount        Money              `json:"costAmount"`
+	Id                openapi_types.UUID `json:"id"`
+	Location          StockLocationRef   `json:"location"`
+	MovementType      StockMovementType  `json:"movementType"`
+	MovementTypeLabel string             `json:"movementTypeLabel"`
+	Product           StockProductRef    `json:"product"`
+
+	// Qty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string; bisa negatif di kartu stok.
+	//
+	// Example: 12.000
+	Qty          StockQuantity       `json:"qty"`
+	SourceLineId *openapi_types.UUID `json:"sourceLineId,omitempty"`
+
+	// Status `available` Tersedia, `quarantine` Karantina, `in_transit` Dalam Pengiriman, `reserved` Dialokasikan.
+	Status      StockStatus `json:"status"`
+	StatusLabel string      `json:"statusLabel"`
+}
+
+// InventoryDocStatus Status dokumen persediaan (Desain Status Dokumen bagian 1).
+type InventoryDocStatus string
+
+// InventoryDocStep defines model for InventoryDocStep.
+type InventoryDocStep struct {
+	At     time.Time          `json:"at"`
+	Name   string             `json:"name"`
+	UserId openapi_types.UUID `json:"userId"`
+}
+
+// InventoryDocStockStatus Status stok baris dokumen (Tersedia atau Karantina).
+type InventoryDocStockStatus string
 
 // Money Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
 //
@@ -452,6 +1213,343 @@ type Problem struct {
 	Status    int                `json:"status"`
 	Title     string             `json:"title"`
 	Type      string             `json:"type"`
+}
+
+// RecostRun defines model for RecostRun.
+type RecostRun struct {
+	// AdjustmentAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	AdjustmentAmount Money               `json:"adjustmentAmount"`
+	BatchId          *openapi_types.UUID `json:"batchId,omitempty"`
+	CompletedAt      *time.Time          `json:"completedAt,omitempty"`
+	CreatedAt        time.Time           `json:"createdAt"`
+	Error            string              `json:"error"`
+
+	// FromBusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	FromBusinessDate   BusinessDate        `json:"fromBusinessDate"`
+	Id                 openapi_types.UUID  `json:"id"`
+	JournalId          *openapi_types.UUID `json:"journalId,omitempty"`
+	Product            StockProductRef     `json:"product"`
+	Status             RecostRunStatus     `json:"status"`
+	TriggerSourceLabel string              `json:"triggerSourceLabel"`
+	TriggerSourceType  string              `json:"triggerSourceType"`
+}
+
+// RecostRunStatus defines model for RecostRun.Status.
+type RecostRunStatus string
+
+// RecostRunList defines model for RecostRunList.
+type RecostRunList struct {
+	Items      []RecostRun `json:"items"`
+	Page       int         `json:"page"`
+	PageSize   int         `json:"pageSize"`
+	TotalItems int64       `json:"totalItems"`
+	TotalPages int         `json:"totalPages"`
+}
+
+// RepackDirection defines model for RepackDirection.
+type RepackDirection string
+
+// Repacking defines model for Repacking.
+type Repacking struct {
+	AllowedActions []InventoryDocAction `json:"allowedActions"`
+
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate `json:"businessDate"`
+
+	// CostAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	CostAmount          Money                  `json:"costAmount"`
+	CreatedAt           time.Time              `json:"createdAt"`
+	CreatedBy           InventoryActorRef      `json:"createdBy"`
+	Id                  openapi_types.UUID     `json:"id"`
+	JournalId           *openapi_types.UUID    `json:"journalId,omitempty"`
+	Lines               []RepackingLine        `json:"lines"`
+	Movements           []InventoryDocMovement `json:"movements"`
+	Note                string                 `json:"note"`
+	Number              *string                `json:"number,omitempty"`
+	Posted              *InventoryDocStep      `json:"posted,omitempty"`
+	ReturnDispositionId *openapi_types.UUID    `json:"returnDispositionId,omitempty"`
+	Started             *InventoryDocStep      `json:"started,omitempty"`
+
+	// Status Status dokumen persediaan (Desain Status Dokumen bagian 1).
+	Status      InventoryDocStatus `json:"status"`
+	StatusLabel string             `json:"statusLabel"`
+	UpdatedAt   time.Time          `json:"updatedAt"`
+	Version     int                `json:"version"`
+}
+
+// RepackingAction defines model for RepackingAction.
+type RepackingAction string
+
+// RepackingInput defines model for RepackingInput.
+type RepackingInput struct {
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate `json:"businessDate"`
+	Lines        []struct {
+		BatchId     *openapi_types.UUID `json:"batchId,omitempty"`
+		BatchNumber *string             `json:"batchNumber,omitempty"`
+		Direction   RepackDirection     `json:"direction"`
+
+		// ExpiryDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+		//
+		// Example: 2026-10-19
+		ExpiryDate *BusinessDate      `json:"expiryDate,omitempty"`
+		LocationId openapi_types.UUID `json:"locationId"`
+		Note       *string            `json:"note,omitempty"`
+		ProductId  openapi_types.UUID `json:"productId"`
+
+		// ProductionDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+		//
+		// Example: 2026-10-19
+		ProductionDate *BusinessDate `json:"productionDate,omitempty"`
+
+		// Qty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string; bisa negatif di kartu stok.
+		//
+		// Example: 12.000
+		Qty StockQuantity `json:"qty"`
+
+		// StockStatus Status stok baris dokumen (Tersedia atau Karantina).
+		StockStatus *InventoryDocStockStatus `json:"stockStatus,omitempty"`
+	} `json:"lines"`
+	Note *string `json:"note,omitempty"`
+}
+
+// RepackingLine defines model for RepackingLine.
+type RepackingLine struct {
+	Batch *InventoryBatchRef `json:"batch,omitempty"`
+
+	// BatchNumber Nomor batch baru baris hasil.
+	BatchNumber string `json:"batchNumber"`
+
+	// CostAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	CostAmount Money           `json:"costAmount"`
+	Direction  RepackDirection `json:"direction"`
+
+	// ExpiryDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	ExpiryDate *BusinessDate      `json:"expiryDate,omitempty"`
+	Id         openapi_types.UUID `json:"id"`
+	LineNo     int                `json:"lineNo"`
+	Location   StockLocationRef   `json:"location"`
+	Note       string             `json:"note"`
+	Product    StockProductRef    `json:"product"`
+
+	// ProductionDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	ProductionDate *BusinessDate `json:"productionDate,omitempty"`
+
+	// Qty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string; bisa negatif di kartu stok.
+	//
+	// Example: 12.000
+	Qty StockQuantity `json:"qty"`
+
+	// StockStatus Status stok baris dokumen (Tersedia atau Karantina).
+	StockStatus InventoryDocStockStatus `json:"stockStatus"`
+}
+
+// RepackingList defines model for RepackingList.
+type RepackingList struct {
+	Items      []Repacking `json:"items"`
+	Page       int         `json:"page"`
+	PageSize   int         `json:"pageSize"`
+	TotalItems int64       `json:"totalItems"`
+	TotalPages int         `json:"totalPages"`
+}
+
+// RepackingUpdate defines model for RepackingUpdate.
+type RepackingUpdate struct {
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate `json:"businessDate"`
+	Lines        []struct {
+		BatchId     *openapi_types.UUID `json:"batchId,omitempty"`
+		BatchNumber *string             `json:"batchNumber,omitempty"`
+		Direction   RepackDirection     `json:"direction"`
+
+		// ExpiryDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+		//
+		// Example: 2026-10-19
+		ExpiryDate *BusinessDate      `json:"expiryDate,omitempty"`
+		LocationId openapi_types.UUID `json:"locationId"`
+		Note       *string            `json:"note,omitempty"`
+		ProductId  openapi_types.UUID `json:"productId"`
+
+		// ProductionDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+		//
+		// Example: 2026-10-19
+		ProductionDate *BusinessDate `json:"productionDate,omitempty"`
+
+		// Qty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string; bisa negatif di kartu stok.
+		//
+		// Example: 12.000
+		Qty StockQuantity `json:"qty"`
+
+		// StockStatus Status stok baris dokumen (Tersedia atau Karantina).
+		StockStatus *InventoryDocStockStatus `json:"stockStatus,omitempty"`
+	} `json:"lines"`
+	Note *string `json:"note,omitempty"`
+
+	// Version Versi terakhir yang dilihat user (optimistic locking).
+	Version int `json:"version"`
+}
+
+// ReturnDisposition Disposisi barang retur (Disposisi Retur, WMS-07); dipakai master Alasan Retur dan dokumen Disposisi Retur.
+type ReturnDisposition string
+
+// ReturnDispositionAction defines model for ReturnDispositionAction.
+type ReturnDispositionAction string
+
+// ReturnDispositionDocument defines model for ReturnDispositionDocument.
+type ReturnDispositionDocument struct {
+	AllowedActions []InventoryDocAction `json:"allowedActions"`
+
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate `json:"businessDate"`
+
+	// CostAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	CostAmount Money             `json:"costAmount"`
+	CreatedAt  time.Time         `json:"createdAt"`
+	CreatedBy  InventoryActorRef `json:"createdBy"`
+
+	// DisposalValue Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	DisposalValue Money                           `json:"disposalValue"`
+	Id            openapi_types.UUID              `json:"id"`
+	JournalId     *openapi_types.UUID             `json:"journalId,omitempty"`
+	Lines         []ReturnDispositionDocumentLine `json:"lines"`
+	Location      StockLocationRef                `json:"location"`
+	Movements     []InventoryDocMovement          `json:"movements"`
+	Note          string                          `json:"note"`
+	Number        *string                         `json:"number,omitempty"`
+	Posted        *InventoryDocStep               `json:"posted,omitempty"`
+
+	// Status Status dokumen persediaan (Desain Status Dokumen bagian 1).
+	Status      InventoryDocStatus `json:"status"`
+	StatusLabel string             `json:"statusLabel"`
+	Submitted   *InventoryDocStep  `json:"submitted,omitempty"`
+	UpdatedAt   time.Time          `json:"updatedAt"`
+	Version     int                `json:"version"`
+}
+
+// ReturnDispositionDocumentInput defines model for ReturnDispositionDocumentInput.
+type ReturnDispositionDocumentInput struct {
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate `json:"businessDate"`
+	Lines        []struct {
+		BatchId *openapi_types.UUID `json:"batchId,omitempty"`
+
+		// Disposition Disposisi barang retur (Disposisi Retur, WMS-07); dipakai master Alasan Retur dan dokumen Disposisi Retur.
+		Disposition *ReturnDisposition `json:"disposition,omitempty"`
+		ProductId   openapi_types.UUID `json:"productId"`
+		QcNote      *string            `json:"qcNote,omitempty"`
+
+		// Qty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string; bisa negatif di kartu stok.
+		//
+		// Example: 12.000
+		Qty      StockQuantity       `json:"qty"`
+		ReasonId *openapi_types.UUID `json:"reasonId,omitempty"`
+
+		// StockStatus Status stok baris dokumen (Tersedia atau Karantina).
+		StockStatus *InventoryDocStockStatus `json:"stockStatus,omitempty"`
+	} `json:"lines"`
+	LocationId openapi_types.UUID `json:"locationId"`
+	Note       *string            `json:"note,omitempty"`
+}
+
+// ReturnDispositionDocumentLine defines model for ReturnDispositionDocumentLine.
+type ReturnDispositionDocumentLine struct {
+	Batch *InventoryBatchRef `json:"batch,omitempty"`
+
+	// CostAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	CostAmount Money `json:"costAmount"`
+
+	// Disposition Disposisi barang retur (Disposisi Retur, WMS-07); dipakai master Alasan Retur dan dokumen Disposisi Retur.
+	Disposition      ReturnDisposition `json:"disposition"`
+	DispositionLabel string            `json:"dispositionLabel"`
+
+	// EstimatedCost Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+	//
+	// Example: 1250000.00
+	EstimatedCost Money              `json:"estimatedCost"`
+	Id            openapi_types.UUID `json:"id"`
+	LineNo        int                `json:"lineNo"`
+	Product       StockProductRef    `json:"product"`
+	QcNote        string             `json:"qcNote"`
+
+	// Qty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string; bisa negatif di kartu stok.
+	//
+	// Example: 12.000
+	Qty    StockQuantity          `json:"qty"`
+	Reason *InventoryDimensionRef `json:"reason,omitempty"`
+
+	// StockStatus Status stok baris dokumen (Tersedia atau Karantina).
+	StockStatus InventoryDocStockStatus `json:"stockStatus"`
+	TargetId    *openapi_types.UUID     `json:"targetId,omitempty"`
+
+	// TargetType Dokumen lanjutan hasil eksekusi (`repacking`, `disposal`, `internal_usage`).
+	TargetType *string `json:"targetType,omitempty"`
+}
+
+// ReturnDispositionDocumentList defines model for ReturnDispositionDocumentList.
+type ReturnDispositionDocumentList struct {
+	Items      []ReturnDispositionDocument `json:"items"`
+	Page       int                         `json:"page"`
+	PageSize   int                         `json:"pageSize"`
+	TotalItems int64                       `json:"totalItems"`
+	TotalPages int                         `json:"totalPages"`
+}
+
+// ReturnDispositionDocumentUpdate defines model for ReturnDispositionDocumentUpdate.
+type ReturnDispositionDocumentUpdate struct {
+	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+	//
+	// Example: 2026-10-19
+	BusinessDate BusinessDate `json:"businessDate"`
+	Lines        []struct {
+		BatchId *openapi_types.UUID `json:"batchId,omitempty"`
+
+		// Disposition Disposisi barang retur (Disposisi Retur, WMS-07); dipakai master Alasan Retur dan dokumen Disposisi Retur.
+		Disposition *ReturnDisposition `json:"disposition,omitempty"`
+		ProductId   openapi_types.UUID `json:"productId"`
+		QcNote      *string            `json:"qcNote,omitempty"`
+
+		// Qty Kuantitas desimal (maks. 3 angka di belakang koma) sebagai string; bisa negatif di kartu stok.
+		//
+		// Example: 12.000
+		Qty      StockQuantity       `json:"qty"`
+		ReasonId *openapi_types.UUID `json:"reasonId,omitempty"`
+
+		// StockStatus Status stok baris dokumen (Tersedia atau Karantina).
+		StockStatus *InventoryDocStockStatus `json:"stockStatus,omitempty"`
+	} `json:"lines"`
+	LocationId openapi_types.UUID `json:"locationId"`
+	Note       *string            `json:"note,omitempty"`
+
+	// Version Versi terakhir yang dilihat user (optimistic locking).
+	Version int `json:"version"`
 }
 
 // StockBalance defines model for StockBalance.
@@ -660,8 +1758,17 @@ type SuggestedBatch struct {
 // Example: 12500.0000
 type UnitCost = string
 
+// VersionInput defines model for VersionInput.
+type VersionInput struct {
+	// Version Versi terakhir yang dilihat user (optimistic locking).
+	Version int `json:"version"`
+}
+
 // Id defines model for Id.
 type Id = openapi_types.UUID
+
+// IdempotencyKey defines model for IdempotencyKey.
+type IdempotencyKey = openapi_types.UUID
 
 // Page defines model for Page.
 type Page = int
@@ -712,6 +1819,134 @@ type ListCostLayersParams struct {
 	OpenOnly *bool `form:"openOnly,omitempty" json:"openOnly,omitempty"`
 }
 
+// ListDisposalsParams defines parameters for ListDisposals.
+type ListDisposalsParams struct {
+	Page     *Page               `form:"page,omitempty" json:"page,omitempty"`
+	PageSize *PageSize           `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+	Q        *Search             `form:"q,omitempty" json:"q,omitempty"`
+	Status   *InventoryDocStatus `form:"status,omitempty" json:"status,omitempty"`
+	Reason   *DisposalReason     `form:"reason,omitempty" json:"reason,omitempty"`
+}
+
+// CreateDisposalParams defines parameters for CreateDisposal.
+type CreateDisposalParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// UpdateDisposalParams defines parameters for UpdateDisposal.
+type UpdateDisposalParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// RunDisposalActionParams defines parameters for RunDisposalAction.
+type RunDisposalActionParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// UpdateDisposalReportParams defines parameters for UpdateDisposalReport.
+type UpdateDisposalReportParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// ListInternalUsageDimensionOptionsParamsKind defines parameters for ListInternalUsageDimensionOptions.
+type ListInternalUsageDimensionOptionsParamsKind string
+
+// ListInternalUsagesParams defines parameters for ListInternalUsages.
+type ListInternalUsagesParams struct {
+	Page     *Page                 `form:"page,omitempty" json:"page,omitempty"`
+	PageSize *PageSize             `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+	Q        *Search               `form:"q,omitempty" json:"q,omitempty"`
+	Status   *InventoryDocStatus   `form:"status,omitempty" json:"status,omitempty"`
+	Purpose  *InternalUsagePurpose `form:"purpose,omitempty" json:"purpose,omitempty"`
+}
+
+// CreateInternalUsageParams defines parameters for CreateInternalUsage.
+type CreateInternalUsageParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// UpdateInternalUsageParams defines parameters for UpdateInternalUsage.
+type UpdateInternalUsageParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// RunInternalUsageActionParams defines parameters for RunInternalUsageAction.
+type RunInternalUsageActionParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// SettleInternalUsageParams defines parameters for SettleInternalUsage.
+type SettleInternalUsageParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// ListRecostRunsParams defines parameters for ListRecostRuns.
+type ListRecostRunsParams struct {
+	Page      *Page               `form:"page,omitempty" json:"page,omitempty"`
+	PageSize  *PageSize           `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+	ProductId *openapi_types.UUID `form:"productId,omitempty" json:"productId,omitempty"`
+}
+
+// ListRepackingsParams defines parameters for ListRepackings.
+type ListRepackingsParams struct {
+	Page     *Page               `form:"page,omitempty" json:"page,omitempty"`
+	PageSize *PageSize           `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+	Q        *Search             `form:"q,omitempty" json:"q,omitempty"`
+	Status   *InventoryDocStatus `form:"status,omitempty" json:"status,omitempty"`
+}
+
+// CreateRepackingParams defines parameters for CreateRepacking.
+type CreateRepackingParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// UpdateRepackingParams defines parameters for UpdateRepacking.
+type UpdateRepackingParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// RunRepackingActionParams defines parameters for RunRepackingAction.
+type RunRepackingActionParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// ListReturnDispositionsParams defines parameters for ListReturnDispositions.
+type ListReturnDispositionsParams struct {
+	Page     *Page               `form:"page,omitempty" json:"page,omitempty"`
+	PageSize *PageSize           `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+	Q        *Search             `form:"q,omitempty" json:"q,omitempty"`
+	Status   *InventoryDocStatus `form:"status,omitempty" json:"status,omitempty"`
+}
+
+// CreateReturnDispositionParams defines parameters for CreateReturnDisposition.
+type CreateReturnDispositionParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// UpdateReturnDispositionParams defines parameters for UpdateReturnDisposition.
+type UpdateReturnDispositionParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
+// RunReturnDispositionActionParams defines parameters for RunReturnDispositionAction.
+type RunReturnDispositionActionParams struct {
+	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
+	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
+}
+
 // ListStockBalancesParams defines parameters for ListStockBalances.
 type ListStockBalancesParams struct {
 	Page      *Page               `form:"page,omitempty" json:"page,omitempty"`
@@ -738,6 +1973,48 @@ type GetStockCardParams struct {
 	DateTo     openapi_types.Date  `form:"dateTo" json:"dateTo"`
 }
 
+// CreateDisposalJSONRequestBody defines body for CreateDisposal for application/json ContentType.
+type CreateDisposalJSONRequestBody = DisposalInput
+
+// UpdateDisposalJSONRequestBody defines body for UpdateDisposal for application/json ContentType.
+type UpdateDisposalJSONRequestBody = DisposalUpdate
+
+// RunDisposalActionJSONRequestBody defines body for RunDisposalAction for application/json ContentType.
+type RunDisposalActionJSONRequestBody = VersionInput
+
+// UpdateDisposalReportJSONRequestBody defines body for UpdateDisposalReport for application/json ContentType.
+type UpdateDisposalReportJSONRequestBody = DisposalReportInput
+
+// CreateInternalUsageJSONRequestBody defines body for CreateInternalUsage for application/json ContentType.
+type CreateInternalUsageJSONRequestBody = InternalUsageInput
+
+// UpdateInternalUsageJSONRequestBody defines body for UpdateInternalUsage for application/json ContentType.
+type UpdateInternalUsageJSONRequestBody = InternalUsageUpdate
+
+// RunInternalUsageActionJSONRequestBody defines body for RunInternalUsageAction for application/json ContentType.
+type RunInternalUsageActionJSONRequestBody = VersionInput
+
+// SettleInternalUsageJSONRequestBody defines body for SettleInternalUsage for application/json ContentType.
+type SettleInternalUsageJSONRequestBody = InternalUsageSettleInput
+
+// CreateRepackingJSONRequestBody defines body for CreateRepacking for application/json ContentType.
+type CreateRepackingJSONRequestBody = RepackingInput
+
+// UpdateRepackingJSONRequestBody defines body for UpdateRepacking for application/json ContentType.
+type UpdateRepackingJSONRequestBody = RepackingUpdate
+
+// RunRepackingActionJSONRequestBody defines body for RunRepackingAction for application/json ContentType.
+type RunRepackingActionJSONRequestBody = VersionInput
+
+// CreateReturnDispositionJSONRequestBody defines body for CreateReturnDisposition for application/json ContentType.
+type CreateReturnDispositionJSONRequestBody = ReturnDispositionDocumentInput
+
+// UpdateReturnDispositionJSONRequestBody defines body for UpdateReturnDisposition for application/json ContentType.
+type UpdateReturnDispositionJSONRequestBody = ReturnDispositionDocumentUpdate
+
+// RunReturnDispositionActionJSONRequestBody defines body for RunReturnDispositionAction for application/json ContentType.
+type RunReturnDispositionActionJSONRequestBody = VersionInput
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// SuggestBatches Alokasi Batch (FEFO) — saran batch untuk mengambil qty dari satu lokasi (S-215)
@@ -755,6 +2032,78 @@ type ServerInterface interface {
 	// ListCostLayerConsumptions Jejak konsumsi HPP satu cost layer (RPT-04)
 	// (GET /api/v1/cost-layers/{id}/consumptions)
 	ListCostLayerConsumptions(w http.ResponseWriter, r *http.Request, id Id)
+	// ListDisposals Pemusnahan — daftar (INV-12)
+	// (GET /api/v1/disposals)
+	ListDisposals(w http.ResponseWriter, r *http.Request, params ListDisposalsParams)
+	// CreateDisposal Membuat draft Pemusnahan (S-223)
+	// (POST /api/v1/disposals)
+	CreateDisposal(w http.ResponseWriter, r *http.Request, params CreateDisposalParams)
+	// GetDisposal Detail Pemusnahan (juga isi Berita Acara cetak)
+	// (GET /api/v1/disposals/{id})
+	GetDisposal(w http.ResponseWriter, r *http.Request, id Id)
+	// UpdateDisposal Mengubah draft Pemusnahan
+	// (PUT /api/v1/disposals/{id})
+	UpdateDisposal(w http.ResponseWriter, r *http.Request, id Id, params UpdateDisposalParams)
+	// RunDisposalAction Aksi Pemusnahan (submit, revise, post, cancel)
+	// (POST /api/v1/disposals/{id}/actions/{action})
+	RunDisposalAction(w http.ResponseWriter, r *http.Request, id Id, action DisposalAction, params RunDisposalActionParams)
+	// UpdateDisposalReport Mengisi Berita Acara Pemusnahan (tanggal, metode, saksi, foto) sebelum posting
+	// (PUT /api/v1/disposals/{id}/report)
+	UpdateDisposalReport(w http.ResponseWriter, r *http.Request, id Id, params UpdateDisposalReportParams)
+	// ListInternalUsageDimensionOptions Divisi atau kampanye aktif untuk form Pemakaian Internal
+	// (GET /api/v1/internal-usage-options/{kind})
+	ListInternalUsageDimensionOptions(w http.ResponseWriter, r *http.Request, kind ListInternalUsageDimensionOptionsParamsKind)
+	// ListInternalUsages Pemakaian Internal — daftar (INV-05, HR-02)
+	// (GET /api/v1/internal-usages)
+	ListInternalUsages(w http.ResponseWriter, r *http.Request, params ListInternalUsagesParams)
+	// CreateInternalUsage Membuat draft Pemakaian Internal (S-221, S-227)
+	// (POST /api/v1/internal-usages)
+	CreateInternalUsage(w http.ResponseWriter, r *http.Request, params CreateInternalUsageParams)
+	// GetInternalUsage Detail Pemakaian Internal beserta batch yang keluar dan aksi yang diizinkan
+	// (GET /api/v1/internal-usages/{id})
+	GetInternalUsage(w http.ResponseWriter, r *http.Request, id Id)
+	// UpdateInternalUsage Mengubah draft Pemakaian Internal
+	// (PUT /api/v1/internal-usages/{id})
+	UpdateInternalUsage(w http.ResponseWriter, r *http.Request, id Id, params UpdateInternalUsageParams)
+	// RunInternalUsageAction Aksi Pemakaian Internal (submit, revise, release, handover, post, cancel)
+	// (POST /api/v1/internal-usages/{id}/actions/{action})
+	RunInternalUsageAction(w http.ResponseWriter, r *http.Request, id Id, action InternalUsageAction, params RunInternalUsageActionParams)
+	// SettleInternalUsage Mencatat sisa barang event (maks. H+1); sisa kembali ke Inbound berstatus Karantina
+	// (POST /api/v1/internal-usages/{id}/settle)
+	SettleInternalUsage(w http.ResponseWriter, r *http.Request, id Id, params SettleInternalUsageParams)
+	// ListRecostRuns Riwayat recost HPP akibat penerimaan bertanggal mundur (S-224)
+	// (GET /api/v1/recost-runs)
+	ListRecostRuns(w http.ResponseWriter, r *http.Request, params ListRecostRunsParams)
+	// ListRepackings Repacking — daftar (INV-06)
+	// (GET /api/v1/repackings)
+	ListRepackings(w http.ResponseWriter, r *http.Request, params ListRepackingsParams)
+	// CreateRepacking Membuat draft Repacking (S-222)
+	// (POST /api/v1/repackings)
+	CreateRepacking(w http.ResponseWriter, r *http.Request, params CreateRepackingParams)
+	// GetRepacking Detail Repacking
+	// (GET /api/v1/repackings/{id})
+	GetRepacking(w http.ResponseWriter, r *http.Request, id Id)
+	// UpdateRepacking Mengubah draft Repacking
+	// (PUT /api/v1/repackings/{id})
+	UpdateRepacking(w http.ResponseWriter, r *http.Request, id Id, params UpdateRepackingParams)
+	// RunRepackingAction Aksi Repacking (start, post, cancel)
+	// (POST /api/v1/repackings/{id}/actions/{action})
+	RunRepackingAction(w http.ResponseWriter, r *http.Request, id Id, action RepackingAction, params RunRepackingActionParams)
+	// ListReturnDispositions Disposisi Retur — daftar (WMS-07)
+	// (GET /api/v1/return-dispositions)
+	ListReturnDispositions(w http.ResponseWriter, r *http.Request, params ListReturnDispositionsParams)
+	// CreateReturnDisposition Membuat draft Disposisi Retur dari barang di Gudang Retur (S-220)
+	// (POST /api/v1/return-dispositions)
+	CreateReturnDisposition(w http.ResponseWriter, r *http.Request, params CreateReturnDispositionParams)
+	// GetReturnDisposition Detail Disposisi Retur
+	// (GET /api/v1/return-dispositions/{id})
+	GetReturnDisposition(w http.ResponseWriter, r *http.Request, id Id)
+	// UpdateReturnDisposition Mengubah draft Disposisi Retur
+	// (PUT /api/v1/return-dispositions/{id})
+	UpdateReturnDisposition(w http.ResponseWriter, r *http.Request, id Id, params UpdateReturnDispositionParams)
+	// RunReturnDispositionAction Aksi Disposisi Retur (submit, revise, post, cancel)
+	// (POST /api/v1/return-dispositions/{id}/actions/{action})
+	RunReturnDispositionAction(w http.ResponseWriter, r *http.Request, id Id, action ReturnDispositionAction, params RunReturnDispositionActionParams)
 	// ListStockBalances Stok per Lokasi — saldo per produk × lokasi × batch × status (INV-01, WMS-01)
 	// (GET /api/v1/stock-balances)
 	ListStockBalances(w http.ResponseWriter, r *http.Request, params ListStockBalancesParams)
@@ -794,6 +2143,150 @@ func (_ Unimplemented) ListCostLayers(w http.ResponseWriter, r *http.Request, pa
 // ListCostLayerConsumptions Jejak konsumsi HPP satu cost layer (RPT-04)
 // (GET /api/v1/cost-layers/{id}/consumptions)
 func (_ Unimplemented) ListCostLayerConsumptions(w http.ResponseWriter, r *http.Request, id Id) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListDisposals Pemusnahan — daftar (INV-12)
+// (GET /api/v1/disposals)
+func (_ Unimplemented) ListDisposals(w http.ResponseWriter, r *http.Request, params ListDisposalsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// CreateDisposal Membuat draft Pemusnahan (S-223)
+// (POST /api/v1/disposals)
+func (_ Unimplemented) CreateDisposal(w http.ResponseWriter, r *http.Request, params CreateDisposalParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetDisposal Detail Pemusnahan (juga isi Berita Acara cetak)
+// (GET /api/v1/disposals/{id})
+func (_ Unimplemented) GetDisposal(w http.ResponseWriter, r *http.Request, id Id) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// UpdateDisposal Mengubah draft Pemusnahan
+// (PUT /api/v1/disposals/{id})
+func (_ Unimplemented) UpdateDisposal(w http.ResponseWriter, r *http.Request, id Id, params UpdateDisposalParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// RunDisposalAction Aksi Pemusnahan (submit, revise, post, cancel)
+// (POST /api/v1/disposals/{id}/actions/{action})
+func (_ Unimplemented) RunDisposalAction(w http.ResponseWriter, r *http.Request, id Id, action DisposalAction, params RunDisposalActionParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// UpdateDisposalReport Mengisi Berita Acara Pemusnahan (tanggal, metode, saksi, foto) sebelum posting
+// (PUT /api/v1/disposals/{id}/report)
+func (_ Unimplemented) UpdateDisposalReport(w http.ResponseWriter, r *http.Request, id Id, params UpdateDisposalReportParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListInternalUsageDimensionOptions Divisi atau kampanye aktif untuk form Pemakaian Internal
+// (GET /api/v1/internal-usage-options/{kind})
+func (_ Unimplemented) ListInternalUsageDimensionOptions(w http.ResponseWriter, r *http.Request, kind ListInternalUsageDimensionOptionsParamsKind) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListInternalUsages Pemakaian Internal — daftar (INV-05, HR-02)
+// (GET /api/v1/internal-usages)
+func (_ Unimplemented) ListInternalUsages(w http.ResponseWriter, r *http.Request, params ListInternalUsagesParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// CreateInternalUsage Membuat draft Pemakaian Internal (S-221, S-227)
+// (POST /api/v1/internal-usages)
+func (_ Unimplemented) CreateInternalUsage(w http.ResponseWriter, r *http.Request, params CreateInternalUsageParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetInternalUsage Detail Pemakaian Internal beserta batch yang keluar dan aksi yang diizinkan
+// (GET /api/v1/internal-usages/{id})
+func (_ Unimplemented) GetInternalUsage(w http.ResponseWriter, r *http.Request, id Id) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// UpdateInternalUsage Mengubah draft Pemakaian Internal
+// (PUT /api/v1/internal-usages/{id})
+func (_ Unimplemented) UpdateInternalUsage(w http.ResponseWriter, r *http.Request, id Id, params UpdateInternalUsageParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// RunInternalUsageAction Aksi Pemakaian Internal (submit, revise, release, handover, post, cancel)
+// (POST /api/v1/internal-usages/{id}/actions/{action})
+func (_ Unimplemented) RunInternalUsageAction(w http.ResponseWriter, r *http.Request, id Id, action InternalUsageAction, params RunInternalUsageActionParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// SettleInternalUsage Mencatat sisa barang event (maks. H+1); sisa kembali ke Inbound berstatus Karantina
+// (POST /api/v1/internal-usages/{id}/settle)
+func (_ Unimplemented) SettleInternalUsage(w http.ResponseWriter, r *http.Request, id Id, params SettleInternalUsageParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListRecostRuns Riwayat recost HPP akibat penerimaan bertanggal mundur (S-224)
+// (GET /api/v1/recost-runs)
+func (_ Unimplemented) ListRecostRuns(w http.ResponseWriter, r *http.Request, params ListRecostRunsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListRepackings Repacking — daftar (INV-06)
+// (GET /api/v1/repackings)
+func (_ Unimplemented) ListRepackings(w http.ResponseWriter, r *http.Request, params ListRepackingsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// CreateRepacking Membuat draft Repacking (S-222)
+// (POST /api/v1/repackings)
+func (_ Unimplemented) CreateRepacking(w http.ResponseWriter, r *http.Request, params CreateRepackingParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetRepacking Detail Repacking
+// (GET /api/v1/repackings/{id})
+func (_ Unimplemented) GetRepacking(w http.ResponseWriter, r *http.Request, id Id) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// UpdateRepacking Mengubah draft Repacking
+// (PUT /api/v1/repackings/{id})
+func (_ Unimplemented) UpdateRepacking(w http.ResponseWriter, r *http.Request, id Id, params UpdateRepackingParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// RunRepackingAction Aksi Repacking (start, post, cancel)
+// (POST /api/v1/repackings/{id}/actions/{action})
+func (_ Unimplemented) RunRepackingAction(w http.ResponseWriter, r *http.Request, id Id, action RepackingAction, params RunRepackingActionParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListReturnDispositions Disposisi Retur — daftar (WMS-07)
+// (GET /api/v1/return-dispositions)
+func (_ Unimplemented) ListReturnDispositions(w http.ResponseWriter, r *http.Request, params ListReturnDispositionsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// CreateReturnDisposition Membuat draft Disposisi Retur dari barang di Gudang Retur (S-220)
+// (POST /api/v1/return-dispositions)
+func (_ Unimplemented) CreateReturnDisposition(w http.ResponseWriter, r *http.Request, params CreateReturnDispositionParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetReturnDisposition Detail Disposisi Retur
+// (GET /api/v1/return-dispositions/{id})
+func (_ Unimplemented) GetReturnDisposition(w http.ResponseWriter, r *http.Request, id Id) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// UpdateReturnDisposition Mengubah draft Disposisi Retur
+// (PUT /api/v1/return-dispositions/{id})
+func (_ Unimplemented) UpdateReturnDisposition(w http.ResponseWriter, r *http.Request, id Id, params UpdateReturnDispositionParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// RunReturnDispositionAction Aksi Disposisi Retur (submit, revise, post, cancel)
+// (POST /api/v1/return-dispositions/{id}/actions/{action})
+func (_ Unimplemented) RunReturnDispositionAction(w http.ResponseWriter, r *http.Request, id Id, action ReturnDispositionAction, params RunReturnDispositionActionParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -1136,6 +2629,1265 @@ func (siw *ServerInterfaceWrapper) ListCostLayerConsumptions(w http.ResponseWrit
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.ListCostLayerConsumptions(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListDisposals operation middleware
+func (siw *ServerInterfaceWrapper) ListDisposals(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListDisposalsParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", r.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "page"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "pageSize", r.URL.Query(), &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "pageSize"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "q" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "q", r.URL.Query(), &params.Q, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "q"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "q", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "status" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "status", r.URL.Query(), &params.Status, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "status"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "status", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "reason" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "reason", r.URL.Query(), &params.Reason, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "reason"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "reason", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListDisposals(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateDisposal operation middleware
+func (siw *ServerInterfaceWrapper) CreateDisposal(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateDisposalParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateDisposal(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetDisposal operation middleware
+func (siw *ServerInterfaceWrapper) GetDisposal(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetDisposal(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateDisposal operation middleware
+func (siw *ServerInterfaceWrapper) UpdateDisposal(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params UpdateDisposalParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateDisposal(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// RunDisposalAction operation middleware
+func (siw *ServerInterfaceWrapper) RunDisposalAction(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "action" -------------
+	var action DisposalAction
+
+	err = runtime.BindStyledParameterWithOptions("simple", "action", chi.URLParam(r, "action"), &action, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "action", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params RunDisposalActionParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.RunDisposalAction(w, r, id, action, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateDisposalReport operation middleware
+func (siw *ServerInterfaceWrapper) UpdateDisposalReport(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params UpdateDisposalReportParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateDisposalReport(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListInternalUsageDimensionOptions operation middleware
+func (siw *ServerInterfaceWrapper) ListInternalUsageDimensionOptions(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "kind" -------------
+	var kind ListInternalUsageDimensionOptionsParamsKind
+
+	err = runtime.BindStyledParameterWithOptions("simple", "kind", chi.URLParam(r, "kind"), &kind, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "kind", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListInternalUsageDimensionOptions(w, r, kind)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListInternalUsages operation middleware
+func (siw *ServerInterfaceWrapper) ListInternalUsages(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListInternalUsagesParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", r.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "page"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "pageSize", r.URL.Query(), &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "pageSize"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "q" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "q", r.URL.Query(), &params.Q, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "q"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "q", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "status" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "status", r.URL.Query(), &params.Status, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "status"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "status", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "purpose" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "purpose", r.URL.Query(), &params.Purpose, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "purpose"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "purpose", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListInternalUsages(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateInternalUsage operation middleware
+func (siw *ServerInterfaceWrapper) CreateInternalUsage(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateInternalUsageParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateInternalUsage(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetInternalUsage operation middleware
+func (siw *ServerInterfaceWrapper) GetInternalUsage(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetInternalUsage(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateInternalUsage operation middleware
+func (siw *ServerInterfaceWrapper) UpdateInternalUsage(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params UpdateInternalUsageParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateInternalUsage(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// RunInternalUsageAction operation middleware
+func (siw *ServerInterfaceWrapper) RunInternalUsageAction(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "action" -------------
+	var action InternalUsageAction
+
+	err = runtime.BindStyledParameterWithOptions("simple", "action", chi.URLParam(r, "action"), &action, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "action", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params RunInternalUsageActionParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.RunInternalUsageAction(w, r, id, action, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// SettleInternalUsage operation middleware
+func (siw *ServerInterfaceWrapper) SettleInternalUsage(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params SettleInternalUsageParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.SettleInternalUsage(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListRecostRuns operation middleware
+func (siw *ServerInterfaceWrapper) ListRecostRuns(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListRecostRunsParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", r.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "page"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "pageSize", r.URL.Query(), &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "pageSize"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "productId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "productId", r.URL.Query(), &params.ProductId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "productId"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "productId", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListRecostRuns(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListRepackings operation middleware
+func (siw *ServerInterfaceWrapper) ListRepackings(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListRepackingsParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", r.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "page"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "pageSize", r.URL.Query(), &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "pageSize"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "q" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "q", r.URL.Query(), &params.Q, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "q"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "q", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "status" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "status", r.URL.Query(), &params.Status, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "status"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "status", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListRepackings(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateRepacking operation middleware
+func (siw *ServerInterfaceWrapper) CreateRepacking(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateRepackingParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateRepacking(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetRepacking operation middleware
+func (siw *ServerInterfaceWrapper) GetRepacking(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetRepacking(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateRepacking operation middleware
+func (siw *ServerInterfaceWrapper) UpdateRepacking(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params UpdateRepackingParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateRepacking(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// RunRepackingAction operation middleware
+func (siw *ServerInterfaceWrapper) RunRepackingAction(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "action" -------------
+	var action RepackingAction
+
+	err = runtime.BindStyledParameterWithOptions("simple", "action", chi.URLParam(r, "action"), &action, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "action", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params RunRepackingActionParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.RunRepackingAction(w, r, id, action, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListReturnDispositions operation middleware
+func (siw *ServerInterfaceWrapper) ListReturnDispositions(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListReturnDispositionsParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", r.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "page"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "pageSize", r.URL.Query(), &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "pageSize"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "q" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "q", r.URL.Query(), &params.Q, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "q"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "q", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "status" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "status", r.URL.Query(), &params.Status, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "status"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "status", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListReturnDispositions(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateReturnDisposition operation middleware
+func (siw *ServerInterfaceWrapper) CreateReturnDisposition(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateReturnDispositionParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateReturnDisposition(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetReturnDisposition operation middleware
+func (siw *ServerInterfaceWrapper) GetReturnDisposition(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetReturnDisposition(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateReturnDisposition operation middleware
+func (siw *ServerInterfaceWrapper) UpdateReturnDisposition(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params UpdateReturnDispositionParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateReturnDisposition(w, r, id, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// RunReturnDispositionAction operation middleware
+func (siw *ServerInterfaceWrapper) RunReturnDispositionAction(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "action" -------------
+	var action ReturnDispositionAction
+
+	err = runtime.BindStyledParameterWithOptions("simple", "action", chi.URLParam(r, "action"), &action, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "action", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params RunReturnDispositionActionParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "Idempotency-Key" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Idempotency-Key")]; found {
+		var IdempotencyKey IdempotencyKey
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Idempotency-Key", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Idempotency-Key", valueList[0], &IdempotencyKey, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: "uuid"})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Idempotency-Key", Err: err})
+			return
+		}
+
+		params.IdempotencyKey = IdempotencyKey
+
+	} else {
+		err := fmt.Errorf("Header parameter Idempotency-Key is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "Idempotency-Key", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.RunReturnDispositionAction(w, r, id, action, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -1501,6 +4253,78 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/api/v1/bundle-availability", wrapper.ListBundleAvailability)
 	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/internal-usages", wrapper.ListInternalUsages)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/internal-usages", wrapper.CreateInternalUsage)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/internal-usages/{id}", wrapper.GetInternalUsage)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/internal-usages/{id}", wrapper.UpdateInternalUsage)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/internal-usages/{id}/actions/{action}", wrapper.RunInternalUsageAction)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/internal-usages/{id}/settle", wrapper.SettleInternalUsage)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/internal-usage-options/{kind}", wrapper.ListInternalUsageDimensionOptions)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/repackings", wrapper.ListRepackings)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/repackings", wrapper.CreateRepacking)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/repackings/{id}", wrapper.GetRepacking)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/repackings/{id}", wrapper.UpdateRepacking)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/repackings/{id}/actions/{action}", wrapper.RunRepackingAction)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/disposals", wrapper.ListDisposals)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/disposals", wrapper.CreateDisposal)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/disposals/{id}", wrapper.GetDisposal)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/disposals/{id}", wrapper.UpdateDisposal)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/disposals/{id}/report", wrapper.UpdateDisposalReport)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/disposals/{id}/actions/{action}", wrapper.RunDisposalAction)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/return-dispositions", wrapper.ListReturnDispositions)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/return-dispositions", wrapper.CreateReturnDisposition)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/return-dispositions/{id}", wrapper.GetReturnDisposition)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/return-dispositions/{id}", wrapper.UpdateReturnDisposition)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/return-dispositions/{id}/actions/{action}", wrapper.RunReturnDispositionAction)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/recost-runs", wrapper.ListRecostRuns)
+	})
 
 	return r
 }
@@ -1702,6 +4526,970 @@ func (response ListCostLayerConsumptionsdefaultApplicationProblemPlusJSONRespons
 	return err
 }
 
+type ListDisposalsRequestObject struct {
+	Params ListDisposalsParams
+}
+
+type ListDisposalsResponseObject interface {
+	VisitListDisposalsResponse(w http.ResponseWriter) error
+}
+
+type ListDisposals200JSONResponse DisposalList
+
+func (response ListDisposals200JSONResponse) VisitListDisposalsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListDisposalsdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListDisposalsdefaultApplicationProblemPlusJSONResponse) VisitListDisposalsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateDisposalRequestObject struct {
+	Params CreateDisposalParams
+	Body   *CreateDisposalJSONRequestBody
+}
+
+type CreateDisposalResponseObject interface {
+	VisitCreateDisposalResponse(w http.ResponseWriter) error
+}
+
+type CreateDisposal201JSONResponse Disposal
+
+func (response CreateDisposal201JSONResponse) VisitCreateDisposalResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateDisposaldefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response CreateDisposaldefaultApplicationProblemPlusJSONResponse) VisitCreateDisposalResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetDisposalRequestObject struct {
+	Id Id `json:"id"`
+}
+
+type GetDisposalResponseObject interface {
+	VisitGetDisposalResponse(w http.ResponseWriter) error
+}
+
+type GetDisposal200JSONResponse Disposal
+
+func (response GetDisposal200JSONResponse) VisitGetDisposalResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetDisposaldefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetDisposaldefaultApplicationProblemPlusJSONResponse) VisitGetDisposalResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateDisposalRequestObject struct {
+	Id     Id `json:"id"`
+	Params UpdateDisposalParams
+	Body   *UpdateDisposalJSONRequestBody
+}
+
+type UpdateDisposalResponseObject interface {
+	VisitUpdateDisposalResponse(w http.ResponseWriter) error
+}
+
+type UpdateDisposal200JSONResponse Disposal
+
+func (response UpdateDisposal200JSONResponse) VisitUpdateDisposalResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateDisposaldefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response UpdateDisposaldefaultApplicationProblemPlusJSONResponse) VisitUpdateDisposalResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RunDisposalActionRequestObject struct {
+	Id     Id             `json:"id"`
+	Action DisposalAction `json:"action"`
+	Params RunDisposalActionParams
+	Body   *RunDisposalActionJSONRequestBody
+}
+
+type RunDisposalActionResponseObject interface {
+	VisitRunDisposalActionResponse(w http.ResponseWriter) error
+}
+
+type RunDisposalAction200JSONResponse Disposal
+
+func (response RunDisposalAction200JSONResponse) VisitRunDisposalActionResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RunDisposalActiondefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response RunDisposalActiondefaultApplicationProblemPlusJSONResponse) VisitRunDisposalActionResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateDisposalReportRequestObject struct {
+	Id     Id `json:"id"`
+	Params UpdateDisposalReportParams
+	Body   *UpdateDisposalReportJSONRequestBody
+}
+
+type UpdateDisposalReportResponseObject interface {
+	VisitUpdateDisposalReportResponse(w http.ResponseWriter) error
+}
+
+type UpdateDisposalReport200JSONResponse Disposal
+
+func (response UpdateDisposalReport200JSONResponse) VisitUpdateDisposalReportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateDisposalReportdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response UpdateDisposalReportdefaultApplicationProblemPlusJSONResponse) VisitUpdateDisposalReportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListInternalUsageDimensionOptionsRequestObject struct {
+	Kind ListInternalUsageDimensionOptionsParamsKind `json:"kind"`
+}
+
+type ListInternalUsageDimensionOptionsResponseObject interface {
+	VisitListInternalUsageDimensionOptionsResponse(w http.ResponseWriter) error
+}
+
+type ListInternalUsageDimensionOptions200JSONResponse InventoryDimensionOptionList
+
+func (response ListInternalUsageDimensionOptions200JSONResponse) VisitListInternalUsageDimensionOptionsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListInternalUsageDimensionOptionsdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListInternalUsageDimensionOptionsdefaultApplicationProblemPlusJSONResponse) VisitListInternalUsageDimensionOptionsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListInternalUsagesRequestObject struct {
+	Params ListInternalUsagesParams
+}
+
+type ListInternalUsagesResponseObject interface {
+	VisitListInternalUsagesResponse(w http.ResponseWriter) error
+}
+
+type ListInternalUsages200JSONResponse InternalUsageList
+
+func (response ListInternalUsages200JSONResponse) VisitListInternalUsagesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListInternalUsagesdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListInternalUsagesdefaultApplicationProblemPlusJSONResponse) VisitListInternalUsagesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateInternalUsageRequestObject struct {
+	Params CreateInternalUsageParams
+	Body   *CreateInternalUsageJSONRequestBody
+}
+
+type CreateInternalUsageResponseObject interface {
+	VisitCreateInternalUsageResponse(w http.ResponseWriter) error
+}
+
+type CreateInternalUsage201JSONResponse InternalUsage
+
+func (response CreateInternalUsage201JSONResponse) VisitCreateInternalUsageResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateInternalUsagedefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response CreateInternalUsagedefaultApplicationProblemPlusJSONResponse) VisitCreateInternalUsageResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetInternalUsageRequestObject struct {
+	Id Id `json:"id"`
+}
+
+type GetInternalUsageResponseObject interface {
+	VisitGetInternalUsageResponse(w http.ResponseWriter) error
+}
+
+type GetInternalUsage200JSONResponse InternalUsage
+
+func (response GetInternalUsage200JSONResponse) VisitGetInternalUsageResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetInternalUsagedefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetInternalUsagedefaultApplicationProblemPlusJSONResponse) VisitGetInternalUsageResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateInternalUsageRequestObject struct {
+	Id     Id `json:"id"`
+	Params UpdateInternalUsageParams
+	Body   *UpdateInternalUsageJSONRequestBody
+}
+
+type UpdateInternalUsageResponseObject interface {
+	VisitUpdateInternalUsageResponse(w http.ResponseWriter) error
+}
+
+type UpdateInternalUsage200JSONResponse InternalUsage
+
+func (response UpdateInternalUsage200JSONResponse) VisitUpdateInternalUsageResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateInternalUsagedefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response UpdateInternalUsagedefaultApplicationProblemPlusJSONResponse) VisitUpdateInternalUsageResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RunInternalUsageActionRequestObject struct {
+	Id     Id                  `json:"id"`
+	Action InternalUsageAction `json:"action"`
+	Params RunInternalUsageActionParams
+	Body   *RunInternalUsageActionJSONRequestBody
+}
+
+type RunInternalUsageActionResponseObject interface {
+	VisitRunInternalUsageActionResponse(w http.ResponseWriter) error
+}
+
+type RunInternalUsageAction200JSONResponse InternalUsage
+
+func (response RunInternalUsageAction200JSONResponse) VisitRunInternalUsageActionResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RunInternalUsageActiondefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response RunInternalUsageActiondefaultApplicationProblemPlusJSONResponse) VisitRunInternalUsageActionResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SettleInternalUsageRequestObject struct {
+	Id     Id `json:"id"`
+	Params SettleInternalUsageParams
+	Body   *SettleInternalUsageJSONRequestBody
+}
+
+type SettleInternalUsageResponseObject interface {
+	VisitSettleInternalUsageResponse(w http.ResponseWriter) error
+}
+
+type SettleInternalUsage200JSONResponse InternalUsage
+
+func (response SettleInternalUsage200JSONResponse) VisitSettleInternalUsageResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SettleInternalUsagedefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response SettleInternalUsagedefaultApplicationProblemPlusJSONResponse) VisitSettleInternalUsageResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListRecostRunsRequestObject struct {
+	Params ListRecostRunsParams
+}
+
+type ListRecostRunsResponseObject interface {
+	VisitListRecostRunsResponse(w http.ResponseWriter) error
+}
+
+type ListRecostRuns200JSONResponse RecostRunList
+
+func (response ListRecostRuns200JSONResponse) VisitListRecostRunsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListRecostRunsdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListRecostRunsdefaultApplicationProblemPlusJSONResponse) VisitListRecostRunsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListRepackingsRequestObject struct {
+	Params ListRepackingsParams
+}
+
+type ListRepackingsResponseObject interface {
+	VisitListRepackingsResponse(w http.ResponseWriter) error
+}
+
+type ListRepackings200JSONResponse RepackingList
+
+func (response ListRepackings200JSONResponse) VisitListRepackingsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListRepackingsdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListRepackingsdefaultApplicationProblemPlusJSONResponse) VisitListRepackingsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateRepackingRequestObject struct {
+	Params CreateRepackingParams
+	Body   *CreateRepackingJSONRequestBody
+}
+
+type CreateRepackingResponseObject interface {
+	VisitCreateRepackingResponse(w http.ResponseWriter) error
+}
+
+type CreateRepacking201JSONResponse Repacking
+
+func (response CreateRepacking201JSONResponse) VisitCreateRepackingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateRepackingdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response CreateRepackingdefaultApplicationProblemPlusJSONResponse) VisitCreateRepackingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetRepackingRequestObject struct {
+	Id Id `json:"id"`
+}
+
+type GetRepackingResponseObject interface {
+	VisitGetRepackingResponse(w http.ResponseWriter) error
+}
+
+type GetRepacking200JSONResponse Repacking
+
+func (response GetRepacking200JSONResponse) VisitGetRepackingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetRepackingdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetRepackingdefaultApplicationProblemPlusJSONResponse) VisitGetRepackingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateRepackingRequestObject struct {
+	Id     Id `json:"id"`
+	Params UpdateRepackingParams
+	Body   *UpdateRepackingJSONRequestBody
+}
+
+type UpdateRepackingResponseObject interface {
+	VisitUpdateRepackingResponse(w http.ResponseWriter) error
+}
+
+type UpdateRepacking200JSONResponse Repacking
+
+func (response UpdateRepacking200JSONResponse) VisitUpdateRepackingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateRepackingdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response UpdateRepackingdefaultApplicationProblemPlusJSONResponse) VisitUpdateRepackingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RunRepackingActionRequestObject struct {
+	Id     Id              `json:"id"`
+	Action RepackingAction `json:"action"`
+	Params RunRepackingActionParams
+	Body   *RunRepackingActionJSONRequestBody
+}
+
+type RunRepackingActionResponseObject interface {
+	VisitRunRepackingActionResponse(w http.ResponseWriter) error
+}
+
+type RunRepackingAction200JSONResponse Repacking
+
+func (response RunRepackingAction200JSONResponse) VisitRunRepackingActionResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RunRepackingActiondefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response RunRepackingActiondefaultApplicationProblemPlusJSONResponse) VisitRunRepackingActionResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListReturnDispositionsRequestObject struct {
+	Params ListReturnDispositionsParams
+}
+
+type ListReturnDispositionsResponseObject interface {
+	VisitListReturnDispositionsResponse(w http.ResponseWriter) error
+}
+
+type ListReturnDispositions200JSONResponse ReturnDispositionDocumentList
+
+func (response ListReturnDispositions200JSONResponse) VisitListReturnDispositionsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListReturnDispositionsdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListReturnDispositionsdefaultApplicationProblemPlusJSONResponse) VisitListReturnDispositionsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateReturnDispositionRequestObject struct {
+	Params CreateReturnDispositionParams
+	Body   *CreateReturnDispositionJSONRequestBody
+}
+
+type CreateReturnDispositionResponseObject interface {
+	VisitCreateReturnDispositionResponse(w http.ResponseWriter) error
+}
+
+type CreateReturnDisposition201JSONResponse ReturnDispositionDocument
+
+func (response CreateReturnDisposition201JSONResponse) VisitCreateReturnDispositionResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateReturnDispositiondefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response CreateReturnDispositiondefaultApplicationProblemPlusJSONResponse) VisitCreateReturnDispositionResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetReturnDispositionRequestObject struct {
+	Id Id `json:"id"`
+}
+
+type GetReturnDispositionResponseObject interface {
+	VisitGetReturnDispositionResponse(w http.ResponseWriter) error
+}
+
+type GetReturnDisposition200JSONResponse ReturnDispositionDocument
+
+func (response GetReturnDisposition200JSONResponse) VisitGetReturnDispositionResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetReturnDispositiondefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetReturnDispositiondefaultApplicationProblemPlusJSONResponse) VisitGetReturnDispositionResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateReturnDispositionRequestObject struct {
+	Id     Id `json:"id"`
+	Params UpdateReturnDispositionParams
+	Body   *UpdateReturnDispositionJSONRequestBody
+}
+
+type UpdateReturnDispositionResponseObject interface {
+	VisitUpdateReturnDispositionResponse(w http.ResponseWriter) error
+}
+
+type UpdateReturnDisposition200JSONResponse ReturnDispositionDocument
+
+func (response UpdateReturnDisposition200JSONResponse) VisitUpdateReturnDispositionResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateReturnDispositiondefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response UpdateReturnDispositiondefaultApplicationProblemPlusJSONResponse) VisitUpdateReturnDispositionResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RunReturnDispositionActionRequestObject struct {
+	Id     Id                      `json:"id"`
+	Action ReturnDispositionAction `json:"action"`
+	Params RunReturnDispositionActionParams
+	Body   *RunReturnDispositionActionJSONRequestBody
+}
+
+type RunReturnDispositionActionResponseObject interface {
+	VisitRunReturnDispositionActionResponse(w http.ResponseWriter) error
+}
+
+type RunReturnDispositionAction200JSONResponse ReturnDispositionDocument
+
+func (response RunReturnDispositionAction200JSONResponse) VisitRunReturnDispositionActionResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RunReturnDispositionActiondefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response RunReturnDispositionActiondefaultApplicationProblemPlusJSONResponse) VisitRunReturnDispositionActionResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type ListStockBalancesRequestObject struct {
 	Params ListStockBalancesParams
 }
@@ -1797,6 +5585,78 @@ type StrictServerInterface interface {
 	// ListCostLayerConsumptions Jejak konsumsi HPP satu cost layer (RPT-04)
 	// (GET /api/v1/cost-layers/{id}/consumptions)
 	ListCostLayerConsumptions(ctx context.Context, request ListCostLayerConsumptionsRequestObject) (ListCostLayerConsumptionsResponseObject, error)
+	// ListDisposals Pemusnahan — daftar (INV-12)
+	// (GET /api/v1/disposals)
+	ListDisposals(ctx context.Context, request ListDisposalsRequestObject) (ListDisposalsResponseObject, error)
+	// CreateDisposal Membuat draft Pemusnahan (S-223)
+	// (POST /api/v1/disposals)
+	CreateDisposal(ctx context.Context, request CreateDisposalRequestObject) (CreateDisposalResponseObject, error)
+	// GetDisposal Detail Pemusnahan (juga isi Berita Acara cetak)
+	// (GET /api/v1/disposals/{id})
+	GetDisposal(ctx context.Context, request GetDisposalRequestObject) (GetDisposalResponseObject, error)
+	// UpdateDisposal Mengubah draft Pemusnahan
+	// (PUT /api/v1/disposals/{id})
+	UpdateDisposal(ctx context.Context, request UpdateDisposalRequestObject) (UpdateDisposalResponseObject, error)
+	// RunDisposalAction Aksi Pemusnahan (submit, revise, post, cancel)
+	// (POST /api/v1/disposals/{id}/actions/{action})
+	RunDisposalAction(ctx context.Context, request RunDisposalActionRequestObject) (RunDisposalActionResponseObject, error)
+	// UpdateDisposalReport Mengisi Berita Acara Pemusnahan (tanggal, metode, saksi, foto) sebelum posting
+	// (PUT /api/v1/disposals/{id}/report)
+	UpdateDisposalReport(ctx context.Context, request UpdateDisposalReportRequestObject) (UpdateDisposalReportResponseObject, error)
+	// ListInternalUsageDimensionOptions Divisi atau kampanye aktif untuk form Pemakaian Internal
+	// (GET /api/v1/internal-usage-options/{kind})
+	ListInternalUsageDimensionOptions(ctx context.Context, request ListInternalUsageDimensionOptionsRequestObject) (ListInternalUsageDimensionOptionsResponseObject, error)
+	// ListInternalUsages Pemakaian Internal — daftar (INV-05, HR-02)
+	// (GET /api/v1/internal-usages)
+	ListInternalUsages(ctx context.Context, request ListInternalUsagesRequestObject) (ListInternalUsagesResponseObject, error)
+	// CreateInternalUsage Membuat draft Pemakaian Internal (S-221, S-227)
+	// (POST /api/v1/internal-usages)
+	CreateInternalUsage(ctx context.Context, request CreateInternalUsageRequestObject) (CreateInternalUsageResponseObject, error)
+	// GetInternalUsage Detail Pemakaian Internal beserta batch yang keluar dan aksi yang diizinkan
+	// (GET /api/v1/internal-usages/{id})
+	GetInternalUsage(ctx context.Context, request GetInternalUsageRequestObject) (GetInternalUsageResponseObject, error)
+	// UpdateInternalUsage Mengubah draft Pemakaian Internal
+	// (PUT /api/v1/internal-usages/{id})
+	UpdateInternalUsage(ctx context.Context, request UpdateInternalUsageRequestObject) (UpdateInternalUsageResponseObject, error)
+	// RunInternalUsageAction Aksi Pemakaian Internal (submit, revise, release, handover, post, cancel)
+	// (POST /api/v1/internal-usages/{id}/actions/{action})
+	RunInternalUsageAction(ctx context.Context, request RunInternalUsageActionRequestObject) (RunInternalUsageActionResponseObject, error)
+	// SettleInternalUsage Mencatat sisa barang event (maks. H+1); sisa kembali ke Inbound berstatus Karantina
+	// (POST /api/v1/internal-usages/{id}/settle)
+	SettleInternalUsage(ctx context.Context, request SettleInternalUsageRequestObject) (SettleInternalUsageResponseObject, error)
+	// ListRecostRuns Riwayat recost HPP akibat penerimaan bertanggal mundur (S-224)
+	// (GET /api/v1/recost-runs)
+	ListRecostRuns(ctx context.Context, request ListRecostRunsRequestObject) (ListRecostRunsResponseObject, error)
+	// ListRepackings Repacking — daftar (INV-06)
+	// (GET /api/v1/repackings)
+	ListRepackings(ctx context.Context, request ListRepackingsRequestObject) (ListRepackingsResponseObject, error)
+	// CreateRepacking Membuat draft Repacking (S-222)
+	// (POST /api/v1/repackings)
+	CreateRepacking(ctx context.Context, request CreateRepackingRequestObject) (CreateRepackingResponseObject, error)
+	// GetRepacking Detail Repacking
+	// (GET /api/v1/repackings/{id})
+	GetRepacking(ctx context.Context, request GetRepackingRequestObject) (GetRepackingResponseObject, error)
+	// UpdateRepacking Mengubah draft Repacking
+	// (PUT /api/v1/repackings/{id})
+	UpdateRepacking(ctx context.Context, request UpdateRepackingRequestObject) (UpdateRepackingResponseObject, error)
+	// RunRepackingAction Aksi Repacking (start, post, cancel)
+	// (POST /api/v1/repackings/{id}/actions/{action})
+	RunRepackingAction(ctx context.Context, request RunRepackingActionRequestObject) (RunRepackingActionResponseObject, error)
+	// ListReturnDispositions Disposisi Retur — daftar (WMS-07)
+	// (GET /api/v1/return-dispositions)
+	ListReturnDispositions(ctx context.Context, request ListReturnDispositionsRequestObject) (ListReturnDispositionsResponseObject, error)
+	// CreateReturnDisposition Membuat draft Disposisi Retur dari barang di Gudang Retur (S-220)
+	// (POST /api/v1/return-dispositions)
+	CreateReturnDisposition(ctx context.Context, request CreateReturnDispositionRequestObject) (CreateReturnDispositionResponseObject, error)
+	// GetReturnDisposition Detail Disposisi Retur
+	// (GET /api/v1/return-dispositions/{id})
+	GetReturnDisposition(ctx context.Context, request GetReturnDispositionRequestObject) (GetReturnDispositionResponseObject, error)
+	// UpdateReturnDisposition Mengubah draft Disposisi Retur
+	// (PUT /api/v1/return-dispositions/{id})
+	UpdateReturnDisposition(ctx context.Context, request UpdateReturnDispositionRequestObject) (UpdateReturnDispositionResponseObject, error)
+	// RunReturnDispositionAction Aksi Disposisi Retur (submit, revise, post, cancel)
+	// (POST /api/v1/return-dispositions/{id}/actions/{action})
+	RunReturnDispositionAction(ctx context.Context, request RunReturnDispositionActionRequestObject) (RunReturnDispositionActionResponseObject, error)
 	// ListStockBalances Stok per Lokasi — saldo per produk × lokasi × batch × status (INV-01, WMS-01)
 	// (GET /api/v1/stock-balances)
 	ListStockBalances(ctx context.Context, request ListStockBalancesRequestObject) (ListStockBalancesResponseObject, error)
@@ -1967,6 +5827,742 @@ func (sh *strictHandler) ListCostLayerConsumptions(w http.ResponseWriter, r *htt
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(ListCostLayerConsumptionsResponseObject); ok {
 		if err := validResponse.VisitListCostLayerConsumptionsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListDisposals operation middleware
+func (sh *strictHandler) ListDisposals(w http.ResponseWriter, r *http.Request, params ListDisposalsParams) {
+	var request ListDisposalsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListDisposals(ctx, request.(ListDisposalsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListDisposals")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListDisposalsResponseObject); ok {
+		if err := validResponse.VisitListDisposalsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreateDisposal operation middleware
+func (sh *strictHandler) CreateDisposal(w http.ResponseWriter, r *http.Request, params CreateDisposalParams) {
+	var request CreateDisposalRequestObject
+
+	request.Params = params
+
+	var body CreateDisposalJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CreateDisposal(ctx, request.(CreateDisposalRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateDisposal")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreateDisposalResponseObject); ok {
+		if err := validResponse.VisitCreateDisposalResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetDisposal operation middleware
+func (sh *strictHandler) GetDisposal(w http.ResponseWriter, r *http.Request, id Id) {
+	var request GetDisposalRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetDisposal(ctx, request.(GetDisposalRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetDisposal")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetDisposalResponseObject); ok {
+		if err := validResponse.VisitGetDisposalResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateDisposal operation middleware
+func (sh *strictHandler) UpdateDisposal(w http.ResponseWriter, r *http.Request, id Id, params UpdateDisposalParams) {
+	var request UpdateDisposalRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body UpdateDisposalJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateDisposal(ctx, request.(UpdateDisposalRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateDisposal")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdateDisposalResponseObject); ok {
+		if err := validResponse.VisitUpdateDisposalResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// RunDisposalAction operation middleware
+func (sh *strictHandler) RunDisposalAction(w http.ResponseWriter, r *http.Request, id Id, action DisposalAction, params RunDisposalActionParams) {
+	var request RunDisposalActionRequestObject
+
+	request.Id = id
+	request.Action = action
+	request.Params = params
+
+	var body RunDisposalActionJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.RunDisposalAction(ctx, request.(RunDisposalActionRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RunDisposalAction")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(RunDisposalActionResponseObject); ok {
+		if err := validResponse.VisitRunDisposalActionResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateDisposalReport operation middleware
+func (sh *strictHandler) UpdateDisposalReport(w http.ResponseWriter, r *http.Request, id Id, params UpdateDisposalReportParams) {
+	var request UpdateDisposalReportRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body UpdateDisposalReportJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateDisposalReport(ctx, request.(UpdateDisposalReportRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateDisposalReport")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdateDisposalReportResponseObject); ok {
+		if err := validResponse.VisitUpdateDisposalReportResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListInternalUsageDimensionOptions operation middleware
+func (sh *strictHandler) ListInternalUsageDimensionOptions(w http.ResponseWriter, r *http.Request, kind ListInternalUsageDimensionOptionsParamsKind) {
+	var request ListInternalUsageDimensionOptionsRequestObject
+
+	request.Kind = kind
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListInternalUsageDimensionOptions(ctx, request.(ListInternalUsageDimensionOptionsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListInternalUsageDimensionOptions")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListInternalUsageDimensionOptionsResponseObject); ok {
+		if err := validResponse.VisitListInternalUsageDimensionOptionsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListInternalUsages operation middleware
+func (sh *strictHandler) ListInternalUsages(w http.ResponseWriter, r *http.Request, params ListInternalUsagesParams) {
+	var request ListInternalUsagesRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListInternalUsages(ctx, request.(ListInternalUsagesRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListInternalUsages")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListInternalUsagesResponseObject); ok {
+		if err := validResponse.VisitListInternalUsagesResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreateInternalUsage operation middleware
+func (sh *strictHandler) CreateInternalUsage(w http.ResponseWriter, r *http.Request, params CreateInternalUsageParams) {
+	var request CreateInternalUsageRequestObject
+
+	request.Params = params
+
+	var body CreateInternalUsageJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CreateInternalUsage(ctx, request.(CreateInternalUsageRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateInternalUsage")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreateInternalUsageResponseObject); ok {
+		if err := validResponse.VisitCreateInternalUsageResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetInternalUsage operation middleware
+func (sh *strictHandler) GetInternalUsage(w http.ResponseWriter, r *http.Request, id Id) {
+	var request GetInternalUsageRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetInternalUsage(ctx, request.(GetInternalUsageRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetInternalUsage")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetInternalUsageResponseObject); ok {
+		if err := validResponse.VisitGetInternalUsageResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateInternalUsage operation middleware
+func (sh *strictHandler) UpdateInternalUsage(w http.ResponseWriter, r *http.Request, id Id, params UpdateInternalUsageParams) {
+	var request UpdateInternalUsageRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body UpdateInternalUsageJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateInternalUsage(ctx, request.(UpdateInternalUsageRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateInternalUsage")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdateInternalUsageResponseObject); ok {
+		if err := validResponse.VisitUpdateInternalUsageResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// RunInternalUsageAction operation middleware
+func (sh *strictHandler) RunInternalUsageAction(w http.ResponseWriter, r *http.Request, id Id, action InternalUsageAction, params RunInternalUsageActionParams) {
+	var request RunInternalUsageActionRequestObject
+
+	request.Id = id
+	request.Action = action
+	request.Params = params
+
+	var body RunInternalUsageActionJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.RunInternalUsageAction(ctx, request.(RunInternalUsageActionRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RunInternalUsageAction")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(RunInternalUsageActionResponseObject); ok {
+		if err := validResponse.VisitRunInternalUsageActionResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// SettleInternalUsage operation middleware
+func (sh *strictHandler) SettleInternalUsage(w http.ResponseWriter, r *http.Request, id Id, params SettleInternalUsageParams) {
+	var request SettleInternalUsageRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body SettleInternalUsageJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.SettleInternalUsage(ctx, request.(SettleInternalUsageRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "SettleInternalUsage")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(SettleInternalUsageResponseObject); ok {
+		if err := validResponse.VisitSettleInternalUsageResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListRecostRuns operation middleware
+func (sh *strictHandler) ListRecostRuns(w http.ResponseWriter, r *http.Request, params ListRecostRunsParams) {
+	var request ListRecostRunsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListRecostRuns(ctx, request.(ListRecostRunsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListRecostRuns")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListRecostRunsResponseObject); ok {
+		if err := validResponse.VisitListRecostRunsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListRepackings operation middleware
+func (sh *strictHandler) ListRepackings(w http.ResponseWriter, r *http.Request, params ListRepackingsParams) {
+	var request ListRepackingsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListRepackings(ctx, request.(ListRepackingsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListRepackings")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListRepackingsResponseObject); ok {
+		if err := validResponse.VisitListRepackingsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreateRepacking operation middleware
+func (sh *strictHandler) CreateRepacking(w http.ResponseWriter, r *http.Request, params CreateRepackingParams) {
+	var request CreateRepackingRequestObject
+
+	request.Params = params
+
+	var body CreateRepackingJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CreateRepacking(ctx, request.(CreateRepackingRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateRepacking")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreateRepackingResponseObject); ok {
+		if err := validResponse.VisitCreateRepackingResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetRepacking operation middleware
+func (sh *strictHandler) GetRepacking(w http.ResponseWriter, r *http.Request, id Id) {
+	var request GetRepackingRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetRepacking(ctx, request.(GetRepackingRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetRepacking")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetRepackingResponseObject); ok {
+		if err := validResponse.VisitGetRepackingResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateRepacking operation middleware
+func (sh *strictHandler) UpdateRepacking(w http.ResponseWriter, r *http.Request, id Id, params UpdateRepackingParams) {
+	var request UpdateRepackingRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body UpdateRepackingJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateRepacking(ctx, request.(UpdateRepackingRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateRepacking")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdateRepackingResponseObject); ok {
+		if err := validResponse.VisitUpdateRepackingResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// RunRepackingAction operation middleware
+func (sh *strictHandler) RunRepackingAction(w http.ResponseWriter, r *http.Request, id Id, action RepackingAction, params RunRepackingActionParams) {
+	var request RunRepackingActionRequestObject
+
+	request.Id = id
+	request.Action = action
+	request.Params = params
+
+	var body RunRepackingActionJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.RunRepackingAction(ctx, request.(RunRepackingActionRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RunRepackingAction")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(RunRepackingActionResponseObject); ok {
+		if err := validResponse.VisitRunRepackingActionResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListReturnDispositions operation middleware
+func (sh *strictHandler) ListReturnDispositions(w http.ResponseWriter, r *http.Request, params ListReturnDispositionsParams) {
+	var request ListReturnDispositionsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListReturnDispositions(ctx, request.(ListReturnDispositionsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListReturnDispositions")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListReturnDispositionsResponseObject); ok {
+		if err := validResponse.VisitListReturnDispositionsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreateReturnDisposition operation middleware
+func (sh *strictHandler) CreateReturnDisposition(w http.ResponseWriter, r *http.Request, params CreateReturnDispositionParams) {
+	var request CreateReturnDispositionRequestObject
+
+	request.Params = params
+
+	var body CreateReturnDispositionJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CreateReturnDisposition(ctx, request.(CreateReturnDispositionRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateReturnDisposition")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreateReturnDispositionResponseObject); ok {
+		if err := validResponse.VisitCreateReturnDispositionResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetReturnDisposition operation middleware
+func (sh *strictHandler) GetReturnDisposition(w http.ResponseWriter, r *http.Request, id Id) {
+	var request GetReturnDispositionRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetReturnDisposition(ctx, request.(GetReturnDispositionRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetReturnDisposition")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetReturnDispositionResponseObject); ok {
+		if err := validResponse.VisitGetReturnDispositionResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateReturnDisposition operation middleware
+func (sh *strictHandler) UpdateReturnDisposition(w http.ResponseWriter, r *http.Request, id Id, params UpdateReturnDispositionParams) {
+	var request UpdateReturnDispositionRequestObject
+
+	request.Id = id
+	request.Params = params
+
+	var body UpdateReturnDispositionJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateReturnDisposition(ctx, request.(UpdateReturnDispositionRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateReturnDisposition")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdateReturnDispositionResponseObject); ok {
+		if err := validResponse.VisitUpdateReturnDispositionResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// RunReturnDispositionAction operation middleware
+func (sh *strictHandler) RunReturnDispositionAction(w http.ResponseWriter, r *http.Request, id Id, action ReturnDispositionAction, params RunReturnDispositionActionParams) {
+	var request RunReturnDispositionActionRequestObject
+
+	request.Id = id
+	request.Action = action
+	request.Params = params
+
+	var body RunReturnDispositionActionJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.RunReturnDispositionAction(ctx, request.(RunReturnDispositionActionRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RunReturnDispositionAction")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(RunReturnDispositionActionResponseObject); ok {
+		if err := validResponse.VisitRunReturnDispositionActionResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

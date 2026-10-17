@@ -27,7 +27,7 @@ tags:
   - name: catalog
     description: Master produk, packaging, material, bundling (R1.1)
   - name: warehouse
-    description: Gudang dan lokasi stok (R1.1)
+    description: Gudang dan lokasi stok (R1.1); Inbound/QC, Transfer Stok, Petty Stock, Stock Count (R1.2)
   - name: inventory
     description: Ledger stok, batch, HPP FIFO, saran FEFO (R1.2)
   - name: accounting
@@ -39,7 +39,7 @@ tags:
   - name: hris
     description: Data karyawan dasar (R1.1)
   - name: procurement
-    description: Purchase Request, Purchase Order (barang, maklon, reprocess), uang muka pembelian (R1.2)
+    description: Purchase Request, Purchase Order (barang, maklon, reprocess), uang muka, Penerimaan Barang, Tagihan Pemasok, Retur Pembelian, Barang Diterima Belum Ditagih (R1.2)
   - name: filestore
     description: Upload dan unduhan file bertanda tangan (R1.1)
   - name: pricing
@@ -241,6 +241,32 @@ paths:
     $ref: "./paths/warehouse.yaml#/location"
   /api/v1/locations/{id}/restore:
     $ref: "./paths/warehouse.yaml#/locationRestore"
+  /api/v1/inbounds:
+    $ref: "./paths/warehouse_documents.yaml#/inbounds"
+  /api/v1/inbounds/{id}:
+    $ref: "./paths/warehouse_documents.yaml#/inbound"
+  /api/v1/inbounds/{id}/lines/{lineId}/qc:
+    $ref: "./paths/warehouse_documents.yaml#/inboundLineQc"
+  /api/v1/stock-transfers:
+    $ref: "./paths/warehouse_documents.yaml#/stockTransfers"
+  /api/v1/stock-transfers/in-transit:
+    $ref: "./paths/warehouse_documents.yaml#/stockTransfersInTransit"
+  /api/v1/stock-transfers/{id}:
+    $ref: "./paths/warehouse_documents.yaml#/stockTransfer"
+  /api/v1/stock-transfers/{id}/actions:
+    $ref: "./paths/warehouse_documents.yaml#/stockTransferActions"
+  /api/v1/stock-counts:
+    $ref: "./paths/warehouse_documents.yaml#/stockCounts"
+  /api/v1/stock-counts/{id}:
+    $ref: "./paths/warehouse_documents.yaml#/stockCount"
+  /api/v1/stock-counts/{id}/entries:
+    $ref: "./paths/warehouse_documents.yaml#/stockCountEntries"
+  /api/v1/stock-counts/{id}/actions:
+    $ref: "./paths/warehouse_documents.yaml#/stockCountActions"
+  /api/v1/stock-count-schedules:
+    $ref: "./paths/warehouse_documents.yaml#/stockCountSchedules"
+  /api/v1/stock-count-schedules/{id}:
+    $ref: "./paths/warehouse_documents.yaml#/stockCountSchedule"
   /api/v1/stock-balances:
     $ref: "./paths/inventory.yaml#/stockBalances"
   /api/v1/stock-card:
@@ -255,6 +281,38 @@ paths:
     $ref: "./paths/inventory.yaml#/costLayerConsumptions"
   /api/v1/bundle-availability:
     $ref: "./paths/inventory.yaml#/bundleAvailability"
+  /api/v1/internal-usages:
+    $ref: "./paths/inventory.yaml#/internalUsages"
+  /api/v1/internal-usages/{id}:
+    $ref: "./paths/inventory.yaml#/internalUsage"
+  /api/v1/internal-usages/{id}/actions/{action}:
+    $ref: "./paths/inventory.yaml#/internalUsageAction"
+  /api/v1/internal-usages/{id}/settle:
+    $ref: "./paths/inventory.yaml#/internalUsageSettle"
+  /api/v1/internal-usage-options/{kind}:
+    $ref: "./paths/inventory.yaml#/internalUsageOptions"
+  /api/v1/repackings:
+    $ref: "./paths/inventory.yaml#/repackings"
+  /api/v1/repackings/{id}:
+    $ref: "./paths/inventory.yaml#/repacking"
+  /api/v1/repackings/{id}/actions/{action}:
+    $ref: "./paths/inventory.yaml#/repackingAction"
+  /api/v1/disposals:
+    $ref: "./paths/inventory.yaml#/disposals"
+  /api/v1/disposals/{id}:
+    $ref: "./paths/inventory.yaml#/disposal"
+  /api/v1/disposals/{id}/report:
+    $ref: "./paths/inventory.yaml#/disposalReport"
+  /api/v1/disposals/{id}/actions/{action}:
+    $ref: "./paths/inventory.yaml#/disposalAction"
+  /api/v1/return-dispositions:
+    $ref: "./paths/inventory.yaml#/returnDispositions"
+  /api/v1/return-dispositions/{id}:
+    $ref: "./paths/inventory.yaml#/returnDisposition"
+  /api/v1/return-dispositions/{id}/actions/{action}:
+    $ref: "./paths/inventory.yaml#/returnDispositionAction"
+  /api/v1/recost-runs:
+    $ref: "./paths/inventory.yaml#/recostRuns"
   /api/v1/customers:
     $ref: "./paths/party.yaml#/customers"
   /api/v1/customers/{id}:
@@ -397,6 +455,44 @@ paths:
     $ref: "./paths/procurement.yaml#/purchaseAdvancePost"
   /api/v1/purchase-advances/{id}/cancel:
     $ref: "./paths/procurement.yaml#/purchaseAdvanceCancel"
+  /api/v1/procurement/inbound-locations:
+    $ref: "./paths/procurement_documents.yaml#/procurementInboundLocations"
+  /api/v1/goods-receipts:
+    $ref: "./paths/procurement_documents.yaml#/goodsReceipts"
+  /api/v1/goods-receipts/{id}:
+    $ref: "./paths/procurement_documents.yaml#/goodsReceipt"
+  /api/v1/goods-receipts/{id}/post:
+    $ref: "./paths/procurement_documents.yaml#/goodsReceiptPost"
+  /api/v1/goods-receipts/{id}/cancel:
+    $ref: "./paths/procurement_documents.yaml#/goodsReceiptCancel"
+  /api/v1/procurement/billable-receipts:
+    $ref: "./paths/procurement_documents.yaml#/billableReceipts"
+  /api/v1/supplier-bills:
+    $ref: "./paths/procurement_documents.yaml#/supplierBills"
+  /api/v1/supplier-bills/{id}:
+    $ref: "./paths/procurement_documents.yaml#/supplierBill"
+  /api/v1/supplier-bills/{id}/post:
+    $ref: "./paths/procurement_documents.yaml#/supplierBillPost"
+  /api/v1/supplier-bills/{id}/revise:
+    $ref: "./paths/procurement_documents.yaml#/supplierBillRevise"
+  /api/v1/supplier-bills/{id}/cancel:
+    $ref: "./paths/procurement_documents.yaml#/supplierBillCancel"
+  /api/v1/procurement/returnable-receipts:
+    $ref: "./paths/procurement_documents.yaml#/returnableReceipts"
+  /api/v1/purchase-returns:
+    $ref: "./paths/procurement_documents.yaml#/purchaseReturns"
+  /api/v1/purchase-returns/{id}:
+    $ref: "./paths/procurement_documents.yaml#/purchaseReturn"
+  /api/v1/purchase-returns/{id}/submit:
+    $ref: "./paths/procurement_documents.yaml#/purchaseReturnSubmit"
+  /api/v1/purchase-returns/{id}/post:
+    $ref: "./paths/procurement_documents.yaml#/purchaseReturnPost"
+  /api/v1/purchase-returns/{id}/revise:
+    $ref: "./paths/procurement_documents.yaml#/purchaseReturnRevise"
+  /api/v1/purchase-returns/{id}/cancel:
+    $ref: "./paths/procurement_documents.yaml#/purchaseReturnCancel"
+  /api/v1/procurement/reports/goods-received-not-invoiced:
+    $ref: "./paths/procurement_documents.yaml#/goodsReceivedNotInvoiced"
 components:
   securitySchemes:
     bearerAuth:

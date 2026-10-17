@@ -209,28 +209,22 @@ func (a *App) buildModules() error {
 		registerAuditEntities(a.audit, catalog.AuditEntities())
 	}
 	if cfg.IsEnabled(warehouse.Name) {
-		a.warehouse = warehouse.New(warehouse.Deps{Pool: a.Pool, Tx: a.Tx, Clock: a.Clock, Responder: a.Responder, Audit: a.audit})
+		a.warehouse = warehouse.New(warehouse.Deps{Pool: a.Pool, Tx: a.Tx, Clock: a.Clock, Responder: a.Responder, Audit: a.audit, Log: a.Log})
 		a.modules = append(a.modules, a.warehouse)
 		registerAuditEntities(a.audit, warehouse.AuditEntities())
 	}
 	if err := a.buildMasterData(); err != nil {
 		return err
 	}
+	reasons := &returnReasonAdapter{}
 	if cfg.IsEnabled(inventory.Name) {
 		if a.catalog == nil || a.warehouse == nil {
 			return errors.New("modul inventory membutuhkan modul catalog dan warehouse")
 		}
-		d := inventory.Deps{
-			Pool: a.Pool, Tx: a.Tx, Clock: a.Clock, Log: a.Log, Responder: a.Responder,
-			Products: a.catalog, Locations: a.warehouse,
-		}
-		if a.accounting != nil {
-			d.Periods = a.accounting
-		}
-		a.inventory = inventory.New(d)
-		a.modules = append(a.modules, a.inventory)
+		a.buildInventory(mailer, reasons)
 	}
 	a.connectMasterData()
+	a.connectWarehouseDocuments()
 	if err := a.buildPricing(); err != nil {
 		return err
 	}
@@ -240,7 +234,7 @@ func (a *App) buildModules() error {
 	if err := a.buildProcurement(mailer); err != nil {
 		return err
 	}
-	gateway, err := a.buildSales(inbox)
+	gateway, err := a.buildSales(inbox, reasons)
 	if err != nil {
 		return err
 	}

@@ -15,6 +15,7 @@ import (
 	"balans/internal/party"
 	"balans/internal/platform/apperr"
 	"balans/internal/platform/clock"
+	"balans/internal/platform/money"
 	"balans/internal/procurement"
 	"balans/internal/warehouse"
 )
@@ -26,17 +27,20 @@ func (a *App) buildProcurement(mailer *notification.Module) error {
 		return nil
 	}
 	if a.approval == nil || a.accounting == nil || a.document == nil || a.catalog == nil || a.party == nil ||
-		a.warehouse == nil || a.identity == nil || mailer == nil {
-		return errors.New("modul procurement membutuhkan modul approval, accounting, document, catalog, party, warehouse, identity, dan notification")
+		a.warehouse == nil || a.inventory == nil || a.identity == nil || mailer == nil {
+		return errors.New("modul procurement membutuhkan modul approval, accounting, document, catalog, party, warehouse, inventory, identity, dan notification")
 	}
 	m := procurement.New(procurement.Deps{
 		Pool: a.Pool, Tx: a.Tx, Clock: a.Clock, Log: a.Log, Responder: a.Responder, Audit: a.audit,
 		Catalog: procurementCatalog{a.catalog}, Suppliers: procurementSuppliers{a.party},
 		Locations: procurementLocations{a.warehouse}, Ledger: procurementLedger{a.accounting}, Approvals: a.approval,
 		Numberer: procurementNumberer{a.document}, Users: procurementUsers{a.identity}, Notifier: mailer,
-		BaseURL: a.Config.PublicBaseURL,
+		Stock: a.inventory, Inbounds: procurementInbounds{a.warehouse}, BaseURL: a.Config.PublicBaseURL,
 	})
 	m.RegisterApprovalHandlers(a.approval)
+	// Hasil QC Inbound barang dari Penerimaan Barang: qty ditolak dikembalikan ke pemasok sebagai retur pembelian
+	// tanpa approval (D-24, PRC-05).
+	a.warehouse.RegisterInboundHandler(warehouse.SourceGoodsReceipt, receiptQCHandler(m, a.Clock))
 	registerAuditEntities(a.audit, procurement.AuditEntities())
 	a.modules = append(a.modules, m)
 	return nil
@@ -57,7 +61,7 @@ func (c procurementCatalog) Products(ctx context.Context, ids []uuid.UUID) (map[
 	for id, p := range products {
 		out[id] = procurement.ProductRef{
 			ID: p.ID, SKU: p.SKU, Name: p.DisplayName(), UOM: p.UOM, Type: string(p.Type), IsBundle: p.IsBundle,
-			IsActive: p.IsActive, Deleted: p.Deleted(),
+			HasBatch: p.HasBatch, IsActive: p.IsActive, Deleted: p.Deleted(),
 		}
 	}
 	return out, nil
@@ -77,6 +81,7 @@ func (s procurementSuppliers) Supplier(ctx context.Context, id uuid.UUID) (procu
 	return procurement.SupplierRef{
 		ID: sup.ID, Code: sup.Code, Name: sup.Name, IsTollManufacturer: sup.Type == party.SupplierTollManufacturer,
 		PaymentTermDays: sup.PaymentTermDays, Address: sup.Address, Phone: sup.Phone, Email: sup.Email, PICName: sup.PICName,
+		DefaultWithholding: string(sup.DefaultWithholding),
 	}, true, nil
 }
 
@@ -111,6 +116,86 @@ func (l procurementLocations) Locations(ctx context.Context, ids []uuid.UUID) (m
 		out[id] = toProcurementLocation(loc)
 	}
 	return out, nil
+}
+
+func (l procurementLocations) InboundLocations(ctx context.Context) ([]procurement.LocationRef, error) {
+	locs, err := l.warehouse.FindLocations(ctx, warehouse.LocationQuery{Types: []warehouse.LocationType{warehouse.LocationInbound}})
+	if err != nil {
+		return nil, err
+	}
+	out := make([]procurement.LocationRef, 0, len(locs))
+	for _, loc := range locs {
+		if loc.IsActive && !loc.Deleted() {
+			out = append(out, toProcurementLocation(loc))
+		}
+	}
+	return out, nil
+}
+
+// procurementInbounds membuat dokumen Inbound/QC modul warehouse untuk Penerimaan Barang yang diposting.
+type procurementInbounds struct{ warehouse *warehouse.Module }
+
+func (i procurementInbounds) CreateInbound(ctx context.Context, r procurement.InboundRequest) (uuid.UUID, error) {
+	loc := r.LocationID
+	req := warehouse.InboundRequest{
+		SourceType: r.SourceType, SourceID: r.SourceID, SourceLabel: r.SourceLabel, LocationID: &loc,
+		BusinessDate: r.BusinessDate,
+	}
+	for _, l := range r.Lines {
+		lineID := l.SourceLineID
+		req.Lines = append(req.Lines, warehouse.InboundLineInput{SourceLineID: &lineID, ProductID: l.ProductID, BatchID: l.BatchID, Qty: l.Qty})
+	}
+	ib, err := i.warehouse.CreateInbound(ctx, req)
+	if err != nil {
+		return uuid.Nil, err
+	}
+	return ib.ID, nil
+}
+
+// CancelInbound menolak pembatalan GR bila Inbound-nya sudah ada baris yang di-QC (stok sudah pindah/ditolak).
+// Inbound yang belum di-QC dibiarkan; stok Karantinanya sudah dikeluarkan pembatalan GR (modul warehouse belum
+// punya aksi batal Inbound).
+func (i procurementInbounds) CancelInbound(ctx context.Context, sourceType string, sourceID uuid.UUID, _ string) error {
+	ib, err := i.warehouse.InboundBySource(ctx, sourceType, sourceID)
+	if apperr.HasCode(err, apperr.CodeNotFound) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	for _, l := range ib.Lines {
+		if l.CheckedAt != nil {
+			return apperr.WithMessage(apperr.CodeInvalidStateTransition,
+				"Barang penerimaan ini sudah diperiksa di Inbound "+ib.Number+" sehingga penerimaan tidak bisa dibatalkan.")
+		}
+	}
+	return nil
+}
+
+// receiptQCHandler mengubah qty yang ditolak QC Inbound menjadi retur pembelian yang langsung diposting.
+func receiptQCHandler(m *procurement.Module, c clock.Clock) warehouse.InboundHandler {
+	return func(ctx context.Context, o warehouse.InboundOutcome) error {
+		if !o.RejectedQty.IsPositive() || o.SourceLineID == nil {
+			return nil
+		}
+		loc := o.DestinationLocationID
+		if o.RejectLocationID != nil {
+			loc = *o.RejectLocationID
+		}
+		reason := "Ditolak QC Inbound " + o.InboundNumber
+		if o.RejectReason != "" {
+			reason += ": " + o.RejectReason
+		}
+		_, err := m.CreateReturnFromQC(ctx, procurement.QCReturnInput{
+			Origin: procurement.ReturnQCInbound, SourceType: "inbound_line", SourceID: o.LineID, SourceLabel: o.InboundNumber,
+			BusinessDate: clock.Today(c), Reason: reason,
+			Lines: []procurement.QCReturnLine{{
+				ReceiptLineID: o.SourceLineID, ProductID: o.ProductID, BatchID: o.BatchID, LocationID: loc,
+				StockStatus: "quarantine", Qty: o.RejectedQty,
+			}},
+		})
+		return err
+	}
 }
 
 // procurementLedger menyesuaikan API publik accounting: divisi, akun Kas & Bank, dan Poster.
@@ -155,6 +240,10 @@ func (l procurementLedger) Post(ctx context.Context, req accounting.PostingReque
 	return l.accounting.Post(ctx, req)
 }
 
+func (l procurementLedger) AccountBalance(ctx context.Context, code string, asOf clock.BusinessDate) (money.Amount, error) {
+	return l.accounting.AccountBalance(ctx, code, asOf)
+}
+
 func (l procurementLedger) Reverse(ctx context.Context, req accounting.ReversalRequest) (accounting.JournalEntry, error) {
 	return l.accounting.Reverse(ctx, req)
 }
@@ -171,6 +260,12 @@ func (n procurementNumberer) Next(ctx context.Context, t procurement.DocumentTyp
 		dt = document.TypePurchaseOrder
 	case procurement.DocPayment:
 		dt = document.TypePayment
+	case procurement.DocGoodsReceipt:
+		dt = document.TypeGoodsReceipt
+	case procurement.DocPurchaseReturn:
+		dt = document.TypePurchaseReturn
+	case procurement.DocDebitNote:
+		dt = document.TypeDebitNote
 	default:
 		return "", fmt.Errorf("jenis nomor dokumen procurement %q tidak dikenal", t)
 	}

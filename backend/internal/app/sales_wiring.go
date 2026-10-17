@@ -31,7 +31,7 @@ const maxPaymentProofBytes = 10 << 20
 
 // buildSales menyusun modul sales (R1.3): webhook Midtrans, alasan retur, Sales Order semua channel, Proforma,
 // Invoice, piutang & pembayaran pelanggan. Handler approval `sales_order_discount` didaftarkan setelah handler dev.
-func (a *App) buildSales(inbox *webhook.Inbox) (*mockpayment.Gateway, error) {
+func (a *App) buildSales(inbox *webhook.Inbox, reasons *returnReasonAdapter) (*mockpayment.Gateway, error) {
 	cfg := a.Config
 	if !cfg.IsEnabled(sales.Name) {
 		return nil, nil
@@ -55,6 +55,7 @@ func (a *App) buildSales(inbox *webhook.Inbox) (*mockpayment.Gateway, error) {
 		Approvals: a.approval, Numberer: salesNumberer{a.document}, Files: a.filestore,
 		Users: procurementUsers{a.identity}, BaseURL: cfg.PublicBaseURL,
 	})
+	reasons.sales = m
 	m.RegisterApprovalHandlers(a.approval)
 	registerAuditEntities(a.audit, sales.AuditEntities())
 	images := []string{filestore.TypeJPEG, filestore.TypePNG, filestore.TypeWebP, filestore.TypePDF}

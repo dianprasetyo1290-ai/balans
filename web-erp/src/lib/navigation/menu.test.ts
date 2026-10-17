@@ -25,6 +25,31 @@ describe("menu", () => {
     ])
   })
 
+  it("Gudang memuat label Naming Convention untuk dokumen gudang R1.2", () => {
+    const gudang = MENU.find((g) => g.label === "Gudang")
+    expect(gudang?.items.map((i) => i.label)).toEqual([
+      "Inbound",
+      "Put-away",
+      "Transfer Stok",
+      "Permintaan Petty Stock",
+      "Stok dalam Pengiriman",
+      "Outbound",
+      "Stock Count",
+      "Gudang Retur",
+      "Disposisi Retur",
+      "Riwayat Mutasi Stok",
+    ])
+    expect(gudang?.items.filter((i) => i.to).map((i) => i.to)).toEqual([
+      "/warehouse/inbounds",
+      "/warehouse/stock-transfers",
+      "/warehouse/petty-stock-requests",
+      "/warehouse/in-transit",
+      "/warehouse/stock-counts",
+      "/warehouse/returns",
+      "/warehouse/return-dispositions",
+    ])
+  })
+
   it("tanpa modul aktif hanya menampilkan halaman yang sudah dibangun", () => {
     const groups = visibleMenu([])
     expect(groups.map((g) => g.label)).toEqual(["Ringkasan", "Pengaturan"])
