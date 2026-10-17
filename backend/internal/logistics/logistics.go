@@ -57,6 +57,7 @@ type (
 	Numberer          = service.Numberer
 	Files             = service.Files
 	Users             = service.Users
+	UserOption        = service.UserOption
 	Notifier          = service.Notifier
 	SalesOrders       = service.SalesOrders
 	SalesOrder        = service.SalesOrder
@@ -153,6 +154,9 @@ func New(d Deps) *Module {
 	}
 	return m
 }
+
+// DocumentsEnabled: bagian Delivery Order aktif (modul warehouse, inventory, catalog, document aktif).
+func (m *Module) DocumentsEnabled() bool { return m.docs != nil }
 
 // Name mengembalikan nama modul.
 func (m *Module) Name() string { return Name }

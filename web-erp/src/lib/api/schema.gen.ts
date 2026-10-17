@@ -785,7 +785,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  "/api/v1/sales/consignment-deliveries/{id}/ship": {
+  "/api/v1/sales/consignment-deliveries/{id}/submit": {
     parameters: {
       query?: never
       header?: never
@@ -795,12 +795,13 @@ export interface paths {
     get?: never
     put?: never
     /**
-     * Kirim barang titipan (nomor DO, Transfer Stok, jurnal A-07 / A-24)
-     * @description Logistik (`logistics.delivery_order.post`). PKS diperiksa ulang; stok FEFO pindah ke lokasi mitra berstatus
-     *     Dalam Pengiriman; jurnal A-07 (Dr 1312 Cr 1311) atau A-24 (Dr 1313 Cr 1311) sebesar nilai FIFO dengan dimensi
-     *     channel konsinyasi/vending + sub-channel mitra.
+     * Ajukan pengiriman titipan ke Logistik (reservasi FEFO + Delivery Order)
+     * @description Sales MT (`sales.sales_order.write`). PKS konsinyasi wajib berlaku; stok FEFO lokasi asal direservasi per baris
+     *     dan Delivery Order Draft jenis konsinyasi / buffer vending dibuat (status Diproses). Logistik me-release DO
+     *     (nomor DO + Outbound picking/packing/QC), menyerahkan ke kurir (stok reserved → lokasi mitra Dalam Pengiriman,
+     *     jurnal A-07 Dr 1312 Cr 1311 / A-24 Dr 1313 Cr 1311 nilai FIFO), lalu mengonfirmasi diterima di halaman DO.
      */
-    post: operations["shipConsignmentDelivery"]
+    post: operations["submitConsignmentDelivery"]
     delete?: never
     options?: never
     head?: never
@@ -816,7 +817,11 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Barang titipan diterima mitra (stok Tersedia di lokasi mitra) */
+    /**
+     * Barang titipan diterima mitra — hanya data lama yang dikirim tanpa DO
+     * @description Logistik (`logistics.delivery_order.post`). Pengiriman lewat DO dikonfirmasi diterima dari halaman DO
+     *     (Logistik › Delivery Order); endpoint ini menolak pengiriman yang punya DO.
+     */
     post: operations["receiveConsignmentDelivery"]
     delete?: never
     options?: never
@@ -1037,6 +1042,26 @@ export interface paths {
     get?: never
     /** Mengubah nama, jenis, atau status kurir (kode tetap) */
     put: operations["updateCourier"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/courier-users": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Merchandiser aktif untuk kurir internal (S-312)
+     * @description Permission `logistics.shipment.write` atau `logistics.shipment.read`.
+     */
+    get: operations["listCourierUsers"]
+    put?: never
     post?: never
     delete?: never
     options?: never
@@ -6884,6 +6909,14 @@ export interface components {
       /** Format: date-time */
       createdAt: string
     }
+    /** @description Delivery Order logistik dokumen penjualan (nomor diberikan saat release). */
+    SalesDeliveryOrderRef: {
+      /** Format: uuid */
+      id: string
+      number?: string | null
+      /** @description Status DO (draft, in_progress, in_transit, received, cancelled). */
+      status: string
+    }
     SalesOrder: components["schemas"]["SalesOrderSummary"] & {
       sourceLocation: components["schemas"]["SalesLocationRef"]
       paymentTermDays: number
@@ -6915,7 +6948,19 @@ export interface components {
       proformas: components["schemas"]["SalesDocumentRef"][]
       invoices: components["schemas"]["SalesDocumentRef"][]
       shipments: components["schemas"]["SalesShipment"][]
-      allowedActions: ("edit" | "confirm" | "cancel" | "upload_payment_proof")[]
+      /** @description Delivery Order logistik pesanan (terbaru dulu); kosong bila modul logistics tidak aktif. */
+      deliveryOrders?: components["schemas"]["SalesDeliveryOrderRef"][]
+      /**
+       * @description `create_delivery_order`: pesanan Diproses dengan alokasi belum dikirim, tanpa DO terbuka, dan user punya
+       *     `logistics.delivery_order.write` (Buat DO, POST /api/v1/delivery-orders).
+       */
+      allowedActions: (
+        | "edit"
+        | "confirm"
+        | "cancel"
+        | "upload_payment_proof"
+        | "create_delivery_order"
+      )[]
     }
     SalesOrderUpdate: components["schemas"]["SalesOrderFields"] &
       components["schemas"]["VersionInput"]
@@ -7433,7 +7478,7 @@ export interface components {
     }
     /** @enum {string} */
     ConsignmentDeliveryStatus:
-      "draft" | "in_transit" | "completed" | "cancelled"
+      "draft" | "in_progress" | "in_transit" | "completed" | "cancelled"
     /**
      * @description `consignment` ke lokasi konsinyasi mitra (A-07), `vending_buffer` ke buffer vending (A-24).
      * @enum {string}
@@ -7495,6 +7540,7 @@ export interface components {
       sourceType: string
       /** Format: uuid */
       transferId?: string | null
+      deliveryOrder?: components["schemas"]["SalesDeliveryOrderRef"] | null
       note: string
       cancelReason: string
       /** Format: date-time */
@@ -7681,6 +7727,14 @@ export interface components {
       name: string
       isInternal: boolean
       isActive: boolean
+    }
+    CourierUser: {
+      /** Format: uuid */
+      id: string
+      name: string
+    }
+    CourierUserList: {
+      items: components["schemas"]["CourierUser"][]
     }
     /**
      * @description Status Delivery Order (Desain Status Dokumen 5.4).
@@ -14295,7 +14349,7 @@ export interface operations {
       default: components["responses"]["Problem"]
     }
   }
-  shipConsignmentDelivery: {
+  submitConsignmentDelivery: {
     parameters: {
       query?: never
       header: {
@@ -14313,7 +14367,7 @@ export interface operations {
       }
     }
     responses: {
-      /** @description Pengiriman Dalam Pengiriman */
+      /** @description Pengiriman Diproses (DO Draft dibuat) */
       200: {
         headers: {
           [name: string]: unknown
@@ -14764,6 +14818,27 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["Courier"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listCourierUsers: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Merchandiser aktif */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["CourierUserList"]
         }
       }
       default: components["responses"]["Problem"]

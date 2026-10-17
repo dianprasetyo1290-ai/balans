@@ -65,6 +65,21 @@ courier:
               $ref: "#/components/schemas/Courier"
       default:
         $ref: "../components/common.yaml#/responses/Problem"
+courierUsers:
+  get:
+    operationId: listCourierUsers
+    tags: [delivery]
+    summary: Merchandiser aktif untuk kurir internal (S-312)
+    description: Permission `logistics.shipment.write` atau `logistics.shipment.read`.
+    responses:
+      "200":
+        description: Merchandiser aktif
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CourierUserList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
 deliveryOrders:
   get:
     operationId: listDeliveryOrders
@@ -299,6 +314,23 @@ shipmentEvents:
         $ref: "../components/common.yaml#/responses/Problem"
 components:
   schemas:
+    CourierUser:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+    CourierUserList:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/CourierUser"
     Courier:
       type: object
       required: [id, code, name, isInternal, isActive, version]

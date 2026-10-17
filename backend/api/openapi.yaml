@@ -133,8 +133,8 @@ paths:
     $ref: "./paths/sales_consignment.yaml#/consignmentDeliveries"
   /api/v1/sales/consignment-deliveries/{id}:
     $ref: "./paths/sales_consignment.yaml#/consignmentDelivery"
-  /api/v1/sales/consignment-deliveries/{id}/ship:
-    $ref: "./paths/sales_consignment.yaml#/consignmentDeliveryShip"
+  /api/v1/sales/consignment-deliveries/{id}/submit:
+    $ref: "./paths/sales_consignment.yaml#/consignmentDeliverySubmit"
   /api/v1/sales/consignment-deliveries/{id}/receive:
     $ref: "./paths/sales_consignment.yaml#/consignmentDeliveryReceive"
   /api/v1/sales/consignment-deliveries/{id}/cancel:
@@ -159,6 +159,8 @@ paths:
     $ref: "./paths/logistics_delivery.yaml#/couriers"
   /api/v1/couriers/{id}:
     $ref: "./paths/logistics_delivery.yaml#/courier"
+  /api/v1/courier-users:
+    $ref: "./paths/logistics_delivery.yaml#/courierUsers"
   /api/v1/delivery-orders:
     $ref: "./paths/logistics_delivery.yaml#/deliveryOrders"
   /api/v1/delivery-orders/{id}:

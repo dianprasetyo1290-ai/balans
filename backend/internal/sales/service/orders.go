@@ -29,15 +29,18 @@ var OrderSortFields = []string{"number", "businessDate", "totalAmount"}
 // OrderView adalah pesanan beserta data tampilan dan dokumen terkait.
 type OrderView struct {
 	domain.Order
-	Products         map[uuid.UUID]ProductRef
-	Location         *LocationRef
-	Channel          ChannelRef
-	SubChannel       ChannelRef
-	Proformas        []domain.Proforma
-	Invoices         []domain.Invoice
-	Shipments        []domain.Shipment
-	CreatedByName    string
-	PaymentProofName string
+	Products   map[uuid.UUID]ProductRef
+	Location   *LocationRef
+	Channel    ChannelRef
+	SubChannel ChannelRef
+	Proformas  []domain.Proforma
+	Invoices   []domain.Invoice
+	Shipments  []domain.Shipment
+	// DeliveryOrders adalah DO logistik pesanan; DeliveryOrdersEnabled false bila modul logistics tidak aktif.
+	DeliveryOrders        []DeliveryOrderRef
+	DeliveryOrdersEnabled bool
+	CreatedByName         string
+	PaymentProofName      string
 	// Batches adalah nomor & kedaluwarsa batch alokasi.
 	Batches map[uuid.UUID]inventory.Batch
 }
@@ -91,6 +94,27 @@ func orderActionPerms(t domain.OrderType) map[domain.Action][]string {
 // OrderActions mengembalikan aksi pesanan yang boleh dilakukan actor (allowedActions).
 func OrderActions(ctx context.Context, o domain.Order) []string {
 	return filterActions(ctx, o.Actions(), orderActionPerms(o.Type))
+}
+
+// PermDOWrite adalah permission membuat Delivery Order (modul logistics).
+const PermDOWrite = "logistics.delivery_order.write"
+
+// OrderViewActions adalah OrderActions ditambah `create_delivery_order` bila pesanan Diproses masih punya alokasi
+// belum dikirim, belum ada DO terbuka, modul logistics aktif, dan actor punya permission tulis DO.
+func OrderViewActions(ctx context.Context, v OrderView) []string {
+	out := OrderActions(ctx, v.Order)
+	if !v.DeliveryOrdersEnabled || !v.HasOutstanding() {
+		return out
+	}
+	for _, d := range v.DeliveryOrders {
+		if d.Open() {
+			return out
+		}
+	}
+	if a, ok := actor.From(ctx); ok && a.Has(PermDOWrite) {
+		out = append(out, string(domain.ActionCreateDeliveryOrder))
+	}
+	return out
 }
 
 func orderSnapshot(o domain.Order) map[string]any {
@@ -366,6 +390,12 @@ func (s *DocumentService) orderView(ctx context.Context, o domain.Order) (OrderV
 	}
 	if v.Shipments, err = s.Store.ShipmentsByOrder(ctx, o.ID); err != nil {
 		return OrderView{}, err
+	}
+	if s.DeliveryOrders != nil {
+		v.DeliveryOrdersEnabled = true
+		if v.DeliveryOrders, err = s.DeliveryOrders.DeliveryOrdersBySource(ctx, SourceSalesOrder, o.ID); err != nil {
+			return OrderView{}, err
+		}
 	}
 	names, err := s.Users.UserNames(ctx, []uuid.UUID{o.CreatedBy})
 	if err != nil {

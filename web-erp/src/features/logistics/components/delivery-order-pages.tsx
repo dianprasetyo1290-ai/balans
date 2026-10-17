@@ -38,8 +38,6 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Textarea } from "@/components/ui/textarea"
-import { UserPicker } from "@/features/approval/components/user-picker"
-import type { ApprovalUserOption } from "@/features/approval/api/approval-api"
 import { EntityHistory } from "@/features/audit/components/entity-history"
 import { parseProblem } from "@/lib/api/problem"
 import { useIdempotentMutation } from "@/lib/api/use-idempotent-mutation"
@@ -51,6 +49,7 @@ import {
   batchText,
   cancelDeliveryOrder,
   couriersQuery,
+  courierUsersQuery,
   createDeliveryOrder,
   DELIVERY_TYPE_LABELS,
   deliverDeliveryOrder,
@@ -436,7 +435,7 @@ export function DeliveryOrderDetailPage({
           ) : null}
           <dl className="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2 lg:grid-cols-4">
             <Info label="Jenis" value={DELIVERY_TYPE_LABELS[d.deliveryType]} />
-            <Info label="Dokumen Asal" value={d.sourceLabel} />
+            <Info label="Dokumen Asal" value={<SourceLink d={d} />} />
             <Info label="Tanggal" value={formatDate(d.businessDate)} />
             <Info
               label="Lokasi Asal"
@@ -486,7 +485,7 @@ export function DeliveryOrderDetailPage({
   )
 }
 
-function Info({ label, value }: { label: string; value: string }) {
+function Info({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div>
       <dt className="text-muted-foreground">{label}</dt>
@@ -588,17 +587,51 @@ function ShipmentView({ d }: { d: DeliveryOrder }) {
   )
 }
 
+/** Tautan ke dokumen asal DO: Sales Order atau pengiriman konsinyasi / buffer vending. */
+function SourceLink({ d }: { d: DeliveryOrder }) {
+  const cls = "text-primary underline-offset-4 hover:underline"
+  if (d.sourceType === "sales_order") {
+    return (
+      <Link
+        to="/sales/orders/$id"
+        params={{ id: d.sourceId }}
+        search={{}}
+        className={cls}
+      >
+        {d.sourceLabel}
+      </Link>
+    )
+  }
+  if (d.sourceType === "consignment_delivery") {
+    return (
+      <Link
+        to="/sales/consignments/$id"
+        params={{ id: d.sourceId }}
+        search={{}}
+        className={cls}
+      >
+        {d.sourceLabel}
+      </Link>
+    )
+  }
+  return <>{d.sourceLabel}</>
+}
+
 function ShipDialog({ d, onClose }: { d: DeliveryOrder; onClose: () => void }) {
   const queryClient = useQueryClient()
   const couriers = useQuery(couriersQuery(true))
   const [courierId, setCourierId] = useState("")
-  const [merch, setMerch] = useState<ApprovalUserOption | null>(null)
+  const [merchId, setMerchId] = useState("")
   const [tracking, setTracking] = useState("")
   const [awb, setAwb] = useState("")
   const [service, setService] = useState("")
   const [cost, setCost] = useState("")
   const [errors, setErrors] = useState<Record<string, string>>({})
   const courier = couriers.data?.items.find((c) => c.id === courierId)
+  const merchandisers = useQuery({
+    ...courierUsersQuery(),
+    enabled: !!courier?.isInternal,
+  })
   const save = useIdempotentMutation({
     mutationFn: (_: void, key) =>
       shipDeliveryOrder(
@@ -606,7 +639,8 @@ function ShipDialog({ d, onClose }: { d: DeliveryOrder; onClose: () => void }) {
         {
           version: d.version,
           courierId,
-          internalCourierUserId: courier?.isInternal ? merch?.id : undefined,
+          internalCourierUserId:
+            courier?.isInternal && merchId ? merchId : undefined,
           trackingNumber: tracking || undefined,
           marketplaceAwb: awb || undefined,
           serviceCode: service || undefined,
@@ -670,12 +704,31 @@ function ShipDialog({ d, onClose }: { d: DeliveryOrder; onClose: () => void }) {
               <FieldLabel htmlFor="ship-merch">
                 Merchandiser pengantar
               </FieldLabel>
-              <UserPicker
-                id="ship-merch"
-                value={merch}
-                onValueChange={setMerch}
-                placeholder="Pilih Merchandiser"
-              />
+              <Select
+                value={merchId}
+                onValueChange={(v) => setMerchId(String(v))}
+              >
+                <SelectTrigger id="ship-merch" className="min-h-11 w-full">
+                  <SelectValue placeholder="Pilih Merchandiser">
+                    {(v: string) =>
+                      merchandisers.data?.find((u) => u.id === v)?.name ??
+                      "Pilih Merchandiser"
+                    }
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {(merchandisers.data ?? []).map((u) => (
+                    <SelectItem key={u.id} value={u.id}>
+                      {u.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {merchandisers.data && merchandisers.data.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  Belum ada user aktif dengan role Merchandiser.
+                </p>
+              ) : null}
               {errors.internalCourierUserId ? (
                 <FieldError>{errors.internalCourierUserId}</FieldError>
               ) : null}

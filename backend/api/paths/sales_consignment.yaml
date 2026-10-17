@@ -91,15 +91,16 @@ consignmentDelivery:
               $ref: "#/components/schemas/ConsignmentDelivery"
       default:
         $ref: "../components/common.yaml#/responses/Problem"
-consignmentDeliveryShip:
+consignmentDeliverySubmit:
   post:
-    operationId: shipConsignmentDelivery
+    operationId: submitConsignmentDelivery
     tags: [sales]
-    summary: Kirim barang titipan (nomor DO, Transfer Stok, jurnal A-07 / A-24)
+    summary: Ajukan pengiriman titipan ke Logistik (reservasi FEFO + Delivery Order)
     description: |
-      Logistik (`logistics.delivery_order.post`). PKS diperiksa ulang; stok FEFO pindah ke lokasi mitra berstatus
-      Dalam Pengiriman; jurnal A-07 (Dr 1312 Cr 1311) atau A-24 (Dr 1313 Cr 1311) sebesar nilai FIFO dengan dimensi
-      channel konsinyasi/vending + sub-channel mitra.
+      Sales MT (`sales.sales_order.write`). PKS konsinyasi wajib berlaku; stok FEFO lokasi asal direservasi per baris
+      dan Delivery Order Draft jenis konsinyasi / buffer vending dibuat (status Diproses). Logistik me-release DO
+      (nomor DO + Outbound picking/packing/QC), menyerahkan ke kurir (stok reserved → lokasi mitra Dalam Pengiriman,
+      jurnal A-07 Dr 1312 Cr 1311 / A-24 Dr 1313 Cr 1311 nilai FIFO), lalu mengonfirmasi diterima di halaman DO.
     parameters:
       - $ref: "../components/common.yaml#/parameters/Id"
       - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
@@ -111,7 +112,7 @@ consignmentDeliveryShip:
             $ref: "../components/common.yaml#/VersionInput"
     responses:
       "200":
-        description: Pengiriman Dalam Pengiriman
+        description: Pengiriman Diproses (DO Draft dibuat)
         content:
           application/json:
             schema:
@@ -122,7 +123,10 @@ consignmentDeliveryReceive:
   post:
     operationId: receiveConsignmentDelivery
     tags: [sales]
-    summary: Barang titipan diterima mitra (stok Tersedia di lokasi mitra)
+    summary: Barang titipan diterima mitra — hanya data lama yang dikirim tanpa DO
+    description: |
+      Logistik (`logistics.delivery_order.post`). Pengiriman lewat DO dikonfirmasi diterima dari halaman DO
+      (Logistik › Delivery Order); endpoint ini menolak pengiriman yang punya DO.
     parameters:
       - $ref: "../components/common.yaml#/parameters/Id"
       - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
@@ -387,7 +391,7 @@ components:
       enum: [consignment, vending_buffer]
     ConsignmentDeliveryStatus:
       type: string
-      enum: [draft, in_transit, completed, cancelled]
+      enum: [draft, in_progress, in_transit, completed, cancelled]
     ConsignmentReconciliationStatus:
       type: string
       enum: [draft, in_progress, pending_approval, rejected, posted, cancelled]
@@ -514,6 +518,10 @@ components:
             transferId:
               type: string
               format: uuid
+              nullable: true
+            deliveryOrder:
+              allOf:
+                - $ref: "./sales.yaml#/components/schemas/SalesDeliveryOrderRef"
               nullable: true
             note:
               type: string

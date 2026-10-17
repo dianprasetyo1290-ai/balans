@@ -35,6 +35,7 @@ export const DELIVERY_TYPE_LABELS: Record<ConsignmentDeliveryType, string> = {
 
 export const DELIVERY_STATUSES: ConsignmentDeliveryStatus[] = [
   "draft",
+  "in_progress",
   "in_transit",
   "completed",
   "cancelled",
@@ -151,7 +152,8 @@ export const updateDelivery = (
     })
   )
 
-export type DeliveryAction = "ship" | "receive" | "cancel"
+/** submit = ajukan ke Logistik (reservasi stok + DO); receive hanya data lama yang dikirim tanpa DO. */
+export type DeliveryAction = "submit" | "receive" | "cancel"
 
 export function deliveryAction(
   id: string,
@@ -162,9 +164,9 @@ export function deliveryAction(
 ) {
   const params = { path: { id }, ...idem(key) }
   switch (action) {
-    case "ship":
+    case "submit":
       return unwrap(
-        api.POST("/api/v1/sales/consignment-deliveries/{id}/ship", {
+        api.POST("/api/v1/sales/consignment-deliveries/{id}/submit", {
           params,
           body: { version },
         })

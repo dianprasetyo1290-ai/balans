@@ -292,6 +292,19 @@ func (o Order) HasShipment() bool {
 	return false
 }
 
+// HasOutstanding bernilai true bila pesanan Diproses masih punya alokasi yang belum dikirim (bisa dibuatkan DO).
+func (o Order) HasOutstanding() bool {
+	if o.Status != StatusInProgress {
+		return false
+	}
+	for _, a := range o.Allocations {
+		if !a.Released && a.OutstandingQty().IsPositive() {
+			return true
+		}
+	}
+	return false
+}
+
 // FullyShipped bernilai true bila semua alokasi sudah dikirim.
 func (o Order) FullyShipped() bool {
 	if len(o.Allocations) == 0 {

@@ -307,8 +307,6 @@ func (n salesNumberer) Next(ctx context.Context, t sales.DocumentType, businessD
 		dt = document.TypeSalesReturn
 	case sales.DocCreditNote:
 		dt = document.TypeCreditNote
-	case sales.DocDeliveryOrder:
-		dt = document.TypeDeliveryOrder
 	case sales.DocReconciliation:
 		dt = document.TypeConsignmentReconciliation
 	default:

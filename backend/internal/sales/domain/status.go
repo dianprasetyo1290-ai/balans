@@ -57,6 +57,8 @@ const (
 	ActionPrint         Action = "print"
 	ActionRecordPayment Action = "record_payment"
 	ActionShareWhatsApp Action = "share_whatsapp"
+	// ActionCreateDeliveryOrder: Buat DO dari Sales Order Diproses (modul logistics).
+	ActionCreateDeliveryOrder Action = "create_delivery_order"
 )
 
 type transitions map[Status][]Status

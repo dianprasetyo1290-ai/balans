@@ -823,12 +823,12 @@ SET number = $1, partner_agreement_id = $2,
     agreement_number = $3, from_location_id = $4,
     to_location_id = $5, channel_id = $6,
     sub_channel_id = $7, business_date = $8, status = $9,
-    source_id = $10, transfer_id = $11,
-    transfer_number = $12, cost_amount = $13, note = $14,
-    cancel_reason = $15, shipped_at = $16,
-    received_at = $17, updated_at = now(), updated_by = $18,
+    source_type = $10, source_id = $11, transfer_id = $12,
+    transfer_number = $13, cost_amount = $14, note = $15,
+    cancel_reason = $16, shipped_at = $17,
+    received_at = $18, updated_at = now(), updated_by = $19,
     version = version + 1
-WHERE id = $19 AND version = $20
+WHERE id = $20 AND version = $21
 RETURNING updated_at, version
 `
 
@@ -842,6 +842,7 @@ type UpdateConsignmentDeliveryParams struct {
 	SubChannelID       uuid.UUID
 	BusinessDate       clock.BusinessDate
 	Status             string
+	SourceType         string
 	SourceID           uuid.NullUUID
 	TransferID         uuid.NullUUID
 	TransferNumber     string
@@ -871,6 +872,7 @@ func (q *Queries) UpdateConsignmentDelivery(ctx context.Context, arg UpdateConsi
 		arg.SubChannelID,
 		arg.BusinessDate,
 		arg.Status,
+		arg.SourceType,
 		arg.SourceID,
 		arg.TransferID,
 		arg.TransferNumber,

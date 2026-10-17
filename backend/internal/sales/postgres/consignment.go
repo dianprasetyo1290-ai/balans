@@ -142,8 +142,9 @@ func (s *Store) SaveDelivery(ctx context.Context, d *domain.ConsignmentDelivery,
 		Number: numberText(d.Number), PartnerAgreementID: nullUUID(d.AgreementID), AgreementNumber: d.AgreementNumber,
 		FromLocationID: d.FromLocationID, ToLocationID: d.ToLocationID, ChannelID: d.ChannelID,
 		SubChannelID: d.SubChannelID, BusinessDate: d.BusinessDate, Status: string(d.Status),
-		SourceID: nullUUID(d.SourceID), TransferID: nullUUID(d.TransferID), TransferNumber: d.TransferNumber,
-		CostAmount: d.Cost.Decimal(), Note: d.Note, CancelReason: d.CancelReason, ShippedAt: d.ShippedAt,
+		SourceType: d.SourceType, SourceID: nullUUID(d.SourceID), TransferID: nullUUID(d.TransferID),
+		TransferNumber: d.TransferNumber,
+		CostAmount:     d.Cost.Decimal(), Note: d.Note, CancelReason: d.CancelReason, ShippedAt: d.ShippedAt,
 		ReceivedAt: d.ReceivedAt, ActorID: actorID, ID: d.ID, Version: version(ver),
 	})
 	if errors.Is(err, pgx.ErrNoRows) {

@@ -37,10 +37,11 @@ func (e ConsignmentBorneBy) Valid() bool {
 
 // Defines values for ConsignmentDeliveryStatus.
 const (
-	ConsignmentDeliveryStatusCancelled ConsignmentDeliveryStatus = "cancelled"
-	ConsignmentDeliveryStatusCompleted ConsignmentDeliveryStatus = "completed"
-	ConsignmentDeliveryStatusDraft     ConsignmentDeliveryStatus = "draft"
-	ConsignmentDeliveryStatusInTransit ConsignmentDeliveryStatus = "in_transit"
+	ConsignmentDeliveryStatusCancelled  ConsignmentDeliveryStatus = "cancelled"
+	ConsignmentDeliveryStatusCompleted  ConsignmentDeliveryStatus = "completed"
+	ConsignmentDeliveryStatusDraft      ConsignmentDeliveryStatus = "draft"
+	ConsignmentDeliveryStatusInProgress ConsignmentDeliveryStatus = "in_progress"
+	ConsignmentDeliveryStatusInTransit  ConsignmentDeliveryStatus = "in_transit"
 )
 
 // Valid indicates whether the value is a known member of the ConsignmentDeliveryStatus enum.
@@ -51,6 +52,8 @@ func (e ConsignmentDeliveryStatus) Valid() bool {
 	case ConsignmentDeliveryStatusCompleted:
 		return true
 	case ConsignmentDeliveryStatusDraft:
+		return true
+	case ConsignmentDeliveryStatusInProgress:
 		return true
 	case ConsignmentDeliveryStatusInTransit:
 		return true
@@ -553,10 +556,11 @@ func (e SalesInvoiceAllowedActions) Valid() bool {
 
 // Defines values for SalesOrderAllowedActions.
 const (
-	SalesOrderAllowedActionsCancel             SalesOrderAllowedActions = "cancel"
-	SalesOrderAllowedActionsConfirm            SalesOrderAllowedActions = "confirm"
-	SalesOrderAllowedActionsEdit               SalesOrderAllowedActions = "edit"
-	SalesOrderAllowedActionsUploadPaymentProof SalesOrderAllowedActions = "upload_payment_proof"
+	SalesOrderAllowedActionsCancel              SalesOrderAllowedActions = "cancel"
+	SalesOrderAllowedActionsConfirm             SalesOrderAllowedActions = "confirm"
+	SalesOrderAllowedActionsCreateDeliveryOrder SalesOrderAllowedActions = "create_delivery_order"
+	SalesOrderAllowedActionsEdit                SalesOrderAllowedActions = "edit"
+	SalesOrderAllowedActionsUploadPaymentProof  SalesOrderAllowedActions = "upload_payment_proof"
 )
 
 // Valid indicates whether the value is a known member of the SalesOrderAllowedActions enum.
@@ -565,6 +569,8 @@ func (e SalesOrderAllowedActions) Valid() bool {
 	case SalesOrderAllowedActionsCancel:
 		return true
 	case SalesOrderAllowedActionsConfirm:
+		return true
+	case SalesOrderAllowedActionsCreateDeliveryOrder:
 		return true
 	case SalesOrderAllowedActionsEdit:
 		return true
@@ -748,9 +754,10 @@ type ConsignmentDelivery struct {
 	// CostAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
 	//
 	// Example: 1250000.00
-	CostAmount    Money     `json:"costAmount"`
-	CreatedAt     time.Time `json:"createdAt"`
-	CreatedByName string    `json:"createdByName"`
+	CostAmount    Money                  `json:"costAmount"`
+	CreatedAt     time.Time              `json:"createdAt"`
+	CreatedByName string                 `json:"createdByName"`
+	DeliveryOrder *SalesDeliveryOrderRef `json:"deliveryOrder,omitempty"`
 
 	// DeliveryType `consignment` ke lokasi konsinyasi mitra (A-07), `vending_buffer` ke buffer vending (A-24).
 	DeliveryType   ConsignmentDeliveryType   `json:"deliveryType"`
@@ -1666,6 +1673,15 @@ type SalesChannelOption struct {
 // SalesChannelOptionKind defines model for SalesChannelOption.Kind.
 type SalesChannelOptionKind string
 
+// SalesDeliveryOrderRef Delivery Order logistik dokumen penjualan (nomor diberikan saat release).
+type SalesDeliveryOrderRef struct {
+	Id     openapi_types.UUID `json:"id"`
+	Number *string            `json:"number,omitempty"`
+
+	// Status Status DO (draft, in_progress, in_transit, received, cancelled).
+	Status string `json:"status"`
+}
+
 // SalesDiscount defines model for SalesDiscount.
 type SalesDiscount struct {
 	// Kind Bentuk diskon manual (MD-05) — persen dari dasar atau nominal rupiah.
@@ -1876,25 +1892,31 @@ type SalesLocationRef struct {
 
 // SalesOrder defines model for SalesOrder.
 type SalesOrder struct {
-	Allocations    []SalesOrderAllocation     `json:"allocations"`
+	Allocations []SalesOrderAllocation `json:"allocations"`
+
+	// AllowedActions `create_delivery_order`: pesanan Diproses dengan alokasi belum dikirim, tanpa DO terbuka, dan user punya
+	// `logistics.delivery_order.write` (Buat DO, POST /api/v1/delivery-orders).
 	AllowedActions []SalesOrderAllowedActions `json:"allowedActions"`
 
 	// BusinessDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
 	//
 	// Example: 2026-10-19
-	BusinessDate             BusinessDate        `json:"businessDate"`
-	CancelReason             string              `json:"cancelReason"`
-	ChannelId                openapi_types.UUID  `json:"channelId"`
-	ChannelName              string              `json:"channelName"`
-	ClientPoNumber           string              `json:"clientPoNumber"`
-	ConfirmedAt              *time.Time          `json:"confirmedAt,omitempty"`
-	CreatedAt                time.Time           `json:"createdAt"`
-	CreatedByName            string              `json:"createdByName"`
-	CustomerId               *openapi_types.UUID `json:"customerId,omitempty"`
-	DeliveredAt              *time.Time          `json:"deliveredAt,omitempty"`
-	DiscountApprovalRequired bool                `json:"discountApprovalRequired"`
-	DiscountApprovedAt       *time.Time          `json:"discountApprovedAt,omitempty"`
-	DocumentDiscount         SalesDiscount       `json:"documentDiscount"`
+	BusinessDate   BusinessDate        `json:"businessDate"`
+	CancelReason   string              `json:"cancelReason"`
+	ChannelId      openapi_types.UUID  `json:"channelId"`
+	ChannelName    string              `json:"channelName"`
+	ClientPoNumber string              `json:"clientPoNumber"`
+	ConfirmedAt    *time.Time          `json:"confirmedAt,omitempty"`
+	CreatedAt      time.Time           `json:"createdAt"`
+	CreatedByName  string              `json:"createdByName"`
+	CustomerId     *openapi_types.UUID `json:"customerId,omitempty"`
+	DeliveredAt    *time.Time          `json:"deliveredAt,omitempty"`
+
+	// DeliveryOrders Delivery Order logistik pesanan (terbaru dulu); kosong bila modul logistics tidak aktif.
+	DeliveryOrders           *[]SalesDeliveryOrderRef `json:"deliveryOrders,omitempty"`
+	DiscountApprovalRequired bool                     `json:"discountApprovalRequired"`
+	DiscountApprovedAt       *time.Time               `json:"discountApprovedAt,omitempty"`
+	DocumentDiscount         SalesDiscount            `json:"documentDiscount"`
 
 	// DocumentDiscountAmount Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
 	//
@@ -2761,8 +2783,8 @@ type ReceiveConsignmentDeliveryParams struct {
 	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
 }
 
-// ShipConsignmentDeliveryParams defines parameters for ShipConsignmentDelivery.
-type ShipConsignmentDeliveryParams struct {
+// SubmitConsignmentDeliveryParams defines parameters for SubmitConsignmentDelivery.
+type SubmitConsignmentDeliveryParams struct {
 	// IdempotencyKey UUID per percobaan submit (Technical Guideline 7.1).
 	IdempotencyKey IdempotencyKey `json:"Idempotency-Key"`
 }
@@ -3045,8 +3067,8 @@ type CancelConsignmentDeliveryJSONRequestBody = SalesCancelInput
 // ReceiveConsignmentDeliveryJSONRequestBody defines body for ReceiveConsignmentDelivery for application/json ContentType.
 type ReceiveConsignmentDeliveryJSONRequestBody = VersionInput
 
-// ShipConsignmentDeliveryJSONRequestBody defines body for ShipConsignmentDelivery for application/json ContentType.
-type ShipConsignmentDeliveryJSONRequestBody = VersionInput
+// SubmitConsignmentDeliveryJSONRequestBody defines body for SubmitConsignmentDelivery for application/json ContentType.
+type SubmitConsignmentDeliveryJSONRequestBody = VersionInput
 
 // CreateConsignmentReconciliationJSONRequestBody defines body for CreateConsignmentReconciliation for application/json ContentType.
 type CreateConsignmentReconciliationJSONRequestBody = ConsignmentReconciliationInput
@@ -3164,12 +3186,12 @@ type ServerInterface interface {
 	// CancelConsignmentDelivery Batalkan draft pengiriman konsinyasi
 	// (POST /api/v1/sales/consignment-deliveries/{id}/cancel)
 	CancelConsignmentDelivery(w http.ResponseWriter, r *http.Request, id Id, params CancelConsignmentDeliveryParams)
-	// ReceiveConsignmentDelivery Barang titipan diterima mitra (stok Tersedia di lokasi mitra)
+	// ReceiveConsignmentDelivery Barang titipan diterima mitra — hanya data lama yang dikirim tanpa DO
 	// (POST /api/v1/sales/consignment-deliveries/{id}/receive)
 	ReceiveConsignmentDelivery(w http.ResponseWriter, r *http.Request, id Id, params ReceiveConsignmentDeliveryParams)
-	// ShipConsignmentDelivery Kirim barang titipan (nomor DO, Transfer Stok, jurnal A-07 / A-24)
-	// (POST /api/v1/sales/consignment-deliveries/{id}/ship)
-	ShipConsignmentDelivery(w http.ResponseWriter, r *http.Request, id Id, params ShipConsignmentDeliveryParams)
+	// SubmitConsignmentDelivery Ajukan pengiriman titipan ke Logistik (reservasi FEFO + Delivery Order)
+	// (POST /api/v1/sales/consignment-deliveries/{id}/submit)
+	SubmitConsignmentDelivery(w http.ResponseWriter, r *http.Request, id Id, params SubmitConsignmentDeliveryParams)
 	// ListConsignmentReconciliations Daftar Rekonsiliasi Konsinyasi (S-304)
 	// (GET /api/v1/sales/consignment-reconciliations)
 	ListConsignmentReconciliations(w http.ResponseWriter, r *http.Request, params ListConsignmentReconciliationsParams)
@@ -3383,15 +3405,15 @@ func (_ Unimplemented) CancelConsignmentDelivery(w http.ResponseWriter, r *http.
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// ReceiveConsignmentDelivery Barang titipan diterima mitra (stok Tersedia di lokasi mitra)
+// ReceiveConsignmentDelivery Barang titipan diterima mitra — hanya data lama yang dikirim tanpa DO
 // (POST /api/v1/sales/consignment-deliveries/{id}/receive)
 func (_ Unimplemented) ReceiveConsignmentDelivery(w http.ResponseWriter, r *http.Request, id Id, params ReceiveConsignmentDeliveryParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// ShipConsignmentDelivery Kirim barang titipan (nomor DO, Transfer Stok, jurnal A-07 / A-24)
-// (POST /api/v1/sales/consignment-deliveries/{id}/ship)
-func (_ Unimplemented) ShipConsignmentDelivery(w http.ResponseWriter, r *http.Request, id Id, params ShipConsignmentDeliveryParams) {
+// SubmitConsignmentDelivery Ajukan pengiriman titipan ke Logistik (reservasi FEFO + Delivery Order)
+// (POST /api/v1/sales/consignment-deliveries/{id}/submit)
+func (_ Unimplemented) SubmitConsignmentDelivery(w http.ResponseWriter, r *http.Request, id Id, params SubmitConsignmentDeliveryParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -4270,8 +4292,8 @@ func (siw *ServerInterfaceWrapper) ReceiveConsignmentDelivery(w http.ResponseWri
 	handler.ServeHTTP(w, r)
 }
 
-// ShipConsignmentDelivery operation middleware
-func (siw *ServerInterfaceWrapper) ShipConsignmentDelivery(w http.ResponseWriter, r *http.Request) {
+// SubmitConsignmentDelivery operation middleware
+func (siw *ServerInterfaceWrapper) SubmitConsignmentDelivery(w http.ResponseWriter, r *http.Request) {
 
 	var err error
 	_ = err
@@ -4286,7 +4308,7 @@ func (siw *ServerInterfaceWrapper) ShipConsignmentDelivery(w http.ResponseWriter
 	}
 
 	// Parameter object where we will unmarshal all parameters from the context
-	var params ShipConsignmentDeliveryParams
+	var params SubmitConsignmentDeliveryParams
 
 	headers := r.Header
 
@@ -4314,7 +4336,7 @@ func (siw *ServerInterfaceWrapper) ShipConsignmentDelivery(w http.ResponseWriter
 	}
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.ShipConsignmentDelivery(w, r, id, params)
+		siw.Handler.SubmitConsignmentDelivery(w, r, id, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -7127,7 +7149,7 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		r.Put(options.BaseURL+"/api/v1/sales/consignment-deliveries/{id}", wrapper.UpdateConsignmentDelivery)
 	})
 	r.Group(func(r chi.Router) {
-		r.Post(options.BaseURL+"/api/v1/sales/consignment-deliveries/{id}/ship", wrapper.ShipConsignmentDelivery)
+		r.Post(options.BaseURL+"/api/v1/sales/consignment-deliveries/{id}/submit", wrapper.SubmitConsignmentDelivery)
 	})
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/api/v1/sales/consignment-deliveries/{id}/receive", wrapper.ReceiveConsignmentDelivery)
@@ -7639,19 +7661,19 @@ func (response ReceiveConsignmentDeliverydefaultApplicationProblemPlusJSONRespon
 	return err
 }
 
-type ShipConsignmentDeliveryRequestObject struct {
+type SubmitConsignmentDeliveryRequestObject struct {
 	Id     Id `json:"id"`
-	Params ShipConsignmentDeliveryParams
-	Body   *ShipConsignmentDeliveryJSONRequestBody
+	Params SubmitConsignmentDeliveryParams
+	Body   *SubmitConsignmentDeliveryJSONRequestBody
 }
 
-type ShipConsignmentDeliveryResponseObject interface {
-	VisitShipConsignmentDeliveryResponse(w http.ResponseWriter) error
+type SubmitConsignmentDeliveryResponseObject interface {
+	VisitSubmitConsignmentDeliveryResponse(w http.ResponseWriter) error
 }
 
-type ShipConsignmentDelivery200JSONResponse ConsignmentDelivery
+type SubmitConsignmentDelivery200JSONResponse ConsignmentDelivery
 
-func (response ShipConsignmentDelivery200JSONResponse) VisitShipConsignmentDeliveryResponse(w http.ResponseWriter) error {
+func (response SubmitConsignmentDelivery200JSONResponse) VisitSubmitConsignmentDeliveryResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(response); err != nil {
@@ -7663,12 +7685,12 @@ func (response ShipConsignmentDelivery200JSONResponse) VisitShipConsignmentDeliv
 	return err
 }
 
-type ShipConsignmentDeliverydefaultApplicationProblemPlusJSONResponse struct {
+type SubmitConsignmentDeliverydefaultApplicationProblemPlusJSONResponse struct {
 	Body       Problem
 	StatusCode int
 }
 
-func (response ShipConsignmentDeliverydefaultApplicationProblemPlusJSONResponse) VisitShipConsignmentDeliveryResponse(w http.ResponseWriter) error {
+func (response SubmitConsignmentDeliverydefaultApplicationProblemPlusJSONResponse) VisitSubmitConsignmentDeliveryResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
@@ -9606,12 +9628,12 @@ type StrictServerInterface interface {
 	// CancelConsignmentDelivery Batalkan draft pengiriman konsinyasi
 	// (POST /api/v1/sales/consignment-deliveries/{id}/cancel)
 	CancelConsignmentDelivery(ctx context.Context, request CancelConsignmentDeliveryRequestObject) (CancelConsignmentDeliveryResponseObject, error)
-	// ReceiveConsignmentDelivery Barang titipan diterima mitra (stok Tersedia di lokasi mitra)
+	// ReceiveConsignmentDelivery Barang titipan diterima mitra — hanya data lama yang dikirim tanpa DO
 	// (POST /api/v1/sales/consignment-deliveries/{id}/receive)
 	ReceiveConsignmentDelivery(ctx context.Context, request ReceiveConsignmentDeliveryRequestObject) (ReceiveConsignmentDeliveryResponseObject, error)
-	// ShipConsignmentDelivery Kirim barang titipan (nomor DO, Transfer Stok, jurnal A-07 / A-24)
-	// (POST /api/v1/sales/consignment-deliveries/{id}/ship)
-	ShipConsignmentDelivery(ctx context.Context, request ShipConsignmentDeliveryRequestObject) (ShipConsignmentDeliveryResponseObject, error)
+	// SubmitConsignmentDelivery Ajukan pengiriman titipan ke Logistik (reservasi FEFO + Delivery Order)
+	// (POST /api/v1/sales/consignment-deliveries/{id}/submit)
+	SubmitConsignmentDelivery(ctx context.Context, request SubmitConsignmentDeliveryRequestObject) (SubmitConsignmentDeliveryResponseObject, error)
 	// ListConsignmentReconciliations Daftar Rekonsiliasi Konsinyasi (S-304)
 	// (GET /api/v1/sales/consignment-reconciliations)
 	ListConsignmentReconciliations(ctx context.Context, request ListConsignmentReconciliationsRequestObject) (ListConsignmentReconciliationsResponseObject, error)
@@ -10149,14 +10171,14 @@ func (sh *strictHandler) ReceiveConsignmentDelivery(w http.ResponseWriter, r *ht
 	}
 }
 
-// ShipConsignmentDelivery operation middleware
-func (sh *strictHandler) ShipConsignmentDelivery(w http.ResponseWriter, r *http.Request, id Id, params ShipConsignmentDeliveryParams) {
-	var request ShipConsignmentDeliveryRequestObject
+// SubmitConsignmentDelivery operation middleware
+func (sh *strictHandler) SubmitConsignmentDelivery(w http.ResponseWriter, r *http.Request, id Id, params SubmitConsignmentDeliveryParams) {
+	var request SubmitConsignmentDeliveryRequestObject
 
 	request.Id = id
 	request.Params = params
 
-	var body ShipConsignmentDeliveryJSONRequestBody
+	var body SubmitConsignmentDeliveryJSONRequestBody
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
 		return
@@ -10164,18 +10186,18 @@ func (sh *strictHandler) ShipConsignmentDelivery(w http.ResponseWriter, r *http.
 	request.Body = &body
 
 	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
-		return sh.ssi.ShipConsignmentDelivery(ctx, request.(ShipConsignmentDeliveryRequestObject))
+		return sh.ssi.SubmitConsignmentDelivery(ctx, request.(SubmitConsignmentDeliveryRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ShipConsignmentDelivery")
+		handler = middleware(handler, "SubmitConsignmentDelivery")
 	}
 
 	response, err := handler(r.Context(), w, r, request)
 
 	if err != nil {
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
-	} else if validResponse, ok := response.(ShipConsignmentDeliveryResponseObject); ok {
-		if err := validResponse.VisitShipConsignmentDeliveryResponse(w); err != nil {
+	} else if validResponse, ok := response.(SubmitConsignmentDeliveryResponseObject); ok {
+		if err := validResponse.VisitSubmitConsignmentDeliveryResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

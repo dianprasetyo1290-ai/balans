@@ -160,9 +160,16 @@ func TestDeliveryOrderOutboundQCFlow(t *testing.T) {
 	require.Equal(t, "in_progress", so["status"])
 	soID := so["id"].(string)
 
-	// S-309: DO dari SO oleh Logistik Leader; batch FEFO dari alokasi (C1 10 + C2 2).
+	assert.NotContains(t, so["allowedActions"], "create_delivery_order", "Sales MT tidak membuat DO")
+
+	// S-309: DO dari SO oleh Logistik Leader (aksi Buat DO di detail SO); batch FEFO dari alokasi (C1 10 + C2 2).
 	h.as("logistik.leader@balans.local")
+	assert.Contains(t, h.order(soID)["allowedActions"], "create_delivery_order")
 	do := h.json(http.MethodPost, "/api/v1/delivery-orders", map[string]any{"salesOrderId": soID}, http.StatusCreated)
+	soView := h.order(soID)
+	assert.NotContains(t, soView["allowedActions"], "create_delivery_order", "sudah ada DO terbuka")
+	require.Len(t, items(soView, "deliveryOrders"), 1)
+	assert.Equal(t, "draft", items(soView, "deliveryOrders")[0]["status"])
 	assert.Equal(t, "draft", do["status"])
 	assert.Nil(t, do["number"], "nomor DO diberikan saat release")
 	assert.Equal(t, "sales", do["deliveryType"])
@@ -311,7 +318,7 @@ func TestDeliveryOrderOutboundQCFlow(t *testing.T) {
 	status, _, _ = h.do(http.MethodPost, "/api/v1/delivery-orders/"+doID+"/deliver", map[string]any{"receivedByName": "Budi"})
 	assert.Equal(t, http.StatusForbidden, status)
 	h.as("merchandiser@balans.local")
-	mine := h.json(http.MethodGet, "/api/v1/shipments?mine=true", nil, http.StatusOK)
+	mine := h.json(http.MethodGet, "/api/v1/shipments?mine=true&q="+do["number"].(string), nil, http.StatusOK)
 	require.Len(t, items(mine, "items"), 1)
 	status, problem, _ = h.do(http.MethodPost, "/api/v1/delivery-orders/"+doID+"/deliver", map[string]any{"receivedByName": "Budi"})
 	require.Equal(t, http.StatusUnprocessableEntity, status)

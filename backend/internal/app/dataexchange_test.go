@@ -405,7 +405,14 @@ func TestImportMastersPerRole(t *testing.T) {
 	})
 	assert.EqualValues(t, 1, res["committedRows"])
 	rows = h.exportRows("warehouse.location", "Gudang & Lokasi")
-	assert.Contains(t, strings.Join(rows[len(rows)-1], "|"), "SUP-DX")
+	// Basis data uji dipakai bersama: cari baris lokasi maklon (lokasi seed UTAMA-* bisa ada sesudahnya).
+	maklon := ""
+	for _, r := range rows {
+		if j := strings.Join(r, "|"); strings.Contains(j, "MKL-DX") {
+			maklon = j
+		}
+	}
+	assert.Contains(t, maklon, "SUP-DX")
 
 	// Chart of Accounts (Finance): akun induk dari baris sebelumnya, kode lama diperbarui.
 	h.as("finance@balans.local")

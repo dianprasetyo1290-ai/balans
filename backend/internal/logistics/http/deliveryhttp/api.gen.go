@@ -361,6 +361,17 @@ type CourierUpdateInput struct {
 	Version    int    `json:"version"`
 }
 
+// CourierUser defines model for CourierUser.
+type CourierUser struct {
+	Id   openapi_types.UUID `json:"id"`
+	Name string             `json:"name"`
+}
+
+// CourierUserList defines model for CourierUserList.
+type CourierUserList struct {
+	Items []CourierUser `json:"items"`
+}
+
 // DeliveryBatchRef defines model for DeliveryBatchRef.
 type DeliveryBatchRef struct {
 	// ExpiryDate Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
@@ -870,6 +881,9 @@ type RecordShipmentEventJSONRequestBody = ShipmentEventInput
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// ListCourierUsers Merchandiser aktif untuk kurir internal (S-312)
+	// (GET /api/v1/courier-users)
+	ListCourierUsers(w http.ResponseWriter, r *http.Request)
 	// ListCouriers Master kurir (Kurir & Resi)
 	// (GET /api/v1/couriers)
 	ListCouriers(w http.ResponseWriter, r *http.Request, params ListCouriersParams)
@@ -911,6 +925,12 @@ type ServerInterface interface {
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
 
 type Unimplemented struct{}
+
+// ListCourierUsers Merchandiser aktif untuk kurir internal (S-312)
+// (GET /api/v1/courier-users)
+func (_ Unimplemented) ListCourierUsers(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
 
 // ListCouriers Master kurir (Kurir & Resi)
 // (GET /api/v1/couriers)
@@ -992,6 +1012,20 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(http.Handler) http.Handler
+
+// ListCourierUsers operation middleware
+func (siw *ServerInterfaceWrapper) ListCourierUsers(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListCourierUsers(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
 
 // ListCouriers operation middleware
 func (siw *ServerInterfaceWrapper) ListCouriers(w http.ResponseWriter, r *http.Request) {
@@ -1772,6 +1806,9 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		r.Put(options.BaseURL+"/api/v1/couriers/{id}", wrapper.UpdateCourier)
 	})
 	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/courier-users", wrapper.ListCourierUsers)
+	})
+	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/api/v1/delivery-orders", wrapper.ListDeliveryOrders)
 	})
 	r.Group(func(r chi.Router) {
@@ -1803,6 +1840,44 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 }
 
 type ProblemApplicationProblemPlusJSONResponse Problem
+
+type ListCourierUsersRequestObject struct {
+}
+
+type ListCourierUsersResponseObject interface {
+	VisitListCourierUsersResponse(w http.ResponseWriter) error
+}
+
+type ListCourierUsers200JSONResponse CourierUserList
+
+func (response ListCourierUsers200JSONResponse) VisitListCourierUsersResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListCourierUsersdefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response ListCourierUsersdefaultApplicationProblemPlusJSONResponse) VisitListCourierUsersResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
 
 type ListCouriersRequestObject struct {
 	Params ListCouriersParams
@@ -2288,6 +2363,9 @@ func (response RecordShipmentEventdefaultApplicationProblemPlusJSONResponse) Vis
 
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
+	// ListCourierUsers Merchandiser aktif untuk kurir internal (S-312)
+	// (GET /api/v1/courier-users)
+	ListCourierUsers(ctx context.Context, request ListCourierUsersRequestObject) (ListCourierUsersResponseObject, error)
 	// ListCouriers Master kurir (Kurir & Resi)
 	// (GET /api/v1/couriers)
 	ListCouriers(ctx context.Context, request ListCouriersRequestObject) (ListCouriersResponseObject, error)
@@ -2363,6 +2441,30 @@ type strictHandler struct {
 	ssi         StrictServerInterface
 	middlewares []StrictMiddlewareFunc
 	options     StrictHTTPServerOptions
+}
+
+// ListCourierUsers operation middleware
+func (sh *strictHandler) ListCourierUsers(w http.ResponseWriter, r *http.Request) {
+	var request ListCourierUsersRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListCourierUsers(ctx, request.(ListCourierUsersRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListCourierUsers")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListCourierUsersResponseObject); ok {
+		if err := validResponse.VisitListCourierUsersResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
 }
 
 // ListCouriers operation middleware

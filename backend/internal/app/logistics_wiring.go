@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"slices"
 	"strings"
 
 	"github.com/google/uuid"
@@ -51,6 +52,7 @@ func (a *App) buildLogistics(inbox *webhook.Inbox, provider *mockshipment.Provid
 	}
 	a.logistics = logistics.New(d)
 	a.modules = append(a.modules, a.logistics)
+	a.wireConsignmentDeliveries()
 }
 
 // logisticsSales menyesuaikan API publik sales untuk DO (sales berada di tingkat atas logistics).
@@ -145,6 +147,19 @@ func (u logisticsUsers) UserWithRole(ctx context.Context, userID uuid.UUID, role
 		}
 	}
 	return "", false, nil
+}
+
+func (u logisticsUsers) UsersWithRole(ctx context.Context, role string) ([]logistics.UserOption, error) {
+	users, err := u.identity.UsersWithRole(ctx, role, nil)
+	if err != nil {
+		return nil, err
+	}
+	out := make([]logistics.UserOption, 0, len(users))
+	for _, x := range users {
+		out = append(out, logistics.UserOption{ID: x.ID, Name: x.FullName})
+	}
+	slices.SortFunc(out, func(a, b logistics.UserOption) int { return strings.Compare(a.Name, b.Name) })
+	return out, nil
 }
 
 // outboundQCReturns membuat retur pembelian otomatis (nota debit, A-02) dari barang reject QC Outbound yang berasal

@@ -85,6 +85,14 @@ type Files interface {
 type Users interface {
 	// UserWithRole mengembalikan nama user aktif bila punya role; ok false bila tidak.
 	UserWithRole(ctx context.Context, userID uuid.UUID, role string) (name string, ok bool, err error)
+	// UsersWithRole mengembalikan user aktif dengan role (urut nama).
+	UsersWithRole(ctx context.Context, role string) ([]UserOption, error)
+}
+
+// UserOption adalah user untuk dropdown (mis. Merchandiser kurir internal).
+type UserOption struct {
+	ID   uuid.UUID
+	Name string
 }
 
 // Notifier mengirim notifikasi in-app (dipenuhi *notification.Module).

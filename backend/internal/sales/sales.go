@@ -7,10 +7,12 @@
 // MarkShipped/MarkHandedOver, dan MarkDelivered di transaksi dokumennya; rekonsiliasi bank memakai
 // IncomingPayments/Payment.
 //
-// Konsinyasi (S-303 – S-305, S-313): pengiriman titipan ke lokasi konsinyasi / buffer vending mitra hanya dengan PKS
-// konsinyasi berlaku (Transfer Stok + jurnal A-07/A-24), dan Rekonsiliasi Konsinyasi bulanan (KSN) yang disetujui
-// Sales MT → Head F&A lalu menerbitkan invoice konsinyasi (A-08) dan memproses selisih (A-23). Modul logistics (DO
-// konsinyasi) memanggil ShipConsignment/ConfirmConsignmentReceived di transaksi DO-nya.
+// Konsinyasi (S-303 – S-305, S-313, S-219): pengiriman titipan ke lokasi konsinyasi / buffer vending mitra hanya
+// dengan PKS konsinyasi berlaku. Sales MT mengajukan draft → stok FEFO direservasi dan Delivery Order logistik
+// dibuat (SetDeliveryOrders); Outbound/QC DO memanggil ReplaceConsignmentBatch, DO ship memanggil ShipConsignment
+// (Transfer Stok reserved → lokasi mitra + jurnal A-07/A-24), DO deliver memanggil ConfirmConsignmentReceived, DO
+// batal memanggil ReopenConsignmentDelivery. Rekonsiliasi Konsinyasi bulanan (KSN) disetujui Sales MT → Head F&A
+// lalu menerbitkan invoice konsinyasi (A-08) dan memproses selisih (A-23).
 package sales
 
 import (
@@ -95,6 +97,18 @@ type (
 	ConsignmentDelivery = domain.ConsignmentDelivery
 	// ConsignmentShipmentInput adalah input ShipConsignment (DO konsinyasi dari logistics).
 	ConsignmentShipmentInput = service.ConsignmentShipmentInput
+	// ConsignmentShippedLine adalah barang lulus QC per baris pengiriman × batch.
+	ConsignmentShippedLine = service.ConsignmentShippedLine
+	// ConsignmentReplaceInput dan ConsignmentReplacement: ganti batch QC Outbound DO pengiriman titipan.
+	ConsignmentReplaceInput = service.ConsignmentReplaceInput
+	ConsignmentReplacement  = service.ConsignmentReplacement
+	// DeliveryOrders adalah API Delivery Order logistik yang dipakai sales (adapter di internal/app).
+	DeliveryOrders       = service.DeliveryOrders
+	DeliveryOrderRef     = service.DeliveryOrderRef
+	DeliveryOrderRequest = service.DeliveryOrderRequest
+	DeliveryOrderLine    = service.DeliveryOrderLine
+	DeliveryOrderBatch   = service.DeliveryOrderBatch
+	StockTransferLine    = service.StockTransferLine
 	// DeliveryLineInput adalah baris pengiriman titipan.
 	DeliveryLineInput = domain.DeliveryLineInput
 	// DeliveryType adalah jenis pengiriman titipan.
@@ -174,8 +188,11 @@ const (
 	DocInvoice    = service.DocInvoice
 	DocPayment    = service.DocPayment
 
-	DocDeliveryOrder  = service.DocDeliveryOrder
 	DocReconciliation = service.DocReconciliation
+	// SourceConsignmentDelivery adalah dokumen asal DO pengiriman titipan (konsinyasi / buffer vending).
+	SourceConsignmentDelivery = service.SourceConsignmentDelivery
+	// SourceDeliveryOrder adalah jenis dokumen pengiriman (DO logistik) di ShipConsignment.
+	SourceDeliveryOrder = service.SourceDeliveryOrder
 
 	DeliveryConsignment   = domain.DeliveryConsignment
 	DeliveryVendingBuffer = domain.DeliveryVendingBuffer
@@ -332,19 +349,34 @@ func (m *Module) RegisterApprovalHandlers(r ApprovalRegistrar) {
 
 // --- API untuk logistics: DO konsinyasi / buffer vending (integrasi S-303 ↔ S-309) ----------
 
-// ShipConsignment mencatat barang titipan keluar lewat dokumen logistik (DO konsinyasi/buffer vending ship) di
-// transaksi pemanggil: PKS konsinyasi wajib berlaku pada tanggal kirim, stok FEFO dipindah ke lokasi konsinyasi /
-// buffer vending mitra lewat warehouse.TransferStock (Dalam Pengiriman), dan jurnal A-07 (Dr 1312 Cr 1311) atau
-// A-24 (Dr 1313 Cr 1311) sebesar nilai FIFO dibuat dengan dimensi channel konsinyasi/vending + sub-channel mitra.
-// Idempotent per (SourceType, SourceID). Logistik TIDAK memindah stok atau memposting jurnal sendiri.
+// SetDeliveryOrders memasang API Delivery Order logistik (dipanggil saat wiring setelah modul logistics dibangun).
+func (m *Module) SetDeliveryOrders(d DeliveryOrders) { m.docs.DeliveryOrders = d }
+
+// ShipConsignment mencatat barang titipan keluar lewat DO konsinyasi / buffer vending (serah ke kurir) di
+// transaksi DO: PKS konsinyasi wajib berlaku pada tanggal kirim, stok reserved pengiriman (batch lulus QC Outbound)
+// dipindah ke lokasi konsinyasi / buffer vending mitra lewat warehouse.TransferStock (Dalam Pengiriman), jurnal
+// A-07 (Dr 1312 Cr 1311) atau A-24 (Dr 1313 Cr 1311) sebesar nilai FIFO dibuat sekali dengan dimensi channel
+// konsinyasi/vending + sub-channel mitra, sisa reservasi dilepas. Idempotent per DO. Logistik TIDAK memindah stok
+// atau memposting jurnal sendiri.
 func (m *Module) ShipConsignment(ctx context.Context, in ConsignmentShipmentInput) (ConsignmentDelivery, error) {
 	return m.docs.ShipConsignment(ctx, in)
 }
 
+// ReplaceConsignmentBatch: QC Outbound DO menolak barang titipan → reserved ke Karantina + pengganti FEFO.
+func (m *Module) ReplaceConsignmentBatch(ctx context.Context, in ConsignmentReplaceInput) (ConsignmentReplacement, error) {
+	return m.docs.ReplaceConsignmentBatch(ctx, in)
+}
+
 // ConfirmConsignmentReceived menandai pengiriman titipan diterima mitra (DO deliver): transfer Dalam Pengiriman →
-// Tersedia di lokasi mitra.
+// Tersedia di lokasi mitra. Idempotent.
 func (m *Module) ConfirmConsignmentReceived(ctx context.Context, deliveryID uuid.UUID) (ConsignmentDelivery, error) {
 	return m.docs.ConfirmConsignmentReceived(ctx, deliveryID)
+}
+
+// ReopenConsignmentDelivery: DO pengiriman titipan dibatalkan sebelum dikirim → reservasi dilepas, pengiriman
+// kembali Draft.
+func (m *Module) ReopenConsignmentDelivery(ctx context.Context, deliveryID, deliveryOrderID uuid.UUID, reason string) error {
+	return m.docs.ReopenConsignmentDelivery(ctx, deliveryID, deliveryOrderID, reason)
 }
 
 // ReturnReason membaca alasan retur (belum dihapus) untuk dokumen retur penjualan/pembelian; NOT_FOUND bila

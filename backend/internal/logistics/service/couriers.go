@@ -28,6 +28,17 @@ func (s *Service) ListCouriers(ctx context.Context, activeOnly bool) ([]domain.C
 	return s.Store.ListCouriers(ctx, active)
 }
 
+// CourierUsers mengembalikan Merchandiser aktif untuk dipilih sebagai kurir internal (S-312).
+func (s *Service) CourierUsers(ctx context.Context) ([]UserOption, error) {
+	if _, err := actor.RequireAny(ctx, PermShipmentWrite, PermShipmentRead); err != nil {
+		return nil, err
+	}
+	if s.Users == nil {
+		return nil, apperr.WithMessage(apperr.CodeProviderUnavailable, "Modul identity tidak aktif.")
+	}
+	return s.Users.UsersWithRole(ctx, RoleMerchandiser)
+}
+
 // CreateCourier menambah kurir (Kurir & Resi). Permission `logistics.shipment.write`.
 func (s *Service) CreateCourier(ctx context.Context, in domain.CourierInput) (domain.Courier, error) {
 	a, err := actor.Require(ctx, PermShipmentWrite)

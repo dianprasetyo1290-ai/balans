@@ -81,6 +81,19 @@ func (h *DeliveryHandler) ListCouriers(ctx context.Context, req ListCouriersRequ
 	return ListCouriers200JSONResponse{Items: items}, nil
 }
 
+// ListCourierUsers mengembalikan Merchandiser aktif untuk kurir internal.
+func (h *DeliveryHandler) ListCourierUsers(ctx context.Context, _ ListCourierUsersRequestObject) (ListCourierUsersResponseObject, error) {
+	list, err := h.svc.CourierUsers(ctx)
+	if err != nil {
+		return nil, err
+	}
+	items := make([]CourierUser, len(list))
+	for i, u := range list {
+		items[i] = CourierUser{Id: u.ID, Name: u.Name}
+	}
+	return ListCourierUsers200JSONResponse{Items: items}, nil
+}
+
 // CreateCourier menambah kurir.
 func (h *DeliveryHandler) CreateCourier(ctx context.Context, req CreateCourierRequestObject) (CreateCourierResponseObject, error) {
 	b := req.Body

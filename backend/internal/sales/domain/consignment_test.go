@@ -63,14 +63,32 @@ func TestConsignmentDeliveryLifecycle(t *testing.T) {
 	assert.Equal(t, domain.StatusDraft, d.Status)
 	assert.Equal(t, "Draft", d.Label())
 	assert.Equal(t, domain.SourceConsignmentDelivery, d.SourceType)
-	assert.Equal(t, []domain.Action{domain.ActionEdit, domain.ActionShip, domain.ActionCancel}, d.Actions())
+	assert.Equal(t, []domain.Action{domain.ActionEdit, domain.ActionSubmit, domain.ActionCancel}, d.Actions())
+	assert.False(t, d.ViaDeliveryOrder())
 
 	upd := deliveryInput()
 	upd.Lines[0].Qty = dec("12")
 	require.NoError(t, d.Update(upd))
 	assert.Equal(t, "12", d.Lines[0].Qty.String())
 
+	// Kirim langsung tanpa DO tidak ada lagi: Draft harus diajukan dulu (reservasi + DO).
 	b1, b2 := uuid.New(), uuid.New()
+	assert.Equal(t, apperr.CodeInvalidStateTransition, code(d.MarkShipped("DO/2026/11/00001", uuid.New(), "TRF", nil, now)))
+	assert.Contains(t, fields(t, d.Submit(uuid.Nil)), "deliveryOrderId")
+	doID := uuid.New()
+	require.NoError(t, d.Submit(doID))
+	assert.Equal(t, domain.StatusInProgress, d.Status)
+	assert.True(t, d.ViaDeliveryOrder())
+	assert.Equal(t, domain.SourceDeliveryOrder, d.SourceType)
+	assert.Empty(t, d.Actions(), "Diproses: dikerjakan Logistik dari halaman DO")
+	assert.Equal(t, apperr.CodeInvalidStateTransition, code(d.Update(upd)))
+	assert.Equal(t, apperr.CodeInvalidStateTransition, code(d.Submit(doID)))
+	// DO dibatalkan → Draft lagi; diajukan ulang dengan DO baru.
+	require.NoError(t, d.Reopen())
+	assert.Equal(t, domain.StatusDraft, d.Status)
+	assert.Nil(t, d.SourceID)
+	assert.Equal(t, apperr.CodeInvalidStateTransition, code(d.Reopen()))
+	require.NoError(t, d.Submit(doID))
 	require.NoError(t, d.MarkShipped("DO/2026/11/00001", uuid.New(), "TRF/2026/11/00001", []domain.DeliveryLine{
 		{ProductID: product1, BatchID: &b1, Qty: dec("7"), Cost: money.MustParse("70000")},
 		{ProductID: product1, BatchID: &b2, Qty: dec("5"), Cost: money.MustParse("55000")},
@@ -79,7 +97,10 @@ func TestConsignmentDeliveryLifecycle(t *testing.T) {
 	assert.Equal(t, "DO/2026/11/00001", d.Label())
 	assert.Equal(t, "125000.00", d.Cost.String())
 	assert.Equal(t, 2, d.Lines[1].LineNo)
-	assert.Equal(t, []domain.Action{domain.ActionReceive, domain.ActionPrint}, d.Actions())
+	assert.Equal(t, []domain.Action{domain.ActionPrint}, d.Actions(), "diterima lewat DO")
+	legacy := d
+	legacy.SourceType, legacy.SourceID = domain.SourceConsignmentDelivery, nil
+	assert.Equal(t, []domain.Action{domain.ActionReceive, domain.ActionPrint}, legacy.Actions(), "data lama tanpa DO")
 	assert.Equal(t, apperr.CodeInvalidStateTransition, code(d.Update(upd)))
 	assert.Equal(t, apperr.CodeInvalidStateTransition, code(d.Cancel("batal")))
 

@@ -1308,16 +1308,17 @@ paths:
                 $ref: '#/components/schemas/ConsignmentDelivery'
         default:
           $ref: '#/components/responses/Problem'
-  /api/v1/sales/consignment-deliveries/{id}/ship:
+  /api/v1/sales/consignment-deliveries/{id}/submit:
     post:
-      operationId: shipConsignmentDelivery
+      operationId: submitConsignmentDelivery
       tags:
         - sales
-      summary: Kirim barang titipan (nomor DO, Transfer Stok, jurnal A-07 / A-24)
+      summary: Ajukan pengiriman titipan ke Logistik (reservasi FEFO + Delivery Order)
       description: |
-        Logistik (`logistics.delivery_order.post`). PKS diperiksa ulang; stok FEFO pindah ke lokasi mitra berstatus
-        Dalam Pengiriman; jurnal A-07 (Dr 1312 Cr 1311) atau A-24 (Dr 1313 Cr 1311) sebesar nilai FIFO dengan dimensi
-        channel konsinyasi/vending + sub-channel mitra.
+        Sales MT (`sales.sales_order.write`). PKS konsinyasi wajib berlaku; stok FEFO lokasi asal direservasi per baris
+        dan Delivery Order Draft jenis konsinyasi / buffer vending dibuat (status Diproses). Logistik me-release DO
+        (nomor DO + Outbound picking/packing/QC), menyerahkan ke kurir (stok reserved → lokasi mitra Dalam Pengiriman,
+        jurnal A-07 Dr 1312 Cr 1311 / A-24 Dr 1313 Cr 1311 nilai FIFO), lalu mengonfirmasi diterima di halaman DO.
       parameters:
         - $ref: '#/components/parameters/Id'
         - $ref: '#/components/parameters/IdempotencyKey'
@@ -1329,7 +1330,7 @@ paths:
               $ref: '#/components/schemas/VersionInput'
       responses:
         '200':
-          description: Pengiriman Dalam Pengiriman
+          description: Pengiriman Diproses (DO Draft dibuat)
           content:
             application/json:
               schema:
@@ -1341,7 +1342,10 @@ paths:
       operationId: receiveConsignmentDelivery
       tags:
         - sales
-      summary: Barang titipan diterima mitra (stok Tersedia di lokasi mitra)
+      summary: Barang titipan diterima mitra — hanya data lama yang dikirim tanpa DO
+      description: |
+        Logistik (`logistics.delivery_order.post`). Pengiriman lewat DO dikonfirmasi diterima dari halaman DO
+        (Logistik › Delivery Order); endpoint ini menolak pengiriman yang punya DO.
       parameters:
         - $ref: '#/components/parameters/Id'
         - $ref: '#/components/parameters/IdempotencyKey'
@@ -1717,6 +1721,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Courier'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/courier-users:
+    get:
+      operationId: listCourierUsers
+      tags:
+        - delivery
+      summary: Merchandiser aktif untuk kurir internal (S-312)
+      description: Permission `logistics.shipment.write` atau `logistics.shipment.read`.
+      responses:
+        '200':
+          description: Merchandiser aktif
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourierUserList'
         default:
           $ref: '#/components/responses/Problem'
   /api/v1/delivery-orders:
@@ -11445,6 +11465,22 @@ components:
         createdAt:
           type: string
           format: date-time
+    SalesDeliveryOrderRef:
+      type: object
+      description: Delivery Order logistik dokumen penjualan (nomor diberikan saat release).
+      required:
+        - id
+        - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+          nullable: true
+        status:
+          type: string
+          description: Status DO (draft, in_progress, in_transit, received, cancelled).
     SalesOrder:
       allOf:
         - $ref: '#/components/schemas/SalesOrderSummary'
@@ -11542,8 +11578,16 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/SalesShipment'
+            deliveryOrders:
+              type: array
+              description: Delivery Order logistik pesanan (terbaru dulu); kosong bila modul logistics tidak aktif.
+              items:
+                $ref: '#/components/schemas/SalesDeliveryOrderRef'
             allowedActions:
               type: array
+              description: |
+                `create_delivery_order`: pesanan Diproses dengan alokasi belum dikirim, tanpa DO terbuka, dan user punya
+                `logistics.delivery_order.write` (Buat DO, POST /api/v1/delivery-orders).
               items:
                 type: string
                 enum:
@@ -11551,6 +11595,7 @@ components:
                   - confirm
                   - cancel
                   - upload_payment_proof
+                  - create_delivery_order
     SalesOrderUpdate:
       allOf:
         - $ref: '#/components/schemas/SalesOrderFields'
@@ -12876,6 +12921,7 @@ components:
       type: string
       enum:
         - draft
+        - in_progress
         - in_transit
         - completed
         - cancelled
@@ -13044,6 +13090,10 @@ components:
             transferId:
               type: string
               format: uuid
+              nullable: true
+            deliveryOrder:
+              allOf:
+                - $ref: '#/components/schemas/SalesDeliveryOrderRef'
               nullable: true
             note:
               type: string
@@ -13505,6 +13555,26 @@ components:
           type: boolean
         isActive:
           type: boolean
+    CourierUser:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+    CourierUserList:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CourierUser'
     DeliveryOrderStatus:
       type: string
       description: Status Delivery Order (Desain Status Dokumen 5.4).

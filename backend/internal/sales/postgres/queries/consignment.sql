@@ -17,7 +17,7 @@ SET number = sqlc.narg('number'), partner_agreement_id = sqlc.narg('partner_agre
     agreement_number = sqlc.arg('agreement_number'), from_location_id = sqlc.arg('from_location_id'),
     to_location_id = sqlc.arg('to_location_id'), channel_id = sqlc.arg('channel_id'),
     sub_channel_id = sqlc.arg('sub_channel_id'), business_date = sqlc.arg('business_date'), status = sqlc.arg('status'),
-    source_id = sqlc.narg('source_id'), transfer_id = sqlc.narg('transfer_id'),
+    source_type = sqlc.arg('source_type'), source_id = sqlc.narg('source_id'), transfer_id = sqlc.narg('transfer_id'),
     transfer_number = sqlc.arg('transfer_number'), cost_amount = sqlc.arg('cost_amount'), note = sqlc.arg('note'),
     cancel_reason = sqlc.arg('cancel_reason'), shipped_at = sqlc.narg('shipped_at'),
     received_at = sqlc.narg('received_at'), updated_at = now(), updated_by = sqlc.arg('actor_id'),

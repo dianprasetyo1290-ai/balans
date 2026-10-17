@@ -306,6 +306,29 @@ type TransferAction struct {
 	// Lines: qty diterima (aksi receive).
 	Lines  []domain.ReceiveLine
 	Reason string
+	// Reserved (hanya API modul lain, aksi post/ship): stok diambil dari reservasi dokumen pemanggil, bukan Tersedia.
+	Reserved *ReservedStock
+}
+
+// ReservedStock adalah reservasi dokumen pemanggil yang dipakai transfer lewat API (mis. pengiriman konsinyasi
+// yang sudah direservasi saat diajukan). LineIDs[i] = SourceLineID reservasi untuk baris transfer ke-i.
+type ReservedStock struct {
+	SourceType string
+	SourceID   uuid.UUID
+	LineIDs    []uuid.UUID
+}
+
+// place mengembalikan asal stok baris transfer ke-i: Tersedia, atau reserved milik dokumen pemanggil.
+func (r *ReservedStock) place(i int, location uuid.UUID) (*StockPlace, *StockReservationRef) {
+	if r == nil {
+		return &StockPlace{LocationID: location, Status: StockAvailable}, nil
+	}
+	ref := &StockReservationRef{SourceType: r.SourceType, SourceID: r.SourceID}
+	if i < len(r.LineIDs) && r.LineIDs[i] != uuid.Nil {
+		id := r.LineIDs[i]
+		ref.SourceLineID = &id
+	}
+	return &StockPlace{LocationID: location, Status: StockReserved}, ref
 }
 
 var transferActionPerm = map[string]string{
@@ -426,10 +449,11 @@ func (s *Service) applyTransferAction(ctx context.Context, t *domain.StockTransf
 		lines := make([]StockLine, len(t.Lines))
 		for i, l := range t.Lines {
 			lineID := l.ID
+			from, res := req.Reserved.place(i, t.FromLocationID)
 			lines[i] = StockLine{
 				Kind: StockMove, SourceLineID: &lineID, ProductID: l.ProductID, BatchID: l.BatchID, Qty: l.Qty,
-				From: &StockPlace{LocationID: t.FromLocationID, Status: StockAvailable},
-				To:   &StockPlace{LocationID: t.ToLocationID, Status: status}, BatchReason: l.BatchReason, Note: l.Note,
+				From: from, To: &StockPlace{LocationID: t.ToLocationID, Status: status}, Reservation: res,
+				BatchReason: l.BatchReason, Note: l.Note,
 			}
 		}
 		if result, err = d.Ledger.Post(ctx, src(req.Action), lines); err != nil {
@@ -622,8 +646,9 @@ func totalCost(t domain.StockTransfer) decimal.Decimal {
 
 // TransferStock membuat dan langsung menjalankan transfer langsung di transaksi aktif tanpa cek permission:
 // dalam satu gudang diposting (Tersedia di tujuan), antar gudang/eksternal dikirim (Dalam Pengiriman di tujuan).
-// in.SourceType/SourceID wajib (mis. delivery_order) dan unik.
-func (s *Service) TransferStock(ctx context.Context, in domain.TransferInput) (TransferResult, error) {
+// in.SourceType/SourceID wajib (mis. delivery_order) dan unik. reserved non-nil = stok asal diambil dari reservasi
+// dokumen pemanggil (baris ke-i memakai reserved.LineIDs[i]).
+func (s *Service) TransferStock(ctx context.Context, in domain.TransferInput, reserved *ReservedStock) (TransferResult, error) {
 	if in.SourceType == "" {
 		return TransferResult{}, apperr.Validation(map[string]string{"source": "Dokumen sumber wajib diisi"})
 	}
@@ -639,7 +664,7 @@ func (s *Service) TransferStock(ctx context.Context, in domain.TransferInput) (T
 		if t.RequiresShipping {
 			action = domain.ActionShip
 		}
-		_, err = s.applyTransferAction(ctx, &t, TransferAction{Action: action}, a)
+		_, err = s.applyTransferAction(ctx, &t, TransferAction{Action: action, Reserved: reserved}, a)
 		return err
 	})
 	return TransferResult{Transfer: t, TotalCost: totalCost(t)}, err

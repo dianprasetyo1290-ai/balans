@@ -1103,6 +1103,20 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SalesAllocationBatch"
+    SalesDeliveryOrderRef:
+      type: object
+      description: Delivery Order logistik dokumen penjualan (nomor diberikan saat release).
+      required: [id, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+          nullable: true
+        status:
+          type: string
+          description: Status DO (draft, in_progress, in_transit, received, cancelled).
     SalesShipment:
       type: object
       required: [id, sourceType, sourceId, sourceLabel, businessDate, costAmount, createdAt]
@@ -1242,11 +1256,19 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/SalesShipment"
+            deliveryOrders:
+              type: array
+              description: Delivery Order logistik pesanan (urut dibuat); tidak ada bila modul logistics tidak aktif.
+              items:
+                $ref: "#/components/schemas/SalesDeliveryOrderRef"
             allowedActions:
               type: array
+              description: |
+                `create_delivery_order`: pesanan Diproses dengan alokasi belum dikirim, tanpa DO terbuka, dan user punya
+                `logistics.delivery_order.write` (Buat DO, POST /api/v1/delivery-orders).
               items:
                 type: string
-                enum: [edit, confirm, cancel, upload_payment_proof]
+                enum: [edit, confirm, cancel, upload_payment_proof, create_delivery_order]
     SalesOrderList:
       allOf:
         - $ref: "../components/common.yaml#/Pagination"

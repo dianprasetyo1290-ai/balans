@@ -55,7 +55,6 @@ func (t DeliveryType) RuleCode() string {
 
 // Aksi dokumen konsinyasi (ActionSubmit dan ActionReceive dipakai bersama retur penjualan).
 const (
-	ActionShip   Action = "ship"
 	ActionStart  Action = "start"
 	ActionUpdate Action = "update_lines"
 	ActionRevise Action = "revise"
@@ -122,8 +121,13 @@ type DeliveryInput struct {
 	Lines          []DeliveryLineInput
 }
 
-// SourceConsignmentDelivery adalah source_type pengiriman yang dibuat langsung dari halaman Konsinyasi.
-const SourceConsignmentDelivery = "consignment_delivery"
+// Dokumen pengiriman (source_type) pengiriman titipan. SourceConsignmentDelivery: draft / data lama yang dikirim
+// langsung dari halaman Konsinyasi (sebelum lewat DO); SourceDeliveryOrder: diproses lewat Delivery Order logistik
+// (source_id = ID DO).
+const (
+	SourceConsignmentDelivery = "consignment_delivery"
+	SourceDeliveryOrder       = "delivery_order"
+)
 
 func validateDelivery(in DeliveryInput) ([]DeliveryLine, error) {
 	f := map[string]string{}
@@ -197,9 +201,12 @@ func (d *ConsignmentDelivery) Update(in DeliveryInput) error {
 	return nil
 }
 
+// deliveryTransitions: Draft → Diproses (diajukan: stok direservasi + DO) → Dalam Pengiriman (DO dikirim) →
+// Selesai (DO diterima). DO dibatalkan sebelum dikirim → kembali Draft.
 var deliveryTransitions = transitions{
-	StatusDraft:     {StatusInTransit, StatusCancelled},
-	StatusInTransit: {StatusCompleted},
+	StatusDraft:      {StatusInProgress, StatusCancelled},
+	StatusInProgress: {StatusInTransit, StatusDraft},
+	StatusInTransit:  {StatusCompleted},
 }
 
 func (d *ConsignmentDelivery) transition(to Status) error {
@@ -218,7 +225,33 @@ func (d ConsignmentDelivery) Label() string {
 	return d.Number
 }
 
-// MarkShipped mencatat barang keluar (TRF Dalam Pengiriman) beserta baris per batch dan nilai FIFO-nya.
+// ViaDeliveryOrder: pengiriman diproses lewat Delivery Order logistik (bukan data lama kirim langsung).
+func (d ConsignmentDelivery) ViaDeliveryOrder() bool {
+	return d.SourceType == SourceDeliveryOrder && d.SourceID != nil
+}
+
+// Submit mencatat pengiriman diajukan ke Logistik: stok sudah direservasi dan DO Draft dibuat (Diproses).
+func (d *ConsignmentDelivery) Submit(deliveryOrderID uuid.UUID) error {
+	if deliveryOrderID == uuid.Nil {
+		return apperr.Validation(map[string]string{"deliveryOrderId": "Delivery Order wajib ada"})
+	}
+	if err := d.transition(StatusInProgress); err != nil {
+		return err
+	}
+	d.SourceType, d.SourceID = SourceDeliveryOrder, &deliveryOrderID
+	return nil
+}
+
+// Reopen mengembalikan pengiriman Diproses ke Draft karena DO-nya dibatalkan sebelum dikirim.
+func (d *ConsignmentDelivery) Reopen() error {
+	if err := d.transition(StatusDraft); err != nil {
+		return err
+	}
+	d.SourceType, d.SourceID = SourceConsignmentDelivery, nil
+	return nil
+}
+
+// MarkShipped mencatat barang keluar lewat DO (TRF Dalam Pengiriman) beserta baris per batch dan nilai FIFO-nya.
 func (d *ConsignmentDelivery) MarkShipped(number string, transferID uuid.UUID, transferNumber string, lines []DeliveryLine, now time.Time) error {
 	if err := d.transition(StatusInTransit); err != nil {
 		return err
@@ -259,8 +292,12 @@ func (d *ConsignmentDelivery) Cancel(reason string) error {
 func (d ConsignmentDelivery) Actions() []Action {
 	switch d.Status {
 	case StatusDraft:
-		return []Action{ActionEdit, ActionShip, ActionCancel}
+		return []Action{ActionEdit, ActionSubmit, ActionCancel}
 	case StatusInTransit:
+		// Diterima lewat DO (Logistik); konfirmasi dari halaman Konsinyasi hanya untuk data lama tanpa DO.
+		if d.ViaDeliveryOrder() {
+			return []Action{ActionPrint}
+		}
 		return []Action{ActionReceive, ActionPrint}
 	case StatusCompleted:
 		return []Action{ActionPrint}

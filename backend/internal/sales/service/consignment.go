@@ -20,8 +20,9 @@ import (
 	"balans/internal/sales/postgres"
 )
 
-// Permission konsinyasi. Pengiriman titipan memakai permission Sales Order (buat/ubah oleh Sales MT) dan
-// Delivery Order (kirim & konfirmasi diterima oleh Logistik); rekonsiliasi memakai sales.consignment_reconciliation.
+// Permission konsinyasi. Pengiriman titipan memakai permission Sales Order (buat/ubah/ajukan oleh Sales MT); kirim
+// dan konfirmasi diterima dikerjakan Logistik di Delivery Order (data lama tanpa DO: konfirmasi diterima dengan
+// permission DO post); rekonsiliasi memakai sales.consignment_reconciliation.
 const (
 	PermDeliveryRead          = "logistics.delivery_order.read"
 	PermDeliveryPost          = "logistics.delivery_order.post"
@@ -36,18 +37,17 @@ const (
 const (
 	RuleConsignmentSales    = "A-08"
 	RuleConsignmentVariance = "A-23"
-	// SourceConsignmentDelivery adalah source_type transfer stok & jurnal A-07/A-24 pengiriman dari halaman
-	// Konsinyasi; DO logistics memakai SourceType miliknya sendiri lewat ShipConsignment.
+	// SourceConsignmentDelivery adalah dokumen asal DO pengiriman titipan dan pemilik reservasi stoknya;
+	// SourceDeliveryOrder adalah source_type transfer stok pengiriman yang dikirim lewat DO.
 	SourceConsignmentDelivery = domain.SourceConsignmentDelivery
+	SourceDeliveryOrder       = domain.SourceDeliveryOrder
 	// SourceReconciliation adalah source_type issue stok dan jurnal A-08/A-23 rekonsiliasi.
 	SourceReconciliation = "consignment_reconciliation"
 )
 
-// Jenis nomor dokumen konsinyasi.
-const (
-	DocDeliveryOrder  DocumentType = "DO"
-	DocReconciliation DocumentType = "KSN"
-)
+// DocReconciliation adalah jenis nomor Rekonsiliasi Konsinyasi. Nomor pengiriman titipan = nomor DO logistik
+// (satu counter DO).
+const DocReconciliation DocumentType = "KSN"
 
 // Jenis pemilik file: Berita Acara Rekonsiliasi bertanda tangan dan laporan penjualan mitra.
 const (
@@ -89,7 +89,11 @@ type StockTransferInput struct {
 	ToLocationID   uuid.UUID
 	BusinessDate   clock.BusinessDate
 	Note           string
-	Lines          []domain.DeliveryLine
+	Lines          []StockTransferLine
+	// ReservationSourceType/ReservationSourceID: dokumen pemilik reservasi stok asal (baris dengan
+	// ReservationLineID diambil dari reserved, bukan Tersedia).
+	ReservationSourceType string
+	ReservationSourceID   uuid.UUID
 }
 
 // TransferredLine adalah satu batch yang dipindah beserta nilai FIFO-nya.
@@ -183,13 +187,15 @@ type DeliveryView struct {
 	ChannelName    string
 	SubChannelName string
 	CreatedByName  string
+	// DeliveryOrder adalah DO logistik yang memproses pengiriman (nil = belum diajukan / data lama).
+	DeliveryOrder  *DeliveryOrderRef
 	AllowedActions []string
 }
 
 var deliveryActionPerms = map[domain.Action][]string{
-	domain.ActionEdit: {PermOrderWrite}, domain.ActionCancel: {PermOrderWrite},
-	domain.ActionShip: {PermDeliveryPost}, domain.ActionReceive: {PermDeliveryPost},
-	domain.ActionPrint: {PermOrderRead, PermDeliveryRead},
+	domain.ActionEdit: {PermOrderWrite}, domain.ActionCancel: {PermOrderWrite}, domain.ActionSubmit: {PermOrderWrite},
+	domain.ActionReceive: {PermDeliveryPost},
+	domain.ActionPrint:   {PermOrderRead, PermDeliveryRead},
 }
 
 func deliverySnapshot(d domain.ConsignmentDelivery) map[string]any {
@@ -228,6 +234,9 @@ func (s *DocumentService) deliveryView(ctx context.Context, d domain.Consignment
 		return DeliveryView{}, err
 	}
 	v.CreatedByName = names[d.CreatedBy]
+	if v.DeliveryOrder, err = s.currentDeliveryOrder(ctx, d); err != nil {
+		return DeliveryView{}, err
+	}
 	v.AllowedActions = filterActions(ctx, d.Actions(), deliveryActionPerms)
 	return v, nil
 }
@@ -391,41 +400,265 @@ func (s *DocumentService) CancelDelivery(ctx context.Context, id uuid.UUID, ver 
 	})
 }
 
-// ShipDelivery mengirim pengiriman Draft dari halaman Konsinyasi: nomor DO, Transfer Stok ke lokasi mitra
-// (Dalam Pengiriman) dan jurnal A-07/A-24 di transaksi yang sama. PKS diperiksa ulang pada tanggal kirim.
-func (s *DocumentService) ShipDelivery(ctx context.Context, id uuid.UUID, ver int) (DeliveryView, error) {
-	return s.mutateDelivery(ctx, id, ver, PermDeliveryPost, audit.ActionStatusChange, true, func(ctx context.Context, d *domain.ConsignmentDelivery) (string, error) {
+// --- Integrasi Delivery Order logistik (S-303 ↔ S-309 – S-312) -------------------------------
+
+// DeliveryOrderRef adalah Delivery Order logistik milik dokumen penjualan (nomor diberikan saat release).
+type DeliveryOrderRef struct {
+	ID     uuid.UUID
+	Number string
+	Status string
+}
+
+// Open: DO masih Draft atau Diproses (satu DO terbuka per dokumen asal).
+func (r DeliveryOrderRef) Open() bool { return r.Status == "draft" || r.Status == "in_progress" }
+
+// DeliveryOrderBatch adalah qty satu batch reserved yang menjadi picking list Outbound.
+type DeliveryOrderBatch struct {
+	BatchID *uuid.UUID
+	Qty     decimal.Decimal
+}
+
+// DeliveryOrderLine adalah baris DO; SourceLineID = baris pengiriman titipan yang memegang reservasi.
+type DeliveryOrderLine struct {
+	SourceLineID uuid.UUID
+	ProductID    uuid.UUID
+	Qty          decimal.Decimal
+	Batches      []DeliveryOrderBatch
+}
+
+// DeliveryOrderRequest adalah DO Draft jenis konsinyasi / buffer vending untuk pengiriman titipan.
+type DeliveryOrderRequest struct {
+	Type           domain.DeliveryType
+	DeliveryID     uuid.UUID
+	SourceLabel    string
+	PartnerID      uuid.UUID
+	RecipientName  string
+	RecipientPhone string
+	ShipToAddress  string
+	LocationID     uuid.UUID
+	BusinessDate   clock.BusinessDate
+	Note           string
+	Lines          []DeliveryOrderLine
+}
+
+// DeliveryOrders adalah API Delivery Order modul logistics (adapter di internal/app; diisi setelah logistics
+// dibangun). Nil = pengajuan pengiriman titipan ditolak PROVIDER_UNAVAILABLE.
+type DeliveryOrders interface {
+	// CreateConsignmentDeliveryOrder membuat DO Draft di transaksi aktif (source_type consignment_delivery).
+	CreateConsignmentDeliveryOrder(ctx context.Context, in DeliveryOrderRequest) (DeliveryOrderRef, error)
+	// DeliveryOrdersBySource membaca DO milik dokumen asal (mis. sales_order, consignment_delivery).
+	DeliveryOrdersBySource(ctx context.Context, sourceType string, sourceID uuid.UUID) ([]DeliveryOrderRef, error)
+}
+
+// currentDeliveryOrder membaca DO yang memproses pengiriman (nil bila belum diajukan / data lama).
+func (s *DocumentService) currentDeliveryOrder(ctx context.Context, d domain.ConsignmentDelivery) (*DeliveryOrderRef, error) {
+	if !d.ViaDeliveryOrder() {
+		return nil, nil
+	}
+	ref := &DeliveryOrderRef{ID: *d.SourceID, Status: "unknown"}
+	if s.DeliveryOrders == nil {
+		return ref, nil
+	}
+	list, err := s.DeliveryOrders.DeliveryOrdersBySource(ctx, EntityConsignmentDelivery, d.ID)
+	if err != nil {
+		return nil, err
+	}
+	for _, r := range list {
+		if r.ID == *d.SourceID {
+			return &r, nil
+		}
+	}
+	return ref, nil
+}
+
+func reservationRef(deliveryID uuid.UUID, lineID *uuid.UUID) *inventory.ReservationRef {
+	return &inventory.ReservationRef{SourceType: EntityConsignmentDelivery, SourceID: deliveryID, SourceLineID: lineID}
+}
+
+// SubmitDelivery mengajukan pengiriman Draft ke Logistik (Sales MT): PKS, lokasi, dan sub-channel diperiksa
+// ulang, stok FEFO lokasi asal direservasi per baris (SourceLineID = baris pengiriman), lalu Delivery Order Draft
+// jenis konsinyasi / buffer vending dibuat dengan batch reserved sebagai picking list. Status → Diproses.
+func (s *DocumentService) SubmitDelivery(ctx context.Context, id uuid.UUID, ver int) (DeliveryView, error) {
+	return s.mutateDelivery(ctx, id, ver, PermOrderWrite, audit.ActionSubmit, false, func(ctx context.Context, d *domain.ConsignmentDelivery) (string, error) {
+		if s.DeliveryOrders == nil {
+			return "", apperr.WithMessage(apperr.CodeProviderUnavailable, "Modul logistics (Delivery Order) tidak aktif.")
+		}
+		if d.Status != domain.StatusDraft {
+			return "", apperr.WithMessage(apperr.CodeInvalidStateTransition, fmt.Sprintf(
+				"Pengiriman %s berstatus %s; hanya Draft yang bisa diajukan.", d.Label(), d.Status.Label()))
+		}
 		if err := s.deliveryRefs(ctx, d); err != nil {
 			return "", err
 		}
-		number, err := s.Numberer.Next(ctx, DocDeliveryOrder, d.BusinessDate)
+		p, _, err := s.Parties.Partner(ctx, d.PartnerID)
 		if err != nil {
 			return "", err
 		}
-		sid := d.ID
-		d.SourceID = &sid
-		if err := s.shipConsignment(ctx, d, number); err != nil {
+		reserve := make([]inventory.ReserveLine, len(d.Lines))
+		for i, l := range d.Lines {
+			lineID := l.ID
+			reserve[i] = inventory.ReserveLine{SourceLineID: &lineID, ProductID: l.ProductID, LocationID: d.FromLocationID, Qty: l.Qty}
+		}
+		label := fmt.Sprintf("%s %s", d.Type.Label(), d.PartnerName)
+		res, err := s.Stock.Reserve(ctx, inventory.ReserveRequest{
+			Source: inventory.Source{
+				Type: EntityConsignmentDelivery, ID: d.ID, Action: fmt.Sprintf("reserve:v%d", d.Version), Label: label,
+				BusinessDate: s.today(),
+			},
+			Lines: reserve,
+		})
+		if err != nil {
 			return "", err
 		}
-		return "Dikirim, " + d.TransferNumber, nil
+		req := DeliveryOrderRequest{
+			Type: d.Type, DeliveryID: d.ID, SourceLabel: label, PartnerID: d.PartnerID, RecipientName: d.PartnerName,
+			RecipientPhone: p.Phone, ShipToAddress: p.Address, LocationID: d.FromLocationID, BusinessDate: d.BusinessDate,
+			Note: d.Note,
+		}
+		for i, l := range d.Lines {
+			line := DeliveryOrderLine{SourceLineID: l.ID, ProductID: l.ProductID, Qty: l.Qty}
+			if i < len(res.Lines) {
+				for _, m := range res.Lines[i].Movements {
+					if m.Type == inventory.MovementMoveIn && m.Status == inventory.StatusReserved && m.Qty.IsPositive() {
+						line.Batches = append(line.Batches, DeliveryOrderBatch{BatchID: m.BatchID, Qty: m.Qty})
+					}
+				}
+			}
+			req.Lines = append(req.Lines, line)
+		}
+		do, err := s.DeliveryOrders.CreateConsignmentDeliveryOrder(ctx, req)
+		if err != nil {
+			return "", err
+		}
+		return "Diajukan ke Logistik; stok direservasi FEFO dan Delivery Order dibuat", d.Submit(do.ID)
 	})
 }
 
-// shipConsignment memindah stok ke lokasi mitra dan memposting A-07 (Dr 1312 Cr 1311) atau A-24 (Dr 1313 Cr 1311)
-// sebesar nilai FIFO dengan dimensi channel konsinyasi/vending + sub-channel mitra.
-func (s *DocumentService) shipConsignment(ctx context.Context, d *domain.ConsignmentDelivery, number string) error {
+// ConsignmentShippedLine adalah barang lulus QC Outbound per baris pengiriman × batch.
+type ConsignmentShippedLine struct {
+	SourceLineID uuid.UUID
+	BatchID      *uuid.UUID
+	Qty          decimal.Decimal
+}
+
+// ConsignmentShipmentInput adalah pengiriman titipan yang diserahkan ke kurir lewat DO.
+type ConsignmentShipmentInput struct {
+	DeliveryID uuid.UUID
+	// SourceType/SourceID/SourceLabel adalah DO yang mengirim ("delivery_order" + ID DO + nomor DO).
+	SourceType   string
+	SourceID     uuid.UUID
+	SourceLabel  string
+	BusinessDate clock.BusinessDate
+	Lines        []ConsignmentShippedLine
+}
+
+// ShipConsignment adalah titik integrasi DO ship (serah ke kurir) di transaksi DO: PKS konsinyasi wajib berlaku
+// pada tanggal kirim, stok reserved pengiriman (batch lulus QC) pindah ke lokasi mitra berstatus Dalam
+// Pengiriman (Transfer Stok), jurnal A-07/A-24 nilai FIFO dibuat sekali, dan sisa reservasi yang tidak ikut
+// dikirim dilepas. Pemanggilan ulang untuk DO yang sama mengembalikan pengiriman yang sama. Tanpa cek
+// permission (pemanggil memeriksa aksi user-nya).
+func (s *DocumentService) ShipConsignment(ctx context.Context, in ConsignmentShipmentInput) (domain.ConsignmentDelivery, error) {
+	if in.DeliveryID == uuid.Nil || in.SourceType != domain.SourceDeliveryOrder || in.SourceID == uuid.Nil || strings.TrimSpace(in.SourceLabel) == "" {
+		return domain.ConsignmentDelivery{}, apperr.Validation(map[string]string{"source": "Delivery Order pengiriman wajib diisi"})
+	}
+	if err := s.requireConsignmentDeps(); err != nil {
+		return domain.ConsignmentDelivery{}, err
+	}
+	if in.BusinessDate.IsZero() {
+		in.BusinessDate = s.today()
+	}
+	var out domain.ConsignmentDelivery
+	err := s.Tx.WithTx(ctx, func(ctx context.Context) error {
+		d, err := s.Store.GetDelivery(ctx, in.DeliveryID, true)
+		if err != nil {
+			return err
+		}
+		sameDO := d.SourceID != nil && *d.SourceID == in.SourceID && d.SourceType == in.SourceType
+		if sameDO && (d.Status == domain.StatusInTransit || d.Status == domain.StatusCompleted) {
+			out = d
+			return nil
+		}
+		if !sameDO || d.Status != domain.StatusInProgress {
+			return apperr.WithMessage(apperr.CodeInvalidStateTransition, fmt.Sprintf(
+				"Pengiriman titipan %s berstatus %s dan tidak diproses oleh DO ini.", d.Label(), d.Status.Label()))
+		}
+		ag, err := s.Agreements.RequireConsignment(ctx, d.PartnerID, in.BusinessDate)
+		if err != nil {
+			return err
+		}
+		d.AgreementID, d.AgreementNumber = &ag.ID, ag.Number
+		products := map[uuid.UUID]uuid.UUID{}
+		for _, l := range d.Lines {
+			products[l.ID] = l.ProductID
+		}
+		var lines []StockTransferLine
+		for _, l := range in.Lines {
+			pid, ok := products[l.SourceLineID]
+			if !ok {
+				return apperr.Validation(map[string]string{"lines": "Baris DO tidak cocok dengan baris pengiriman titipan"})
+			}
+			if !l.Qty.IsPositive() {
+				continue
+			}
+			lineID := l.SourceLineID
+			lines = append(lines, StockTransferLine{ProductID: pid, BatchID: l.BatchID, Qty: l.Qty, ReservationLineID: &lineID})
+		}
+		if len(lines) == 0 {
+			return apperr.WithMessage(apperr.CodeInvalidStateTransition, "Tidak ada barang lulus QC untuk dikirim.")
+		}
+		before, ver := deliverySnapshot(d), d.Version
+		d.BusinessDate = in.BusinessDate
+		if err := s.shipConsignment(ctx, &d, in.SourceLabel, lines); err != nil {
+			return err
+		}
+		// Sisa reservasi (baris ditahan yang tidak ikut dikirim) kembali Tersedia.
+		if _, err := s.Stock.Release(ctx, inventory.ReleaseRequest{
+			Source: inventory.Source{
+				Type: EntityConsignmentDelivery, ID: d.ID, Action: "release:ship:" + in.SourceID.String(), Label: in.SourceLabel,
+				BusinessDate: in.BusinessDate,
+			},
+			Reservation: *reservationRef(d.ID, nil),
+		}); err != nil {
+			return err
+		}
+		if err := s.Store.SaveDelivery(ctx, &d, ver, actor.UserID(ctx), true); err != nil {
+			return err
+		}
+		out = d
+		return s.Audit.Record(ctx, audit.Entry{
+			Action: audit.ActionStatusChange, EntityType: EntityConsignmentDelivery, EntityID: d.ID, EntityLabel: d.Label(),
+			Before: before, After: deliverySnapshot(d), Note: "Dikirim lewat " + in.SourceLabel + ", " + d.TransferNumber,
+		})
+	})
+	return out, err
+}
+
+// StockTransferLine adalah baris transfer stok reserved ke lokasi mitra.
+type StockTransferLine struct {
+	ProductID uuid.UUID
+	BatchID   *uuid.UUID
+	Qty       decimal.Decimal
+	// ReservationLineID: baris pengiriman yang memegang reservasi stok asal.
+	ReservationLineID *uuid.UUID
+	Note              string
+}
+
+// shipConsignment memindah stok reserved ke lokasi mitra dan memposting A-07 (Dr 1312 Cr 1311) atau A-24
+// (Dr 1313 Cr 1311) sebesar nilai FIFO dengan dimensi channel konsinyasi/vending + sub-channel mitra.
+func (s *DocumentService) shipConsignment(ctx context.Context, d *domain.ConsignmentDelivery, number string, lines []StockTransferLine) error {
 	res, err := s.Consignment.Transfer(ctx, StockTransferInput{
 		SourceType: d.SourceType, SourceID: *d.SourceID, FromLocationID: d.FromLocationID, ToLocationID: d.ToLocationID,
-		BusinessDate: d.BusinessDate, Note: fmt.Sprintf("%s %s %s", d.Type.Label(), number, d.PartnerName), Lines: d.Lines,
+		BusinessDate: d.BusinessDate, Note: fmt.Sprintf("%s %s %s", d.Type.Label(), number, d.PartnerName), Lines: lines,
+		ReservationSourceType: EntityConsignmentDelivery, ReservationSourceID: d.ID,
 	})
 	if err != nil {
 		return err
 	}
-	lines := make([]domain.DeliveryLine, len(res.Lines))
+	shipped := make([]domain.DeliveryLine, len(res.Lines))
 	for i, l := range res.Lines {
-		lines[i] = domain.DeliveryLine{ProductID: l.ProductID, BatchID: l.BatchID, Qty: l.Qty, Cost: l.Cost}
+		shipped[i] = domain.DeliveryLine{ProductID: l.ProductID, BatchID: l.BatchID, Qty: l.Qty, Cost: l.Cost}
 	}
-	if err := d.MarkShipped(number, res.ID, res.Number, lines, s.Clock.Now()); err != nil {
+	if err := d.MarkShipped(number, res.ID, res.Number, shipped, s.Clock.Now()); err != nil {
 		return err
 	}
 	if !d.Cost.IsPositive() {
@@ -440,11 +673,167 @@ func (s *DocumentService) shipConsignment(ctx context.Context, d *domain.Consign
 	return err
 }
 
-// ReceiveDelivery mencatat barang titipan diterima mitra: transfer Dalam Pengiriman → Tersedia di lokasi mitra.
+// ConsignmentReplaceInput adalah barang pengiriman titipan yang ditolak QC Outbound DO (atau baris ditahan).
+type ConsignmentReplaceInput struct {
+	DeliveryID uuid.UUID
+	// LineID adalah baris pengiriman (SourceLineID baris Outbound) yang memegang reservasi.
+	LineID uuid.UUID
+	// RejectBatchID + RejectQty: batch ditolak QC → reserved pindah ke Karantina. RejectQty nol = hanya mengisi
+	// baris ditahan.
+	RejectBatchID *uuid.UUID
+	RejectQty     decimal.Decimal
+	// Need adalah qty yang harus dicarikan stok pengganti (qty ditolak atau qty baris ditahan).
+	Need decimal.Decimal
+	// Ref unik per permintaan (mis. ID baris Outbound); Label untuk kartu stok.
+	Ref   string
+	Label string
+}
+
+// ConsignmentReplacement adalah hasil ganti batch: lokasi Karantina, batch pengganti FEFO, dan kekurangan.
+type ConsignmentReplacement struct {
+	QuarantineLocationID uuid.UUID
+	Replacements         []domain.AllocationBatch
+	Shortfall            decimal.Decimal
+}
+
+// ReplaceConsignmentBatch: QC Outbound DO menolak barang titipan → stok reserved batch itu pindah ke Karantina
+// lokasi asal (memakai reservasi baris pengiriman), lalu stok pengganti FEFO langsung direservasi untuk baris yang
+// sama. Kekurangan dikembalikan sebagai Shortfall (baris Outbound ditahan). Tanpa cek permission.
+func (s *DocumentService) ReplaceConsignmentBatch(ctx context.Context, in ConsignmentReplaceInput) (ConsignmentReplacement, error) {
+	if in.Ref == "" {
+		return ConsignmentReplacement{}, apperr.Validation(map[string]string{"ref": "Referensi dokumen wajib diisi"})
+	}
+	var out ConsignmentReplacement
+	err := s.Tx.WithTx(ctx, func(ctx context.Context) error {
+		d, err := s.Store.GetDelivery(ctx, in.DeliveryID, true)
+		if err != nil {
+			return err
+		}
+		if d.Status != domain.StatusInProgress {
+			return apperr.WithMessage(apperr.CodeInvalidStateTransition, fmt.Sprintf(
+				"Pengiriman titipan %s berstatus %s; batch hanya bisa diganti saat Diproses.", d.Label(), d.Status.Label()))
+		}
+		var line *domain.DeliveryLine
+		for i := range d.Lines {
+			if d.Lines[i].ID == in.LineID {
+				line = &d.Lines[i]
+			}
+		}
+		if line == nil {
+			return apperr.Validation(map[string]string{"lineId": "Baris tidak ditemukan di pengiriman titipan ini"})
+		}
+		label := d.Type.Label() + " " + d.PartnerName
+		if in.Label != "" {
+			label = in.Label + " · " + label
+		}
+		src := func(action string) inventory.Source {
+			return inventory.Source{Type: EntityConsignmentDelivery, ID: d.ID, Action: action + ":" + in.Ref, Label: label, BusinessDate: s.today()}
+		}
+		lineID := line.ID
+		out = ConsignmentReplacement{QuarantineLocationID: d.FromLocationID, Shortfall: decimal.Zero}
+		note := ""
+		if in.RejectQty.IsPositive() {
+			if _, err := s.Stock.Post(ctx, inventory.Posting{
+				Source: src("qc-reject"),
+				Lines: []inventory.Line{{
+					Kind: inventory.KindMove, SourceLineID: &lineID, ProductID: line.ProductID, Qty: in.RejectQty, BatchID: in.RejectBatchID,
+					From:        &inventory.Place{LocationID: d.FromLocationID, Status: inventory.StatusReserved},
+					To:          &inventory.Place{LocationID: d.FromLocationID, Status: inventory.StatusQuarantine},
+					Reservation: reservationRef(d.ID, &lineID),
+					Note:        "Ditolak QC Outbound",
+				}},
+			}); err != nil {
+				return err
+			}
+			note = fmt.Sprintf("Ditolak QC Outbound %s → Karantina; ", in.RejectQty.String())
+		}
+		need := in.Need
+		if !need.IsPositive() {
+			need = in.RejectQty
+		}
+		if need.IsPositive() {
+			sug, err := s.Stock.SuggestBatches(ctx, line.ProductID, d.FromLocationID, need)
+			if err != nil {
+				return err
+			}
+			take := decimal.Min(sug.AllocatedQty, need)
+			out.Shortfall = need.Sub(take)
+			if take.IsPositive() {
+				res, err := s.Stock.Reserve(ctx, inventory.ReserveRequest{
+					Source: src("qc-replace"),
+					Lines:  []inventory.ReserveLine{{SourceLineID: &lineID, ProductID: line.ProductID, LocationID: d.FromLocationID, Qty: take}},
+				})
+				if err != nil {
+					return err
+				}
+				for _, m := range res.Movements {
+					if m.Type == inventory.MovementMoveIn && m.Status == inventory.StatusReserved {
+						out.Replacements = append(out.Replacements, domain.AllocationBatch{BatchID: m.BatchID, Qty: m.Qty})
+					}
+				}
+			}
+		}
+		note += fmt.Sprintf("Stok pengganti %s untuk QC Outbound (%s)", sumBatches(out.Replacements).String(), label)
+		if out.Shortfall.IsPositive() {
+			note += "; kurang " + out.Shortfall.String()
+		}
+		return s.Audit.Record(ctx, audit.Entry{
+			Action: audit.ActionUpdate, EntityType: EntityConsignmentDelivery, EntityID: d.ID, EntityLabel: d.Label(),
+			After: map[string]any{"lineId": lineID, "replacements": batchSnapshot(out.Replacements)}, Note: note,
+		})
+	})
+	return out, err
+}
+
+// ReopenConsignmentDelivery: DO pengiriman titipan dibatalkan sebelum dikirim → reservasi dilepas dan pengiriman
+// kembali Draft (Sales MT bisa mengubah lalu mengajukan ulang, atau membatalkan). DO lain / pengiriman yang
+// sudah tidak Diproses diabaikan. Tanpa cek permission.
+func (s *DocumentService) ReopenConsignmentDelivery(ctx context.Context, deliveryID, deliveryOrderID uuid.UUID, reason string) error {
+	return s.Tx.WithTx(ctx, func(ctx context.Context) error {
+		d, err := s.Store.GetDelivery(ctx, deliveryID, true)
+		if err != nil {
+			return err
+		}
+		if d.Status != domain.StatusInProgress || d.SourceID == nil || *d.SourceID != deliveryOrderID {
+			return nil
+		}
+		before, ver := deliverySnapshot(d), d.Version
+		if _, err := s.Stock.Release(ctx, inventory.ReleaseRequest{
+			Source: inventory.Source{
+				Type: EntityConsignmentDelivery, ID: d.ID, Action: "release:cancel:" + deliveryOrderID.String(),
+				Label: d.Type.Label() + " " + d.PartnerName, BusinessDate: s.today(),
+			},
+			Reservation: *reservationRef(d.ID, nil),
+		}); err != nil {
+			return err
+		}
+		if err := d.Reopen(); err != nil {
+			return err
+		}
+		if err := s.Store.SaveDelivery(ctx, &d, ver, actor.UserID(ctx), false); err != nil {
+			return err
+		}
+		note := "Delivery Order dibatalkan; reservasi stok dilepas"
+		if r := strings.TrimSpace(reason); r != "" {
+			note += ": " + r
+		}
+		return s.Audit.Record(ctx, audit.Entry{
+			Action: audit.ActionStatusChange, EntityType: EntityConsignmentDelivery, EntityID: d.ID, EntityLabel: d.Label(),
+			Before: before, After: deliverySnapshot(d), Note: note,
+		})
+	})
+}
+
+// ReceiveDelivery mencatat barang titipan data lama (dikirim langsung tanpa DO) diterima mitra. Pengiriman lewat
+// DO dikonfirmasi dari halaman DO (ConfirmConsignmentReceived).
 func (s *DocumentService) ReceiveDelivery(ctx context.Context, id uuid.UUID, ver int) (DeliveryView, error) {
 	return s.mutateDelivery(ctx, id, ver, PermDeliveryPost, audit.ActionStatusChange, false, func(ctx context.Context, d *domain.ConsignmentDelivery) (string, error) {
 		if err := s.requireConsignmentDeps(); err != nil {
 			return "", err
+		}
+		if d.ViaDeliveryOrder() {
+			return "", apperr.WithMessage(apperr.CodeInvalidStateTransition,
+				"Pengiriman ini diproses lewat Delivery Order; konfirmasi diterima dari halaman Delivery Order.")
 		}
 		if d.TransferID != nil && d.Status == domain.StatusInTransit {
 			if err := s.Consignment.ReceiveAll(ctx, *d.TransferID); err != nil {
@@ -455,81 +844,21 @@ func (s *DocumentService) ReceiveDelivery(ctx context.Context, id uuid.UUID, ver
 	})
 }
 
-// ConsignmentShipmentInput adalah pengiriman titipan yang dikirim lewat dokumen logistik (DO konsinyasi).
-type ConsignmentShipmentInput struct {
-	Type      domain.DeliveryType
-	PartnerID uuid.UUID
-	// SourceType/SourceID/SourceLabel adalah dokumen pengiriman, mis. "delivery_order" + ID DO + nomor DO; satu
-	// dokumen sumber hanya dicatat sekali (pemanggilan ulang mengembalikan pengiriman yang sama).
-	SourceType     string
-	SourceID       uuid.UUID
-	SourceLabel    string
-	FromLocationID uuid.UUID
-	BusinessDate   clock.BusinessDate
-	Note           string
-	Lines          []domain.DeliveryLineInput
-}
-
-// ShipConsignment adalah titik integrasi DO konsinyasi/buffer vending (modul logistics) di transaksi DO ship:
-// PKS konsinyasi wajib berlaku, stok pindah ke lokasi mitra (TRF Dalam Pengiriman) dan jurnal A-07/A-24 dibuat.
-// Tanpa cek permission (pemanggil memeriksa aksi user-nya).
-func (s *DocumentService) ShipConsignment(ctx context.Context, in ConsignmentShipmentInput) (domain.ConsignmentDelivery, error) {
-	if strings.TrimSpace(in.SourceType) == "" || in.SourceID == uuid.Nil || in.SourceType == SourceConsignmentDelivery {
-		return domain.ConsignmentDelivery{}, apperr.Validation(map[string]string{"source": "Dokumen pengiriman wajib diisi"})
-	}
-	if in.BusinessDate.IsZero() {
-		in.BusinessDate = s.today()
-	}
-	var out domain.ConsignmentDelivery
-	err := s.Tx.WithTx(ctx, func(ctx context.Context) error {
-		if d, ok, err := s.Store.DeliveryBySource(ctx, in.SourceType, in.SourceID); err != nil || ok {
-			out = d
-			return err
-		}
-		d, err := domain.NewConsignmentDelivery(domain.DeliveryInput{
-			Type: in.Type, PartnerID: in.PartnerID, FromLocationID: in.FromLocationID, BusinessDate: in.BusinessDate,
-			Note: in.Note, Lines: in.Lines,
-		})
-		if err != nil {
-			return err
-		}
-		sid := in.SourceID
-		d.SourceType, d.SourceID = in.SourceType, &sid
-		if err := s.deliveryRefs(ctx, &d); err != nil {
-			return err
-		}
-		if d, err = s.Store.InsertDelivery(ctx, d, actor.UserID(ctx)); err != nil {
-			return err
-		}
-		ver := d.Version
-		number := in.SourceLabel
-		if number == "" {
-			if number, err = s.Numberer.Next(ctx, DocDeliveryOrder, d.BusinessDate); err != nil {
-				return err
-			}
-		}
-		if err := s.shipConsignment(ctx, &d, number); err != nil {
-			return err
-		}
-		if err := s.Store.SaveDelivery(ctx, &d, ver, actor.UserID(ctx), true); err != nil {
-			return err
-		}
-		out = d
-		return s.Audit.Record(ctx, audit.Entry{
-			Action: audit.ActionCreate, EntityType: EntityConsignmentDelivery, EntityID: d.ID, EntityLabel: d.Label(),
-			After: deliverySnapshot(d), Note: "Dikirim lewat " + number,
-		})
-	})
-	return out, err
-}
-
-// ConfirmConsignmentReceived menandai pengiriman titipan dari DO sudah diterima mitra (DO deliver).
+// ConfirmConsignmentReceived menandai pengiriman titipan dari DO diterima mitra (DO deliver): transfer Dalam
+// Pengiriman → Tersedia di lokasi mitra. Pengiriman yang sudah Selesai dikembalikan apa adanya.
 func (s *DocumentService) ConfirmConsignmentReceived(ctx context.Context, deliveryID uuid.UUID) (domain.ConsignmentDelivery, error) {
+	if err := s.requireConsignmentDeps(); err != nil {
+		return domain.ConsignmentDelivery{}, err
+	}
 	var out domain.ConsignmentDelivery
 	err := s.Tx.WithTx(ctx, func(ctx context.Context) error {
 		d, err := s.Store.GetDelivery(ctx, deliveryID, true)
 		if err != nil {
 			return err
+		}
+		if d.Status == domain.StatusCompleted {
+			out = d
+			return nil
 		}
 		if d.TransferID != nil && d.Status == domain.StatusInTransit {
 			if err := s.Consignment.ReceiveAll(ctx, *d.TransferID); err != nil {

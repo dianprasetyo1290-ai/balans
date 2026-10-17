@@ -236,7 +236,14 @@ func toOrder(ctx context.Context, v service.OrderView) SalesOrder {
 			BusinessDate: toDate(sh.BusinessDate), CostAmount: sh.Cost.String(), CreatedAt: sh.CreatedAt,
 		})
 	}
-	for _, a := range service.OrderActions(ctx, v.Order) {
+	if v.DeliveryOrdersEnabled {
+		dos := make([]SalesDeliveryOrderRef, len(v.DeliveryOrders))
+		for i, d := range v.DeliveryOrders {
+			dos[i] = SalesDeliveryOrderRef{Id: d.ID, Number: optStr(d.Number), Status: d.Status}
+		}
+		out.DeliveryOrders = &dos
+	}
+	for _, a := range service.OrderViewActions(ctx, v) {
 		out.AllowedActions = append(out.AllowedActions, SalesOrderAllowedActions(a))
 	}
 	return out

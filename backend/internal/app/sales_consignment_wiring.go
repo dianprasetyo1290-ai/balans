@@ -26,14 +26,24 @@ func (c salesConsignment) PartnerLocation(ctx context.Context, locationType stri
 }
 
 func (c salesConsignment) Transfer(ctx context.Context, in sales.StockTransferInput) (sales.StockTransferResult, error) {
-	lines := make([]warehouse.TransferLineInput, len(in.Lines))
-	for i, l := range in.Lines {
-		lines[i] = warehouse.TransferLineInput{ProductID: l.ProductID, Qty: l.Qty, Note: l.Note}
-	}
-	res, err := c.warehouse.TransferStock(ctx, warehouse.TransferRequest{
+	req := warehouse.TransferRequest{
 		SourceType: in.SourceType, SourceID: in.SourceID, FromLocationID: in.FromLocationID, ToLocationID: in.ToLocationID,
-		BusinessDate: in.BusinessDate, Note: in.Note, Lines: lines,
-	})
+		BusinessDate: in.BusinessDate, Note: in.Note,
+	}
+	if in.ReservationSourceType != "" {
+		req.Reservation = &warehouse.TransferReservation{SourceType: in.ReservationSourceType, SourceID: in.ReservationSourceID}
+	}
+	for _, l := range in.Lines {
+		req.Lines = append(req.Lines, warehouse.TransferLineInput{ProductID: l.ProductID, BatchID: l.BatchID, Qty: l.Qty, Note: l.Note})
+		if req.Reservation != nil {
+			id := uuid.Nil
+			if l.ReservationLineID != nil {
+				id = *l.ReservationLineID
+			}
+			req.Reservation.LineIDs = append(req.Reservation.LineIDs, id)
+		}
+	}
+	res, err := c.warehouse.TransferStock(ctx, req)
 	if err != nil {
 		return sales.StockTransferResult{}, err
 	}

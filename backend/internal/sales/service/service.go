@@ -224,6 +224,9 @@ type Deps struct {
 	Consignment ConsignmentStock
 	Agreements  Agreements
 	Flows       StockFlows
+	// DeliveryOrders: Delivery Order logistik untuk pengiriman titipan dan DO Sales Order (diisi setelah modul
+	// logistics dibangun lewat Module.SetDeliveryOrders). Nil = pengajuan pengiriman titipan ditolak.
+	DeliveryOrders DeliveryOrders
 	// ProformaValidDays adalah masa berlaku Proforma Invoice; 0 = 14 hari (BRD 5.4).
 	ProformaValidDays int
 	// BaseURL adalah URL ERP untuk tautan invoice di teks WhatsApp.

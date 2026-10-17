@@ -41,6 +41,10 @@ func toDelivery(v service.DeliveryView) ConsignmentDelivery {
 		}
 	}
 	from, to := v.FromLocation, v.ToLocation
+	var do *SalesDeliveryOrderRef
+	if v.DeliveryOrder != nil {
+		do = &SalesDeliveryOrderRef{Id: v.DeliveryOrder.ID, Number: optStr(v.DeliveryOrder.Number), Status: v.DeliveryOrder.Status}
+	}
 	return ConsignmentDelivery{
 		Id: s.Id, Number: s.Number, DeliveryType: s.DeliveryType, PartnerId: s.PartnerId, PartnerCode: s.PartnerCode,
 		PartnerName: s.PartnerName, BusinessDate: s.BusinessDate, Status: s.Status, TransferNumber: s.TransferNumber,
@@ -49,7 +53,7 @@ func toDelivery(v service.DeliveryView) ConsignmentDelivery {
 		ChannelName: v.ChannelName, SubChannelName: v.SubChannelName, SourceType: v.SourceType, TransferId: v.TransferID,
 		Note: v.Note, CancelReason: v.CancelReason, ShippedAt: v.ShippedAt, ReceivedAt: v.ReceivedAt,
 		CreatedAt: v.CreatedAt, CreatedByName: v.CreatedByName, UpdatedAt: v.UpdatedAt, Lines: lines,
-		AllowedActions: v.AllowedActions,
+		DeliveryOrder: do, AllowedActions: v.AllowedActions,
 	}
 }
 
@@ -133,17 +137,17 @@ func (h *SalesHandler) UpdateConsignmentDelivery(ctx context.Context, req Update
 	return UpdateConsignmentDelivery200JSONResponse(toDelivery(v)), nil
 }
 
-// ShipConsignmentDelivery mengirim barang titipan.
-func (h *SalesHandler) ShipConsignmentDelivery(ctx context.Context, req ShipConsignmentDeliveryRequestObject) (ShipConsignmentDeliveryResponseObject, error) {
+// SubmitConsignmentDelivery mengajukan pengiriman ke Logistik (reservasi FEFO + Delivery Order).
+func (h *SalesHandler) SubmitConsignmentDelivery(ctx context.Context, req SubmitConsignmentDeliveryRequestObject) (SubmitConsignmentDeliveryResponseObject, error) {
 	b, err := bodyRequired(req.Body)
 	if err != nil {
 		return nil, err
 	}
-	v, err := h.docs.ShipDelivery(ctx, req.Id, b.Version)
+	v, err := h.docs.SubmitDelivery(ctx, req.Id, b.Version)
 	if err != nil {
 		return nil, err
 	}
-	return ShipConsignmentDelivery200JSONResponse(toDelivery(v)), nil
+	return SubmitConsignmentDelivery200JSONResponse(toDelivery(v)), nil
 }
 
 // ReceiveConsignmentDelivery mencatat barang diterima mitra.

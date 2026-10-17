@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { Link } from "@tanstack/react-router"
+import { Link, useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
 import { toast } from "sonner"
 
@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/table"
 import { ApprovalSteps } from "@/features/approval/components/approval-steps"
 import { EntityHistory } from "@/features/audit/components/entity-history"
+import { createDeliveryOrder } from "@/features/logistics/api/logistics-api"
 import { openFile } from "@/features/party/api/party-api"
 import { subjectApprovalsQuery } from "@/features/procurement/api/procurement-api"
 import type { DetailTab } from "@/features/procurement/components/request-detail-page"
@@ -39,6 +40,7 @@ import { useIdempotentMutation } from "@/lib/api/use-idempotent-mutation"
 import { formatDate, formatDateTime } from "@/lib/format/date"
 import { formatRupiah } from "@/lib/format/money"
 import { formatQuantity } from "@/lib/format/number"
+import { statusLabel } from "@/lib/format/status-labels"
 import { showErrorDialog } from "@/stores/error-dialog-store"
 
 import {
@@ -114,6 +116,7 @@ function OrderDetail({
     order.allowedActions.includes(a)
   const kind = ORDER_KINDS[orderKindOf(order.orderType)]
   const marketplace = order.orderType === "marketplace"
+  const navigate = useNavigate()
 
   const refresh = async () => {
     await queryClient.invalidateQueries({ queryKey: ["sales"] })
@@ -146,6 +149,22 @@ function OrderDetail({
       setCancelling(false)
       toast.success("Sales Order dibatalkan, alokasi stok dilepas")
       await refresh()
+    },
+    onError: (err) => showErrorDialog(parseProblem(err)),
+  })
+
+  // Buat DO (S-309): Logistik membuat Delivery Order dari pesanan Diproses dengan alokasi belum dikirim.
+  const createDO = useIdempotentMutation({
+    mutationFn: (_: void, key) =>
+      createDeliveryOrder({ salesOrderId: order.id }, key),
+    onSuccess: async (d) => {
+      toast.success("Delivery Order dibuat")
+      await queryClient.invalidateQueries({ queryKey: ["logistics"] })
+      await refresh()
+      void navigate({
+        to: "/logistics/delivery-orders/$id",
+        params: { id: d.id },
+      })
     },
     onError: (err) => showErrorDialog(parseProblem(err)),
   })
@@ -216,6 +235,15 @@ function OrderDetail({
                 Buka Proforma {p.number}
               </Button>
             ))}
+          {can("create_delivery_order") ? (
+            <LoadingButton
+              className="min-h-11"
+              loading={createDO.isPending}
+              onClick={() => createDO.mutate()}
+            >
+              Buat DO
+            </LoadingButton>
+          ) : null}
           {can("confirm") ? (
             <Button onClick={() => setConfirming(true)}>
               Konfirmasi Sales Order
@@ -450,6 +478,25 @@ function OrderDetail({
                     </TableBody>
                   </Table>
                 </div>
+              </section>
+            ) : null}
+            {order.deliveryOrders && order.deliveryOrders.length > 0 ? (
+              <section className="flex flex-col gap-2">
+                <h2 className="text-sm font-semibold">Delivery Order</h2>
+                <ul className="flex flex-col gap-1 text-sm">
+                  {order.deliveryOrders.map((d) => (
+                    <li key={d.id}>
+                      <Link
+                        to="/logistics/delivery-orders/$id"
+                        params={{ id: d.id }}
+                        className="text-primary underline-offset-4 hover:underline"
+                      >
+                        {d.number ?? "Draft DO"}
+                      </Link>{" "}
+                      · {statusLabel(d.status).label}
+                    </li>
+                  ))}
+                </ul>
               </section>
             ) : null}
             {order.shipments.length > 0 ? (

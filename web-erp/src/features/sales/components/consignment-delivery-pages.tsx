@@ -336,7 +336,8 @@ function DeliveryForm({
         </DialogTitle>
         <DialogDescription>
           Tujuan otomatis lokasi konsinyasi atau buffer vending milik mitra.
-          Logistik mengirim barang (Transfer Stok + jurnal A-07/A-24).
+          Setelah diajukan, stok direservasi dan Logistik memproses Delivery
+          Order (Outbound, QC, kirim: Transfer Stok + jurnal A-07/A-24).
         </DialogDescription>
       </DialogHeader>
       <form
@@ -519,11 +520,18 @@ const ACTION_TEXT: Record<
   Exclude<DeliveryAction, "cancel">,
   { label: string; toast: string }
 > = {
-  ship: { label: "Kirim", toast: "Barang dikirim ke lokasi mitra" },
+  submit: {
+    label: "Ajukan ke Logistik",
+    toast: "Diajukan ke Logistik: stok direservasi dan Delivery Order dibuat",
+  },
   receive: { label: "Diterima Mitra", toast: "Barang diterima mitra" },
 }
 
-/** Detail pengiriman konsinyasi dengan aksi Kirim (Logistik), Diterima Mitra, dan Batalkan. */
+/**
+ * Detail pengiriman konsinyasi: Sales MT mengajukan ke Logistik (reservasi stok + Delivery Order); Logistik
+ * memproses picking, packing, QC, kirim, dan konfirmasi diterima dari halaman Delivery Order yang ditautkan.
+ * Diterima Mitra di sini hanya untuk data lama yang dikirim tanpa DO.
+ */
 export function ConsignmentDeliveryDetailPage({
   id,
   tab,
@@ -574,7 +582,7 @@ export function ConsignmentDeliveryDetailPage({
                   Ubah
                 </Button>
               ) : null}
-              {(["ship", "receive"] as const)
+              {(["submit", "receive"] as const)
                 .filter((a) => d.allowedActions.includes(a))
                 .map((a) => (
                   <LoadingButton
@@ -604,7 +612,31 @@ export function ConsignmentDeliveryDetailPage({
           />
           {tab === "summary" ? (
             <>
+              {d.status === "in_progress" ? (
+                <p className="rounded-lg border bg-muted/40 p-3 text-sm">
+                  Stok sudah direservasi. Logistik memproses pengiriman di
+                  Delivery Order: release, picking, packing, QC Outbound, serah
+                  ke kurir, lalu konfirmasi diterima mitra.
+                </p>
+              ) : null}
               <dl className="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2 lg:grid-cols-4">
+                <Info
+                  label="Delivery Order"
+                  value={
+                    d.deliveryOrder ? (
+                      <Link
+                        to="/logistics/delivery-orders/$id"
+                        params={{ id: d.deliveryOrder.id }}
+                        className="font-medium text-primary underline-offset-4 hover:underline"
+                      >
+                        {d.deliveryOrder.number ?? "Draft"} ·{" "}
+                        {statusLabel(d.deliveryOrder.status).label}
+                      </Link>
+                    ) : (
+                      "—"
+                    )
+                  }
+                />
                 <Info
                   label="Tanggal Kirim"
                   value={formatDate(d.businessDate)}
@@ -676,7 +708,7 @@ export function ConsignmentDeliveryDetailPage({
             open={cancelling}
             onOpenChange={setCancelling}
             title="Batalkan pengiriman"
-            description="Draft pengiriman dibatalkan; stok tidak berubah."
+            description="Draft pengiriman dibatalkan; stok tidak berubah. Pengiriman yang sudah diajukan dibatalkan dengan membatalkan Delivery Order-nya (kembali Draft)."
             confirmLabel="Batalkan Pengiriman"
             required
             destructive

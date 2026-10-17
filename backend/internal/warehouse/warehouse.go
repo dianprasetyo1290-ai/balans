@@ -397,8 +397,19 @@ type TransferRequest struct {
 	// BusinessDate kosong = hari ini.
 	BusinessDate clock.BusinessDate
 	Note         string
-	// Lines: BatchID kosong = FEFO; batch manual bukan saran FEFO wajib BatchReason.
+	// Lines: BatchID kosong = FEFO; batch manual bukan saran FEFO wajib BatchReason (kecuali dari reservasi).
 	Lines []TransferLineInput
+	// Reservation non-nil: stok asal diambil dari reservasi dokumen pemanggil (bukan Tersedia), mis. pengiriman
+	// konsinyasi yang sudah direservasi FEFO saat diajukan ke Logistik.
+	Reservation *TransferReservation
+}
+
+// TransferReservation menunjuk reservasi stok dokumen pemanggil; LineIDs[i] = SourceLineID reservasi baris ke-i
+// TransferRequest.Lines (uuid.Nil = reservasi dokumen mana pun untuk produk/batch itu).
+type TransferReservation struct {
+	SourceType string
+	SourceID   uuid.UUID
+	LineIDs    []uuid.UUID
 }
 
 // TransferStock membuat Transfer Stok (nomor TRF) dan langsung menjalankannya di transaksi aktif tanpa cek
@@ -410,10 +421,14 @@ func (m *Module) TransferStock(ctx context.Context, r TransferRequest) (Transfer
 	if r.BusinessDate.IsZero() {
 		r.BusinessDate = clock.Today(m.clock)
 	}
+	var reserved *service.ReservedStock
+	if r.Reservation != nil {
+		reserved = &service.ReservedStock{SourceType: r.Reservation.SourceType, SourceID: r.Reservation.SourceID, LineIDs: r.Reservation.LineIDs}
+	}
 	return m.svc.TransferStock(ctx, domain.TransferInput{
 		Type: domain.TransferDirect, FromLocationID: r.FromLocationID, ToLocationID: r.ToLocationID,
 		BusinessDate: r.BusinessDate, Note: r.Note, SourceType: r.SourceType, SourceID: &sid, Lines: r.Lines,
-	})
+	}, reserved)
 }
 
 // ReceiveTransfer mencatat qty diterima transfer Dalam Pengiriman tanpa cek permission (Dalam Pengiriman →

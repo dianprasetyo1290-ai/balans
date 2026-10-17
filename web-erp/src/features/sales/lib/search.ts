@@ -69,7 +69,7 @@ export const consignmentDeliverySearchSchema = z.object({
   page: z.number().int().min(1).catch(1),
   q: z.string().optional(),
   status: z
-    .enum(["draft", "in_transit", "completed", "cancelled"])
+    .enum(["draft", "in_progress", "in_transit", "completed", "cancelled"])
     .optional()
     .catch(undefined),
   deliveryType: z

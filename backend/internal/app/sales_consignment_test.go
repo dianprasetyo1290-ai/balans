@@ -13,7 +13,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"balans/internal/platform/actor"
 	"balans/internal/platform/clock"
 	"balans/internal/sales"
 	"balans/internal/warehouse"
@@ -101,11 +100,12 @@ func (h *salesHarness) approve(subjectType, subjectID, email string) {
 }
 
 // TestConsignmentDeliveryReconciliationFlow: S-303 (A-07, A-24), S-304, S-305, S-313 konsinyasi end-to-end:
-// DO konsinyasi butuh PKS → stok ke lokasi mitra → stock count Merchandiser → rekonsiliasi (laporan mitra,
-// selisih per penyebab, BA) → approval Sales MT → Head F&A → invoice konsinyasi + invoice selisih + jurnal
-// A-08/A-23 balance dengan dimensi channel konsinyasi; periode berikutnya memakai sisa fisik sebagai stok awal.
+// pengiriman konsinyasi butuh PKS → diajukan Sales MT → DO Logistik (Outbound/QC) → stok ke lokasi mitra → stock
+// count Merchandiser → rekonsiliasi (laporan mitra, selisih per penyebab, BA) → approval Sales MT → Head F&A →
+// invoice konsinyasi + invoice selisih + jurnal A-08/A-23 balance dengan dimensi channel konsinyasi; periode
+// berikutnya memakai sisa fisik sebagai stok awal.
 func TestConsignmentDeliveryReconciliationFlow(t *testing.T) {
-	h := newSalesHarness(t)
+	h := newLogisticsHarness(t)
 	coklat := h.product("KCO", "100000")
 	vanila := h.product("KVA", "50000")
 	h.receive(coklat, h.fg, "KC1", 300, 100, "40000")
@@ -140,13 +140,16 @@ func TestConsignmentDeliveryReconciliationFlow(t *testing.T) {
 	assert.Equal(t, "draft", d["status"])
 	assert.Equal(t, "PKS-"+h.tag, d["agreementNumber"])
 	assert.Equal(t, consLoc, d["toLocation"].(map[string]any)["id"])
-	assert.ElementsMatch(t, []any{"edit", "cancel"}, d["allowedActions"], "Sales MT tidak mengirim fisik")
+	assert.ElementsMatch(t, []any{"edit", "submit", "cancel"}, d["allowedActions"], "Sales MT tidak mengirim fisik")
 
-	// Logistik mengirim: TRF Dalam Pengiriman + A-07 (Dr 1312, Cr 1311) nilai FIFO.
-	h.as("logistik.leader@balans.local")
-	d = h.json(http.MethodPost, "/api/v1/sales/consignment-deliveries/"+d["id"].(string)+"/ship", map[string]any{"version": d["version"]}, http.StatusOK)
-	require.Equal(t, "in_transit", d["status"])
-	assert.Regexp(t, `^DO/2026/11/\d{5}$`, d["number"])
+	// Diajukan → DO konsinyasi; Logistik mengirim lewat DO: TRF Dalam Pengiriman + A-07 (Dr 1312, Cr 1311) nilai FIFO.
+	d, do := h.submitConsignment(d)
+	h.passOutbound(do["outbound"].(map[string]any)["id"].(string))
+	h.shipDO(do["id"].(string), true)
+	h.as("sales.mt@balans.local")
+	d = h.json(http.MethodGet, "/api/v1/sales/consignment-deliveries/"+d["id"].(string), nil, http.StatusOK)
+	require.Equal(t, "completed", d["status"])
+	assert.Equal(t, do["number"], d["number"], "nomor pengiriman = nomor DO")
 	assert.Regexp(t, `^TRF/`, d["transferNumber"])
 	assert.Equal(t, "2200000.00", d["costAmount"])
 	a07 := h.journal("A-07", "consignment_delivery", d["id"])
@@ -157,30 +160,21 @@ func TestConsignmentDeliveryReconciliationFlow(t *testing.T) {
 	consSub := strings.ToLower("k" + h.tag + "con")
 	assertDims(t, a07, "consignment", consSub)
 	assert.Equal(t, "50", h.available(coklat, h.fg))
-	d = h.json(http.MethodPost, "/api/v1/sales/consignment-deliveries/"+d["id"].(string)+"/receive", map[string]any{"version": d["version"]}, http.StatusOK)
-	assert.Equal(t, "completed", d["status"])
+	assert.Equal(t, "0", h.reserved(coklat, h.fg))
 	assert.Equal(t, "50", h.available(coklat, consID))
 	assert.Equal(t, "10", h.available(vanila, consID))
 
-	// Buffer vending (A-24, Dr 1313 Cr 1311) lewat API logistics (integrasi DO) — idempotent per DO.
-	ctx := actor.System(context.Background())
-	doID := uuid.New()
-	in := sales.ConsignmentShipmentInput{
-		Type: sales.DeliveryVendingBuffer, PartnerID: uuid.MustParse(partner), SourceType: "delivery_order", SourceID: doID,
-		SourceLabel: "DO/2026/11/09999", FromLocationID: h.fg,
-		Lines: []sales.DeliveryLineInput{{ProductID: coklat, Qty: dec("5")}},
-	}
-	buf, err := h.app.sales.ShipConsignment(ctx, in)
-	require.NoError(t, err)
-	again, err := h.app.sales.ShipConsignment(ctx, in)
-	require.NoError(t, err)
-	assert.Equal(t, buf.ID, again.ID)
-	a24 := h.journal("A-24", "consignment_delivery", buf.ID)
+	// Buffer vending (A-24, Dr 1313 Cr 1311) lewat DO jenis buffer vending.
+	st, buf := delivery("vending_buffer", []map[string]any{{"productId": coklat, "qty": "5"}})
+	require.Equal(t, http.StatusCreated, st, buf)
+	buf, bdo := h.submitConsignment(buf)
+	assert.Equal(t, "vending_buffer", bdo["deliveryType"])
+	h.passOutbound(bdo["outbound"].(map[string]any)["id"].(string))
+	h.shipDO(bdo["id"].(string), true)
+	a24 := h.journal("A-24", "consignment_delivery", buf["id"])
 	dr, _ = amountOf(a24, "1313")
 	assert.Equal(t, "200000.00", dr)
 	assertDims(t, a24, "vending", strings.ToLower("k"+h.tag+"ven"))
-	_, err = h.app.sales.ConfirmConsignmentReceived(ctx, buf.ID)
-	require.NoError(t, err)
 	assert.Equal(t, "5", h.available(coklat, bufferID))
 
 	// Stock count Merchandiser: sisa fisik coklat 30, vanila 6.

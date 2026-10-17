@@ -158,6 +158,14 @@ export const couriersQuery = (activeOnly: boolean) =>
       ),
   })
 
+/** Merchandiser aktif untuk kurir internal (role Merchandiser). */
+export const courierUsersQuery = () =>
+  queryOptions({
+    queryKey: ["logistics", "courier-users"],
+    queryFn: async () => (await unwrap(api.GET("/api/v1/courier-users"))).items,
+    staleTime: 60_000,
+  })
+
 export function createCourier(body: CourierInput, key: string) {
   return unwrap(api.POST("/api/v1/couriers", { params: idem(key), body }))
 }
