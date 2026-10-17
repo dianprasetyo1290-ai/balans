@@ -39,12 +39,14 @@
 	encode zstd gzip
 	header X-Robots-Tag "noindex, nofollow"
 
-	# route menjaga urutan: health check dan webhook tidak melewati basic auth, sisanya wajib basic auth
-	# karena staging tidak dibuka untuk umum sebelum login tersedia di R1.1 (PRD Fase 0 bagian 4.2).
+	# route menjaga urutan: health check dan API tidak melewati basic auth, sisanya (halaman ERP, simulasi
+	# pihak ketiga, Mailpit) wajib basic auth agar staging tidak terbuka untuk umum (PRD Fase 0 bagian 4.2).
+	# API sudah dilindungi login JWT (R1.1) dan memakai header Authorization: Bearer, yang bentrok dengan
+	# basic auth bila keduanya diwajibkan di path yang sama.
 	route {
 		request_header X-Request-ID {http.request.uuid}
 
-		@public path /healthz /readyz /api/v1/webhooks/*
+		@public path /healthz /readyz /api/*
 		reverse_proxy @public staging-api:8080
 
 		basic_auth {
@@ -54,7 +56,7 @@
 		@mail path /_mock/mail /_mock/mail/*
 		reverse_proxy @mail staging-mailpit:8025
 
-		@backend path /api/* /_mock /_mock/*
+		@backend path /_mock /_mock/*
 		reverse_proxy @backend staging-api:8080
 
 		reverse_proxy staging-web:8080
