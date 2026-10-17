@@ -2230,7 +2230,7 @@ type SalesOrder struct {
 	CustomerId     *openapi_types.UUID `json:"customerId,omitempty"`
 	DeliveredAt    *time.Time          `json:"deliveredAt,omitempty"`
 
-	// DeliveryOrders Delivery Order logistik pesanan (terbaru dulu); kosong bila modul logistics tidak aktif.
+	// DeliveryOrders Delivery Order logistik pesanan (urut dibuat); tidak ada bila modul logistics tidak aktif.
 	DeliveryOrders           *[]SalesDeliveryOrderRef `json:"deliveryOrders,omitempty"`
 	DiscountApprovalRequired bool                     `json:"discountApprovalRequired"`
 	DiscountApprovedAt       *time.Time               `json:"discountApprovedAt,omitempty"`

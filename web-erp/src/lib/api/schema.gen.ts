@@ -7385,7 +7385,7 @@ export interface components {
       proformas: components["schemas"]["SalesDocumentRef"][]
       invoices: components["schemas"]["SalesDocumentRef"][]
       shipments: components["schemas"]["SalesShipment"][]
-      /** @description Delivery Order logistik pesanan (terbaru dulu); kosong bila modul logistics tidak aktif. */
+      /** @description Delivery Order logistik pesanan (urut dibuat); tidak ada bila modul logistics tidak aktif. */
       deliveryOrders?: components["schemas"]["SalesDeliveryOrderRef"][]
       /**
        * @description `create_delivery_order`: pesanan Diproses dengan alokasi belum dikirim, tanpa DO terbuka, dan user punya

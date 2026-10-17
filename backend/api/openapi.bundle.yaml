@@ -12210,7 +12210,7 @@ components:
                 $ref: '#/components/schemas/SalesShipment'
             deliveryOrders:
               type: array
-              description: Delivery Order logistik pesanan (terbaru dulu); kosong bila modul logistics tidak aktif.
+              description: Delivery Order logistik pesanan (urut dibuat); tidak ada bila modul logistics tidak aktif.
               items:
                 $ref: '#/components/schemas/SalesDeliveryOrderRef'
             allowedActions:
