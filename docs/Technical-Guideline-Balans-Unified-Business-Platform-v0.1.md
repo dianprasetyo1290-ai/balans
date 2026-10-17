@@ -1709,6 +1709,7 @@ Kode baru ditambahkan lewat PR yang mengubah lampiran ini, `apperr`, OpenAPI, da
 | `payment_webhook.process` | critical | Webhook Midtrans | 15 (± 24 jam) |
 | `payment_status.reconcile` | critical | Tiap 15 menit | 5 |
 | `stock_reservation.expire` | critical | Tiap 1 menit | 5 |
+| `sales.expire_proformas` | default | Tiap 1 jam dan saat worker mulai: Proforma Invoice lewat masa berlaku → Kedaluwarsa, alokasi stok SO dilepas | 3 |
 | `shipment.create_order` | default | DO siap kirim (Biteship) | 10 (± 6 jam) |
 | `shipment_webhook.process` | default | Webhook Biteship | 15 |
 | `shipment_status.reconcile` | default | Tiap 1 jam | 5 |
