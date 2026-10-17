@@ -27,6 +27,11 @@ sql:
               pointer: true
           - db_type: pg_catalog.numeric
             go_type: github.com/shopspring/decimal.Decimal
+          - db_type: pg_catalog.numeric
+            nullable: true
+            go_type: github.com/shopspring/decimal.NullDecimal
+          - db_type: date
+            go_type: balans/internal/platform/clock.BusinessDate
   - <<: *pkg
     queries: internal/platform/webhook/queries
     gen:
@@ -63,3 +68,9 @@ sql:
       go:
         <<: *go
         out: internal/identity/postgres/sqlcgen
+  - <<: *pkg
+    queries: internal/approval/postgres/queries
+    gen:
+      go:
+        <<: *go
+        out: internal/approval/postgres/sqlcgen

@@ -37,6 +37,22 @@ describe("menu", () => {
     ])
   })
 
+  it("menampilkan halaman persetujuan hanya jika modul approval aktif", () => {
+    const labels = (modules: string[]) =>
+      visibleMenu(modules, [], ["approval.policy.read"]).flatMap((g) =>
+        g.items.map((i) => i.label)
+      )
+    expect(labels([])).not.toContain("Persetujuan Saya")
+    expect(labels(["approval"])).toEqual(
+      expect.arrayContaining(["Persetujuan Saya", "Matriks Persetujuan"])
+    )
+    expect(
+      visibleMenu(["approval"], [], []).flatMap((g) =>
+        g.items.map((i) => i.label)
+      )
+    ).not.toContain("Matriks Persetujuan")
+  })
+
   it("menyembunyikan halaman yang permission-nya tidak dimiliki user", () => {
     const labels = visibleMenu([], [], ["identity.user.read"]).flatMap((g) =>
       g.items.map((i) => i.label)

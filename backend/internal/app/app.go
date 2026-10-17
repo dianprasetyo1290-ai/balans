@@ -11,6 +11,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
+	"balans/internal/approval"
 	"balans/internal/audit"
 	"balans/internal/identity"
 	"balans/internal/integration/mockconsole"
@@ -46,6 +47,7 @@ type App struct {
 	system      *system.Module
 	audit       *audit.Module
 	identity    *identity.Module
+	approval    *approval.Module
 	modules     []module
 	console     *mockconsole.Console
 }
@@ -125,7 +127,8 @@ func (a *App) buildModules() error {
 		}
 		mailer = notification.New(notification.Deps{
 			Pool: a.Pool, Tx: a.Tx, Jobs: a.Jobs, Clock: a.Clock, Log: a.Log,
-			Sender: smtpmail.New(cfg.SMTPHost, cfg.SMTPPort, cfg.MailFrom),
+			Sender:    smtpmail.New(cfg.SMTPHost, cfg.SMTPPort, cfg.MailFrom),
+			Responder: a.Responder,
 		})
 		a.modules = append(a.modules, mailer)
 		console.Email = mailer
@@ -148,6 +151,19 @@ func (a *App) buildModules() error {
 			return err
 		}
 		a.modules = append(a.modules, a.identity)
+	}
+	if cfg.IsEnabled(approval.Name) {
+		if a.identity == nil || mailer == nil {
+			return errors.New("modul approval membutuhkan modul identity dan notification")
+		}
+		a.approval = approval.New(approval.Deps{
+			Pool: a.Pool, Tx: a.Tx, Clock: a.Clock, Log: a.Log, Responder: a.Responder, Audit: a.audit,
+			Directory: approvalDirectory{identity: a.identity}, Notifier: mailer, BaseURL: cfg.PublicBaseURL,
+		})
+		a.modules = append(a.modules, a.approval)
+		if cfg.Env == config.EnvLocal {
+			registerDevApprovalHandlers(a.approval, a.Log)
+		}
 	}
 	if cfg.IsEnabled(sales.Name) {
 		if cfg.PaymentGateway != config.ProviderMock {
@@ -195,7 +211,16 @@ func (a *App) SeedDev(ctx context.Context, password string) ([]identity.DevUser,
 	if a.identity == nil {
 		return nil, errors.New("seed pengembangan membutuhkan modul identity aktif")
 	}
-	return a.identity.SeedDevUsers(ctx, password)
+	users, err := a.identity.SeedDevUsers(ctx, password)
+	if err != nil {
+		return nil, err
+	}
+	n, err := a.seedDevApprovals(ctx)
+	if err != nil {
+		return nil, err
+	}
+	a.Log.InfoContext(ctx, "dev approvals seeded", "count", n)
+	return users, nil
 }
 
 // newCipher membaca kunci PII. Di APP_ENV=local tanpa kunci dipakai kunci pengembangan deterministik;

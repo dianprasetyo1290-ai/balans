@@ -36,6 +36,7 @@ describe("katalog error", () => {
       STOCK_INSUFFICIENT: true,
       BATCH_SHELF_LIFE_TOO_SHORT: true,
       APPROVAL_REQUIRED: true,
+      APPROVAL_POLICY_MISSING: true,
       DISCOUNT_LIMIT_EXCEEDED: true,
       CREDIT_LIMIT_EXCEEDED: true,
       THREE_WAY_MATCH_FAILED: true,

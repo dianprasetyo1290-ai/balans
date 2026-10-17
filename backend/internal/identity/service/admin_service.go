@@ -395,3 +395,26 @@ func (s *AdminService) UsersWithRole(ctx context.Context, code string, division 
 func (s *AdminService) UserByID(ctx context.Context, id uuid.UUID) (domain.User, error) {
 	return s.Store.GetUser(ctx, id)
 }
+
+// SearchActiveUsers dipakai modul lain (approval) untuk memilih user aktif; tanpa cek permission karena
+// hanya nama dan email yang dipakai, dan pemanggil sudah memastikan user login.
+func (s *AdminService) SearchActiveUsers(ctx context.Context, q string, limit int) ([]domain.User, error) {
+	active := true
+	size := limit
+	res, err := s.Store.ListUsers(ctx, postgres.UserFilter{
+		Search: q, IsActive: &active, Sort: paging.Sort{Field: "fullName"},
+	}, paging.New(nil, &size))
+	if err != nil {
+		return nil, err
+	}
+	return res.Items, nil
+}
+
+// RoleName mengembalikan nama role; ok false jika kode tidak dikenal.
+func (s *AdminService) RoleName(ctx context.Context, code string) (string, bool, error) {
+	roles, err := s.Store.RolesByCodes(ctx, []string{code})
+	if err != nil || len(roles) == 0 {
+		return "", false, err
+	}
+	return roles[0].Name, true, nil
+}

@@ -1,4 +1,4 @@
-import { useQueryClient } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router"
 import { ChevronsUpDownIcon, LogOutIcon } from "lucide-react"
 
@@ -20,11 +20,14 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
+import { approvalInboxCountQuery } from "@/features/approval/api/approval-api"
 import { logout } from "@/features/auth/api/auth-api"
+import { countLabel } from "@/features/notification/components/notification-bell"
 import { visibleMenu } from "@/lib/navigation/menu"
 
 type AppSidebarProps = {
@@ -54,6 +57,11 @@ export function AppSidebar({
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const groups = visibleMenu(enabledModules, [], permissions)
+  const inboxCount = useQuery({
+    ...approvalInboxCountQuery,
+    enabled: enabledModules.includes("approval"),
+  })
+  const badges = { approvalInbox: inboxCount.data?.pending ?? 0 }
 
   const handleLogout = async () => {
     await logout()
@@ -100,7 +108,20 @@ export function AppSidebar({
                       >
                         <group.icon aria-hidden="true" />
                         <span>{item.label}</span>
+                        {item.badge && badges[item.badge] > 0 ? (
+                          <span className="sr-only">
+                            , {badges[item.badge]} menunggu
+                          </span>
+                        ) : null}
                       </SidebarMenuButton>
+                      {item.badge && badges[item.badge] > 0 ? (
+                        <SidebarMenuBadge
+                          aria-hidden="true"
+                          className="bg-amber-500/15 text-amber-800 dark:text-amber-300"
+                        >
+                          {countLabel(badges[item.badge])}
+                        </SidebarMenuBadge>
+                      ) : null}
                     </SidebarMenuItem>
                   ) : null
                 )}

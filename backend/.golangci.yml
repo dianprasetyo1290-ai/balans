@@ -91,7 +91,7 @@ linters:
               desc: "platform tidak boleh bergantung pada modul"
             - pkg: "balans/internal/integration"
               desc: "platform tidak boleh bergantung pada adapter"
-            - pkg: "balans/internal/app"
+            - pkg: "balans/internal/app$"
               desc: "platform tidak boleh bergantung pada wiring"
         module-catalog:
           list-mode: lax
@@ -180,7 +180,7 @@ linters:
               desc: "arah dependensi salah: catalog tidak boleh bergantung pada system"
             - pkg: "balans/internal/integration"
               desc: "modul bergantung pada interface, bukan adapter"
-            - pkg: "balans/internal/app"
+            - pkg: "balans/internal/app$"
               desc: "modul tidak boleh bergantung pada wiring"
         module-party:
           list-mode: lax
@@ -269,7 +269,7 @@ linters:
               desc: "arah dependensi salah: party tidak boleh bergantung pada system"
             - pkg: "balans/internal/integration"
               desc: "modul bergantung pada interface, bukan adapter"
-            - pkg: "balans/internal/app"
+            - pkg: "balans/internal/app$"
               desc: "modul tidak boleh bergantung pada wiring"
         module-accounting:
           list-mode: lax
@@ -358,7 +358,7 @@ linters:
               desc: "arah dependensi salah: accounting tidak boleh bergantung pada system"
             - pkg: "balans/internal/integration"
               desc: "modul bergantung pada interface, bukan adapter"
-            - pkg: "balans/internal/app"
+            - pkg: "balans/internal/app$"
               desc: "modul tidak boleh bergantung pada wiring"
         module-tax:
           list-mode: lax
@@ -447,7 +447,7 @@ linters:
               desc: "arah dependensi salah: tax tidak boleh bergantung pada system"
             - pkg: "balans/internal/integration"
               desc: "modul bergantung pada interface, bukan adapter"
-            - pkg: "balans/internal/app"
+            - pkg: "balans/internal/app$"
               desc: "modul tidak boleh bergantung pada wiring"
         module-document:
           list-mode: lax
@@ -536,7 +536,7 @@ linters:
               desc: "arah dependensi salah: document tidak boleh bergantung pada system"
             - pkg: "balans/internal/integration"
               desc: "modul bergantung pada interface, bukan adapter"
-            - pkg: "balans/internal/app"
+            - pkg: "balans/internal/app$"
               desc: "modul tidak boleh bergantung pada wiring"
         module-audit:
           list-mode: lax
@@ -625,7 +625,7 @@ linters:
               desc: "arah dependensi salah: audit tidak boleh bergantung pada system"
             - pkg: "balans/internal/integration"
               desc: "modul bergantung pada interface, bukan adapter"
-            - pkg: "balans/internal/app"
+            - pkg: "balans/internal/app$"
               desc: "modul tidak boleh bergantung pada wiring"
         module-setting:
           list-mode: lax
@@ -714,7 +714,7 @@ linters:
               desc: "arah dependensi salah: setting tidak boleh bergantung pada system"
             - pkg: "balans/internal/integration"
               desc: "modul bergantung pada interface, bukan adapter"
-            - pkg: "balans/internal/app"
+            - pkg: "balans/internal/app$"
               desc: "modul tidak boleh bergantung pada wiring"
         module-identity:
           list-mode: lax
@@ -803,7 +803,7 @@ linters:
               desc: "arah dependensi salah: identity tidak boleh bergantung pada system"
             - pkg: "balans/internal/integration"
               desc: "modul bergantung pada interface, bukan adapter"
-            - pkg: "balans/internal/app"
+            - pkg: "balans/internal/app$"
               desc: "modul tidak boleh bergantung pada wiring"
         module-filestore:
           list-mode: lax
@@ -892,7 +892,7 @@ linters:
               desc: "arah dependensi salah: filestore tidak boleh bergantung pada system"
             - pkg: "balans/internal/integration"
               desc: "modul bergantung pada interface, bukan adapter"
-            - pkg: "balans/internal/app"
+            - pkg: "balans/internal/app$"
               desc: "modul tidak boleh bergantung pada wiring"
         module-notification:
           list-mode: lax
@@ -981,7 +981,7 @@ linters:
               desc: "arah dependensi salah: notification tidak boleh bergantung pada system"
             - pkg: "balans/internal/integration"
               desc: "modul bergantung pada interface, bukan adapter"
-            - pkg: "balans/internal/app"
+            - pkg: "balans/internal/app$"
               desc: "modul tidak boleh bergantung pada wiring"
         module-dataexchange:
           list-mode: lax
@@ -1070,7 +1070,7 @@ linters:
               desc: "arah dependensi salah: dataexchange tidak boleh bergantung pada system"
             - pkg: "balans/internal/integration"
               desc: "modul bergantung pada interface, bukan adapter"
-            - pkg: "balans/internal/app"
+            - pkg: "balans/internal/app$"
               desc: "modul tidak boleh bergantung pada wiring"
         module-inventory:
           list-mode: lax
@@ -1147,7 +1147,7 @@ linters:
               desc: "arah dependensi salah: inventory tidak boleh bergantung pada system"
             - pkg: "balans/internal/integration"
               desc: "modul bergantung pada interface, bukan adapter"
-            - pkg: "balans/internal/app"
+            - pkg: "balans/internal/app$"
               desc: "modul tidak boleh bergantung pada wiring"
         module-warehouse:
           list-mode: lax
@@ -1224,7 +1224,7 @@ linters:
               desc: "arah dependensi salah: warehouse tidak boleh bergantung pada system"
             - pkg: "balans/internal/integration"
               desc: "modul bergantung pada interface, bukan adapter"
-            - pkg: "balans/internal/app"
+            - pkg: "balans/internal/app$"
               desc: "modul tidak boleh bergantung pada wiring"
         module-logistics:
           list-mode: lax
@@ -1301,7 +1301,7 @@ linters:
               desc: "arah dependensi salah: logistics tidak boleh bergantung pada system"
             - pkg: "balans/internal/integration"
               desc: "modul bergantung pada interface, bukan adapter"
-            - pkg: "balans/internal/app"
+            - pkg: "balans/internal/app$"
               desc: "modul tidak boleh bergantung pada wiring"
         module-pricing:
           list-mode: lax
@@ -1378,7 +1378,7 @@ linters:
               desc: "arah dependensi salah: pricing tidak boleh bergantung pada system"
             - pkg: "balans/internal/integration"
               desc: "modul bergantung pada interface, bukan adapter"
-            - pkg: "balans/internal/app"
+            - pkg: "balans/internal/app$"
               desc: "modul tidak boleh bergantung pada wiring"
         module-approval:
           list-mode: lax
@@ -1455,7 +1455,7 @@ linters:
               desc: "arah dependensi salah: approval tidak boleh bergantung pada system"
             - pkg: "balans/internal/integration"
               desc: "modul bergantung pada interface, bukan adapter"
-            - pkg: "balans/internal/app"
+            - pkg: "balans/internal/app$"
               desc: "modul tidak boleh bergantung pada wiring"
         module-hris:
           list-mode: lax
@@ -1532,7 +1532,7 @@ linters:
               desc: "arah dependensi salah: hris tidak boleh bergantung pada system"
             - pkg: "balans/internal/integration"
               desc: "modul bergantung pada interface, bukan adapter"
-            - pkg: "balans/internal/app"
+            - pkg: "balans/internal/app$"
               desc: "modul tidak boleh bergantung pada wiring"
         module-storefront:
           list-mode: lax
@@ -1593,7 +1593,7 @@ linters:
               desc: "arah dependensi salah: storefront tidak boleh bergantung pada system"
             - pkg: "balans/internal/integration"
               desc: "modul bergantung pada interface, bukan adapter"
-            - pkg: "balans/internal/app"
+            - pkg: "balans/internal/app$"
               desc: "modul tidak boleh bergantung pada wiring"
         module-sales:
           list-mode: lax
@@ -1654,7 +1654,7 @@ linters:
               desc: "arah dependensi salah: sales tidak boleh bergantung pada system"
             - pkg: "balans/internal/integration"
               desc: "modul bergantung pada interface, bukan adapter"
-            - pkg: "balans/internal/app"
+            - pkg: "balans/internal/app$"
               desc: "modul tidak boleh bergantung pada wiring"
         module-procurement:
           list-mode: lax
@@ -1715,7 +1715,7 @@ linters:
               desc: "arah dependensi salah: procurement tidak boleh bergantung pada system"
             - pkg: "balans/internal/integration"
               desc: "modul bergantung pada interface, bukan adapter"
-            - pkg: "balans/internal/app"
+            - pkg: "balans/internal/app$"
               desc: "modul tidak boleh bergantung pada wiring"
         module-vending:
           list-mode: lax
@@ -1776,7 +1776,7 @@ linters:
               desc: "arah dependensi salah: vending tidak boleh bergantung pada system"
             - pkg: "balans/internal/integration"
               desc: "modul bergantung pada interface, bukan adapter"
-            - pkg: "balans/internal/app"
+            - pkg: "balans/internal/app$"
               desc: "modul tidak boleh bergantung pada wiring"
         module-reseller:
           list-mode: lax
@@ -1837,7 +1837,7 @@ linters:
               desc: "arah dependensi salah: reseller tidak boleh bergantung pada system"
             - pkg: "balans/internal/integration"
               desc: "modul bergantung pada interface, bukan adapter"
-            - pkg: "balans/internal/app"
+            - pkg: "balans/internal/app$"
               desc: "modul tidak boleh bergantung pada wiring"
         module-payroll:
           list-mode: lax
@@ -1898,7 +1898,7 @@ linters:
               desc: "arah dependensi salah: payroll tidak boleh bergantung pada system"
             - pkg: "balans/internal/integration"
               desc: "modul bergantung pada interface, bukan adapter"
-            - pkg: "balans/internal/app"
+            - pkg: "balans/internal/app$"
               desc: "modul tidak boleh bergantung pada wiring"
         module-pipeline:
           list-mode: lax
@@ -1959,7 +1959,7 @@ linters:
               desc: "arah dependensi salah: pipeline tidak boleh bergantung pada system"
             - pkg: "balans/internal/integration"
               desc: "modul bergantung pada interface, bukan adapter"
-            - pkg: "balans/internal/app"
+            - pkg: "balans/internal/app$"
               desc: "modul tidak boleh bergantung pada wiring"
         module-crm:
           list-mode: lax
@@ -2020,7 +2020,7 @@ linters:
               desc: "arah dependensi salah: crm tidak boleh bergantung pada system"
             - pkg: "balans/internal/integration"
               desc: "modul bergantung pada interface, bukan adapter"
-            - pkg: "balans/internal/app"
+            - pkg: "balans/internal/app$"
               desc: "modul tidak boleh bergantung pada wiring"
         module-system:
           list-mode: lax
@@ -2079,7 +2079,7 @@ linters:
               desc: "pakai API publik di root package crm"
             - pkg: "balans/internal/integration"
               desc: "modul bergantung pada interface, bukan adapter"
-            - pkg: "balans/internal/app"
+            - pkg: "balans/internal/app$"
               desc: "modul tidak boleh bergantung pada wiring"
         integration:
           list-mode: lax
@@ -2138,7 +2138,7 @@ linters:
               desc: "adapter hanya memakai API publik modul crm"
             - pkg: "balans/internal/system/"
               desc: "adapter hanya memakai API publik modul system"
-            - pkg: "balans/internal/app"
+            - pkg: "balans/internal/app$"
               desc: "adapter tidak boleh bergantung pada wiring"
   exclusions:
     generated: lax

@@ -149,6 +149,13 @@ export const ERROR_MESSAGES = {
     action: "close",
     display: "modal",
   },
+  APPROVAL_POLICY_MISSING: {
+    title: "Kebijakan persetujuan belum diatur",
+    message:
+      "Kebijakan persetujuan untuk dokumen ini belum diatur. Hubungi Admin Sistem.",
+    action: "close",
+    display: "modal",
+  },
   DISCOUNT_LIMIT_EXCEEDED: {
     title: "Diskon melebihi batas",
     message: "Diskon melebihi batas role Anda dan membutuhkan persetujuan.",

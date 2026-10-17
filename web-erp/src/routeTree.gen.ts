@@ -16,6 +16,8 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as MfaSetupRouteImport } from './routes/mfa-setup'
 import { Route as SetPasswordRouteImport } from './routes/set-password'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AppApprovalsRouteImport } from './routes/_app/approvals'
+import { Route as AppSettingsApprovalPoliciesRouteImport } from './routes/_app/settings/approval-policies'
 import { Route as AppSettingsAuditLogsRouteImport } from './routes/_app/settings/audit-logs'
 import { Route as AppSettingsRolesRouteImport } from './routes/_app/settings/roles'
 import { Route as AppSettingsUsersRouteImport } from './routes/_app/settings/users'
@@ -55,6 +57,17 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppApprovalsRoute = AppApprovalsRouteImport.update({
+  id: '/approvals',
+  path: '/approvals',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsApprovalPoliciesRoute =
+  AppSettingsApprovalPoliciesRouteImport.update({
+    id: '/settings/approval-policies',
+    path: '/settings/approval-policies',
+    getParentRoute: () => AppRoute,
+  } as any)
 const AppSettingsAuditLogsRoute = AppSettingsAuditLogsRouteImport.update({
   id: '/settings/audit-logs',
   path: '/settings/audit-logs',
@@ -83,6 +96,8 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/mfa-setup': typeof MfaSetupRoute
   '/set-password': typeof SetPasswordRoute
+  '/approvals': typeof AppApprovalsRoute
+  '/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/settings/audit-logs': typeof AppSettingsAuditLogsRoute
   '/settings/roles': typeof AppSettingsRolesRoute
   '/settings/users': typeof AppSettingsUsersRoute
@@ -94,7 +109,9 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/mfa-setup': typeof MfaSetupRoute
   '/set-password': typeof SetPasswordRoute
+  '/approvals': typeof AppApprovalsRoute
   '/': typeof AppIndexRoute
+  '/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/settings/audit-logs': typeof AppSettingsAuditLogsRoute
   '/settings/roles': typeof AppSettingsRolesRoute
   '/settings/users': typeof AppSettingsUsersRoute
@@ -108,7 +125,9 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/mfa-setup': typeof MfaSetupRoute
   '/set-password': typeof SetPasswordRoute
+  '/_app/approvals': typeof AppApprovalsRoute
   '/_app/': typeof AppIndexRoute
+  '/_app/settings/approval-policies': typeof AppSettingsApprovalPoliciesRoute
   '/_app/settings/audit-logs': typeof AppSettingsAuditLogsRoute
   '/_app/settings/roles': typeof AppSettingsRolesRoute
   '/_app/settings/users': typeof AppSettingsUsersRoute
@@ -123,6 +142,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/mfa-setup'
     | '/set-password'
+    | '/approvals'
+    | '/settings/approval-policies'
     | '/settings/audit-logs'
     | '/settings/roles'
     | '/settings/users'
@@ -134,7 +155,9 @@ export interface FileRouteTypes {
     | '/login'
     | '/mfa-setup'
     | '/set-password'
+    | '/approvals'
     | '/'
+    | '/settings/approval-policies'
     | '/settings/audit-logs'
     | '/settings/roles'
     | '/settings/users'
@@ -147,7 +170,9 @@ export interface FileRouteTypes {
     | '/login'
     | '/mfa-setup'
     | '/set-password'
+    | '/_app/approvals'
     | '/_app/'
+    | '/_app/settings/approval-policies'
     | '/_app/settings/audit-logs'
     | '/_app/settings/roles'
     | '/_app/settings/users'
@@ -214,6 +239,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/approvals': {
+      id: '/_app/approvals'
+      path: '/approvals'
+      fullPath: '/approvals'
+      preLoaderRoute: typeof AppApprovalsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/settings/approval-policies': {
+      id: '/_app/settings/approval-policies'
+      path: '/settings/approval-policies'
+      fullPath: '/settings/approval-policies'
+      preLoaderRoute: typeof AppSettingsApprovalPoliciesRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/settings/audit-logs': {
       id: '/_app/settings/audit-logs'
       path: '/settings/audit-logs'
@@ -246,7 +285,9 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRouteChildren {
+  AppApprovalsRoute: typeof AppApprovalsRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppSettingsApprovalPoliciesRoute: typeof AppSettingsApprovalPoliciesRoute
   AppSettingsAuditLogsRoute: typeof AppSettingsAuditLogsRoute
   AppSettingsRolesRoute: typeof AppSettingsRolesRoute
   AppSettingsUsersRoute: typeof AppSettingsUsersRoute
@@ -254,7 +295,9 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppApprovalsRoute: AppApprovalsRoute,
   AppIndexRoute: AppIndexRoute,
+  AppSettingsApprovalPoliciesRoute: AppSettingsApprovalPoliciesRoute,
   AppSettingsAuditLogsRoute: AppSettingsAuditLogsRoute,
   AppSettingsRolesRoute: AppSettingsRolesRoute,
   AppSettingsUsersRoute: AppSettingsUsersRoute,

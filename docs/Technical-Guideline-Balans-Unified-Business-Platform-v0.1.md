@@ -1684,6 +1684,7 @@ Container memakai `restart: unless-stopped`, healthcheck, dan log rotation (`max
 | `STOCK_INSUFFICIENT` | 422 | Modal | Stok {produk} di {lokasi} tidak cukup. Tersedia {qty}. |
 | `BATCH_SHELF_LIFE_TOO_SHORT` | 422 | Modal | Sisa umur simpan batch {batch} kurang dari batas channel {channel}. |
 | `APPROVAL_REQUIRED` | 422 | Modal | Tindakan ini membutuhkan persetujuan. Dokumen sudah diajukan untuk persetujuan. |
+| `APPROVAL_POLICY_MISSING` | 422 | Modal | Kebijakan persetujuan untuk dokumen ini belum diatur. Hubungi Admin Sistem. |
 | `DISCOUNT_LIMIT_EXCEEDED` | 422 | Modal | Diskon melebihi batas role Anda dan membutuhkan persetujuan. |
 | `CREDIT_LIMIT_EXCEEDED` | 422 | Modal | Transaksi melebihi batas kredit pelanggan. |
 | `THREE_WAY_MATCH_FAILED` | 422 | Modal | Tagihan tidak cocok dengan PO dan penerimaan barang melebihi toleransi. |

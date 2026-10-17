@@ -138,3 +138,13 @@ func (m *Module) UsersWithRole(ctx context.Context, roleCode string, division *u
 func (m *Module) UserByID(ctx context.Context, id uuid.UUID) (User, error) {
 	return m.admin.UserByID(ctx, id)
 }
+
+// SearchActiveUsers mencari user aktif berdasarkan nama atau email.
+func (m *Module) SearchActiveUsers(ctx context.Context, q string, limit int) ([]User, error) {
+	return m.admin.SearchActiveUsers(ctx, q, limit)
+}
+
+// RoleName mengembalikan nama role untuk ditampilkan.
+func (m *Module) RoleName(ctx context.Context, code string) (string, bool, error) {
+	return m.admin.RoleName(ctx, code)
+}

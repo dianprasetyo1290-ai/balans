@@ -20,6 +20,10 @@ tags:
     description: Sesi, pengguna, dan permission (R1.1)
   - name: audit
     description: Riwayat perubahan (audit trail)
+  - name: approval
+    description: Engine & inbox persetujuan (R1.1)
+  - name: notification
+    description: Notifikasi in-app (R1.1)
   - name: catalog
     description: Master produk, packaging, material, bundling (R1.1)
   - name: warehouse
@@ -77,6 +81,40 @@ paths:
     $ref: "./paths/identity.yaml#/permissions"
   /api/v1/audit-logs:
     $ref: "./paths/audit.yaml#/auditLogs"
+  /api/v1/approvals/inbox:
+    $ref: "./paths/approval.yaml#/approvalInbox"
+  /api/v1/approvals/inbox/count:
+    $ref: "./paths/approval.yaml#/approvalInboxCount"
+  /api/v1/approvals/subject-types:
+    $ref: "./paths/approval.yaml#/approvalSubjectTypes"
+  /api/v1/approvals/user-options:
+    $ref: "./paths/approval.yaml#/approvalUserOptions"
+  /api/v1/approval-requests:
+    $ref: "./paths/approval.yaml#/approvalRequests"
+  /api/v1/approval-requests/{id}:
+    $ref: "./paths/approval.yaml#/approvalRequest"
+  /api/v1/approval-requests/{id}/approve:
+    $ref: "./paths/approval.yaml#/approvalRequestApprove"
+  /api/v1/approval-requests/{id}/reject:
+    $ref: "./paths/approval.yaml#/approvalRequestReject"
+  /api/v1/approval-policies:
+    $ref: "./paths/approval.yaml#/approvalPolicies"
+  /api/v1/approval-policies/{id}:
+    $ref: "./paths/approval.yaml#/approvalPolicy"
+  /api/v1/approval-policies/{id}/end:
+    $ref: "./paths/approval.yaml#/approvalPolicyEnd"
+  /api/v1/approval-delegations:
+    $ref: "./paths/approval.yaml#/approvalDelegations"
+  /api/v1/approval-delegations/{id}/cancel:
+    $ref: "./paths/approval.yaml#/approvalDelegationCancel"
+  /api/v1/notifications:
+    $ref: "./paths/notification.yaml#/notifications"
+  /api/v1/notifications/unread-count:
+    $ref: "./paths/notification.yaml#/notificationUnreadCount"
+  /api/v1/notifications/read-all:
+    $ref: "./paths/notification.yaml#/notificationReadAll"
+  /api/v1/notifications/{id}/read:
+    $ref: "./paths/notification.yaml#/notificationRead"
   /api/v1/products:
     $ref: "./paths/catalog.yaml#/products"
   /api/v1/products/{id}:

@@ -48,16 +48,16 @@ Fase 1 memindahkan **seluruh alur operasional dan akuntansi Balans yang tidak be
 | **R1.4** Finance Close, Pajak & Laporan | Tutup buku & laporan | Kas/bank, biaya, pajak, aset, laporan, dan tutup buku bulanan berjalan; sistem siap UAT end-to-end | 31 | 19 | 125 |
 | **Fase 1** | | | **105** | **97** | **593** |
 
-**Status pengerjaan per 16 Oktober 2026** (rincian per story di Status Fase 1):
+**Status pengerjaan per 17 Oktober 2026** (rincian per story di Status Fase 1):
 
 | Rilis | Fitur selesai | Fitur sebagian | Fitur belum | Story selesai / sebagian |
 |---|---|---|---|---|
-| R1.1 | 2 (F1-101, F1-102) | 3 (F1-103, F1-104, F1-105) | 15 | 4 selesai (S-101 – S-104) dan S-108 dari Fase 0; 3 sebagian (S-105, S-107, S-109) |
+| R1.1 | 3 (F1-101, F1-102, F1-106) | 3 (F1-103, F1-104, F1-105) | 14 | 7 selesai (S-101 – S-104, S-110 – S-112) dan S-108 dari Fase 0; 3 sebagian (S-105, S-107, S-109) |
 | R1.2 | — | — | 18 | — |
 | R1.3 | — | — | 12 | — |
 | R1.4 | — | — | 12 | — |
 
-Status **Selesai** berarti kode, test otomatis, dan kriteria penerimaan terpenuhi di lingkungan lokal; penerimaan PO/key user di sprint review dan deploy staging masih mengikuti Definition of Done (bagian 12.3). Pekerjaan berikutnya: engine & inbox approval (F1-106), lalu fondasi posting rule (F1-118) dan master data.
+Status **Selesai** berarti kode, test otomatis, dan kriteria penerimaan terpenuhi di lingkungan lokal; penerimaan PO/key user di sprint review dan deploy staging masih mengikuti Definition of Done (bagian 12.3). Pekerjaan berikutnya: fondasi posting rule & dimensi (F1-118), penomoran & periode (F1-120), lalu master data mulai dari produk dan gudang (F1-107, F1-114) bersama soft delete (S-106).
 
 Setelah keempat rilis selesai, Fase 1 masuk **UAT, mock migration, training, cut-over, go-live, dan hypercare** sampai tutup buku bulan pertama selesai (bagian 11).
 
@@ -167,7 +167,7 @@ Setiap fitur di bawah dipecah menjadi user story di Backlog Fase 1 (kolom *Story
 | F1-103 | Audit trail & soft delete | Create/update/delete/restore/ubah status/approval/login tercatat dengan diff dan field sensitif di-mask; hapus master = soft delete dan restore tercatat | NFR-03, D-25 | M | S-105, S-106 | Sebagian |
 | F1-104 | Responsif & lokalisasi | Layout nyaman di desktop, tablet, HP; `Rp1.250.000`, `14 Okt 2026 09.30 WIB`; seluruh pesan Bahasa Indonesia | NFR-01, NFR-05 | M | S-107, S-108 | Sebagian |
 | F1-105 | Privasi data | NIK, NPWP, rekening terenkripsi AES-256-GCM; tidak ada data pribadi di log dan Sentry | NFR-04 | M | S-109 | Sebagian |
-| F1-106 | Engine & inbox approval | Kebijakan per jenis dokumen, nominal, dan divisi; level berurutan; pembuat tidak menyetujui dokumennya sendiri; inbox lintas dokumen; tolak wajib catatan; delegasi saat cuti; notifikasi in-app + email dan pengingat tiap jam di jam kerja | 5.17, NFR-11 | M | S-110, S-111, S-112 | Belum |
+| F1-106 | Engine & inbox approval | Kebijakan per jenis dokumen, nominal, dan divisi; level berurutan; pembuat tidak menyetujui dokumennya sendiri; inbox lintas dokumen; tolak wajib catatan; delegasi saat cuti; notifikasi in-app + email dan pengingat tiap jam di jam kerja | 5.17, NFR-11 | M | S-110, S-111, S-112 | Selesai |
 | F1-107 | Master produk & label barcode | SKU unik permanen; varian, tipe kemasan, satuan, umur simpan wajib; banyak barcode dengan satu utama; isi per karton; cetak label produk 50 × 30 mm | MD-01 | M | S-113 | Belum |
 | F1-108 | Packaging & material, bundel virtual | Packaging (RM) dan bahan reprocess (GM); bundel tanpa stok sendiri, stok tersedia = min(stok komponen ÷ qty) | MD-02, MD-03 | M | S-114, S-115 | Belum |
 | F1-109 | Price list & resolver harga | Price list per channel/mitra/karyawan/vending, effective-dated dengan riwayat versi; approval Head Sales → Head F&A; resolver memilih harga khusus → promo → bertingkat → channel → dasar dan menyimpan aturan & versi yang dipakai | MD-04, MD-11 | M | S-116, S-117, S-118 | Belum |

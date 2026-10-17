@@ -1,0 +1,108 @@
+notifications:
+  get:
+    operationId: listNotifications
+    tags: [notification]
+    summary: Notifikasi in-app milik user yang login
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Page"
+      - $ref: "../components/common.yaml#/parameters/PageSize"
+      - name: unreadOnly
+        in: query
+        schema:
+          type: boolean
+          default: false
+    responses:
+      "200":
+        description: Daftar notifikasi, terbaru lebih dulu
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotificationList"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+notificationUnreadCount:
+  get:
+    operationId: getNotificationUnreadCount
+    tags: [notification]
+    summary: Jumlah notifikasi belum dibaca (badge)
+    responses:
+      "200":
+        description: Jumlah notifikasi belum dibaca
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotificationUnreadCount"
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+notificationRead:
+  post:
+    operationId: markNotificationRead
+    tags: [notification]
+    summary: Menandai notifikasi sudah dibaca
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/Id"
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    responses:
+      "204":
+        description: Ditandai sudah dibaca
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+notificationReadAll:
+  post:
+    operationId: markAllNotificationsRead
+    tags: [notification]
+    summary: Menandai semua notifikasi sudah dibaca
+    parameters:
+      - $ref: "../components/common.yaml#/parameters/IdempotencyKey"
+    responses:
+      "204":
+        description: Semua ditandai sudah dibaca
+      default:
+        $ref: "../components/common.yaml#/responses/Problem"
+components:
+  schemas:
+    Notification:
+      type: object
+      required: [id, kind, title, body, link, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          description: Jenis notifikasi `<modul>.<peristiwa>`, mis. `approval.pending`.
+          example: approval.pending
+        title:
+          type: string
+        body:
+          type: string
+        link:
+          type: string
+          description: Path ERP yang dibuka saat notifikasi diklik; kosong jika tidak ada.
+        readAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+    NotificationList:
+      allOf:
+        - $ref: "../components/common.yaml#/Pagination"
+        - type: object
+          required: [items, unreadCount]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/Notification"
+            unreadCount:
+              type: integer
+              format: int64
+    NotificationUnreadCount:
+      type: object
+      required: [unreadCount]
+      properties:
+        unreadCount:
+          type: integer
+          format: int64

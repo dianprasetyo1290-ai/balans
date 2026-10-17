@@ -7,10 +7,91 @@ package sqlcgen
 import (
 	"time"
 
+	"balans/internal/platform/clock"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/shopspring/decimal"
 )
+
+type ApprovalDelegation struct {
+	ID          uuid.UUID
+	FromUserID  uuid.UUID
+	ToUserID    uuid.UUID
+	ValidFrom   clock.BusinessDate
+	ValidTo     clock.BusinessDate
+	Reason      string
+	CancelledAt *time.Time
+	CancelledBy uuid.NullUUID
+	CreatedAt   time.Time
+	CreatedBy   uuid.UUID
+	UpdatedAt   time.Time
+	UpdatedBy   uuid.UUID
+	Version     int32
+}
+
+type ApprovalPolicy struct {
+	ID               uuid.UUID
+	SubjectType      string
+	DivisionID       uuid.NullUUID
+	Level            int32
+	MinAmount        decimal.NullDecimal
+	MaxAmount        decimal.NullDecimal
+	Condition        string
+	ApproverRoleCode string
+	ApproverUserID   uuid.NullUUID
+	SubstituteUserID uuid.NullUUID
+	ValidFrom        time.Time
+	ValidTo          *time.Time
+	CreatedAt        time.Time
+	CreatedBy        uuid.UUID
+	UpdatedAt        time.Time
+	UpdatedBy        uuid.UUID
+	Version          int32
+}
+
+type ApprovalRequest struct {
+	ID              uuid.UUID
+	SubjectType     string
+	SubjectID       uuid.UUID
+	SubjectLabel    string
+	SubjectLink     string
+	Summary         string
+	Amount          decimal.Decimal
+	DivisionID      uuid.NullUUID
+	Flags           []string
+	RequestedBy     uuid.UUID
+	RequestedByName string
+	Status          string
+	CurrentLevel    int32
+	TotalLevels     int32
+	DecidedAt       *time.Time
+	CreatedAt       time.Time
+	CreatedBy       uuid.UUID
+	UpdatedAt       time.Time
+	UpdatedBy       uuid.UUID
+	Version         int32
+}
+
+type ApprovalStep struct {
+	ID                  uuid.UUID
+	ApprovalRequestID   uuid.UUID
+	Level               int32
+	PolicyID            uuid.UUID
+	ApproverRoleCode    string
+	ApproverUserID      uuid.NullUUID
+	SubstituteUserID    uuid.NullUUID
+	DivisionID          uuid.NullUUID
+	RequesterIsApprover bool
+	Decision            pgtype.Text
+	DecidedBy           uuid.NullUUID
+	DecidedByName       string
+	DelegatedFromUserID uuid.NullUUID
+	Note                string
+	ActivatedAt         *time.Time
+	DecidedAt           *time.Time
+	LastRemindedAt      *time.Time
+	CreatedAt           time.Time
+}
 
 type AuditLog struct {
 	ID          uuid.UUID
@@ -66,6 +147,17 @@ type MockShipment struct {
 	Status         string
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
+}
+
+type Notification struct {
+	ID        uuid.UUID
+	UserID    uuid.UUID
+	Kind      string
+	Title     string
+	Body      string
+	Link      string
+	ReadAt    *time.Time
+	CreatedAt time.Time
 }
 
 type NotificationEmail struct {

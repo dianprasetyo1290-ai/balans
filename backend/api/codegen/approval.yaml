@@ -1,0 +1,8 @@
+package: http
+generate:
+  chi-server: true
+  strict-server: true
+  models: true
+output: internal/approval/http/api.gen.go
+output-options:
+  include-tags: [approval]

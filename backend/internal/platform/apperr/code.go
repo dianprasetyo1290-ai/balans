@@ -30,6 +30,7 @@ const (
 	CodeStockInsufficient       Code = "STOCK_INSUFFICIENT"
 	CodeBatchShelfLifeTooShort  Code = "BATCH_SHELF_LIFE_TOO_SHORT"
 	CodeApprovalRequired        Code = "APPROVAL_REQUIRED"
+	CodeApprovalPolicyMissing   Code = "APPROVAL_POLICY_MISSING"
 	CodeDiscountLimitExceeded   Code = "DISCOUNT_LIMIT_EXCEEDED"
 	CodeCreditLimitExceeded     Code = "CREDIT_LIMIT_EXCEEDED"
 	CodeThreeWayMatchFailed     Code = "THREE_WAY_MATCH_FAILED"
@@ -73,6 +74,7 @@ var codeSpecs = map[Code]codeSpec{
 	CodeStockInsufficient:       {http.StatusUnprocessableEntity, "Stok tidak cukup", "Stok tidak cukup."},
 	CodeBatchShelfLifeTooShort:  {http.StatusUnprocessableEntity, "Umur simpan tidak cukup", "Sisa umur simpan batch kurang dari batas channel."},
 	CodeApprovalRequired:        {http.StatusUnprocessableEntity, "Membutuhkan persetujuan", "Tindakan ini membutuhkan persetujuan. Dokumen sudah diajukan untuk persetujuan."},
+	CodeApprovalPolicyMissing:   {http.StatusUnprocessableEntity, "Kebijakan persetujuan belum diatur", "Kebijakan persetujuan untuk dokumen ini belum diatur. Hubungi Admin Sistem."},
 	CodeDiscountLimitExceeded:   {http.StatusUnprocessableEntity, "Diskon melebihi batas", "Diskon melebihi batas role Anda dan membutuhkan persetujuan."},
 	CodeCreditLimitExceeded:     {http.StatusUnprocessableEntity, "Batas kredit terlampaui", "Transaksi melebihi batas kredit pelanggan."},
 	CodeThreeWayMatchFailed:     {http.StatusUnprocessableEntity, "Tagihan tidak cocok", "Tagihan tidak cocok dengan PO dan penerimaan barang melebihi toleransi."},

@@ -491,6 +491,328 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/v1/approvals/inbox": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Persetujuan Saya — dokumen yang menunggu keputusan user
+     * @description Termasuk dokumen yang bisa diputuskan sebagai penerima delegasi atau sebagai pengganti approver.
+     *     Dokumen yang diajukan user sendiri tidak pernah muncul (pembuat tidak boleh menyetujui dokumennya sendiri).
+     *     Terlama lebih dulu.
+     */
+    get: operations["listApprovalInbox"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/approvals/inbox/count": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Jumlah dokumen yang menunggu keputusan user (badge menu) */
+    get: operations["getApprovalInboxCount"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/approvals/subject-types": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Jenis dokumen yang memakai engine approval */
+    get: operations["listApprovalSubjectTypes"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/approvals/user-options": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Mencari pengguna aktif untuk dipilih sebagai penerima delegasi, approver, atau pengganti */
+    get: operations["listApprovalUserOptions"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/approval-requests": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Riwayat permintaan persetujuan
+     * @description `scope=requested` — diajukan user; `scope=decided` — pernah diputuskan user; `scope=all` — semua dokumen
+     *     (butuh `approval.policy.read`). Dengan `subjectType` + `subjectId` mengembalikan riwayat satu dokumen
+     *     (panel Persetujuan di detail dokumen) dan `scope` diabaikan.
+     */
+    get: operations["listApprovalRequests"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/approval-requests/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail permintaan persetujuan */
+    get: operations["getApprovalRequest"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/approval-requests/{id}/approve": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Setujui level yang aktif
+     * @description Level berikutnya aktif dan approver-nya diberi notifikasi. Setelah level terakhir, modul pemilik dokumen
+     *     memproses persetujuan di transaksi yang sama. Pembuat dokumen ditolak `FORBIDDEN`.
+     */
+    post: operations["approveApprovalRequest"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/approval-requests/{id}/reject": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Tolak dokumen
+     * @description Catatan wajib diisi. Dokumen kembali ke pembuat untuk direvisi.
+     */
+    post: operations["rejectApprovalRequest"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/approval-policies": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Matriks Persetujuan
+     * @description Butuh `approval.policy.read`. Tanpa `includeEnded` hanya versi yang masih/akan berlaku.
+     */
+    get: operations["listApprovalPolicies"]
+    put?: never
+    /** Menambah level kebijakan (langsung berlaku) */
+    post: operations["createApprovalPolicy"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/approval-policies/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /**
+     * Mengubah kebijakan (versi baru mulai sekarang)
+     * @description Versi lama ditutup dan versi baru berlaku mulai sekarang (effective-dated). Jenis dokumen, divisi, dan level
+     *     tidak berubah. Dokumen yang sudah diajukan tetap memakai approver versi lama.
+     */
+    put: operations["updateApprovalPolicy"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/approval-policies/{id}/end": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Menghentikan level kebijakan mulai sekarang */
+    post: operations["endApprovalPolicy"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/approval-delegations": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Delegasi persetujuan
+     * @description Default delegasi yang melibatkan user. `all=true` untuk semua user (butuh `approval.policy.read`).
+     */
+    get: operations["listApprovalDelegations"]
+    put?: never
+    /**
+     * Mendelegasikan persetujuan selama cuti
+     * @description Tanpa `fromUserId` mendelegasikan milik user sendiri. Mencatat delegasi untuk user lain butuh
+     *     `approval.policy.write`. Satu user hanya punya satu delegasi pada tanggal yang sama; maksimal 90 hari.
+     */
+    post: operations["createApprovalDelegation"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/approval-delegations/{id}/cancel": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Menghentikan delegasi */
+    post: operations["cancelApprovalDelegation"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/notifications": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Notifikasi in-app milik user yang login */
+    get: operations["listNotifications"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/notifications/unread-count": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Jumlah notifikasi belum dibaca (badge) */
+    get: operations["getNotificationUnreadCount"]
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/notifications/read-all": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Menandai semua notifikasi sudah dibaca */
+    post: operations["markAllNotificationsRead"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/notifications/{id}/read": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Menandai notifikasi sudah dibaca */
+    post: operations["markNotificationRead"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/v1/products": {
     parameters: {
       query?: never
@@ -616,6 +938,7 @@ export interface components {
       | "STOCK_INSUFFICIENT"
       | "BATCH_SHELF_LIFE_TOO_SHORT"
       | "APPROVAL_REQUIRED"
+      | "APPROVAL_POLICY_MISSING"
       | "DISCOUNT_LIMIT_EXCEEDED"
       | "CREDIT_LIMIT_EXCEEDED"
       | "THREE_WAY_MATCH_FAILED"
@@ -871,6 +1194,221 @@ export interface components {
     }
     AuditLogList: components["schemas"]["Pagination"] & {
       items: components["schemas"]["AuditLog"][]
+    }
+    /**
+     * @description Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+     * @example 1250000.00
+     */
+    Money: string
+    /** @enum {string} */
+    ApprovalStatus: "pending_approval" | "approved" | "rejected" | "cancelled"
+    /**
+     * @description `waiting` belum aktif, `pending` menunggu keputusan, `skipped` tidak diputuskan karena dokumen ditolak/dibatalkan.
+     * @enum {string}
+     */
+    ApprovalStepStatus:
+      "waiting" | "pending" | "approved" | "rejected" | "skipped"
+    ApprovalStep: {
+      level: number
+      approverRole: string
+      approverRoleName: string
+      /** Format: uuid */
+      approverUserId?: string | null
+      approverUserName?: string | null
+      /** Format: uuid */
+      substituteUserId?: string | null
+      substituteUserName?: string | null
+      status: components["schemas"]["ApprovalStepStatus"]
+      /** Format: uuid */
+      decidedById?: string | null
+      decidedByName: string
+      /** @description Terisi jika keputusan diambil penerima delegasi atas nama approver ini. */
+      delegatedFromName?: string | null
+      note: string
+      /** Format: date-time */
+      activatedAt?: string | null
+      /** Format: date-time */
+      decidedAt?: string | null
+    }
+    ApprovalRequest: {
+      /** Format: uuid */
+      id: string
+      subjectType: string
+      subjectTypeLabel: string
+      /** Format: uuid */
+      subjectId: string
+      /** @description Nomor dokumen, mis. PO/2027/01/00012. */
+      subjectLabel: string
+      /** @description Path detail dokumen di ERP; kosong jika halaman detail belum ada. */
+      subjectLink: string
+      summary: string
+      amount: components["schemas"]["Money"]
+      /** Format: uuid */
+      divisionId?: string | null
+      /** Format: uuid */
+      requestedById: string
+      requestedByName: string
+      status: components["schemas"]["ApprovalStatus"]
+      currentLevel: number
+      totalLevels: number
+      steps: components["schemas"]["ApprovalStep"][]
+      /** Format: date-time */
+      createdAt: string
+      /** Format: date-time */
+      decidedAt?: string | null
+      version: number
+      /** @description Aksi yang boleh dilakukan user yang login (Technical Guideline 5.4). */
+      allowedActions: ("approve" | "reject")[]
+    }
+    ApprovalTask: {
+      request: components["schemas"]["ApprovalRequest"]
+      /** Format: uuid */
+      delegatedFromUserId?: string | null
+      /** @description Approver yang sedang cuti dan mendelegasikan dokumen ini kepada user. */
+      delegatedFromName?: string | null
+    }
+    ApprovalInbox: {
+      items: components["schemas"]["ApprovalTask"][]
+      totalItems: number
+    }
+    ApprovalInboxCount: {
+      pending: number
+    }
+    ApprovalCondition: {
+      code: string
+      label: string
+    }
+    ApprovalSubjectType: {
+      type: string
+      label: string
+      amountLabel: string
+      conditions: components["schemas"]["ApprovalCondition"][]
+    }
+    ApprovalUserOption: {
+      /** Format: uuid */
+      id: string
+      fullName: string
+      email: string
+    }
+    ApprovalRequestList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["ApprovalRequest"][]
+    }
+    ApprovalApproveInput: {
+      version: number
+      note?: string
+    }
+    ApprovalRejectInput: {
+      version: number
+      note: string
+    }
+    ApprovalPolicy: {
+      /** Format: uuid */
+      id: string
+      subjectType: string
+      subjectTypeLabel: string
+      /** Format: uuid */
+      divisionId?: string | null
+      level: number
+      /** @description Level berlaku jika nominal lebih dari nilai ini; kosong = semua nominal. */
+      minAmount?: components["schemas"]["Money"] | null
+      /** @description Level berlaku jika nominal paling besar nilai ini; kosong = tanpa batas. */
+      maxAmount?: components["schemas"]["Money"] | null
+      condition: string
+      approverRole: string
+      approverRoleName: string
+      /** Format: uuid */
+      approverUserId?: string | null
+      approverUserName?: string | null
+      /** Format: uuid */
+      substituteUserId?: string | null
+      substituteUserName?: string | null
+      /** Format: date-time */
+      validFrom: string
+      /** Format: date-time */
+      validTo?: string | null
+      isActive: boolean
+      /** Format: date-time */
+      updatedAt: string
+      version: number
+    }
+    ApprovalPolicyFields: {
+      minAmount?: components["schemas"]["Money"] | null
+      maxAmount?: components["schemas"]["Money"] | null
+      condition?: string
+      approverRole: string
+      /** Format: uuid */
+      approverUserId?: string | null
+      /** Format: uuid */
+      substituteUserId?: string | null
+    }
+    ApprovalPolicyInput: components["schemas"]["ApprovalPolicyFields"] & {
+      subjectType: string
+      /** Format: uuid */
+      divisionId?: string | null
+      level: number
+    }
+    ApprovalPolicyUpdate: components["schemas"]["ApprovalPolicyFields"] & {
+      version: number
+    }
+    /**
+     * Format: date
+     * @description Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+     * @example 2026-10-19
+     */
+    BusinessDate: string
+    /** @enum {string} */
+    ApprovalDelegationStatus: "scheduled" | "active" | "ended" | "cancelled"
+    ApprovalDelegation: {
+      /** Format: uuid */
+      id: string
+      /** Format: uuid */
+      fromUserId: string
+      fromUserName: string
+      /** Format: uuid */
+      toUserId: string
+      toUserName: string
+      validFrom: components["schemas"]["BusinessDate"]
+      validTo: components["schemas"]["BusinessDate"]
+      reason: string
+      status: components["schemas"]["ApprovalDelegationStatus"]
+      /** Format: date-time */
+      cancelledAt?: string | null
+      version: number
+    }
+    ApprovalDelegationInput: {
+      /** Format: uuid */
+      fromUserId?: string | null
+      /** Format: uuid */
+      toUserId: string
+      validFrom: components["schemas"]["BusinessDate"]
+      validTo: components["schemas"]["BusinessDate"]
+      reason?: string
+    }
+    Notification: {
+      /** Format: uuid */
+      id: string
+      /**
+       * @description Jenis notifikasi `<modul>.<peristiwa>`, mis. `approval.pending`.
+       * @example approval.pending
+       */
+      kind: string
+      title: string
+      body: string
+      /** @description Path ERP yang dibuka saat notifikasi diklik; kosong jika tidak ada. */
+      link: string
+      /** Format: date-time */
+      readAt?: string | null
+      /** Format: date-time */
+      createdAt: string
+    }
+    NotificationList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["Notification"][]
+      /** Format: int64 */
+      unreadCount: number
+    }
+    NotificationUnreadCount: {
+      /** Format: int64 */
+      unreadCount: number
     }
     /** @enum {string} */
     ProductType: "finished_good" | "packaging" | "reprocess_material"
@@ -1745,6 +2283,491 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["AuditLogList"]
         }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listApprovalInbox: {
+    parameters: {
+      query?: {
+        subjectType?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Dokumen menunggu keputusan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApprovalInbox"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getApprovalInboxCount: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Jumlah dokumen */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApprovalInboxCount"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listApprovalSubjectTypes: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Jenis dokumen */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApprovalSubjectType"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listApprovalUserOptions: {
+    parameters: {
+      query?: {
+        q?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Maksimal 20 pengguna */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApprovalUserOption"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listApprovalRequests: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        scope?: "requested" | "decided" | "all"
+        status?: components["schemas"]["ApprovalStatus"]
+        subjectType?: string
+        subjectId?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Permintaan persetujuan, terbaru lebih dulu */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApprovalRequestList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getApprovalRequest: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Permintaan persetujuan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApprovalRequest"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  approveApprovalRequest: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ApprovalApproveInput"]
+      }
+    }
+    responses: {
+      /** @description Keputusan tersimpan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApprovalRequest"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  rejectApprovalRequest: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ApprovalRejectInput"]
+      }
+    }
+    responses: {
+      /** @description Dokumen ditolak */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApprovalRequest"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listApprovalPolicies: {
+    parameters: {
+      query?: {
+        subjectType?: string
+        includeEnded?: boolean
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Kebijakan per jenis dokumen dan level */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApprovalPolicy"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createApprovalPolicy: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ApprovalPolicyInput"]
+      }
+    }
+    responses: {
+      /** @description Kebijakan dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApprovalPolicy"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateApprovalPolicy: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ApprovalPolicyUpdate"]
+      }
+    }
+    responses: {
+      /** @description Versi baru kebijakan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApprovalPolicy"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  endApprovalPolicy: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Kebijakan dihentikan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApprovalPolicy"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listApprovalDelegations: {
+    parameters: {
+      query?: {
+        all?: boolean
+        includePast?: boolean
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Delegasi, terbaru lebih dulu */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApprovalDelegation"][]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createApprovalDelegation: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ApprovalDelegationInput"]
+      }
+    }
+    responses: {
+      /** @description Delegasi dibuat */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApprovalDelegation"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  cancelApprovalDelegation: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Delegasi dihentikan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ApprovalDelegation"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listNotifications: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        unreadOnly?: boolean
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Daftar notifikasi, terbaru lebih dulu */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["NotificationList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getNotificationUnreadCount: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Jumlah notifikasi belum dibaca */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["NotificationUnreadCount"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  markAllNotificationsRead: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Semua ditandai sudah dibaca */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  markNotificationRead: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ditandai sudah dibaca */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       default: components["responses"]["Problem"]
     }

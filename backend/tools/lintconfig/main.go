@@ -13,6 +13,9 @@ import (
 
 const modulePath = "balans/internal/"
 
+// depguard mencocokkan prefix; "app$" mencocokkan package wiring persis agar tidak ikut menolak
+// modul berawalan sama seperti "approval".
+
 // tiers mengikuti arah dependensi umum: modul hanya boleh mengimpor API publik modul di tingkat
 // yang sama atau lebih rendah. Indeks lebih kecil = lebih rendah.
 var tiers = [][]string{
@@ -57,7 +60,7 @@ func rules() []rule {
 	}
 	platform.deny = append(platform.deny,
 		[2]string{modulePath + "integration", "platform tidak boleh bergantung pada adapter"},
-		[2]string{modulePath + "app", "platform tidak boleh bergantung pada wiring"})
+		[2]string{modulePath + "app$", "platform tidak boleh bergantung pada wiring"})
 	out = append(out, platform)
 
 	for _, m := range modules {
@@ -73,7 +76,7 @@ func rules() []rule {
 		}
 		r.deny = append(r.deny,
 			[2]string{modulePath + "integration", "modul bergantung pada interface, bukan adapter"},
-			[2]string{modulePath + "app", "modul tidak boleh bergantung pada wiring"})
+			[2]string{modulePath + "app$", "modul tidak boleh bergantung pada wiring"})
 		out = append(out, r)
 	}
 
@@ -81,7 +84,7 @@ func rules() []rule {
 	for _, m := range modules {
 		integration.deny = append(integration.deny, [2]string{modulePath + m + "/", "adapter hanya memakai API publik modul " + m})
 	}
-	integration.deny = append(integration.deny, [2]string{modulePath + "app", "adapter tidak boleh bergantung pada wiring"})
+	integration.deny = append(integration.deny, [2]string{modulePath + "app$", "adapter tidak boleh bergantung pada wiring"})
 	out = append(out, integration)
 	return out
 }

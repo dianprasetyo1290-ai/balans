@@ -35,6 +35,7 @@ func (e DatabaseInfoStatus) Valid() bool {
 
 // Defines values for ErrorCode.
 const (
+	APPROVALPOLICYMISSING     ErrorCode = "APPROVAL_POLICY_MISSING"
 	APPROVALREQUIRED          ErrorCode = "APPROVAL_REQUIRED"
 	AUTHACCOUNTLOCKED         ErrorCode = "AUTH_ACCOUNT_LOCKED"
 	AUTHINVALIDCREDENTIALS    ErrorCode = "AUTH_INVALID_CREDENTIALS"
@@ -74,6 +75,8 @@ const (
 // Valid indicates whether the value is a known member of the ErrorCode enum.
 func (e ErrorCode) Valid() bool {
 	switch e {
+	case APPROVALPOLICYMISSING:
+		return true
 	case APPROVALREQUIRED:
 		return true
 	case AUTHACCOUNTLOCKED:

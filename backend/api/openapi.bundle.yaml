@@ -20,6 +20,10 @@ tags:
     description: Sesi, pengguna, dan permission (R1.1)
   - name: audit
     description: Riwayat perubahan (audit trail)
+  - name: approval
+    description: Engine & inbox persetujuan (R1.1)
+  - name: notification
+    description: Notifikasi in-app (R1.1)
   - name: catalog
     description: Master produk, packaging, material, bundling (R1.1)
   - name: warehouse
@@ -653,6 +657,442 @@ paths:
                 $ref: '#/components/schemas/AuditLogList'
         default:
           $ref: '#/components/responses/Problem'
+  /api/v1/approvals/inbox:
+    get:
+      operationId: listApprovalInbox
+      tags:
+        - approval
+      summary: Persetujuan Saya — dokumen yang menunggu keputusan user
+      description: |
+        Termasuk dokumen yang bisa diputuskan sebagai penerima delegasi atau sebagai pengganti approver.
+        Dokumen yang diajukan user sendiri tidak pernah muncul (pembuat tidak boleh menyetujui dokumennya sendiri).
+        Terlama lebih dulu.
+      parameters:
+        - name: subjectType
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Dokumen menunggu keputusan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalInbox'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/approvals/inbox/count:
+    get:
+      operationId: getApprovalInboxCount
+      tags:
+        - approval
+      summary: Jumlah dokumen yang menunggu keputusan user (badge menu)
+      responses:
+        '200':
+          description: Jumlah dokumen
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalInboxCount'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/approvals/subject-types:
+    get:
+      operationId: listApprovalSubjectTypes
+      tags:
+        - approval
+      summary: Jenis dokumen yang memakai engine approval
+      responses:
+        '200':
+          description: Jenis dokumen
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApprovalSubjectType'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/approvals/user-options:
+    get:
+      operationId: listApprovalUserOptions
+      tags:
+        - approval
+      summary: Mencari pengguna aktif untuk dipilih sebagai penerima delegasi, approver, atau pengganti
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+            maxLength: 100
+      responses:
+        '200':
+          description: Maksimal 20 pengguna
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApprovalUserOption'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/approval-requests:
+    get:
+      operationId: listApprovalRequests
+      tags:
+        - approval
+      summary: Riwayat permintaan persetujuan
+      description: |
+        `scope=requested` — diajukan user; `scope=decided` — pernah diputuskan user; `scope=all` — semua dokumen
+        (butuh `approval.policy.read`). Dengan `subjectType` + `subjectId` mengembalikan riwayat satu dokumen
+        (panel Persetujuan di detail dokumen) dan `scope` diabaikan.
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - name: scope
+          in: query
+          schema:
+            type: string
+            enum:
+              - requested
+              - decided
+              - all
+            default: requested
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/ApprovalStatus'
+        - name: subjectType
+          in: query
+          schema:
+            type: string
+        - name: subjectId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Permintaan persetujuan, terbaru lebih dulu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalRequestList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/approval-requests/{id}:
+    get:
+      operationId: getApprovalRequest
+      tags:
+        - approval
+      summary: Detail permintaan persetujuan
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Permintaan persetujuan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalRequest'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/approval-requests/{id}/approve:
+    post:
+      operationId: approveApprovalRequest
+      tags:
+        - approval
+      summary: Setujui level yang aktif
+      description: |
+        Level berikutnya aktif dan approver-nya diberi notifikasi. Setelah level terakhir, modul pemilik dokumen
+        memproses persetujuan di transaksi yang sama. Pembuat dokumen ditolak `FORBIDDEN`.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApprovalApproveInput'
+      responses:
+        '200':
+          description: Keputusan tersimpan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalRequest'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/approval-requests/{id}/reject:
+    post:
+      operationId: rejectApprovalRequest
+      tags:
+        - approval
+      summary: Tolak dokumen
+      description: Catatan wajib diisi. Dokumen kembali ke pembuat untuk direvisi.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApprovalRejectInput'
+      responses:
+        '200':
+          description: Dokumen ditolak
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalRequest'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/approval-policies:
+    get:
+      operationId: listApprovalPolicies
+      tags:
+        - approval
+      summary: Matriks Persetujuan
+      description: Butuh `approval.policy.read`. Tanpa `includeEnded` hanya versi yang masih/akan berlaku.
+      parameters:
+        - name: subjectType
+          in: query
+          schema:
+            type: string
+        - name: includeEnded
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Kebijakan per jenis dokumen dan level
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApprovalPolicy'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createApprovalPolicy
+      tags:
+        - approval
+      summary: Menambah level kebijakan (langsung berlaku)
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApprovalPolicyInput'
+      responses:
+        '201':
+          description: Kebijakan dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalPolicy'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/approval-policies/{id}:
+    put:
+      operationId: updateApprovalPolicy
+      tags:
+        - approval
+      summary: Mengubah kebijakan (versi baru mulai sekarang)
+      description: |
+        Versi lama ditutup dan versi baru berlaku mulai sekarang (effective-dated). Jenis dokumen, divisi, dan level
+        tidak berubah. Dokumen yang sudah diajukan tetap memakai approver versi lama.
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApprovalPolicyUpdate'
+      responses:
+        '200':
+          description: Versi baru kebijakan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalPolicy'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/approval-policies/{id}/end:
+    post:
+      operationId: endApprovalPolicy
+      tags:
+        - approval
+      summary: Menghentikan level kebijakan mulai sekarang
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Kebijakan dihentikan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalPolicy'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/approval-delegations:
+    get:
+      operationId: listApprovalDelegations
+      tags:
+        - approval
+      summary: Delegasi persetujuan
+      description: Default delegasi yang melibatkan user. `all=true` untuk semua user (butuh `approval.policy.read`).
+      parameters:
+        - name: all
+          in: query
+          schema:
+            type: boolean
+            default: false
+        - name: includePast
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Delegasi, terbaru lebih dulu
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApprovalDelegation'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      operationId: createApprovalDelegation
+      tags:
+        - approval
+      summary: Mendelegasikan persetujuan selama cuti
+      description: |
+        Tanpa `fromUserId` mendelegasikan milik user sendiri. Mencatat delegasi untuk user lain butuh
+        `approval.policy.write`. Satu user hanya punya satu delegasi pada tanggal yang sama; maksimal 90 hari.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApprovalDelegationInput'
+      responses:
+        '201':
+          description: Delegasi dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalDelegation'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/approval-delegations/{id}/cancel:
+    post:
+      operationId: cancelApprovalDelegation
+      tags:
+        - approval
+      summary: Menghentikan delegasi
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionInput'
+      responses:
+        '200':
+          description: Delegasi dihentikan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalDelegation'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/notifications:
+    get:
+      operationId: listNotifications
+      tags:
+        - notification
+      summary: Notifikasi in-app milik user yang login
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - name: unreadOnly
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Daftar notifikasi, terbaru lebih dulu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationList'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/notifications/unread-count:
+    get:
+      operationId: getNotificationUnreadCount
+      tags:
+        - notification
+      summary: Jumlah notifikasi belum dibaca (badge)
+      responses:
+        '200':
+          description: Jumlah notifikasi belum dibaca
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationUnreadCount'
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/notifications/read-all:
+    post:
+      operationId: markAllNotificationsRead
+      tags:
+        - notification
+      summary: Menandai semua notifikasi sudah dibaca
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '204':
+          description: Semua ditandai sudah dibaca
+        default:
+          $ref: '#/components/responses/Problem'
+  /api/v1/notifications/{id}/read:
+    post:
+      operationId: markNotificationRead
+      tags:
+        - notification
+      summary: Menandai notifikasi sudah dibaca
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '204':
+          description: Ditandai sudah dibaca
+        default:
+          $ref: '#/components/responses/Problem'
   /api/v1/products:
     get:
       operationId: listProducts
@@ -915,6 +1355,7 @@ components:
         - STOCK_INSUFFICIENT
         - BATCH_SHELF_LIFE_TOO_SHORT
         - APPROVAL_REQUIRED
+        - APPROVAL_POLICY_MISSING
         - DISCOUNT_LIMIT_EXCEEDED
         - CREDIT_LIMIT_EXCEEDED
         - THREE_WAY_MATCH_FAILED
@@ -1504,6 +1945,517 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/AuditLog'
+    Money:
+      type: string
+      description: Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+      pattern: ^-?[0-9]{1,16}(\.[0-9]{1,2})?$
+      example: '1250000.00'
+    ApprovalStatus:
+      type: string
+      enum:
+        - pending_approval
+        - approved
+        - rejected
+        - cancelled
+    ApprovalStepStatus:
+      type: string
+      description: '`waiting` belum aktif, `pending` menunggu keputusan, `skipped` tidak diputuskan karena dokumen ditolak/dibatalkan.'
+      enum:
+        - waiting
+        - pending
+        - approved
+        - rejected
+        - skipped
+    ApprovalStep:
+      type: object
+      required:
+        - level
+        - approverRole
+        - approverRoleName
+        - status
+        - note
+        - decidedByName
+      properties:
+        level:
+          type: integer
+        approverRole:
+          type: string
+        approverRoleName:
+          type: string
+        approverUserId:
+          type: string
+          format: uuid
+          nullable: true
+        approverUserName:
+          type: string
+          nullable: true
+        substituteUserId:
+          type: string
+          format: uuid
+          nullable: true
+        substituteUserName:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/ApprovalStepStatus'
+        decidedById:
+          type: string
+          format: uuid
+          nullable: true
+        decidedByName:
+          type: string
+        delegatedFromName:
+          type: string
+          nullable: true
+          description: Terisi jika keputusan diambil penerima delegasi atas nama approver ini.
+        note:
+          type: string
+        activatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        decidedAt:
+          type: string
+          format: date-time
+          nullable: true
+    ApprovalRequest:
+      type: object
+      required:
+        - id
+        - subjectType
+        - subjectTypeLabel
+        - subjectId
+        - subjectLabel
+        - subjectLink
+        - summary
+        - amount
+        - requestedById
+        - requestedByName
+        - status
+        - currentLevel
+        - totalLevels
+        - steps
+        - createdAt
+        - version
+        - allowedActions
+      properties:
+        id:
+          type: string
+          format: uuid
+        subjectType:
+          type: string
+        subjectTypeLabel:
+          type: string
+        subjectId:
+          type: string
+          format: uuid
+        subjectLabel:
+          type: string
+          description: Nomor dokumen, mis. PO/2027/01/00012.
+        subjectLink:
+          type: string
+          description: Path detail dokumen di ERP; kosong jika halaman detail belum ada.
+        summary:
+          type: string
+        amount:
+          $ref: '#/components/schemas/Money'
+        divisionId:
+          type: string
+          format: uuid
+          nullable: true
+        requestedById:
+          type: string
+          format: uuid
+        requestedByName:
+          type: string
+        status:
+          $ref: '#/components/schemas/ApprovalStatus'
+        currentLevel:
+          type: integer
+        totalLevels:
+          type: integer
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApprovalStep'
+        createdAt:
+          type: string
+          format: date-time
+        decidedAt:
+          type: string
+          format: date-time
+          nullable: true
+        version:
+          type: integer
+        allowedActions:
+          type: array
+          description: Aksi yang boleh dilakukan user yang login (Technical Guideline 5.4).
+          items:
+            type: string
+            enum:
+              - approve
+              - reject
+    ApprovalTask:
+      type: object
+      required:
+        - request
+      properties:
+        request:
+          $ref: '#/components/schemas/ApprovalRequest'
+        delegatedFromUserId:
+          type: string
+          format: uuid
+          nullable: true
+        delegatedFromName:
+          type: string
+          nullable: true
+          description: Approver yang sedang cuti dan mendelegasikan dokumen ini kepada user.
+    ApprovalInbox:
+      type: object
+      required:
+        - items
+        - totalItems
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApprovalTask'
+        totalItems:
+          type: integer
+    ApprovalInboxCount:
+      type: object
+      required:
+        - pending
+      properties:
+        pending:
+          type: integer
+    ApprovalCondition:
+      type: object
+      required:
+        - code
+        - label
+      properties:
+        code:
+          type: string
+        label:
+          type: string
+    ApprovalSubjectType:
+      type: object
+      required:
+        - type
+        - label
+        - amountLabel
+        - conditions
+      properties:
+        type:
+          type: string
+        label:
+          type: string
+        amountLabel:
+          type: string
+        conditions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApprovalCondition'
+    ApprovalUserOption:
+      type: object
+      required:
+        - id
+        - fullName
+        - email
+      properties:
+        id:
+          type: string
+          format: uuid
+        fullName:
+          type: string
+        email:
+          type: string
+    ApprovalRequestList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/ApprovalRequest'
+    ApprovalApproveInput:
+      type: object
+      required:
+        - version
+      properties:
+        version:
+          type: integer
+        note:
+          type: string
+          maxLength: 1000
+    ApprovalRejectInput:
+      type: object
+      required:
+        - version
+        - note
+      properties:
+        version:
+          type: integer
+        note:
+          type: string
+          minLength: 1
+          maxLength: 1000
+    ApprovalPolicy:
+      type: object
+      required:
+        - id
+        - subjectType
+        - subjectTypeLabel
+        - level
+        - condition
+        - approverRole
+        - approverRoleName
+        - validFrom
+        - isActive
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        subjectType:
+          type: string
+        subjectTypeLabel:
+          type: string
+        divisionId:
+          type: string
+          format: uuid
+          nullable: true
+        level:
+          type: integer
+        minAmount:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          nullable: true
+          description: Level berlaku jika nominal lebih dari nilai ini; kosong = semua nominal.
+        maxAmount:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          nullable: true
+          description: Level berlaku jika nominal paling besar nilai ini; kosong = tanpa batas.
+        condition:
+          type: string
+        approverRole:
+          type: string
+        approverRoleName:
+          type: string
+        approverUserId:
+          type: string
+          format: uuid
+          nullable: true
+        approverUserName:
+          type: string
+          nullable: true
+        substituteUserId:
+          type: string
+          format: uuid
+          nullable: true
+        substituteUserName:
+          type: string
+          nullable: true
+        validFrom:
+          type: string
+          format: date-time
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
+        isActive:
+          type: boolean
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+    ApprovalPolicyFields:
+      type: object
+      required:
+        - approverRole
+      properties:
+        minAmount:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          nullable: true
+        maxAmount:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          nullable: true
+        condition:
+          type: string
+        approverRole:
+          type: string
+        approverUserId:
+          type: string
+          format: uuid
+          nullable: true
+        substituteUserId:
+          type: string
+          format: uuid
+          nullable: true
+    ApprovalPolicyInput:
+      allOf:
+        - $ref: '#/components/schemas/ApprovalPolicyFields'
+        - type: object
+          required:
+            - subjectType
+            - level
+          properties:
+            subjectType:
+              type: string
+            divisionId:
+              type: string
+              format: uuid
+              nullable: true
+            level:
+              type: integer
+              minimum: 1
+              maximum: 9
+    ApprovalPolicyUpdate:
+      allOf:
+        - $ref: '#/components/schemas/ApprovalPolicyFields'
+        - type: object
+          required:
+            - version
+          properties:
+            version:
+              type: integer
+    BusinessDate:
+      type: string
+      format: date
+      description: Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+      example: '2026-10-19'
+    ApprovalDelegationStatus:
+      type: string
+      enum:
+        - scheduled
+        - active
+        - ended
+        - cancelled
+    ApprovalDelegation:
+      type: object
+      required:
+        - id
+        - fromUserId
+        - fromUserName
+        - toUserId
+        - toUserName
+        - validFrom
+        - validTo
+        - reason
+        - status
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        fromUserId:
+          type: string
+          format: uuid
+        fromUserName:
+          type: string
+        toUserId:
+          type: string
+          format: uuid
+        toUserName:
+          type: string
+        validFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        validTo:
+          $ref: '#/components/schemas/BusinessDate'
+        reason:
+          type: string
+        status:
+          $ref: '#/components/schemas/ApprovalDelegationStatus'
+        cancelledAt:
+          type: string
+          format: date-time
+          nullable: true
+        version:
+          type: integer
+    ApprovalDelegationInput:
+      type: object
+      required:
+        - toUserId
+        - validFrom
+        - validTo
+      properties:
+        fromUserId:
+          type: string
+          format: uuid
+          nullable: true
+        toUserId:
+          type: string
+          format: uuid
+        validFrom:
+          $ref: '#/components/schemas/BusinessDate'
+        validTo:
+          $ref: '#/components/schemas/BusinessDate'
+        reason:
+          type: string
+          maxLength: 500
+    Notification:
+      type: object
+      required:
+        - id
+        - kind
+        - title
+        - body
+        - link
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          description: Jenis notifikasi `<modul>.<peristiwa>`, mis. `approval.pending`.
+          example: approval.pending
+        title:
+          type: string
+        body:
+          type: string
+        link:
+          type: string
+          description: Path ERP yang dibuka saat notifikasi diklik; kosong jika tidak ada.
+        readAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+    NotificationList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          required:
+            - items
+            - unreadCount
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/Notification'
+            unreadCount:
+              type: integer
+              format: int64
+    NotificationUnreadCount:
+      type: object
+      required:
+        - unreadCount
+      properties:
+        unreadCount:
+          type: integer
+          format: int64
     ProductType:
       type: string
       enum:

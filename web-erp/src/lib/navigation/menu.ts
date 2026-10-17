@@ -33,6 +33,10 @@ export type MenuItem = {
   optional?: string
   /** Permission minimal untuk melihat halaman; kosong = semua user login. */
   permission?: string
+  /** Modul pemilik halaman; item disembunyikan jika modul tidak aktif. Kosong = ikut grup. */
+  module?: string
+  /** Badge jumlah di menu, mis. dokumen yang menunggu persetujuan (NFR-11). */
+  badge?: "approvalInbox"
 }
 
 export type MenuGroup = {
@@ -54,6 +58,12 @@ export const MENU: MenuGroup[] = [
     items: [
       { label: "Ringkasan Operasional", to: "/" },
       { label: "Dashboard Eksekutif" },
+      {
+        label: "Persetujuan Saya",
+        to: "/approvals",
+        module: "approval",
+        badge: "approvalInbox",
+      },
     ],
   },
   {
@@ -351,8 +361,13 @@ export const MENU: MenuGroup[] = [
         to: "/settings/roles",
         permission: "identity.role.read",
       },
+      {
+        label: "Matriks Persetujuan",
+        to: "/settings/approval-policies",
+        permission: "approval.policy.read",
+        module: "approval",
+      },
       ...items(
-        "Matriks Persetujuan",
         "Notifikasi",
         "Nomor Dokumen",
         "Template Dokumen",
@@ -382,6 +397,7 @@ export function visibleMenu(
     items: group.items.filter(
       (item) =>
         item.to &&
+        (!item.module || enabledModules.includes(item.module)) &&
         (!item.optional || takenOptions.includes(item.optional)) &&
         (!item.permission ||
           !permissions ||

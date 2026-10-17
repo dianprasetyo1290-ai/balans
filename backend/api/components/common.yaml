@@ -28,6 +28,16 @@ AuditFields:
     version:
       type: integer
       description: Dipakai optimistic locking; kirim kembali saat update (Technical Guideline 7.2).
+Money:
+  type: string
+  description: Nominal Rupiah sebagai string desimal 2 angka di belakang koma (Technical Guideline 10.5).
+  pattern: "^-?[0-9]{1,16}(\\.[0-9]{1,2})?$"
+  example: "1250000.00"
+BusinessDate:
+  type: string
+  format: date
+  description: Tanggal bisnis WIB tanpa jam (YYYY-MM-DD).
+  example: "2026-10-19"
 VersionInput:
   type: object
   required: [version]
