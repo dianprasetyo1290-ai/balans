@@ -108,7 +108,18 @@ export const MENU: MenuGroup[] = [
         permission: "catalog.product.read",
         module: "catalog",
       },
-      ...items("Daftar Harga", "Aturan Harga"),
+      {
+        label: "Daftar Harga",
+        to: "/master/price-lists",
+        permission: ["pricing.price_list.read", "pricing.price_list.approve"],
+        module: "pricing",
+      },
+      {
+        label: "Aturan Harga",
+        to: "/master/price-rules",
+        permission: ["pricing.promotion.read", "pricing.special_price.read"],
+        module: "pricing",
+      },
       {
         label: "Pelanggan",
         to: "/master/customers",
@@ -278,21 +289,33 @@ export const MENU: MenuGroup[] = [
   {
     label: "Penjualan",
     icon: ShoppingBagIcon,
-    modules: ["sales"],
-    items: items(
-      "Sales Order",
-      "Modern Trade",
-      "Konsinyasi",
-      "Penjualan Marketplace",
-      "Pesanan WhatsApp/Instagram",
-      "Penjualan Karyawan",
-      "Proforma Invoice",
-      "Invoice",
-      "Retur Penjualan",
-      "Nota Kredit",
-      "Rekonsiliasi Konsinyasi",
-      "Harga & Diskon"
-    ),
+    modules: ["sales", "pricing"],
+    items: [
+      ...items(
+        "Sales Order",
+        "Modern Trade",
+        "Konsinyasi",
+        "Penjualan Marketplace",
+        "Pesanan WhatsApp/Instagram",
+        "Penjualan Karyawan",
+        "Proforma Invoice",
+        "Invoice",
+        "Retur Penjualan",
+        "Nota Kredit",
+        "Rekonsiliasi Konsinyasi"
+      ),
+      {
+        label: "Harga & Diskon",
+        to: "/sales/pricing",
+        permission: [
+          "pricing.price_list.read",
+          "pricing.promotion.read",
+          "pricing.special_price.read",
+          "pricing.discount_limit.read",
+        ],
+        module: "pricing",
+      },
+    ],
   },
   {
     label: "Pipeline Penjualan",

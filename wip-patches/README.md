@@ -5,6 +5,5 @@ diverifikasi. Terapkan dengan `git apply --3way wip-patches/<nama>.patch` di ata
 
 | Patch | Isi |
 |---|---|
-| agent-a55002e01cb8a442e | Harga & diskon (S-116 – S-119) |
 | agent-a7fb15a21b5f0a365 | Inbound/QC, transfer, Petty Stock, stock count (S-211, S-216 – S-219, S-226) |
 | agent-a1b1ce47e3b44c80c | Pemakaian internal, event, repacking, pemusnahan, disposisi retur, recost (S-220 – S-224, S-227) |

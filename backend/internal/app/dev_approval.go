@@ -44,7 +44,6 @@ func devApprovalSamples() []devApprovalSample {
 	return []devApprovalSample{
 		{"marketing", sample(approval.SubjectExpenseClaim, "EXP/2026/10/90001", "Biaya booth event Jakarta Fair", 3_200_000)},
 		{"warehouse_staff", sample(approval.SubjectReturnDisposition, "RJ/2026/10/90001", "Retur MT · 3 baris pemusnahan", 1_750_000, approval.ConditionHasDisposal)},
-		{"sales_mt", sample(approval.SubjectPriceListVersion, "Daftar Harga MT 2026-11", "Kenaikan harga 3% untuk modern trade", 0)},
 	}
 }
 
