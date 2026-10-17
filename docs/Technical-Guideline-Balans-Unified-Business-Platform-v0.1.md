@@ -1720,6 +1720,7 @@ Kode baru ditambahkan lewat PR yang mengubah lampiran ini, `apperr`, OpenAPI, da
 | `inventory.alert_min_stock` | default | Harian 07.00 | 3 |
 | `dataexchange.import` / `dataexchange.export` | bulk | Diminta user | 3 |
 | `marketplace.sync_orders` / `marketplace.sync_stock` | default | Tiap 5–15 menit (Fase marketplace) | 25 (± 24 jam) |
+| `accounting.ensure_fiscal_periods` | default | Harian 00.05 dan saat worker mulai: buat periode bulan berjalan & berikutnya | 3 |
 | `accounting.depreciate` | bulk | Tanggal 1, 01.00, untuk bulan sebelumnya | 3 |
 | `accounting.refresh_read_models` | bulk | Tiap 15 menit | 3 |
 | `payroll.run` | bulk | Diminta HRGA | 3 |
