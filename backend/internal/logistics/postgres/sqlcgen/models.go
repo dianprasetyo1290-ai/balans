@@ -235,6 +235,121 @@ type Channel struct {
 	DeletedBy uuid.NullUUID
 }
 
+type ConsignmentDelivery struct {
+	ID                 uuid.UUID
+	Number             pgtype.Text
+	DeliveryType       string
+	PartnerID          uuid.UUID
+	PartnerCode        string
+	PartnerName        string
+	PartnerAgreementID uuid.NullUUID
+	AgreementNumber    string
+	FromLocationID     uuid.UUID
+	ToLocationID       uuid.UUID
+	ChannelID          uuid.UUID
+	SubChannelID       uuid.UUID
+	BusinessDate       clock.BusinessDate
+	Status             string
+	SourceType         string
+	SourceID           uuid.NullUUID
+	TransferID         uuid.NullUUID
+	TransferNumber     string
+	CostAmount         decimal.Decimal
+	Note               string
+	CancelReason       string
+	ShippedAt          *time.Time
+	ReceivedAt         *time.Time
+	CreatedAt          time.Time
+	CreatedBy          uuid.UUID
+	UpdatedAt          time.Time
+	UpdatedBy          uuid.UUID
+	Version            int32
+	DeletedAt          *time.Time
+	DeletedBy          uuid.NullUUID
+}
+
+type ConsignmentDeliveryLine struct {
+	ID         uuid.UUID
+	DeliveryID uuid.UUID
+	LineNo     int32
+	ProductID  uuid.UUID
+	BatchID    uuid.NullUUID
+	Qty        decimal.Decimal
+	CostAmount decimal.Decimal
+	Note       string
+}
+
+type ConsignmentReconciliation struct {
+	ID                   uuid.UUID
+	Number               pgtype.Text
+	PartnerID            uuid.UUID
+	PartnerCode          string
+	PartnerName          string
+	PartnerAddress       string
+	PartnerAgreementID   uuid.NullUUID
+	AgreementNumber      string
+	PaymentTermDays      int32
+	MarginPercent        decimal.NullDecimal
+	LossBorneBy          string
+	PartnerDamageBorneBy string
+	ProductDefectBorneBy string
+	NearExpiryBorneBy    string
+	LocationID           uuid.UUID
+	ChannelID            uuid.UUID
+	SubChannelID         uuid.UUID
+	PeriodStart          pgtype.Date
+	CutOffDate           clock.BusinessDate
+	StockCountID         uuid.UUID
+	StockCountNumber     string
+	PartnerReportFileID  uuid.NullUUID
+	BaFileID             uuid.NullUUID
+	Status               string
+	Note                 string
+	SalesAmount          decimal.Decimal
+	BilledVarianceAmount decimal.Decimal
+	AbsorbedVarianceCost decimal.Decimal
+	CostAmount           decimal.Decimal
+	InvoiceID            uuid.NullUUID
+	VarianceInvoiceID    uuid.NullUUID
+	StartedAt            *time.Time
+	SubmittedAt          *time.Time
+	DecidedAt            *time.Time
+	DecisionNote         string
+	PostedAt             *time.Time
+	CancelReason         string
+	CreatedAt            time.Time
+	CreatedBy            uuid.UUID
+	UpdatedAt            time.Time
+	UpdatedBy            uuid.UUID
+	Version              int32
+	DeletedAt            *time.Time
+	DeletedBy            uuid.NullUUID
+}
+
+type ConsignmentReconciliationLine struct {
+	ID                 uuid.UUID
+	ReconciliationID   uuid.UUID
+	LineNo             int32
+	ProductID          uuid.UUID
+	OpeningQty         decimal.Decimal
+	DeliveredQty       decimal.Decimal
+	ReturnedQty        decimal.Decimal
+	CountedQty         decimal.Decimal
+	SoldQty            decimal.Decimal
+	ReportedQty        decimal.Decimal
+	VarianceQty        decimal.Decimal
+	VarianceCause      string
+	VarianceBorneBy    string
+	UnitPriceAmount    decimal.Decimal
+	PriceRule          string
+	PriceDescription   string
+	SalesAmount        decimal.Decimal
+	VarianceAmount     decimal.Decimal
+	CostAmount         decimal.Decimal
+	VarianceCostAmount decimal.Decimal
+	Note               string
+}
+
 type CostLayer struct {
 	ID           uuid.UUID
 	ProductID    uuid.UUID

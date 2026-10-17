@@ -745,6 +745,241 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/api/v1/sales/consignment-deliveries": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Daftar pengiriman konsinyasi & buffer vending (Penjualan › Konsinyasi, S-303) */
+    get: operations["listConsignmentDeliveries"]
+    put?: never
+    /**
+     * Menyimpan draft pengiriman konsinyasi / buffer vending
+     * @description Hanya bila mitra punya PKS konsinyasi berlaku pada tanggal kirim (`party.RequireActiveAgreement`). Tujuan =
+     *     lokasi konsinyasi (atau buffer vending) milik mitra; lokasi asal FG Non-Ecommerce.
+     */
+    post: operations["createConsignmentDelivery"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/consignment-deliveries/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail pengiriman konsinyasi */
+    get: operations["getConsignmentDelivery"]
+    /** Mengubah draft pengiriman konsinyasi */
+    put: operations["updateConsignmentDelivery"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/consignment-deliveries/{id}/ship": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Kirim barang titipan (nomor DO, Transfer Stok, jurnal A-07 / A-24)
+     * @description Logistik (`logistics.delivery_order.post`). PKS diperiksa ulang; stok FEFO pindah ke lokasi mitra berstatus
+     *     Dalam Pengiriman; jurnal A-07 (Dr 1312 Cr 1311) atau A-24 (Dr 1313 Cr 1311) sebesar nilai FIFO dengan dimensi
+     *     channel konsinyasi/vending + sub-channel mitra.
+     */
+    post: operations["shipConsignmentDelivery"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/consignment-deliveries/{id}/receive": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Barang titipan diterima mitra (stok Tersedia di lokasi mitra) */
+    post: operations["receiveConsignmentDelivery"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/consignment-deliveries/{id}/cancel": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Batalkan draft pengiriman konsinyasi */
+    post: operations["cancelConsignmentDelivery"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/consignment-reconciliations": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Daftar Rekonsiliasi Konsinyasi (S-304) */
+    get: operations["listConsignmentReconciliations"]
+    put?: never
+    /**
+     * Menyimpan draft rekonsiliasi (mitra, cut-off, stock count lokasi mitra)
+     * @description Stock count harus berjenis konsinyasi, Selesai, di lokasi konsinyasi mitra, dan bertanggal paling jauh 7 hari
+     *     dari cut-off. Satu rekonsiliasi terbuka per mitra.
+     */
+    post: operations["createConsignmentReconciliation"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/consignment-reconciliations/{id}": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detail rekonsiliasi (dan data cetak Berita Acara Rekonsiliasi) */
+    get: operations["getConsignmentReconciliation"]
+    /** Mengubah draft rekonsiliasi */
+    put: operations["updateConsignmentReconciliationDraft"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/consignment-reconciliations/{id}/start": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Mulai rekonsiliasi (nomor KSN; hitung stok awal, kiriman, tarikan, sisa fisik, terjual sistem)
+     * @description PKS konsinyasi berlaku pada cut-off disalin (harga, termin, ketentuan selisih). Periode = hari setelah cut-off
+     *     rekonsiliasi Diposting sebelumnya (atau tanggal 1 bulan cut-off) s.d. cut-off. Terjual sistem = stok awal +
+     *     kiriman − tarikan − sisa fisik. Harga konsinyasi dari resolver harga (daftar harga PKS).
+     */
+    post: operations["startConsignmentReconciliation"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/consignment-reconciliations/{id}/entries": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /**
+     * Isi laporan penjualan mitra per SKU, penyebab selisih, file laporan mitra & BA bertanda tangan
+     * @description File diunggah lewat `/api/v1/files` dengan `ownerType=sales.consignment_partner_report` (laporan mitra) atau
+     *     `sales.consignment_ba` (BA bertanda tangan). Ditanggung oleh dihitung dari ketentuan selisih PKS.
+     */
+    put: operations["updateConsignmentReconciliation"]
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/consignment-reconciliations/{id}/submit": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Ajukan Berita Acara Rekonsiliasi ke approval (Sales MT → Head Finance & Accounting)
+     * @description Wajib BA bertanda tangan, sisa fisik ≤ saldo sistem, dan penyebab untuk setiap selisih. Disetujui level
+     *     terakhir → stok terjual & selisih keluar dari lokasi mitra, invoice konsinyasi (A-08) dan invoice selisih yang
+     *     ditagih ke mitra (A-23), selisih ditanggung Balans ke Beban Kehilangan Persediaan (A-23), status Diposting.
+     */
+    post: operations["submitConsignmentReconciliation"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/consignment-reconciliations/{id}/revise": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Revisi rekonsiliasi yang ditolak */
+    post: operations["reviseConsignmentReconciliation"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/api/v1/sales/consignment-reconciliations/{id}/cancel": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Batalkan rekonsiliasi Draft/Diproses */
+    post: operations["cancelConsignmentReconciliation"]
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/api/v1/webhooks/biteship": {
     parameters: {
       query?: never
@@ -7195,6 +7430,224 @@ export interface components {
       /** @description Kode akun Kas & Bank sumber pembayaran. */
       accountCode: string
       reference?: string
+    }
+    /** @enum {string} */
+    ConsignmentDeliveryStatus:
+      "draft" | "in_transit" | "completed" | "cancelled"
+    /**
+     * @description `consignment` ke lokasi konsinyasi mitra (A-07), `vending_buffer` ke buffer vending (A-24).
+     * @enum {string}
+     */
+    ConsignmentDeliveryType: "consignment" | "vending_buffer"
+    ConsignmentDeliverySummary: {
+      /** Format: uuid */
+      id: string
+      number?: string | null
+      deliveryType: components["schemas"]["ConsignmentDeliveryType"]
+      /** Format: uuid */
+      partnerId: string
+      partnerCode: string
+      partnerName: string
+      businessDate: components["schemas"]["BusinessDate"]
+      status: components["schemas"]["ConsignmentDeliveryStatus"]
+      transferNumber: string
+      costAmount: components["schemas"]["Money"]
+      version: number
+    }
+    ConsignmentDeliveryList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["ConsignmentDeliverySummary"][]
+    }
+    ConsignmentDeliveryLineInput: {
+      /** Format: uuid */
+      productId: string
+      qty: components["schemas"]["SalesQuantity"]
+      note?: string
+    }
+    ConsignmentDeliveryFields: {
+      /** Format: uuid */
+      fromLocationId: string
+      businessDate: components["schemas"]["BusinessDate"]
+      note?: string
+      lines: components["schemas"]["ConsignmentDeliveryLineInput"][]
+    }
+    ConsignmentDeliveryInput: components["schemas"]["ConsignmentDeliveryFields"] & {
+      deliveryType: components["schemas"]["ConsignmentDeliveryType"]
+      /** Format: uuid */
+      partnerId: string
+    }
+    ConsignmentDeliveryLine: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      product: components["schemas"]["SalesProductRef"]
+      /** Format: uuid */
+      batchId?: string | null
+      qty: string
+      costAmount: components["schemas"]["Money"]
+      note: string
+    }
+    ConsignmentDelivery: components["schemas"]["ConsignmentDeliverySummary"] & {
+      agreementNumber: string
+      fromLocation: components["schemas"]["SalesLocationRef"]
+      toLocation: components["schemas"]["SalesLocationRef"]
+      channelName: string
+      subChannelName: string
+      sourceType: string
+      /** Format: uuid */
+      transferId?: string | null
+      note: string
+      cancelReason: string
+      /** Format: date-time */
+      shippedAt?: string | null
+      /** Format: date-time */
+      receivedAt?: string | null
+      /** Format: date-time */
+      createdAt: string
+      createdByName: string
+      /** Format: date-time */
+      updatedAt: string
+      lines: components["schemas"]["ConsignmentDeliveryLine"][]
+      allowedActions: string[]
+    }
+    ConsignmentDeliveryUpdate: components["schemas"]["ConsignmentDeliveryFields"] &
+      components["schemas"]["VersionInput"]
+    /** @enum {string} */
+    ConsignmentReconciliationStatus:
+      | "draft"
+      | "in_progress"
+      | "pending_approval"
+      | "rejected"
+      | "posted"
+      | "cancelled"
+    ConsignmentReconciliationSummary: {
+      /** Format: uuid */
+      id: string
+      number?: string | null
+      /** Format: uuid */
+      partnerId: string
+      partnerCode: string
+      partnerName: string
+      periodStart?: components["schemas"]["BusinessDate"] | null
+      cutOffDate: components["schemas"]["BusinessDate"]
+      stockCountNumber: string
+      status: components["schemas"]["ConsignmentReconciliationStatus"]
+      salesAmount: components["schemas"]["Money"]
+      billedVarianceAmount: components["schemas"]["Money"]
+      version: number
+    }
+    ConsignmentReconciliationList: components["schemas"]["Pagination"] & {
+      items: components["schemas"]["ConsignmentReconciliationSummary"][]
+    }
+    ConsignmentReconciliationFields: {
+      cutOffDate: components["schemas"]["BusinessDate"]
+      /** Format: uuid */
+      stockCountId: string
+      note?: string
+    }
+    ConsignmentReconciliationInput: components["schemas"]["ConsignmentReconciliationFields"] & {
+      /** Format: uuid */
+      partnerId: string
+    }
+    /** @enum {string} */
+    ConsignmentBorneBy: "partner" | "balans"
+    ConsignmentVarianceRules: {
+      lost: components["schemas"]["ConsignmentBorneBy"]
+      partnerDamage: components["schemas"]["ConsignmentBorneBy"]
+      productDefect: components["schemas"]["ConsignmentBorneBy"]
+      nearExpiry: components["schemas"]["ConsignmentBorneBy"]
+    }
+    /**
+     * @description Penyebab selisih (BRD U-02).
+     * @enum {string}
+     */
+    ConsignmentVarianceCause:
+      "lost" | "partner_damage" | "product_defect" | "near_expiry"
+    ConsignmentReconciliationLine: {
+      /** Format: uuid */
+      id: string
+      lineNo: number
+      product: components["schemas"]["SalesProductRef"]
+      openingQty: string
+      deliveredQty: string
+      returnedQty: string
+      countedQty: string
+      /** @description Terjual sistem = stok awal + kiriman − tarikan − sisa fisik. */
+      soldQty: string
+      reportedQty: string
+      varianceQty: string
+      varianceCause?: components["schemas"]["ConsignmentVarianceCause"] | null
+      borneBy?: components["schemas"]["ConsignmentBorneBy"] | null
+      unitPrice: components["schemas"]["Money"]
+      priceRule: string
+      priceDescription: string
+      salesAmount: components["schemas"]["Money"]
+      varianceAmount: components["schemas"]["Money"]
+      costAmount: components["schemas"]["Money"]
+      varianceCostAmount: components["schemas"]["Money"]
+      note: string
+    }
+    ConsignmentReconciliation: components["schemas"]["ConsignmentReconciliationSummary"] & {
+      partnerAddress: string
+      agreementNumber: string
+      paymentTermDays: number
+      marginPercent?: string | null
+      varianceRules: components["schemas"]["ConsignmentVarianceRules"]
+      location: components["schemas"]["SalesLocationRef"]
+      channelName: string
+      subChannelName: string
+      /** Format: uuid */
+      stockCountId: string
+      /** Format: uuid */
+      partnerReportFileId?: string | null
+      partnerReportFileName: string
+      /** Format: uuid */
+      baFileId?: string | null
+      baFileName: string
+      note: string
+      absorbedVarianceCost: components["schemas"]["Money"]
+      costAmount: components["schemas"]["Money"]
+      /** Format: uuid */
+      invoiceId?: string | null
+      invoiceNumber: string
+      /** Format: uuid */
+      varianceInvoiceId?: string | null
+      varianceInvoiceNumber: string
+      /** Format: date-time */
+      submittedAt?: string | null
+      /** Format: date-time */
+      decidedAt?: string | null
+      decisionNote: string
+      /** Format: date-time */
+      postedAt?: string | null
+      cancelReason: string
+      /** Format: date-time */
+      createdAt: string
+      createdByName: string
+      /** Format: date-time */
+      updatedAt: string
+      lines: components["schemas"]["ConsignmentReconciliationLine"][]
+      allowedActions: string[]
+    }
+    ConsignmentReconciliationDraftUpdate: components["schemas"]["ConsignmentReconciliationFields"] &
+      components["schemas"]["VersionInput"]
+    ConsignmentReconciliationLineEntry: {
+      /** Format: uuid */
+      lineId: string
+      /** @description Qty terjual menurut laporan penjualan mitra. */
+      reportedQty: string
+      varianceCause?: components["schemas"]["ConsignmentVarianceCause"] | null
+      note?: string
+    }
+    ConsignmentReconciliationUpdate: {
+      version: number
+      lines?: components["schemas"]["ConsignmentReconciliationLineEntry"][]
+      /** @description true = laporan mitra dan BA diganti dengan nilai di bawah (kosong = dilepas). */
+      setFiles?: boolean
+      /** Format: uuid */
+      partnerReportFileId?: string | null
+      /** Format: uuid */
+      baFileId?: string | null
+      note?: string | null
     }
     /** @description Payload webhook status order Biteship (nama field milik Biteship). */
     BiteshipNotification: {
@@ -13728,6 +14181,463 @@ export interface operations {
         }
         content: {
           "application/json": components["schemas"]["CreditNote"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listConsignmentDeliveries: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["ConsignmentDeliveryStatus"]
+        deliveryType?: components["schemas"]["ConsignmentDeliveryType"]
+        partnerId?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Pengiriman terbaru lebih dulu */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ConsignmentDeliveryList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createConsignmentDelivery: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ConsignmentDeliveryInput"]
+      }
+    }
+    responses: {
+      /** @description Draft pengiriman */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ConsignmentDelivery"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getConsignmentDelivery: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Pengiriman */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ConsignmentDelivery"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateConsignmentDelivery: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ConsignmentDeliveryUpdate"]
+      }
+    }
+    responses: {
+      /** @description Pengiriman */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ConsignmentDelivery"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  shipConsignmentDelivery: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Pengiriman Dalam Pengiriman */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ConsignmentDelivery"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  receiveConsignmentDelivery: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Pengiriman Selesai */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ConsignmentDelivery"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  cancelConsignmentDelivery: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SalesCancelInput"]
+      }
+    }
+    responses: {
+      /** @description Pengiriman dibatalkan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ConsignmentDelivery"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  listConsignmentReconciliations: {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"]
+        pageSize?: components["parameters"]["PageSize"]
+        q?: components["parameters"]["Search"]
+        status?: components["schemas"]["ConsignmentReconciliationStatus"]
+        partnerId?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Cut-off terbaru lebih dulu */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ConsignmentReconciliationList"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  createConsignmentReconciliation: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ConsignmentReconciliationInput"]
+      }
+    }
+    responses: {
+      /** @description Draft rekonsiliasi */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ConsignmentReconciliation"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  getConsignmentReconciliation: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Rekonsiliasi */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ConsignmentReconciliation"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateConsignmentReconciliationDraft: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ConsignmentReconciliationDraftUpdate"]
+      }
+    }
+    responses: {
+      /** @description Rekonsiliasi */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ConsignmentReconciliation"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  startConsignmentReconciliation: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Rekonsiliasi Diproses */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ConsignmentReconciliation"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  updateConsignmentReconciliation: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ConsignmentReconciliationUpdate"]
+      }
+    }
+    responses: {
+      /** @description Rekonsiliasi */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ConsignmentReconciliation"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  submitConsignmentReconciliation: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Menunggu Persetujuan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ConsignmentReconciliation"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  reviseConsignmentReconciliation: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionInput"]
+      }
+    }
+    responses: {
+      /** @description Rekonsiliasi Diproses */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ConsignmentReconciliation"]
+        }
+      }
+      default: components["responses"]["Problem"]
+    }
+  }
+  cancelConsignmentReconciliation: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description UUID per percobaan submit (Technical Guideline 7.1). */
+        "Idempotency-Key": components["parameters"]["IdempotencyKey"]
+      }
+      path: {
+        id: components["parameters"]["Id"]
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SalesCancelInput"]
+      }
+    }
+    responses: {
+      /** @description Rekonsiliasi dibatalkan */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          "application/json": components["schemas"]["ConsignmentReconciliation"]
         }
       }
       default: components["responses"]["Problem"]

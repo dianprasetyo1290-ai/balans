@@ -54,6 +54,7 @@ func (a *App) buildSales(inbox *webhook.Inbox, reasons *returnReasonAdapter) (*m
 		Locations: salesLocations{a.warehouse}, Pricing: a.pricing, Stock: a.inventory, Ledger: salesLedger{a.accounting},
 		Approvals: a.approval, Numberer: salesNumberer{a.document}, Files: a.filestore,
 		Users: procurementUsers{a.identity}, BaseURL: cfg.PublicBaseURL,
+		Consignment: salesConsignment{a.warehouse}, Agreements: salesAgreements{a.party}, Flows: a.inventory,
 	})
 	reasons.sales = m
 	m.RegisterApprovalHandlers(a.approval)
@@ -67,6 +68,13 @@ func (a *App) buildSales(inbox *webhook.Inbox, reasons *returnReasonAdapter) (*m
 		OwnerType: sales.FileOwnerCustomerPaymentProof, WritePermission: "sales.invoice.post",
 		ReadPermission: sales.PermInvoiceRead, ContentTypes: images, MaxBytes: maxPaymentProofBytes,
 	})
+	// Berita Acara Rekonsiliasi bertanda tangan dan laporan penjualan mitra (foto/scan/PDF).
+	for _, owner := range []string{sales.FileOwnerConsignmentBA, sales.FileOwnerConsignmentReport} {
+		a.filestore.RegisterOwner(filestore.OwnerPolicy{
+			OwnerType: owner, WritePermission: "sales.consignment_reconciliation.write",
+			ReadPermission: sales.PermReconciliationRead, ContentTypes: images, MaxBytes: maxPaymentProofBytes,
+		})
+	}
 	if a.dataexchange != nil {
 		s := spec(sales.MarketplaceImportKind, "Penjualan Marketplace", "Penjualan Marketplace", sales.MarketplaceColumns())
 		a.dataexchange.RegisterImporter(tableImporter{spec: s, apply: func(ctx context.Context, row tabular.Row) error {
@@ -299,6 +307,10 @@ func (n salesNumberer) Next(ctx context.Context, t sales.DocumentType, businessD
 		dt = document.TypeSalesReturn
 	case sales.DocCreditNote:
 		dt = document.TypeCreditNote
+	case sales.DocDeliveryOrder:
+		dt = document.TypeDeliveryOrder
+	case sales.DocReconciliation:
+		dt = document.TypeConsignmentReconciliation
 	default:
 		return "", fmt.Errorf("jenis nomor dokumen sales %q tidak dikenal", t)
 	}

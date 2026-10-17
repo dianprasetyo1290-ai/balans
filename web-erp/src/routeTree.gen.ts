@@ -102,6 +102,9 @@ import { Route as AppProcurementPurchaseReturnsIndexRouteImport } from './routes
 import { Route as AppProcurementPurchaseReturnsNewRouteImport } from './routes/_app/procurement/purchase-returns/new'
 import { Route as AppProcurementSupplierBillsIndexRouteImport } from './routes/_app/procurement/supplier-bills/index'
 import { Route as AppProcurementSupplierBillsNewRouteImport } from './routes/_app/procurement/supplier-bills/new'
+import { Route as AppSalesConsignmentReconciliationsIndexRouteImport } from './routes/_app/sales/consignment-reconciliations/index'
+import { Route as AppSalesConsignmentsIndexRouteImport } from './routes/_app/sales/consignments/index'
+import { Route as AppSalesConsignmentsIdRouteImport } from './routes/_app/sales/consignments/$id'
 import { Route as AppSalesCreditNotesIndexRouteImport } from './routes/_app/sales/credit-notes/index'
 import { Route as AppSalesInvoicesIndexRouteImport } from './routes/_app/sales/invoices/index'
 import { Route as AppSalesOrdersIndexRouteImport } from './routes/_app/sales/orders/index'
@@ -145,6 +148,8 @@ import { Route as AppProcurementPurchaseReturnsIdIndexRouteImport } from './rout
 import { Route as AppProcurementPurchaseReturnsIdEditRouteImport } from './routes/_app/procurement/purchase-returns/$id.edit'
 import { Route as AppProcurementSupplierBillsIdIndexRouteImport } from './routes/_app/procurement/supplier-bills/$id.index'
 import { Route as AppProcurementSupplierBillsIdEditRouteImport } from './routes/_app/procurement/supplier-bills/$id.edit'
+import { Route as AppSalesConsignmentReconciliationsIdIndexRouteImport } from './routes/_app/sales/consignment-reconciliations/$id.index'
+import { Route as AppSalesConsignmentReconciliationsIdPrintRouteImport } from './routes/_app/sales/consignment-reconciliations/$id.print'
 import { Route as AppSalesCreditNotesIdIndexRouteImport } from './routes/_app/sales/credit-notes/$id.index'
 import { Route as AppSalesInvoicesIdIndexRouteImport } from './routes/_app/sales/invoices/$id.index'
 import { Route as AppSalesInvoicesIdPrintRouteImport } from './routes/_app/sales/invoices/$id.print'
@@ -663,6 +668,23 @@ const AppProcurementSupplierBillsNewRoute =
     path: '/procurement/supplier-bills/new',
     getParentRoute: () => AppRoute,
   } as any)
+const AppSalesConsignmentReconciliationsIndexRoute =
+  AppSalesConsignmentReconciliationsIndexRouteImport.update({
+    id: '/sales/consignment-reconciliations/',
+    path: '/sales/consignment-reconciliations/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppSalesConsignmentsIndexRoute =
+  AppSalesConsignmentsIndexRouteImport.update({
+    id: '/sales/consignments/',
+    path: '/sales/consignments/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppSalesConsignmentsIdRoute = AppSalesConsignmentsIdRouteImport.update({
+  id: '/sales/consignments/$id',
+  path: '/sales/consignments/$id',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppSalesCreditNotesIndexRoute =
   AppSalesCreditNotesIndexRouteImport.update({
     id: '/sales/credit-notes/',
@@ -914,6 +936,18 @@ const AppProcurementSupplierBillsIdEditRoute =
     path: '/procurement/supplier-bills/$id/edit',
     getParentRoute: () => AppRoute,
   } as any)
+const AppSalesConsignmentReconciliationsIdIndexRoute =
+  AppSalesConsignmentReconciliationsIdIndexRouteImport.update({
+    id: '/sales/consignment-reconciliations/$id/',
+    path: '/sales/consignment-reconciliations/$id/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppSalesConsignmentReconciliationsIdPrintRoute =
+  AppSalesConsignmentReconciliationsIdPrintRouteImport.update({
+    id: '/sales/consignment-reconciliations/$id/print',
+    path: '/sales/consignment-reconciliations/$id/print',
+    getParentRoute: () => AppRoute,
+  } as any)
 const AppSalesCreditNotesIdIndexRoute =
   AppSalesCreditNotesIdIndexRouteImport.update({
     id: '/sales/credit-notes/$id/',
@@ -1056,6 +1090,7 @@ export interface FileRoutesByFullPath {
   '/procurement/purchase-requests/new': typeof AppProcurementPurchaseRequestsNewRoute
   '/procurement/purchase-returns/new': typeof AppProcurementPurchaseReturnsNewRoute
   '/procurement/supplier-bills/new': typeof AppProcurementSupplierBillsNewRoute
+  '/sales/consignments/$id': typeof AppSalesConsignmentsIdRoute
   '/sales/orders/new': typeof AppSalesOrdersNewRoute
   '/sales/returns/new': typeof AppSalesReturnsNewRoute
   '/warehouse/inbounds/$id': typeof AppWarehouseInboundsIdRoute
@@ -1081,6 +1116,8 @@ export interface FileRoutesByFullPath {
   '/procurement/purchase-requests/': typeof AppProcurementPurchaseRequestsIndexRoute
   '/procurement/purchase-returns/': typeof AppProcurementPurchaseReturnsIndexRoute
   '/procurement/supplier-bills/': typeof AppProcurementSupplierBillsIndexRoute
+  '/sales/consignment-reconciliations/': typeof AppSalesConsignmentReconciliationsIndexRoute
+  '/sales/consignments/': typeof AppSalesConsignmentsIndexRoute
   '/sales/credit-notes/': typeof AppSalesCreditNotesIndexRoute
   '/sales/invoices/': typeof AppSalesInvoicesIndexRoute
   '/sales/orders/': typeof AppSalesOrdersIndexRoute
@@ -1105,6 +1142,7 @@ export interface FileRoutesByFullPath {
   '/procurement/purchase-requests/$id/edit': typeof AppProcurementPurchaseRequestsIdEditRoute
   '/procurement/purchase-returns/$id/edit': typeof AppProcurementPurchaseReturnsIdEditRoute
   '/procurement/supplier-bills/$id/edit': typeof AppProcurementSupplierBillsIdEditRoute
+  '/sales/consignment-reconciliations/$id/print': typeof AppSalesConsignmentReconciliationsIdPrintRoute
   '/sales/invoices/$id/print': typeof AppSalesInvoicesIdPrintRoute
   '/sales/orders/$id/edit': typeof AppSalesOrdersIdEditRoute
   '/sales/proforma-invoices/$id/print': typeof AppSalesProformaInvoicesIdPrintRoute
@@ -1122,6 +1160,7 @@ export interface FileRoutesByFullPath {
   '/procurement/purchase-requests/$id/': typeof AppProcurementPurchaseRequestsIdIndexRoute
   '/procurement/purchase-returns/$id/': typeof AppProcurementPurchaseReturnsIdIndexRoute
   '/procurement/supplier-bills/$id/': typeof AppProcurementSupplierBillsIdIndexRoute
+  '/sales/consignment-reconciliations/$id/': typeof AppSalesConsignmentReconciliationsIdIndexRoute
   '/sales/credit-notes/$id/': typeof AppSalesCreditNotesIdIndexRoute
   '/sales/invoices/$id/': typeof AppSalesInvoicesIdIndexRoute
   '/sales/orders/$id/': typeof AppSalesOrdersIdIndexRoute
@@ -1205,6 +1244,7 @@ export interface FileRoutesByTo {
   '/procurement/purchase-requests/new': typeof AppProcurementPurchaseRequestsNewRoute
   '/procurement/purchase-returns/new': typeof AppProcurementPurchaseReturnsNewRoute
   '/procurement/supplier-bills/new': typeof AppProcurementSupplierBillsNewRoute
+  '/sales/consignments/$id': typeof AppSalesConsignmentsIdRoute
   '/sales/orders/new': typeof AppSalesOrdersNewRoute
   '/sales/returns/new': typeof AppSalesReturnsNewRoute
   '/warehouse/inbounds/$id': typeof AppWarehouseInboundsIdRoute
@@ -1230,6 +1270,8 @@ export interface FileRoutesByTo {
   '/procurement/purchase-requests': typeof AppProcurementPurchaseRequestsIndexRoute
   '/procurement/purchase-returns': typeof AppProcurementPurchaseReturnsIndexRoute
   '/procurement/supplier-bills': typeof AppProcurementSupplierBillsIndexRoute
+  '/sales/consignment-reconciliations': typeof AppSalesConsignmentReconciliationsIndexRoute
+  '/sales/consignments': typeof AppSalesConsignmentsIndexRoute
   '/sales/credit-notes': typeof AppSalesCreditNotesIndexRoute
   '/sales/invoices': typeof AppSalesInvoicesIndexRoute
   '/sales/orders': typeof AppSalesOrdersIndexRoute
@@ -1254,6 +1296,7 @@ export interface FileRoutesByTo {
   '/procurement/purchase-requests/$id/edit': typeof AppProcurementPurchaseRequestsIdEditRoute
   '/procurement/purchase-returns/$id/edit': typeof AppProcurementPurchaseReturnsIdEditRoute
   '/procurement/supplier-bills/$id/edit': typeof AppProcurementSupplierBillsIdEditRoute
+  '/sales/consignment-reconciliations/$id/print': typeof AppSalesConsignmentReconciliationsIdPrintRoute
   '/sales/invoices/$id/print': typeof AppSalesInvoicesIdPrintRoute
   '/sales/orders/$id/edit': typeof AppSalesOrdersIdEditRoute
   '/sales/proforma-invoices/$id/print': typeof AppSalesProformaInvoicesIdPrintRoute
@@ -1271,6 +1314,7 @@ export interface FileRoutesByTo {
   '/procurement/purchase-requests/$id': typeof AppProcurementPurchaseRequestsIdIndexRoute
   '/procurement/purchase-returns/$id': typeof AppProcurementPurchaseReturnsIdIndexRoute
   '/procurement/supplier-bills/$id': typeof AppProcurementSupplierBillsIdIndexRoute
+  '/sales/consignment-reconciliations/$id': typeof AppSalesConsignmentReconciliationsIdIndexRoute
   '/sales/credit-notes/$id': typeof AppSalesCreditNotesIdIndexRoute
   '/sales/invoices/$id': typeof AppSalesInvoicesIdIndexRoute
   '/sales/orders/$id': typeof AppSalesOrdersIdIndexRoute
@@ -1356,6 +1400,7 @@ export interface FileRoutesById {
   '/_app/procurement/purchase-requests/new': typeof AppProcurementPurchaseRequestsNewRoute
   '/_app/procurement/purchase-returns/new': typeof AppProcurementPurchaseReturnsNewRoute
   '/_app/procurement/supplier-bills/new': typeof AppProcurementSupplierBillsNewRoute
+  '/_app/sales/consignments/$id': typeof AppSalesConsignmentsIdRoute
   '/_app/sales/orders/new': typeof AppSalesOrdersNewRoute
   '/_app/sales/returns/new': typeof AppSalesReturnsNewRoute
   '/_app/warehouse/inbounds/$id': typeof AppWarehouseInboundsIdRoute
@@ -1381,6 +1426,8 @@ export interface FileRoutesById {
   '/_app/procurement/purchase-requests/': typeof AppProcurementPurchaseRequestsIndexRoute
   '/_app/procurement/purchase-returns/': typeof AppProcurementPurchaseReturnsIndexRoute
   '/_app/procurement/supplier-bills/': typeof AppProcurementSupplierBillsIndexRoute
+  '/_app/sales/consignment-reconciliations/': typeof AppSalesConsignmentReconciliationsIndexRoute
+  '/_app/sales/consignments/': typeof AppSalesConsignmentsIndexRoute
   '/_app/sales/credit-notes/': typeof AppSalesCreditNotesIndexRoute
   '/_app/sales/invoices/': typeof AppSalesInvoicesIndexRoute
   '/_app/sales/orders/': typeof AppSalesOrdersIndexRoute
@@ -1405,6 +1452,7 @@ export interface FileRoutesById {
   '/_app/procurement/purchase-requests/$id/edit': typeof AppProcurementPurchaseRequestsIdEditRoute
   '/_app/procurement/purchase-returns/$id/edit': typeof AppProcurementPurchaseReturnsIdEditRoute
   '/_app/procurement/supplier-bills/$id/edit': typeof AppProcurementSupplierBillsIdEditRoute
+  '/_app/sales/consignment-reconciliations/$id/print': typeof AppSalesConsignmentReconciliationsIdPrintRoute
   '/_app/sales/invoices/$id/print': typeof AppSalesInvoicesIdPrintRoute
   '/_app/sales/orders/$id/edit': typeof AppSalesOrdersIdEditRoute
   '/_app/sales/proforma-invoices/$id/print': typeof AppSalesProformaInvoicesIdPrintRoute
@@ -1422,6 +1470,7 @@ export interface FileRoutesById {
   '/_app/procurement/purchase-requests/$id/': typeof AppProcurementPurchaseRequestsIdIndexRoute
   '/_app/procurement/purchase-returns/$id/': typeof AppProcurementPurchaseReturnsIdIndexRoute
   '/_app/procurement/supplier-bills/$id/': typeof AppProcurementSupplierBillsIdIndexRoute
+  '/_app/sales/consignment-reconciliations/$id/': typeof AppSalesConsignmentReconciliationsIdIndexRoute
   '/_app/sales/credit-notes/$id/': typeof AppSalesCreditNotesIdIndexRoute
   '/_app/sales/invoices/$id/': typeof AppSalesInvoicesIdIndexRoute
   '/_app/sales/orders/$id/': typeof AppSalesOrdersIdIndexRoute
@@ -1507,6 +1556,7 @@ export interface FileRouteTypes {
     | '/procurement/purchase-requests/new'
     | '/procurement/purchase-returns/new'
     | '/procurement/supplier-bills/new'
+    | '/sales/consignments/$id'
     | '/sales/orders/new'
     | '/sales/returns/new'
     | '/warehouse/inbounds/$id'
@@ -1532,6 +1582,8 @@ export interface FileRouteTypes {
     | '/procurement/purchase-requests/'
     | '/procurement/purchase-returns/'
     | '/procurement/supplier-bills/'
+    | '/sales/consignment-reconciliations/'
+    | '/sales/consignments/'
     | '/sales/credit-notes/'
     | '/sales/invoices/'
     | '/sales/orders/'
@@ -1556,6 +1608,7 @@ export interface FileRouteTypes {
     | '/procurement/purchase-requests/$id/edit'
     | '/procurement/purchase-returns/$id/edit'
     | '/procurement/supplier-bills/$id/edit'
+    | '/sales/consignment-reconciliations/$id/print'
     | '/sales/invoices/$id/print'
     | '/sales/orders/$id/edit'
     | '/sales/proforma-invoices/$id/print'
@@ -1573,6 +1626,7 @@ export interface FileRouteTypes {
     | '/procurement/purchase-requests/$id/'
     | '/procurement/purchase-returns/$id/'
     | '/procurement/supplier-bills/$id/'
+    | '/sales/consignment-reconciliations/$id/'
     | '/sales/credit-notes/$id/'
     | '/sales/invoices/$id/'
     | '/sales/orders/$id/'
@@ -1656,6 +1710,7 @@ export interface FileRouteTypes {
     | '/procurement/purchase-requests/new'
     | '/procurement/purchase-returns/new'
     | '/procurement/supplier-bills/new'
+    | '/sales/consignments/$id'
     | '/sales/orders/new'
     | '/sales/returns/new'
     | '/warehouse/inbounds/$id'
@@ -1681,6 +1736,8 @@ export interface FileRouteTypes {
     | '/procurement/purchase-requests'
     | '/procurement/purchase-returns'
     | '/procurement/supplier-bills'
+    | '/sales/consignment-reconciliations'
+    | '/sales/consignments'
     | '/sales/credit-notes'
     | '/sales/invoices'
     | '/sales/orders'
@@ -1705,6 +1762,7 @@ export interface FileRouteTypes {
     | '/procurement/purchase-requests/$id/edit'
     | '/procurement/purchase-returns/$id/edit'
     | '/procurement/supplier-bills/$id/edit'
+    | '/sales/consignment-reconciliations/$id/print'
     | '/sales/invoices/$id/print'
     | '/sales/orders/$id/edit'
     | '/sales/proforma-invoices/$id/print'
@@ -1722,6 +1780,7 @@ export interface FileRouteTypes {
     | '/procurement/purchase-requests/$id'
     | '/procurement/purchase-returns/$id'
     | '/procurement/supplier-bills/$id'
+    | '/sales/consignment-reconciliations/$id'
     | '/sales/credit-notes/$id'
     | '/sales/invoices/$id'
     | '/sales/orders/$id'
@@ -1806,6 +1865,7 @@ export interface FileRouteTypes {
     | '/_app/procurement/purchase-requests/new'
     | '/_app/procurement/purchase-returns/new'
     | '/_app/procurement/supplier-bills/new'
+    | '/_app/sales/consignments/$id'
     | '/_app/sales/orders/new'
     | '/_app/sales/returns/new'
     | '/_app/warehouse/inbounds/$id'
@@ -1831,6 +1891,8 @@ export interface FileRouteTypes {
     | '/_app/procurement/purchase-requests/'
     | '/_app/procurement/purchase-returns/'
     | '/_app/procurement/supplier-bills/'
+    | '/_app/sales/consignment-reconciliations/'
+    | '/_app/sales/consignments/'
     | '/_app/sales/credit-notes/'
     | '/_app/sales/invoices/'
     | '/_app/sales/orders/'
@@ -1855,6 +1917,7 @@ export interface FileRouteTypes {
     | '/_app/procurement/purchase-requests/$id/edit'
     | '/_app/procurement/purchase-returns/$id/edit'
     | '/_app/procurement/supplier-bills/$id/edit'
+    | '/_app/sales/consignment-reconciliations/$id/print'
     | '/_app/sales/invoices/$id/print'
     | '/_app/sales/orders/$id/edit'
     | '/_app/sales/proforma-invoices/$id/print'
@@ -1872,6 +1935,7 @@ export interface FileRouteTypes {
     | '/_app/procurement/purchase-requests/$id/'
     | '/_app/procurement/purchase-returns/$id/'
     | '/_app/procurement/supplier-bills/$id/'
+    | '/_app/sales/consignment-reconciliations/$id/'
     | '/_app/sales/credit-notes/$id/'
     | '/_app/sales/invoices/$id/'
     | '/_app/sales/orders/$id/'
@@ -2542,6 +2606,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProcurementSupplierBillsNewRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/sales/consignment-reconciliations/': {
+      id: '/_app/sales/consignment-reconciliations/'
+      path: '/sales/consignment-reconciliations'
+      fullPath: '/sales/consignment-reconciliations/'
+      preLoaderRoute: typeof AppSalesConsignmentReconciliationsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/sales/consignments/': {
+      id: '/_app/sales/consignments/'
+      path: '/sales/consignments'
+      fullPath: '/sales/consignments/'
+      preLoaderRoute: typeof AppSalesConsignmentsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/sales/consignments/$id': {
+      id: '/_app/sales/consignments/$id'
+      path: '/sales/consignments/$id'
+      fullPath: '/sales/consignments/$id'
+      preLoaderRoute: typeof AppSalesConsignmentsIdRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/sales/credit-notes/': {
       id: '/_app/sales/credit-notes/'
       path: '/sales/credit-notes'
@@ -2843,6 +2928,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProcurementSupplierBillsIdEditRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/sales/consignment-reconciliations/$id/': {
+      id: '/_app/sales/consignment-reconciliations/$id/'
+      path: '/sales/consignment-reconciliations/$id'
+      fullPath: '/sales/consignment-reconciliations/$id/'
+      preLoaderRoute: typeof AppSalesConsignmentReconciliationsIdIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/sales/consignment-reconciliations/$id/print': {
+      id: '/_app/sales/consignment-reconciliations/$id/print'
+      path: '/sales/consignment-reconciliations/$id/print'
+      fullPath: '/sales/consignment-reconciliations/$id/print'
+      preLoaderRoute: typeof AppSalesConsignmentReconciliationsIdPrintRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/sales/credit-notes/$id/': {
       id: '/_app/sales/credit-notes/$id/'
       path: '/sales/credit-notes/$id'
@@ -3001,6 +3100,7 @@ interface AppRouteChildren {
   AppProcurementPurchaseRequestsNewRoute: typeof AppProcurementPurchaseRequestsNewRoute
   AppProcurementPurchaseReturnsNewRoute: typeof AppProcurementPurchaseReturnsNewRoute
   AppProcurementSupplierBillsNewRoute: typeof AppProcurementSupplierBillsNewRoute
+  AppSalesConsignmentsIdRoute: typeof AppSalesConsignmentsIdRoute
   AppSalesOrdersNewRoute: typeof AppSalesOrdersNewRoute
   AppSalesReturnsNewRoute: typeof AppSalesReturnsNewRoute
   AppWarehouseInboundsIdRoute: typeof AppWarehouseInboundsIdRoute
@@ -3026,6 +3126,8 @@ interface AppRouteChildren {
   AppProcurementPurchaseRequestsIndexRoute: typeof AppProcurementPurchaseRequestsIndexRoute
   AppProcurementPurchaseReturnsIndexRoute: typeof AppProcurementPurchaseReturnsIndexRoute
   AppProcurementSupplierBillsIndexRoute: typeof AppProcurementSupplierBillsIndexRoute
+  AppSalesConsignmentReconciliationsIndexRoute: typeof AppSalesConsignmentReconciliationsIndexRoute
+  AppSalesConsignmentsIndexRoute: typeof AppSalesConsignmentsIndexRoute
   AppSalesCreditNotesIndexRoute: typeof AppSalesCreditNotesIndexRoute
   AppSalesInvoicesIndexRoute: typeof AppSalesInvoicesIndexRoute
   AppSalesOrdersIndexRoute: typeof AppSalesOrdersIndexRoute
@@ -3050,6 +3152,7 @@ interface AppRouteChildren {
   AppProcurementPurchaseRequestsIdEditRoute: typeof AppProcurementPurchaseRequestsIdEditRoute
   AppProcurementPurchaseReturnsIdEditRoute: typeof AppProcurementPurchaseReturnsIdEditRoute
   AppProcurementSupplierBillsIdEditRoute: typeof AppProcurementSupplierBillsIdEditRoute
+  AppSalesConsignmentReconciliationsIdPrintRoute: typeof AppSalesConsignmentReconciliationsIdPrintRoute
   AppSalesInvoicesIdPrintRoute: typeof AppSalesInvoicesIdPrintRoute
   AppSalesOrdersIdEditRoute: typeof AppSalesOrdersIdEditRoute
   AppSalesProformaInvoicesIdPrintRoute: typeof AppSalesProformaInvoicesIdPrintRoute
@@ -3067,6 +3170,7 @@ interface AppRouteChildren {
   AppProcurementPurchaseRequestsIdIndexRoute: typeof AppProcurementPurchaseRequestsIdIndexRoute
   AppProcurementPurchaseReturnsIdIndexRoute: typeof AppProcurementPurchaseReturnsIdIndexRoute
   AppProcurementSupplierBillsIdIndexRoute: typeof AppProcurementSupplierBillsIdIndexRoute
+  AppSalesConsignmentReconciliationsIdIndexRoute: typeof AppSalesConsignmentReconciliationsIdIndexRoute
   AppSalesCreditNotesIdIndexRoute: typeof AppSalesCreditNotesIdIndexRoute
   AppSalesInvoicesIdIndexRoute: typeof AppSalesInvoicesIdIndexRoute
   AppSalesOrdersIdIndexRoute: typeof AppSalesOrdersIdIndexRoute
@@ -3148,6 +3252,7 @@ const AppRouteChildren: AppRouteChildren = {
     AppProcurementPurchaseRequestsNewRoute,
   AppProcurementPurchaseReturnsNewRoute: AppProcurementPurchaseReturnsNewRoute,
   AppProcurementSupplierBillsNewRoute: AppProcurementSupplierBillsNewRoute,
+  AppSalesConsignmentsIdRoute: AppSalesConsignmentsIdRoute,
   AppSalesOrdersNewRoute: AppSalesOrdersNewRoute,
   AppSalesReturnsNewRoute: AppSalesReturnsNewRoute,
   AppWarehouseInboundsIdRoute: AppWarehouseInboundsIdRoute,
@@ -3179,6 +3284,9 @@ const AppRouteChildren: AppRouteChildren = {
   AppProcurementPurchaseReturnsIndexRoute:
     AppProcurementPurchaseReturnsIndexRoute,
   AppProcurementSupplierBillsIndexRoute: AppProcurementSupplierBillsIndexRoute,
+  AppSalesConsignmentReconciliationsIndexRoute:
+    AppSalesConsignmentReconciliationsIndexRoute,
+  AppSalesConsignmentsIndexRoute: AppSalesConsignmentsIndexRoute,
   AppSalesCreditNotesIndexRoute: AppSalesCreditNotesIndexRoute,
   AppSalesInvoicesIndexRoute: AppSalesInvoicesIndexRoute,
   AppSalesOrdersIndexRoute: AppSalesOrdersIndexRoute,
@@ -3212,6 +3320,8 @@ const AppRouteChildren: AppRouteChildren = {
     AppProcurementPurchaseReturnsIdEditRoute,
   AppProcurementSupplierBillsIdEditRoute:
     AppProcurementSupplierBillsIdEditRoute,
+  AppSalesConsignmentReconciliationsIdPrintRoute:
+    AppSalesConsignmentReconciliationsIdPrintRoute,
   AppSalesInvoicesIdPrintRoute: AppSalesInvoicesIdPrintRoute,
   AppSalesOrdersIdEditRoute: AppSalesOrdersIdEditRoute,
   AppSalesProformaInvoicesIdPrintRoute: AppSalesProformaInvoicesIdPrintRoute,
@@ -3237,6 +3347,8 @@ const AppRouteChildren: AppRouteChildren = {
     AppProcurementPurchaseReturnsIdIndexRoute,
   AppProcurementSupplierBillsIdIndexRoute:
     AppProcurementSupplierBillsIdIndexRoute,
+  AppSalesConsignmentReconciliationsIdIndexRoute:
+    AppSalesConsignmentReconciliationsIdIndexRoute,
   AppSalesCreditNotesIdIndexRoute: AppSalesCreditNotesIdIndexRoute,
   AppSalesInvoicesIdIndexRoute: AppSalesInvoicesIdIndexRoute,
   AppSalesOrdersIdIndexRoute: AppSalesOrdersIdIndexRoute,
