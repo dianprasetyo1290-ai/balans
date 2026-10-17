@@ -364,7 +364,12 @@ export const MENU: MenuGroup[] = [
         permission: "sales.sales_order.read",
         module: "sales",
       },
-      { label: "Konsinyasi" },
+      {
+        label: "Konsinyasi",
+        to: "/sales/consignments",
+        permission: ["sales.sales_order.read", "logistics.delivery_order.read"],
+        module: "sales",
+      },
       {
         label: "Penjualan Marketplace",
         to: "/sales/marketplace",
@@ -395,7 +400,13 @@ export const MENU: MenuGroup[] = [
         permission: ["sales.invoice.read", "accounting.payment.read"],
         module: "sales",
       },
-      ...items("Retur Penjualan", "Nota Kredit", "Rekonsiliasi Konsinyasi"),
+      ...items("Retur Penjualan", "Nota Kredit"),
+      {
+        label: "Rekonsiliasi Konsinyasi",
+        to: "/sales/consignment-reconciliations",
+        permission: "sales.consignment_reconciliation.read",
+        module: "sales",
+      },
       {
         label: "Harga & Diskon",
         to: "/sales/pricing",

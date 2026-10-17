@@ -95,6 +95,30 @@ paths:
     $ref: "./paths/sales.yaml#/customerPaymentCancel"
   /api/v1/sales/receivable-aging:
     $ref: "./paths/sales.yaml#/receivableAging"
+  /api/v1/sales/consignment-deliveries:
+    $ref: "./paths/sales_consignment.yaml#/consignmentDeliveries"
+  /api/v1/sales/consignment-deliveries/{id}:
+    $ref: "./paths/sales_consignment.yaml#/consignmentDelivery"
+  /api/v1/sales/consignment-deliveries/{id}/ship:
+    $ref: "./paths/sales_consignment.yaml#/consignmentDeliveryShip"
+  /api/v1/sales/consignment-deliveries/{id}/receive:
+    $ref: "./paths/sales_consignment.yaml#/consignmentDeliveryReceive"
+  /api/v1/sales/consignment-deliveries/{id}/cancel:
+    $ref: "./paths/sales_consignment.yaml#/consignmentDeliveryCancel"
+  /api/v1/sales/consignment-reconciliations:
+    $ref: "./paths/sales_consignment.yaml#/consignmentReconciliations"
+  /api/v1/sales/consignment-reconciliations/{id}:
+    $ref: "./paths/sales_consignment.yaml#/consignmentReconciliation"
+  /api/v1/sales/consignment-reconciliations/{id}/start:
+    $ref: "./paths/sales_consignment.yaml#/consignmentReconciliationStart"
+  /api/v1/sales/consignment-reconciliations/{id}/entries:
+    $ref: "./paths/sales_consignment.yaml#/consignmentReconciliationEntries"
+  /api/v1/sales/consignment-reconciliations/{id}/submit:
+    $ref: "./paths/sales_consignment.yaml#/consignmentReconciliationSubmit"
+  /api/v1/sales/consignment-reconciliations/{id}/revise:
+    $ref: "./paths/sales_consignment.yaml#/consignmentReconciliationRevise"
+  /api/v1/sales/consignment-reconciliations/{id}/cancel:
+    $ref: "./paths/sales_consignment.yaml#/consignmentReconciliationCancel"
   /api/v1/webhooks/biteship:
     $ref: "./paths/logistics.yaml#/biteshipWebhook"
   /api/v1/auth/login:

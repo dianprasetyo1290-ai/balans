@@ -47,6 +47,7 @@ type store interface {
 	EnsureBatch(ctx context.Context, b domain.Batch, actorID uuid.UUID) (domain.Batch, bool, error)
 	GetBatch(ctx context.Context, id uuid.UUID) (domain.Batch, error)
 	BatchesByIDs(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID]domain.Batch, error)
+	LocationFlows(ctx context.Context, q postgres.LocationFlowQuery) ([]domain.LocationFlow, error)
 	ListBatches(ctx context.Context, f postgres.BatchFilter, page paging.Page) (paging.Result[postgres.BatchSummary], error)
 
 	InsertPosting(ctx context.Context, src domain.Source, actorID uuid.UUID) (uuid.UUID, error)
