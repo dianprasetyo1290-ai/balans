@@ -23,6 +23,7 @@ import (
 	"balans/internal/integration/mockpayment"
 	"balans/internal/integration/mockshipment"
 	"balans/internal/integration/smtpmail"
+	"balans/internal/inventory"
 	"balans/internal/logistics"
 	"balans/internal/notification"
 	"balans/internal/party"
@@ -59,6 +60,7 @@ type App struct {
 	accounting  *accounting.Module
 	catalog     *catalog.Module
 	warehouse   *warehouse.Module
+	inventory   *inventory.Module
 	filestore   *filestore.Module
 	party       *party.Module
 	hris        *hris.Module
@@ -208,6 +210,20 @@ func (a *App) buildModules() error {
 	if err := a.buildMasterData(); err != nil {
 		return err
 	}
+	if cfg.IsEnabled(inventory.Name) {
+		if a.catalog == nil || a.warehouse == nil {
+			return errors.New("modul inventory membutuhkan modul catalog dan warehouse")
+		}
+		d := inventory.Deps{
+			Pool: a.Pool, Tx: a.Tx, Clock: a.Clock, Log: a.Log, Responder: a.Responder,
+			Products: a.catalog, Locations: a.warehouse,
+		}
+		if a.accounting != nil {
+			d.Periods = a.accounting
+		}
+		a.inventory = inventory.New(d)
+		a.modules = append(a.modules, a.inventory)
+	}
 	if cfg.IsEnabled(sales.Name) {
 		if cfg.PaymentGateway != config.ProviderMock {
 			return providerNotAvailable("PAYMENT_GATEWAY", cfg.PaymentGateway)
@@ -287,7 +303,12 @@ func (a *App) seedDevMasters(ctx context.Context) error {
 		}
 	}
 	if a.catalog != nil {
-		return a.catalog.SeedDev(ctx)
+		if err := a.catalog.SeedDev(ctx); err != nil {
+			return err
+		}
+	}
+	if a.inventory != nil && a.catalog != nil && a.warehouse != nil {
+		return a.seedDevStock(ctx)
 	}
 	return nil
 }

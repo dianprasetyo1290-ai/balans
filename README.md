@@ -24,7 +24,7 @@ POSTGRES_PORT=5432 SMTP_PORT=1025 MAILPIT_PORT=8025 docker compose -f deploy/com
 # 2. Backend (terminal 1 dan 2)
 cd backend
 export DATABASE_URL="postgres://balans:balans@localhost:5432/balans?sslmode=disable"
-export APP_ENV=local ENABLED_MODULES=identity,audit,notification,approval,document,accounting,catalog,warehouse,filestore,party,hris,sales,logistics
+export APP_ENV=local ENABLED_MODULES=identity,audit,notification,approval,document,accounting,catalog,warehouse,inventory,filestore,party,hris,sales,logistics
 export MIDTRANS_SERVER_KEY=local BITESHIP_WEBHOOK_SECRET=local
 export DEV_SKIP_MFA=true  # opsional, hanya local: login tanpa kode autentikator
 go run ./cmd/migrate up

@@ -128,6 +128,19 @@ type AuditLog struct {
 	CreatedAt   time.Time
 }
 
+type Batch struct {
+	ID             uuid.UUID
+	ProductID      uuid.UUID
+	BatchNumber    string
+	ProductionDate pgtype.Date
+	ExpiryDate     pgtype.Date
+	CreatedAt      time.Time
+	CreatedBy      uuid.UUID
+	UpdatedAt      time.Time
+	UpdatedBy      uuid.UUID
+	Version        int32
+}
+
 type Campaign struct {
 	ID           uuid.UUID
 	Code         string
@@ -158,6 +171,32 @@ type Channel struct {
 	Version   int32
 	DeletedAt *time.Time
 	DeletedBy uuid.NullUUID
+}
+
+type CostLayer struct {
+	ID           uuid.UUID
+	ProductID    uuid.UUID
+	BatchID      uuid.NullUUID
+	SourceType   string
+	SourceID     uuid.UUID
+	SourceLabel  string
+	MovementID   uuid.UUID
+	ReceivedQty  decimal.Decimal
+	RemainingQty decimal.Decimal
+	UnitCost     decimal.Decimal
+	BusinessDate clock.BusinessDate
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+}
+
+type CostLayerConsumption struct {
+	ID              uuid.UUID
+	CostLayerID     uuid.UUID
+	StockMovementID uuid.UUID
+	Qty             decimal.Decimal
+	UnitCost        decimal.Decimal
+	CreatedAt       time.Time
+	CreatedBy       uuid.UUID
 }
 
 type Customer struct {
@@ -672,6 +711,69 @@ type Session struct {
 	UserAgent        string
 	Ip               string
 	CreatedAt        time.Time
+}
+
+type StockBalance struct {
+	ID          uuid.UUID
+	ProductID   uuid.UUID
+	LocationID  uuid.UUID
+	BatchID     uuid.NullUUID
+	StockStatus string
+	Qty         decimal.Decimal
+	UpdatedAt   time.Time
+}
+
+type StockMovement struct {
+	ID                  uuid.UUID
+	PostingID           uuid.UUID
+	LineNo              int32
+	SourceType          string
+	SourceID            uuid.UUID
+	SourceLineID        uuid.NullUUID
+	BusinessDate        clock.BusinessDate
+	MovementType        string
+	ProductID           uuid.UUID
+	LocationID          uuid.UUID
+	BatchID             uuid.NullUUID
+	StockStatus         string
+	Qty                 decimal.Decimal
+	UnitCost            decimal.Decimal
+	CostAmount          decimal.Decimal
+	ReservationID       uuid.NullUUID
+	BatchOverrideReason pgtype.Text
+	Note                string
+	CreatedAt           time.Time
+	CreatedBy           uuid.UUID
+}
+
+type StockPosting struct {
+	ID           uuid.UUID
+	SourceType   string
+	SourceID     uuid.UUID
+	Action       string
+	SourceLabel  string
+	BusinessDate clock.BusinessDate
+	CreatedAt    time.Time
+	CreatedBy    uuid.UUID
+}
+
+type StockReservation struct {
+	ID           uuid.UUID
+	SourceType   string
+	SourceID     uuid.UUID
+	SourceLineID uuid.NullUUID
+	ProductID    uuid.UUID
+	LocationID   uuid.UUID
+	BatchID      uuid.NullUUID
+	ReservedQty  decimal.Decimal
+	ConsumedQty  decimal.Decimal
+	ReleasedQty  decimal.Decimal
+	ExpiresAt    *time.Time
+	CreatedAt    time.Time
+	CreatedBy    uuid.UUID
+	UpdatedAt    time.Time
+	UpdatedBy    uuid.UUID
+	Version      int32
 }
 
 type SubChannel struct {
